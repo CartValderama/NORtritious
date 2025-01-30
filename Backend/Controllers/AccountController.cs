@@ -19,6 +19,11 @@ public class AccountController : Controller
         _logger = logger;
     }
 
+    /// <summary>
+    ///     Example method for logging in.
+    /// </summary>
+    /// <param name="request">Takes email and password</param>
+    /// <returns>HTTP message OK on success, Unauthorized otherwise</returns>
     [HttpPost("login")]
     [AllowAnonymous]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
