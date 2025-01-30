@@ -16,14 +16,6 @@ obj/
 *.dylib
 *.pdb
 
-# Configuration files
-appsettings*.json
-secrets.json
-
-# Publish output
-wwwroot/
-dist/
-
 # Visual Studio specific
 .vs/
 .idea/
