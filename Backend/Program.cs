@@ -58,15 +58,27 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Events.OnRedirectToLogin = context =>
     {
-        // If the request is for an API endpoint, return 401 Unauthorized
+        // Handle unauthenticated requests
         if (context.Request.Path.StartsWithSegments("/api"))
         {
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
             return Task.CompletedTask;
         }
 
-        // Default behavior for non-API requests (e.g., Razor Pages)
-        context.Response.Redirect("/Account/Login");
+        context.Response.Redirect(context.RedirectUri);
+        return Task.CompletedTask;
+    };
+
+    options.Events.OnRedirectToAccessDenied = context =>
+    {
+        // Handle unauthorized requests (authenticated but insufficient permissions)
+        if (context.Request.Path.StartsWithSegments("/api"))
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            return Task.CompletedTask;
+        }
+
+        context.Response.Redirect(context.RedirectUri);
         return Task.CompletedTask;
     };
 });
@@ -110,6 +122,8 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     await RoleSeeder.SeedRolesAsync(services);
     await UserSeeder.SeedAdminUserAsync(services);
+    await UserSeeder.SeedProducerUserAsync(services);
+    await UserSeeder.SeedResearcherUserAsync(services);
 }
 
 // Configure the HTTP request pipeline.

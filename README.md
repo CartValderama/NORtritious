@@ -112,6 +112,12 @@ npm start
 
 ### API Endpoints
 
+| **Endpoint**          | **Method** | **Description** | **Authorization** |
+| --------------------- | ---------- | --------------- | ----------------- |
+| /api/Account/login    | POST       | User login      | Public            |
+| /api/Account/logout   | POST       | User logout     | Authenticated     |
+| /api/Account/authTest | GET        | Admin role test | Admin             |
+
 ### Frontend Usage
 
 - Access the application at `http://localhost:<port>`.
@@ -122,6 +128,12 @@ npm start
 
 ## 6 Roles and Permissions
 
+| **Role**       | **Permissions**           |
+| -------------- | ------------------------- |
+| **Admin**      | Read, Update, Delete      |
+| **Producer**   | Read, Add, Update, Delete |
+| **Researcher** | Read                      |
+
 ## 7 Authentication and Security
 
 - ASP.NET Identity for user management.
@@ -129,9 +141,47 @@ npm start
 - Role-Based Authorization.
 - MFA Support (to be implemented).
 
+### API Authentication and Authorization
+
+To ensure proper status codes for API requests:
+
+- **401 Unauthorized:** Returned when the user is unauthenticated (not logged in).
+- **403 Forbidden:** Returned when the user is authenticated but does not have the required permissions.
+
+This is achieved by configuring the application cookie settings in `Program.cs`:
+
+```csharp
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Events.OnRedirectToLogin = context =>
+    {
+        if (context.Request.Path.StartsWithSegments("/api"))
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return Task.CompletedTask;
+        }
+
+        context.Response.Redirect(context.RedirectUri);
+        return Task.CompletedTask;
+    };
+
+    options.Events.OnRedirectToAccessDenied = context =>
+    {
+        if (context.Request.Path.StartsWithSegments("/api"))
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            return Task.CompletedTask;
+        }
+
+        context.Response.Redirect(context.RedirectUri);
+        return Task.CompletedTask;
+    };
+});
+```
+
 ### Session Handling
 
-In the current repository `ApplicationRepository`, the login process uses `SignInManager.PasswordSignInAsync()`, which is a typical method in ASP.NET Core Identity for handling user authentication. Here’s how it works and what happens with the session:
+In the current repository `AccountRepository`, the login process uses `SignInManager.PasswordSignInAsync()`, which is a typical method in ASP.NET Core Identity for handling user authentication. Here’s how it works and what happens with the session:
 
 How `PasswordSignInAsync` Works:
 
@@ -147,6 +197,63 @@ How `PasswordSignInAsync` Works:
 ## 8 Development Notes
 
 ### Project Structure
+
+```bash
+├── Backend
+│   ├── Backend.csproj
+│   ├── Backend.sln
+│   ├── Controllers
+│   │   └── AccountController.cs
+│   ├── DAL
+│   │   ├── AccountRepository.cs
+│   │   ├── ApplicationDbContext.cs
+│   │   ├── IAccountRepository.cs
+│   │   └── Seed
+│   │       ├── RoleSeeder.cs
+│   │       └── UserSeeder.cs
+│   ├── DTO
+│   ├── Logs
+│   ├── Migrations
+│   │   ├── 20250129194901_InitialCreate.Designer.cs
+│   │   ├── 20250129194901_InitialCreate.cs
+│   │   └── ApplicationDbContextModelSnapshot.cs
+│   ├── Models
+│   │   └── ErrorViewModel.cs
+│   ├── Program.cs
+│   ├── Properties
+│   │   └── launchSettings.json
+│   ├── Services
+│   │   └── DummyEmailSender.cs
+│   ├── app.db
+│   ├── appsettings.Development.json
+│   ├── appsettings.json
+│   └── wwwroot
+│       ├── css
+│       ├── favicon.ico
+│       ├── js
+│       └── lib
+├── Frontend
+│   ├── README.md
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── node_modules
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── public
+│   │   └── vite.svg
+│   ├── src
+│   │   ├── App.css
+│   │   ├── App.tsx
+│   │   ├── assets
+│   │   ├── index.css
+│   │   ├── main.tsx
+│   │   └── vite-env.d.ts
+│   ├── tsconfig.app.json
+│   ├── tsconfig.json
+│   ├── tsconfig.node.json
+│   └── vite.config.ts
+└── README.md
+```
 
 ### Important Files
 
