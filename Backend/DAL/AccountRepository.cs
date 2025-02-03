@@ -4,13 +4,13 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Backend.DAL;
 
-public class ApplicationRepository : IApplicationRepository
+public class AccountRepository : IAccountRepository
 {
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly ApplicationDbContext _db;
-    private readonly ILogger<ApplicationRepository> _logger;
+    private readonly ILogger<AccountRepository> _logger;
 
-    public ApplicationRepository(SignInManager<IdentityUser> signInManager, ApplicationDbContext db, ILogger<ApplicationRepository> logger)
+    public AccountRepository(SignInManager<IdentityUser> signInManager, ApplicationDbContext db, ILogger<AccountRepository> logger)
     {
         _signInManager = signInManager;
         _db = db;

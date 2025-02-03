@@ -9,10 +9,10 @@ using Microsoft.AspNetCore.Authorization;
 public class AccountController : Controller
 {
     private readonly UserManager<IdentityUser> _userManager;
-    private readonly IApplicationRepository _applicationRepository;
+    private readonly IAccountRepository _applicationRepository;
     private readonly ILogger<AccountController> _logger;
 
-    public AccountController(UserManager<IdentityUser> userManager, IApplicationRepository applicationRepository, ILogger<AccountController> logger)
+    public AccountController(UserManager<IdentityUser> userManager, IAccountRepository applicationRepository, ILogger<AccountController> logger)
     {
         _userManager = userManager;
         _applicationRepository = applicationRepository;
