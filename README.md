@@ -35,3 +35,18 @@ Contains an out-of-the-box React application which has yet to be developed.
   "password": "Admin123!"
 }
 ```
+
+## 4 Login Session
+
+In the current repository `ApplicationRepository`, the login process uses `SignInManager.PasswordSignInAsync()`, which is a typical method in ASP.NET Core Identity for handling user authentication. Here’s how it works and what happens with the session:
+
+How `PasswordSignInAsync` Works:
+
+1. **User Lookup and Password Check:**
+   The method checks if the provided email and password match a user in the Identity store.
+2. **Session Persistence `isPersistent` Flag:**
+   We currently have `isPersistent: false`, which means that after closing the browser, the session is terminated. Setting it to `true` would create a persistent session cookie.
+3. **Lockout Handling:**
+   With `lockoutOnFailure: true`, failed login attempts can lock the user account based on Identity’s configuration.
+4. **Session Creation:**
+   If the login succeeds, ASP.NET Core Identity generates a secure, encrypted authentication cookie containing the user’s claims. This cookie is stored in the user’s browser and acts as the session state.

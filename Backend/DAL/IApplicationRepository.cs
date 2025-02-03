@@ -6,4 +6,5 @@ namespace Backend.DAL;
 public interface IApplicationRepository
 {
     Task<SignInResult> LoginAsync(string email, string password);
+    Task LogoutAsync();
 }

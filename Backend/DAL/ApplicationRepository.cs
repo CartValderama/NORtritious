@@ -40,5 +40,11 @@ public class ApplicationRepository : IApplicationRepository
 
         return result;
     }
+
+    public async Task LogoutAsync()
+    {
+        await _signInManager.SignOutAsync();
+        _logger.LogInformation("User logged out successfully.");
+    }
 }
 

@@ -38,15 +38,43 @@ public class AccountController : Controller
         }
 
         _logger.LogError("[AccountController] Login failed when executing _applicationRepository.LoginAsync()");
-        return Unauthorized(new { message = "Invalid email or password" });
+        return Unauthorized(new { message = "Invalid email or password!" });
     }
 
-    /*
+
     [HttpGet("authTest")]
     [Authorize(Policy = "RequireAdminRole")]
-    public async Task<IActionResult> AuthTest()
+    public IActionResult AuthTest()
     {
-        return null;
+        try
+        {
+            _logger.LogInformation("[AccountController] Auth test accessed by Admin user {user}.", User.Identity?.Name);
+            return Ok(new { message = "Access granted: You are an Admin!" });
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "[AccountController] Error during authTest execution.");
+            return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An unexpected error occurred!" });
+        }
+
     }
-    */
+
+    [HttpPost("logout")]
+    [Authorize]
+    public async Task<IActionResult> Logout()
+    {
+        try
+        {
+            await _applicationRepository.LogoutAsync();
+            _logger.LogInformation("[AccountController] User {User} logged out successfully.", User.Identity?.Name);
+            return Ok(new { message = "Logout successful!" });
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "[AccountController] Error during logout.");
+            return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An unexpected error occurred!" });
+        }
+
+    }
+
 }

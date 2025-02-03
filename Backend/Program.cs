@@ -53,6 +53,24 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
+// Configure application cookie behavior to ensure a 401 on unauthorized api calls
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Events.OnRedirectToLogin = context =>
+    {
+        // If the request is for an API endpoint, return 401 Unauthorized
+        if (context.Request.Path.StartsWithSegments("/api"))
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return Task.CompletedTask;
+        }
+
+        // Default behavior for non-API requests (e.g., Razor Pages)
+        context.Response.Redirect("/Account/Login");
+        return Task.CompletedTask;
+    };
+});
+
 // Add EmailSender
 builder.Services.AddSingleton<IEmailSender, DummyEmailSender>();
 
