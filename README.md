@@ -24,3 +24,14 @@ The backend contains:
 ## 2 Frontend
 
 Contains an out-of-the-box React application which has yet to be developed.
+
+## 3 API
+
+`AccountController` -> `Login` can be tested using the the seeded Admin json:
+
+```
+{
+  "email": "admin@example.com",
+  "password": "Admin123!"
+}
+```
