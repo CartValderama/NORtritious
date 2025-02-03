@@ -27,14 +27,19 @@ Contains an out-of-the-box React application which has yet to be developed.
 
 ## 3 API
 
-`AccountController` -> `Login` can be tested using the the seeded Admin json:
+- `login` can be tested using the the seeded Admin json:
 
-```
-{
+  ```
+  {
   "email": "admin@example.com",
   "password": "Admin123!"
-}
-```
+  }
+  ```
+
+  This stores an http-only cookie which keeps the session going until the tab or app i closed. It returns 200 OK on success and 401 Unauthorized otherwise.
+
+- `authTest` returnes 200 OK when Admin user is logged in, and 401 Unauthorized otherwise.
+- `logout` logs out any logged in user and returns 200 OK on success and 401 Unauthorized otherwise.
 
 ## 4 Login Session
 
