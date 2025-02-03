@@ -25,3 +25,7 @@ obj/
 node_modules/
 bower_components/
 packages/
+
+# SQLite temporary files
+*.db-shm
+*.db-wal
