@@ -22,6 +22,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers();
 
 // Add Repository
+builder.Services.AddScoped<IProductsRepository, ProductsRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
 // Add IdentityDbContext with SQLite

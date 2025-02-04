@@ -4,7 +4,7 @@ using Backend.DAL;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Authorization;
 
-[Route("api/[controller]")]
+[Route("api/account")]
 [ApiController]
 public class AccountController : Controller
 {
@@ -42,9 +42,9 @@ public class AccountController : Controller
     }
 
 
-    [HttpGet("authTest")]
+    [HttpGet("admin-role-test")]
     [Authorize(Policy = "RequireAdminRole")]
-    public IActionResult AuthTest()
+    public IActionResult AdminRoleTest()
     {
         try
         {

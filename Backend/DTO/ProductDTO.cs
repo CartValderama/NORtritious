@@ -1,8 +1,6 @@
-using Microsoft.AspNetCore.Identity;
-
-public class Product
+namespace Backend.DTO;
+public class ProductDTO
 {
-    public int ProductId { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Group { get; set; } = string.Empty;
     public string Type { get; set; } = string.Empty;
@@ -21,8 +19,4 @@ public class Product
     public decimal Fiber { get; set; }
     public decimal Protein { get; set; }
     public decimal Salt { get; set; }
-
-    // Foreign Key for User (CreatedBy)
-    public string UserId { get; set; } = string.Empty; // Foreign key for IdentityUser
-    public IdentityUser CreatedByUser { get; set; } = null!; // Navigation property to IdentityUser
 }
