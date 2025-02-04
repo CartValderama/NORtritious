@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250204104213_CreateProduct")]
+    partial class CreateProduct
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.1");
@@ -208,14 +211,11 @@ namespace Backend.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Product", b =>
+            modelBuilder.Entity("NutritionalInfo", b =>
                 {
-                    b.Property<int>("ProductId")
+                    b.Property<int>("NutritionalInfoId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
-
-                    b.Property<decimal>("AddedSugar")
-                        .HasColumnType("TEXT");
 
                     b.Property<decimal>("Calories")
                         .HasColumnType("TEXT");
@@ -223,14 +223,34 @@ namespace Backend.Migrations
                     b.Property<decimal>("Carbs")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("CreatedByUserId")
-                        .HasColumnType("TEXT");
-
                     b.Property<decimal>("Fat")
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("Fiber")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("Protein")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("Sugar")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("NutritionalInfoId");
+
+                    b.HasIndex("ProductId")
+                        .IsUnique();
+
+                    b.ToTable("NutritionalInfo");
+                });
+
+            modelBuilder.Entity("Product", b =>
+                {
+                    b.Property<int>("ProductId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Group")
                         .IsRequired()
@@ -253,17 +273,8 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal>("NatSugar")
-                        .HasColumnType("TEXT");
-
-                    b.Property<decimal>("Protein")
-                        .HasColumnType("TEXT");
-
-                    b.Property<decimal>("Salt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<decimal>("SatFat")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("NutritionalInfoId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -275,9 +286,9 @@ namespace Backend.Migrations
 
                     b.HasKey("ProductId");
 
-                    b.HasIndex("CreatedByUserId");
+                    b.HasIndex("UserId");
 
-                    b.ToTable("Products");
+                    b.ToTable("Product");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -331,13 +342,32 @@ namespace Backend.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("NutritionalInfo", b =>
+                {
+                    b.HasOne("Product", "Product")
+                        .WithOne("NutritionalInfo")
+                        .HasForeignKey("NutritionalInfo", "ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("Product", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "CreatedByUser")
                         .WithMany()
-                        .HasForeignKey("CreatedByUserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("CreatedByUser");
+                });
+
+            modelBuilder.Entity("Product", b =>
+                {
+                    b.Navigation("NutritionalInfo")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

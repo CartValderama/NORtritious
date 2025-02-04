@@ -7,8 +7,6 @@ This is the Bachelor project of:
 - Harald Hammershaug (s374171)
 - Gunnar Larsson (s375150)
 
-A web application for managing products in a centralized system, featuring user roles, secure authentication, and a React frontend.
-
 ## Table of Contents
 
 1. [Project Overview](#1-project-overview)
@@ -30,19 +28,20 @@ A web application for managing products in a centralized system, featuring user 
 
 ## 1 Project Overview
 
-Fremtidsmat is a web-based tool that allows producers, researchers, and administrators to register and manage food products in a secure environment. The system implements role-based access control and API endpoints for interacting with the backend.
+Fremtidsmat is a web-based tool that allows producers, researchers, and administrators to register and manage food products, as well as validate food standards certificates in a secure environment. The system implements role-based access control and API endpoints for interacting with the backend.
 
 ## 2 Features
 
 ### Backend Features
 
 - Entity Framework with SQLite Migrations and Identity set up.
-- Identity is set up with role and admin user seeding.
+- Identity is set up with role and test user seeding.
 - Logger for error handling.
-- DAL with Interface Repository, Repository and DbContext.
+- DAL with Interface Repositories, Repositories and DbContext.
 - DTO folder for React transfer objects.
-- Account controller containing a basic login test method.
-- Swagger for API exploring.
+- Account controller containing a basic login and logout test methods.
+- Products controller containing basic CRUD methods.
+- Swagger for API exploring in dev mode.
 
 ## 3 Technologies Used
 
@@ -50,7 +49,7 @@ Fremtidsmat is a web-based tool that allows producers, researchers, and administ
 - Frontend: React with Axios for API calls
 - Authentication: ASP.NET Identity with secure cookies
 - Database: Migrations on SQLite
-- API Testing: Swagger and Postman
+- API Testing: Swagger
 - Logging: Serilog
 - Version Control: GitHub
 
@@ -119,11 +118,16 @@ npm start
 
 ### API Endpoints
 
-| **Endpoint**          | **Method** | **Description** | **Authorization** |
-| --------------------- | ---------- | --------------- | ----------------- |
-| /api/Account/login    | POST       | User login      | Public            |
-| /api/Account/logout   | POST       | User logout     | Authenticated     |
-| /api/Account/authTest | GET        | Admin role test | Admin             |
+| **Endpoint**                 | **Method** | **Description**    | **Authorization** |
+| ---------------------------- | ---------- | ------------------ | ----------------- |
+| /api/account/login           | POST       | User login         | Public            |
+| /api/account/logout          | POST       | User logout        | Authenticated     |
+| /api/account/admin-role-test | GET        | Admin role test    | Admin             |
+| /api/products                | GET        | Get all products   | Authenticated     |
+| /api/products                | POST       | Create product     | Producer          |
+| /api/products/{id}           | GET        | Get products by id | Authenticated     |
+| /api/products/{id}           | PUT        | Update product     | Admin, Producer   |
+| /api/products/{id}           | DELETE     | Delete product     | Admin, Producer   |
 
 ### Frontend Usage
 
@@ -191,22 +195,25 @@ This application uses ASP.NET Core Identity for user authentication. To manage t
 │   ├── Backend.csproj
 │   ├── Backend.sln
 │   ├── Controllers
-│   │   └── AccountController.cs
+│   │   ├── AccountController.cs
+│   │   └── ProductsController.cs
 │   ├── DAL
 │   │   ├── AccountRepository.cs
 │   │   ├── ApplicationDbContext.cs
 │   │   ├── IAccountRepository.cs
+│   │   ├── IProductsRepository.cs
+│   │   ├── ProductsRepository.cs
 │   │   └── Seed
 │   │       ├── RoleSeeder.cs
 │   │       └── UserSeeder.cs
 │   ├── DTO
+│   │   ├── ProductDTO.cs
+│   │   └── UserDTO.cs
 │   ├── Logs
 │   ├── Migrations
-│   │   ├── 20250129194901_InitialCreate.Designer.cs
-│   │   ├── 20250129194901_InitialCreate.cs
-│   │   └── ApplicationDbContextModelSnapshot.cs
 │   ├── Models
-│   │   └── ErrorViewModel.cs
+│   │   ├── ErrorViewModel.cs
+│   │   └── Product.cs
 │   ├── Program.cs
 │   ├── Properties
 │   │   └── launchSettings.json
