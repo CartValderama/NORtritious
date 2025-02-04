@@ -81,6 +81,13 @@ builder.Services.ConfigureApplicationCookie(options =>
         context.Response.Redirect(context.RedirectUri);
         return Task.CompletedTask;
     };
+
+    // Cookie configuration for session security and expiration
+    options.Cookie.HttpOnly = true;  // Prevent access via JavaScript
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;  // Use only over HTTPS
+    options.Cookie.SameSite = SameSiteMode.Strict;  // Prevent CSRF attacks
+    options.Cookie.Name = "YourAppAuthCookie";  // You can rename the cookie if needed
+    options.ExpireTimeSpan = TimeSpan.FromDays(14);  // Cookie expiration (e.g., 14 days)
 });
 
 // Add EmailSender
@@ -96,12 +103,6 @@ builder.Services.AddAuthorization(options =>
 
 // Add Razor Pages
 builder.Services.AddRazorPages();
-builder.Services.AddSession(options =>
-{
-    options.Cookie.Name = ".Fremtidsmat.Session";
-    options.IdleTimeout = TimeSpan.FromSeconds(1800);
-    options.Cookie.IsEssential = true;
-});
 
 // Add Logging
 var loggerConfiguration = new LoggerConfiguration()
@@ -141,7 +142,6 @@ else
 
 //app.UseHttpsRedirection();
 app.UseStaticFiles();
-app.UseSession();
 app.UseRouting();
 app.UseCors("CorsPolicy");
 

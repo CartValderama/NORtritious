@@ -15,9 +15,16 @@ A web application for managing products in a centralized system, featuring user 
 2. [Features](#2-features)
 3. [Technologies Used](#3-technologies-used)
 4. [Setup and Installation](#4-setup-and-installation)
+   - [Prerequisites](#prerequisites)
+   - [Backend Setup](#backend-setup)
+   - [Frontend Setup](#frontend-setup)
 5. [Usage](#5-usage)
+   - [API Endpoints](#api-endpoints)
+   - [Frontend Usage](#frontend-usage)
 6. [Roles and Permissions](#6-roles-and-permissions)
 7. [Authentication and Security](#7-authentication-and-security)
+   - [API Authentication and Authorization](#api-authentication-and-authorization)
+   - [Cookie Configuration](#cookie-configuration)
 8. [Development Notes](#8-development-notes)
 9. [Future Improvements](#9-future-improvements)
 
@@ -148,51 +155,32 @@ To ensure proper status codes for API requests:
 - **401 Unauthorized:** Returned when the user is unauthenticated (not logged in).
 - **403 Forbidden:** Returned when the user is authenticated but does not have the required permissions.
 
-This is achieved by configuring the application cookie settings in `Program.cs`:
+### Cookie Configuration
 
-```csharp
-builder.Services.ConfigureApplicationCookie(options =>
-{
-    options.Events.OnRedirectToLogin = context =>
-    {
-        if (context.Request.Path.StartsWithSegments("/api"))
-        {
-            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            return Task.CompletedTask;
-        }
+This application uses ASP.NET Core Identity for user authentication. To manage the user sessions, the application uses a secure authentication cookie that stores the user’s login information.
 
-        context.Response.Redirect(context.RedirectUri);
-        return Task.CompletedTask;
-    };
+#### Cookie Configuration Details
 
-    options.Events.OnRedirectToAccessDenied = context =>
-    {
-        if (context.Request.Path.StartsWithSegments("/api"))
-        {
-            context.Response.StatusCode = StatusCodes.Status403Forbidden;
-            return Task.CompletedTask;
-        }
+- **Cookie Name:** "YourAppAuthCookie"
+  This is the name of the cookie that stores the authentication token. It is used for managing the user’s session.
+- **HttpOnly:** true
+  This flag ensures that the cookie is inaccessible via JavaScript, preventing cross-site scripting (XSS) attacks.
+- **Secure:** CookieSecurePolicy.Always
+  The cookie is only sent over HTTPS connections, ensuring data security when transmitted over the network.
+- **SameSite:** SameSiteMode.Strict
+  This setting restricts the cookie from being sent along with cross-site requests, reducing the risk of cross-site request forgery (CSRF) attacks.
+- **Expiration:** 14 days
+  The authentication cookie expires after 14 days of inactivity. After expiration, the user will need to log in again.
 
-        context.Response.Redirect(context.RedirectUri);
-        return Task.CompletedTask;
-    };
-});
-```
+#### Cookie Behavior
 
-### Session Handling
+- **Login Redirection:** If a user tries to access a protected API or resource without being authenticated, they will receive a 401 Unauthorized response. If a user is authenticated but lacks the required permissions, they will receive a 403 Forbidden response.
+- **Automatic Session Management:** ASP.NET Core Identity handles the session lifecycle through the authentication cookie. No additional session management is required unless specified by the developer.
 
-In the current repository `AccountRepository`, the login process uses `SignInManager.PasswordSignInAsync()`, which is a typical method in ASP.NET Core Identity for handling user authentication. Here’s how it works and what happens with the session:
+#### Security Considerations
 
-How `PasswordSignInAsync` Works:
-
-1. **User Lookup and Password Check:**
-   The method checks if the provided email and password match a user in the Identity store.
-2. **Session Persistence `isPersistent` Flag:**
-   We currently have `isPersistent: false`, which means that after closing the browser, the session is terminated. Setting it to `true` would create a persistent session cookie.
-3. **Lockout Handling:**
-   With `lockoutOnFailure: true`, failed login attempts can lock the user account based on Identity’s configuration.
-4. **Session Creation:**
-   If the login succeeds, ASP.NET Core Identity generates a secure, encrypted authentication cookie containing the user’s claims. This cookie is stored in the user’s browser and acts as the session state.
+- **Cookies are configured to be secure and HttpOnly**, which protects the application from common vulnerabilities such as XSS and CSRF.
+- **Password policies** and **lockout settings** ensure that user credentials are managed securely, and users who exceed the maximum number of failed login attempts are temporarily locked out.
 
 ## 8 Development Notes
 
@@ -254,12 +242,6 @@ How `PasswordSignInAsync` Works:
 │   └── vite.config.ts
 └── README.md
 ```
-
-### Important Files
-
-- Program.cs: Configures backend services, Identity and routes.
-- ApplicationRepository.cs: Handles business logic for authentication.
-- AccountController.cs: API endpoints for account management.
 
 ## 9 Future Improvements
 
