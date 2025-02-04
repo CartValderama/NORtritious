@@ -43,7 +43,7 @@ public class AccountController : Controller
 
 
     [HttpGet("admin-role-test")]
-    [Authorize(Policy = "RequireAdminRole")]
+    [Authorize(Roles = "Admin")]
     public IActionResult AdminRoleTest()
     {
         try

@@ -22,9 +22,7 @@ public class ProductsController : Controller
 
     // GET: api/products
     [HttpGet]
-    [Authorize(Policy = "RequireAdminRole")]
-    [Authorize(Policy = "RequireProducerRole")]
-    [Authorize(Policy = "RequireResearcherRole")]
+    [Authorize(Roles = "Admin, Producer, Researcher")]
     public async Task<IActionResult> GetAllProductsAsync()
     {
         var products = await _productsRepository.GetAllProductsAsync();
@@ -33,9 +31,7 @@ public class ProductsController : Controller
 
     // GET: api/products/{id}
     [HttpGet("{id}")]
-    [Authorize(Policy = "RequireAdminRole")]
-    [Authorize(Policy = "RequireProducerRole")]
-    [Authorize(Policy = "RequireResearcherRole")]
+    [Authorize(Roles = "Admin, Producer, Researcher")]
     public async Task<IActionResult> GetProductByIdAsync(int id)
     {
         var product = await _productsRepository.GetProductByIdAsync(id);
@@ -48,7 +44,7 @@ public class ProductsController : Controller
 
     // POST: api/products
     [HttpPost]
-    [Authorize(Policy = "RequireProducerRole")]
+    [Authorize(Roles = "Producer")]
     public async Task<IActionResult> CreateProductAsync([FromBody] ProductDTO productDTO)
     {
         if (productDTO == null)
@@ -108,8 +104,7 @@ public class ProductsController : Controller
 
     // PUT: api/products/{id}
     [HttpPut("{id}")]
-    [Authorize(Policy = "RequireAdminRole")]
-    [Authorize(Policy = "RequireProducerRole")]
+    [Authorize(Roles = "Admin, Producer")]
     public async Task<IActionResult> UpdateProductAsync(int id, [FromBody] Product product)
     {
         if (product == null || product.ProductId != id)
@@ -135,8 +130,7 @@ public class ProductsController : Controller
 
     // DELETE: api/products/{id}
     [HttpDelete("{id}")]
-    [Authorize(Policy = "RequireAdminRole")]
-    [Authorize(Policy = "RequireProducerRole")]
+    [Authorize(Roles = "Admin, Producer")]
     public async Task<IActionResult> DeleteProductAsync(int id)
     {
         var success = await _productsRepository.DeleteProductAsync(id);
