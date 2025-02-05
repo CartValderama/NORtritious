@@ -16,18 +16,36 @@ public class ProductsRepository : IProductsRepository
         _logger = logger;
     }
 
-    public async Task<IEnumerable<Product>> GetAllProductsAsync()
+    public async Task<IEnumerable<Product>?> GetAllProductsAsync()
     {
-        var products = await _db.Products.ToListAsync();
-        if (products == null) return new List<Product>();
+        try 
+        {
+            var products = await _db.Products.ToListAsync();
+            if (products == null) return new List<Product>();
 
-        return products;
+            return products;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "[ProductRepository] Error getting all products");
+            return null;
+        }
+        
     }
 
     public async Task<Product?> GetProductByIdAsync(int productId)
     {
-        var product = await _db.Products.FirstOrDefaultAsync(p => p.ProductId == productId);
-        return product;
+        try
+        {
+            var product = await _db.Products.FirstOrDefaultAsync(p => p.ProductId == productId);
+            return product;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "[ProductRepository] Error getting product by Id {productId}", productId);
+            return null;
+        }
+        
     }
 
     public Task<IEnumerable<Product>> GetProductsByUserIdAsync(string userId)
@@ -63,13 +81,49 @@ public class ProductsRepository : IProductsRepository
         }
     }
 
-    public Task<bool> UpdateProductAsync(Product product)
+    // UpdateProductAsync method to update product to the database
+    public async Task<bool> UpdateProductAsync(Product product)
     {
-        throw new NotImplementedException();
+        if (product == null)
+        {
+            throw new ArgumentNullException(nameof(product));
+        }
+
+        try
+        {
+            _db.Products.Update(product);
+            await _db.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error updating product {product}", product);
+            return false;
+        }
+        //throw new NotImplementedException();
     }
 
-    public Task<bool> DeleteProductAsync(int productId)
+    // DeleteProductAsync method to delete a product from the database
+    public async Task<bool> DeleteProductAsync(int productId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var product = await _db.Products.FindAsync(productId);
+            if (product == null)
+            {
+                _logger.LogError("[ProductRepository] Product not found for the ProductId {ProductId:0000}", productId);
+                return false;
+            }
+
+            _db.Products.Remove(product);
+            var result = await _db.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "[ProductRepository] Error deleting product {productId}", productId);
+            return false;
+        }
+        //throw new NotImplementedException();
     }
 }

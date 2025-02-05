@@ -110,7 +110,10 @@ public class ProductsController : Controller
         if (product == null || product.ProductId != id)
         {
             return BadRequest();
-        }
+        }   
+            
+        // TODO: Producers should only update their own products, 
+        // use GetProductsByUserIdAsync(userId)
 
         var existingProduct = await _productsRepository.GetProductByIdAsync(id);
         if (existingProduct == null)
