@@ -42,6 +42,23 @@ public class ProductsController : Controller
         return Ok(product);
     }
 
+    // GET: api/products (by user ID)
+    [HttpGet("my-products")]
+    [Authorize(Roles = "Producer")]
+    public async Task<IActionResult> GetProductByUserIdAsync()
+    {
+        // Get the user ID from the authenticated user
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        // Call the repository to get products by user ID
+        var products = await _productsRepository.GetProductsByUserIdAsync(userId);
+        if (products == null || !products.Any())
+        {
+            return NotFound("No products found for the current producer.");
+        }
+        return Ok(products);
+    }
+
     // POST: api/products
     [HttpPost]
     [Authorize(Roles = "Producer")]

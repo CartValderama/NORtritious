@@ -48,9 +48,20 @@ public class ProductsRepository : IProductsRepository
         
     }
 
-    public Task<IEnumerable<Product>> GetProductsByUserIdAsync(string userId)
+    public async Task<IEnumerable<Product>?> GetProductsByUserIdAsync(string? userId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var products = await _db.Products.Where(p => p.UserId == userId).ToListAsync();
+            return products;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "[ProductRepository] Error getting products by user Id {userId}", userId);
+            return Enumerable.Empty<Product>();
+        }
+
+        //throw new NotImplementedException();
     }
 
     // CreateProductAsync method to add a new product to the database
