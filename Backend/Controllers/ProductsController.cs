@@ -105,9 +105,9 @@ public class ProductsController : Controller
     // PUT: api/products/{id}
     [HttpPut("{id}")]
     [Authorize(Roles = "Admin, Producer")]
-    public async Task<IActionResult> UpdateProductAsync(int id, [FromBody] Product product)
+    public async Task<IActionResult> UpdateProductAsync(int id, [FromBody] ProductDTO productDTO)
     {
-        if (product == null || product.ProductId != id)
+        if (productDTO == null || productDTO.ProductId != id)
         {
             return BadRequest();
         }   
@@ -121,14 +121,44 @@ public class ProductsController : Controller
             return NotFound();
         }
 
+        // Get the user ID from the authenticated user
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        // Check if the user is a producer and if they are the owner of the product
+        if (User.IsInRole("Producer") && existingProduct.UserId != userId)
+        {
+            return Unauthorized("Producers can only update their own products.");
+        }
+
+        existingProduct.Name = productDTO.Name;
+        existingProduct.Group = productDTO.Group;
+        existingProduct.Type = productDTO.Type;
+        existingProduct.HasEfsaHealth = productDTO.HasEfsaHealth;
+        existingProduct.HasEfsaNutrition = productDTO.HasEfsaNutrition;
+        existingProduct.HasNokkelhullet = productDTO.HasNokkelhullet;
+        existingProduct.ImageUrl = productDTO.ImageUrl;
+        existingProduct.Calories = productDTO.Calories;
+        existingProduct.Fat = productDTO.Fat;
+        existingProduct.SatFat = productDTO.SatFat;
+        existingProduct.Carbs = productDTO.Carbs;
+        existingProduct.NatSugar = productDTO.NatSugar;
+        existingProduct.AddedSugar = productDTO.AddedSugar;
+        existingProduct.Fiber = productDTO.Fiber;
+        existingProduct.Protein = productDTO.Protein;
+        existingProduct.Salt = productDTO.Salt;
+
         // You can call the repository to update the product here
-        var success = await _productsRepository.UpdateProductAsync(product);
+        var success = await _productsRepository.UpdateProductAsync(existingProduct);
         if (!success)
         {
             return StatusCode(500, "An error occurred while updating the product.");
         }
+        else
+        {
+            return CreatedAtAction(nameof(GetProductByIdAsync), new { id = existingProduct.ProductId }, existingProduct);
+        }
 
-        return NoContent(); // Status 204 means the update was successful, but there's no content to return
+        //return NoContent(); // Status 204 means the update was successful, but there's no content to return
     }
 
     // DELETE: api/products/{id}
@@ -136,6 +166,22 @@ public class ProductsController : Controller
     [Authorize(Roles = "Admin, Producer")]
     public async Task<IActionResult> DeleteProductAsync(int id)
     {
+
+        var existingProduct = await _productsRepository.GetProductByIdAsync(id);
+        if (existingProduct == null)
+        {
+            return NotFound();
+        }
+
+        // Get the user ID from the authenticated user
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    
+        // Check if the user is a producer and if they are the owner of the product
+        if (User.IsInRole("Producer") && existingProduct.UserId != userId)
+        {
+            return Unauthorized("Producers can only delete their own products.");
+        }
+
         var success = await _productsRepository.DeleteProductAsync(id);
         if (!success)
         {

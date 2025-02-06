@@ -1,6 +1,7 @@
 namespace Backend.DTO;
 public class ProductDTO
 {
+    public int ProductId { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Group { get; set; } = string.Empty;
     public string Type { get; set; } = string.Empty;

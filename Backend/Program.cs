@@ -125,6 +125,7 @@ using (var scope = app.Services.CreateScope())
     await RoleSeeder.SeedRolesAsync(services);
     await UserSeeder.SeedAdminUserAsync(services);
     await UserSeeder.SeedProducerUserAsync(services);
+    await UserSeeder.SeedProducerUserAsync2(services);
     await UserSeeder.SeedResearcherUserAsync(services);
 }
 

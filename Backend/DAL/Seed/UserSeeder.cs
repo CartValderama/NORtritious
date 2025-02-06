@@ -40,6 +40,24 @@ public static class UserSeeder
         }
     }
 
+    public static async Task SeedProducerUserAsync2(IServiceProvider serviceProvider)
+    {
+        var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
+        var producerEmail = "producer2@example.com";
+        var producerPassword = "Producer12345!";
+
+        if (await userManager.FindByEmailAsync(producerEmail) == null)
+        {
+            var producerUser = new IdentityUser { UserName = producerEmail, Email = producerEmail };
+            var result = await userManager.CreateAsync(producerUser, producerPassword);
+
+            if (result.Succeeded)
+            {
+                await userManager.AddToRoleAsync(producerUser, "Producer");
+            }
+        }
+    }
+
     public static async Task SeedResearcherUserAsync(IServiceProvider serviceProvider)
     {
         var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
