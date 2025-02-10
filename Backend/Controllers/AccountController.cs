@@ -19,6 +19,23 @@ public class AccountController : Controller
         _logger = logger;
     }
 
+    [HttpPost("register")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Register([FromBody] Backend.Models.RegisterRequest request)
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        var result = await _applicationRepository.RegisterAsync(request);
+
+        if (result.Succeeded)
+        {
+            return Ok(new { message = "Registration successful" });
+        }
+
+        _logger.LogError("[AccountController] Registration failed when executing _applicationRepository.RegisterAsync()");
+        return BadRequest(new { message = "Registration failed", errors = result.Errors });
+    }
+    
     /// <summary>
     ///     Example method for logging in.
     /// </summary>
@@ -74,7 +91,6 @@ public class AccountController : Controller
             _logger.LogError(e, "[AccountController] Error during logout.");
             return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An unexpected error occurred!" });
         }
-
     }
 
 }

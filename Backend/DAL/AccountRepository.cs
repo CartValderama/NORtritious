@@ -1,17 +1,20 @@
 using Microsoft.EntityFrameworkCore;
 using Backend.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Backend.DAL;
 
 public class AccountRepository : IAccountRepository
 {
     private readonly SignInManager<IdentityUser> _signInManager;
+    private readonly UserManager<IdentityUser> _userManager;
     private readonly ApplicationDbContext _db;
     private readonly ILogger<AccountRepository> _logger;
 
-    public AccountRepository(SignInManager<IdentityUser> signInManager, ApplicationDbContext db, ILogger<AccountRepository> logger)
+    public AccountRepository(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, ApplicationDbContext db, ILogger<AccountRepository> logger)
     {
+        _userManager = userManager;
         _signInManager = signInManager;
         _db = db;
         _logger = logger;
@@ -46,5 +49,17 @@ public class AccountRepository : IAccountRepository
         await _signInManager.SignOutAsync();
         _logger.LogInformation("User logged out successfully.");
     }
+
+    public async Task<IdentityResult> RegisterAsync(RegisterRequest request)
+    {
+        var user = new IdentityUser { UserName = request.Email, Email = request.Email };
+        var result = await _userManager.CreateAsync(user, request.Password);
+        if (result.Succeeded)
+        {
+            await _userManager.AddToRoleAsync(user, request.Role);
+        }
+        return result;
+    }
+
 }
 
