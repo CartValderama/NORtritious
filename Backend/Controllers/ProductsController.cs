@@ -96,6 +96,8 @@ public class ProductsController : Controller
         // Get the user ID from the authenticated user (usually comes from the JWT token or other means)
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+        // NOTE! Do we need this due to the existence of [Authorize] Attribute
+        // which ensures a logged in user exists
         if (string.IsNullOrEmpty(userId))
         {
             return Unauthorized("User not authenticated.");
