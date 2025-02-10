@@ -25,8 +25,16 @@ public class ProductsController : Controller
     [Authorize(Roles = "Admin, Producer, Researcher")]
     public async Task<IActionResult> GetAllProductsAsync()
     {
-        var products = await _productsRepository.GetAllProductsAsync();
-        return Ok(products);
+        try
+        {
+            var products = await _productsRepository.GetAllProductsAsync();
+            return Ok(products);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "[ProductsController] an error eccourred while executing GetAllProductsAsync.");
+            return StatusCode(500, "Internal server error.");
+        }
     }
 
     // GET: api/products/{id}
@@ -34,12 +42,20 @@ public class ProductsController : Controller
     [Authorize(Roles = "Admin, Producer, Researcher")]
     public async Task<IActionResult> GetProductByIdAsync(int id)
     {
-        var product = await _productsRepository.GetProductByIdAsync(id);
-        if (product == null)
+        try
         {
-            return NotFound();
+            var product = await _productsRepository.GetProductByIdAsync(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+            return Ok(product);
         }
-        return Ok(product);
+        catch (Exception e)
+        {
+            _logger.LogError(e, "[ProductsController] and error occurred while executing GetProductByIdAsync.");
+            return StatusCode(500, "Internal server error.");
+        }
     }
 
     // GET: api/products (by user ID)
@@ -47,16 +63,24 @@ public class ProductsController : Controller
     [Authorize(Roles = "Producer")]
     public async Task<IActionResult> GetProductByUserIdAsync()
     {
-        // Get the user ID from the authenticated user
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        // Call the repository to get products by user ID
-        var products = await _productsRepository.GetProductsByUserIdAsync(userId);
-        if (products == null || !products.Any())
+        try
         {
-            return NotFound("No products found for the current producer.");
+            // Get the user ID from the authenticated user
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Call the repository to get products by user ID
+            var products = await _productsRepository.GetProductsByUserIdAsync(userId);
+            if (products == null || !products.Any())
+            {
+                return NotFound("No products found for the current producer.");
+            }
+            return Ok(products);
         }
-        return Ok(products);
+        catch (Exception e)
+        {
+            _logger.LogError(e, "[ProductsController] an error occurred while executing GetProductsByUserId.");
+            return StatusCode(500, "Internal server error.");
+        }
     }
 
     // POST: api/products
@@ -77,46 +101,54 @@ public class ProductsController : Controller
             return Unauthorized("User not authenticated.");
         }
 
-        // Use UserManager to fetch the user object based on the userId
-        var user = await _userManager.FindByIdAsync(userId);
-
-        if (user == null)
+        try
         {
-            return NotFound("User not found.");
+            // Use UserManager to fetch the user object based on the userId
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            // Map the DTO to the Product entity
+            var product = new Product
+            {
+                Name = productDTO.Name,
+                Group = productDTO.Group,
+                Type = productDTO.Type,
+                HasEfsaHealth = productDTO.HasEfsaHealth,
+                HasEfsaNutrition = productDTO.HasEfsaNutrition,
+                HasNokkelhullet = productDTO.HasNokkelhullet,
+                ImageUrl = productDTO.ImageUrl,
+                Calories = productDTO.Calories,
+                Fat = productDTO.Fat,
+                SatFat = productDTO.SatFat,
+                Carbs = productDTO.Carbs,
+                NatSugar = productDTO.NatSugar,
+                AddedSugar = productDTO.AddedSugar,
+                Fiber = productDTO.Fiber,
+                Protein = productDTO.Protein,
+                Salt = productDTO.Salt,
+                UserId = userId,  // Set the userId for the created product
+                CreatedByUser = user  // Set the User navigation property
+            };
+
+            // Call your repository to create the product
+            var success = await _productsRepository.CreateProductAsync(product);
+
+            if (success)
+            {
+                return CreatedAtAction(nameof(GetProductByIdAsync), new { id = product.ProductId }, product);
+            }
+
+            return BadRequest("Failed to create product.");
         }
-
-        // Map the DTO to the Product entity
-        var product = new Product
+        catch (Exception e)
         {
-            Name = productDTO.Name,
-            Group = productDTO.Group,
-            Type = productDTO.Type,
-            HasEfsaHealth = productDTO.HasEfsaHealth,
-            HasEfsaNutrition = productDTO.HasEfsaNutrition,
-            HasNokkelhullet = productDTO.HasNokkelhullet,
-            ImageUrl = productDTO.ImageUrl,
-            Calories = productDTO.Calories,
-            Fat = productDTO.Fat,
-            SatFat = productDTO.SatFat,
-            Carbs = productDTO.Carbs,
-            NatSugar = productDTO.NatSugar,
-            AddedSugar = productDTO.AddedSugar,
-            Fiber = productDTO.Fiber,
-            Protein = productDTO.Protein,
-            Salt = productDTO.Salt,
-            UserId = userId,  // Set the userId for the created product
-            CreatedByUser = user  // Set the User navigation property
-        };
-
-        // Call your repository to create the product
-        var success = await _productsRepository.CreateProductAsync(product);
-
-        if (success)
-        {
-            return CreatedAtAction(nameof(GetProductByIdAsync), new { id = product.ProductId }, product);
+            _logger.LogError(e, "[ProductsController] an error occurred while executing CreateProductAsync.");
+            return StatusCode(500, "Internal server error.");
         }
-
-        return BadRequest("Failed to create product.");
     }
 
     // PUT: api/products/{id}
@@ -127,55 +159,63 @@ public class ProductsController : Controller
         if (productDTO == null || productDTO.ProductId != id)
         {
             return BadRequest();
-        }   
-            
-        // TODO: Producers should only update their own products, 
-        // use GetProductsByUserIdAsync(userId)
-
-        var existingProduct = await _productsRepository.GetProductByIdAsync(id);
-        if (existingProduct == null)
-        {
-            return NotFound();
         }
 
-        // Get the user ID from the authenticated user
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        // Check if the user is a producer and if they are the owner of the product
-        if (User.IsInRole("Producer") && existingProduct.UserId != userId)
+        try
         {
-            return Unauthorized("Producers can only update their own products.");
+            // TODO: Producers should only update their own products, 
+            // use GetProductsByUserIdAsync(userId)
+
+            var existingProduct = await _productsRepository.GetProductByIdAsync(id);
+            if (existingProduct == null)
+            {
+                return NotFound();
+            }
+
+            // Get the user ID from the authenticated user
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Check if the user is a producer and if they are the owner of the product
+            if (User.IsInRole("Producer") && existingProduct.UserId != userId)
+            {
+                return Unauthorized("Producers can only update their own products.");
+            }
+
+            existingProduct.Name = productDTO.Name;
+            existingProduct.Group = productDTO.Group;
+            existingProduct.Type = productDTO.Type;
+            existingProduct.HasEfsaHealth = productDTO.HasEfsaHealth;
+            existingProduct.HasEfsaNutrition = productDTO.HasEfsaNutrition;
+            existingProduct.HasNokkelhullet = productDTO.HasNokkelhullet;
+            existingProduct.ImageUrl = productDTO.ImageUrl;
+            existingProduct.Calories = productDTO.Calories;
+            existingProduct.Fat = productDTO.Fat;
+            existingProduct.SatFat = productDTO.SatFat;
+            existingProduct.Carbs = productDTO.Carbs;
+            existingProduct.NatSugar = productDTO.NatSugar;
+            existingProduct.AddedSugar = productDTO.AddedSugar;
+            existingProduct.Fiber = productDTO.Fiber;
+            existingProduct.Protein = productDTO.Protein;
+            existingProduct.Salt = productDTO.Salt;
+
+            // You can call the repository to update the product here
+            var success = await _productsRepository.UpdateProductAsync(existingProduct);
+            if (!success)
+            {
+                return StatusCode(500, "An error occurred while updating the product.");
+            }
+            else
+            {
+                return CreatedAtAction(nameof(GetProductByIdAsync), new { id = existingProduct.ProductId }, existingProduct);
+            }
+            //return NoContent(); // Status 204 means the update was successful, but there's no content to return
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "[ProductsController] an error occurred while executing UpdateProductAsync.");
+            return StatusCode(500, "Internal server error.");
         }
 
-        existingProduct.Name = productDTO.Name;
-        existingProduct.Group = productDTO.Group;
-        existingProduct.Type = productDTO.Type;
-        existingProduct.HasEfsaHealth = productDTO.HasEfsaHealth;
-        existingProduct.HasEfsaNutrition = productDTO.HasEfsaNutrition;
-        existingProduct.HasNokkelhullet = productDTO.HasNokkelhullet;
-        existingProduct.ImageUrl = productDTO.ImageUrl;
-        existingProduct.Calories = productDTO.Calories;
-        existingProduct.Fat = productDTO.Fat;
-        existingProduct.SatFat = productDTO.SatFat;
-        existingProduct.Carbs = productDTO.Carbs;
-        existingProduct.NatSugar = productDTO.NatSugar;
-        existingProduct.AddedSugar = productDTO.AddedSugar;
-        existingProduct.Fiber = productDTO.Fiber;
-        existingProduct.Protein = productDTO.Protein;
-        existingProduct.Salt = productDTO.Salt;
-
-        // You can call the repository to update the product here
-        var success = await _productsRepository.UpdateProductAsync(existingProduct);
-        if (!success)
-        {
-            return StatusCode(500, "An error occurred while updating the product.");
-        }
-        else
-        {
-            return CreatedAtAction(nameof(GetProductByIdAsync), new { id = existingProduct.ProductId }, existingProduct);
-        }
-
-        //return NoContent(); // Status 204 means the update was successful, but there's no content to return
     }
 
     // DELETE: api/products/{id}
@@ -183,26 +223,33 @@ public class ProductsController : Controller
     [Authorize(Roles = "Admin, Producer")]
     public async Task<IActionResult> DeleteProductAsync(int id)
     {
-
-        var existingProduct = await _productsRepository.GetProductByIdAsync(id);
-        if (existingProduct == null)
+        try
         {
-            return NotFound();
+            var existingProduct = await _productsRepository.GetProductByIdAsync(id);
+            if (existingProduct == null)
+            {
+                return NotFound();
+            }
+
+            // Get the user ID from the authenticated user
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Check if the user is a producer and if they are the owner of the product
+            if (User.IsInRole("Producer") && existingProduct.UserId != userId)
+            {
+                return Unauthorized("Producers can only delete their own products.");
+            }
+
+            var success = await _productsRepository.DeleteProductAsync(id);
+            if (!success)
+            {
+                return NotFound();
+            }
         }
-
-        // Get the user ID from the authenticated user
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-    
-        // Check if the user is a producer and if they are the owner of the product
-        if (User.IsInRole("Producer") && existingProduct.UserId != userId)
+        catch (Exception e)
         {
-            return Unauthorized("Producers can only delete their own products.");
-        }
-
-        var success = await _productsRepository.DeleteProductAsync(id);
-        if (!success)
-        {
-            return NotFound();
+            _logger.LogError(e, "[ProductsController] an error occurred while executing DeleteProduct.");
+            return StatusCode(500, "Internal server error.");
         }
 
         return NoContent();
