@@ -1,0 +1,35 @@
+# Build artifacts
+bin/
+obj/
+
+# Visual Studio Code settings
+.vscode/
+
+# Test results and coverage
+TestResults/
+coverage/
+
+# Temporary files
+*.user
+*.vs/
+*.suo
+*.cache
+*.log
+*.tlog
+*.pdb
+
+# .NET-related files
+project.lock.json
+*.dll
+*.exe
+
+# If you're using Coverlet for code coverage
+coverage.opencover.xml
+coverage.cobertura.xml
+lcov.info
+
+# If using JetBrains Rider
+.idea/
+
+# Ignore NuGet packages (if restoring separately)
+packages/
