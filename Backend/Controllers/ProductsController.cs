@@ -5,255 +5,258 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-[Route("api/products")]
-[ApiController]
-public class ProductsController : Controller
+namespace Backend.Controllers
 {
-    private readonly UserManager<IdentityUser> _userManager;
-    private readonly IProductsRepository _productsRepository;
-    private readonly ILogger<ProductsController> _logger;
-
-    public ProductsController(UserManager<IdentityUser> userManager, IProductsRepository productsRepository, ILogger<ProductsController> logger)
+    [Route("api/products")]
+    [ApiController]
+    public class ProductsController : Controller
     {
-        _userManager = userManager;
-        _productsRepository = productsRepository;
-        _logger = logger;
-    }
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly IProductsRepository _productsRepository;
+        private readonly ILogger<ProductsController> _logger;
 
-    // GET: api/products
-    [HttpGet]
-    [Authorize(Roles = "Admin, Producer, Researcher")]
-    public async Task<IActionResult> GetAllProductsAsync()
-    {
-        try
+        public ProductsController(UserManager<IdentityUser> userManager, IProductsRepository productsRepository, ILogger<ProductsController> logger)
         {
-            var products = await _productsRepository.GetAllProductsAsync();
-            return Ok(products);
+            _userManager = userManager;
+            _productsRepository = productsRepository;
+            _logger = logger;
         }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "[ProductsController] an error eccourred while executing GetAllProductsAsync.");
-            return StatusCode(500, "Internal server error.");
-        }
-    }
 
-    // GET: api/products/{id}
-    [HttpGet("{id}")]
-    [Authorize(Roles = "Admin, Producer, Researcher")]
-    public async Task<IActionResult> GetProductByIdAsync(int id)
-    {
-        try
+        // GET: api/products
+        [HttpGet]
+        [Authorize(Roles = "Admin, Producer, Researcher")]
+        public async Task<IActionResult> GetAllProductsAsync()
         {
-            var product = await _productsRepository.GetProductByIdAsync(id);
-            if (product == null)
+            try
             {
-                return NotFound();
+                var products = await _productsRepository.GetAllProductsAsync();
+                return Ok(products);
             }
-            return Ok(product);
+            catch (Exception e)
+            {
+                _logger.LogError(e, "[ProductsController] an error eccourred while executing GetAllProductsAsync.");
+                return StatusCode(500, "Internal server error.");
+            }
         }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "[ProductsController] and error occurred while executing GetProductByIdAsync.");
-            return StatusCode(500, "Internal server error.");
-        }
-    }
 
-    // GET: api/products (by user ID)
-    [HttpGet("my-products")]
-    [Authorize(Roles = "Producer")]
-    public async Task<IActionResult> GetProductByUserIdAsync()
-    {
-        try
+        // GET: api/products/{id}
+        [HttpGet("{id}")]
+        [Authorize(Roles = "Admin, Producer, Researcher")]
+        public async Task<IActionResult> GetProductByIdAsync(int id)
         {
-            // Get the user ID from the authenticated user
+            try
+            {
+                var product = await _productsRepository.GetProductByIdAsync(id);
+                if (product == null)
+                {
+                    return NotFound();
+                }
+                return Ok(product);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "[ProductsController] and error occurred while executing GetProductByIdAsync.");
+                return StatusCode(500, "Internal server error.");
+            }
+        }
+
+        // GET: api/products (by user ID)
+        [HttpGet("my-products")]
+        [Authorize(Roles = "Producer")]
+        public async Task<IActionResult> GetProductByUserIdAsync()
+        {
+            try
+            {
+                // Get the user ID from the authenticated user
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                // Call the repository to get products by user ID
+                var products = await _productsRepository.GetProductsByUserIdAsync(userId);
+                if (products == null || !products.Any())
+                {
+                    return NotFound("No products found for the current producer.");
+                }
+                return Ok(products);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "[ProductsController] an error occurred while executing GetProductsByUserId.");
+                return StatusCode(500, "Internal server error.");
+            }
+        }
+
+        // POST: api/products
+        [HttpPost]
+        [Authorize(Roles = "Producer")]
+        public async Task<IActionResult> CreateProductAsync([FromBody] ProductDTO productDTO)
+        {
+            if (productDTO == null)
+            {
+                return BadRequest("Product data is null.");
+            }
+
+            // Get the user ID from the authenticated user (usually comes from the JWT token or other means)
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            // Call the repository to get products by user ID
-            var products = await _productsRepository.GetProductsByUserIdAsync(userId);
-            if (products == null || !products.Any())
+            // NOTE! Do we need this due to the existence of [Authorize] Attribute
+            // which ensures a logged in user exists
+            if (string.IsNullOrEmpty(userId))
             {
-                return NotFound("No products found for the current producer.");
-            }
-            return Ok(products);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "[ProductsController] an error occurred while executing GetProductsByUserId.");
-            return StatusCode(500, "Internal server error.");
-        }
-    }
-
-    // POST: api/products
-    [HttpPost]
-    [Authorize(Roles = "Producer")]
-    public async Task<IActionResult> CreateProductAsync([FromBody] ProductDTO productDTO)
-    {
-        if (productDTO == null)
-        {
-            return BadRequest("Product data is null.");
-        }
-
-        // Get the user ID from the authenticated user (usually comes from the JWT token or other means)
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        // NOTE! Do we need this due to the existence of [Authorize] Attribute
-        // which ensures a logged in user exists
-        if (string.IsNullOrEmpty(userId))
-        {
-            return Unauthorized("User not authenticated.");
-        }
-
-        try
-        {
-            // Use UserManager to fetch the user object based on the userId
-            var user = await _userManager.FindByIdAsync(userId);
-
-            if (user == null)
-            {
-                return NotFound("User not found.");
+                return Unauthorized("User not authenticated.");
             }
 
-            // Map the DTO to the Product entity
-            var product = new Product
+            try
             {
-                Name = productDTO.Name,
-                Group = productDTO.Group,
-                Type = productDTO.Type,
-                HasEfsaHealth = productDTO.HasEfsaHealth,
-                HasEfsaNutrition = productDTO.HasEfsaNutrition,
-                HasNokkelhullet = productDTO.HasNokkelhullet,
-                ImageUrl = productDTO.ImageUrl,
-                Calories = productDTO.Calories,
-                Fat = productDTO.Fat,
-                SatFat = productDTO.SatFat,
-                Carbs = productDTO.Carbs,
-                NatSugar = productDTO.NatSugar,
-                AddedSugar = productDTO.AddedSugar,
-                Fiber = productDTO.Fiber,
-                Protein = productDTO.Protein,
-                Salt = productDTO.Salt,
-                UserId = userId,  // Set the userId for the created product
-                CreatedByUser = user  // Set the User navigation property
-            };
+                // Use UserManager to fetch the user object based on the userId
+                var user = await _userManager.FindByIdAsync(userId);
 
-            // Call your repository to create the product
-            var success = await _productsRepository.CreateProductAsync(product);
+                if (user == null)
+                {
+                    return NotFound("User not found.");
+                }
 
-            if (success)
-            {
-                return CreatedAtAction(nameof(GetProductByIdAsync), new { id = product.ProductId }, product);
+                // Map the DTO to the Product entity
+                var product = new Product
+                {
+                    Name = productDTO.Name,
+                    Group = productDTO.Group,
+                    Type = productDTO.Type,
+                    HasEfsaHealth = productDTO.HasEfsaHealth,
+                    HasEfsaNutrition = productDTO.HasEfsaNutrition,
+                    HasNokkelhullet = productDTO.HasNokkelhullet,
+                    ImageUrl = productDTO.ImageUrl,
+                    Calories = productDTO.Calories,
+                    Fat = productDTO.Fat,
+                    SatFat = productDTO.SatFat,
+                    Carbs = productDTO.Carbs,
+                    NatSugar = productDTO.NatSugar,
+                    AddedSugar = productDTO.AddedSugar,
+                    Fiber = productDTO.Fiber,
+                    Protein = productDTO.Protein,
+                    Salt = productDTO.Salt,
+                    UserId = userId,  // Set the userId for the created product
+                    CreatedByUser = user  // Set the User navigation property
+                };
+
+                // Call your repository to create the product
+                var success = await _productsRepository.CreateProductAsync(product);
+
+                if (success)
+                {
+                    return CreatedAtAction(nameof(GetProductByIdAsync), new { id = product.ProductId }, product);
+                }
+
+                return BadRequest("Failed to create product.");
             }
-
-            return BadRequest("Failed to create product.");
+            catch (Exception e)
+            {
+                _logger.LogError(e, "[ProductsController] an error occurred while executing CreateProductAsync.");
+                return StatusCode(500, "Internal server error.");
+            }
         }
-        catch (Exception e)
+
+        // PUT: api/products/{id}
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Admin, Producer")]
+        public async Task<IActionResult> UpdateProductAsync(int id, [FromBody] ProductDTO productDTO)
         {
-            _logger.LogError(e, "[ProductsController] an error occurred while executing CreateProductAsync.");
-            return StatusCode(500, "Internal server error.");
-        }
-    }
+            if (productDTO == null || productDTO.ProductId != id)
+            {
+                return BadRequest();
+            }
 
-    // PUT: api/products/{id}
-    [HttpPut("{id}")]
-    [Authorize(Roles = "Admin, Producer")]
-    public async Task<IActionResult> UpdateProductAsync(int id, [FromBody] ProductDTO productDTO)
-    {
-        if (productDTO == null || productDTO.ProductId != id)
+            try
+            {
+                // TODO: Producers should only update their own products, 
+                // use GetProductsByUserIdAsync(userId)
+
+                var existingProduct = await _productsRepository.GetProductByIdAsync(id);
+                if (existingProduct == null)
+                {
+                    return NotFound();
+                }
+
+                // Get the user ID from the authenticated user
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                // Check if the user is a producer and if they are the owner of the product
+                if (User.IsInRole("Producer") && existingProduct.UserId != userId)
+                {
+                    return Unauthorized("Producers can only update their own products.");
+                }
+
+                existingProduct.Name = productDTO.Name;
+                existingProduct.Group = productDTO.Group;
+                existingProduct.Type = productDTO.Type;
+                existingProduct.HasEfsaHealth = productDTO.HasEfsaHealth;
+                existingProduct.HasEfsaNutrition = productDTO.HasEfsaNutrition;
+                existingProduct.HasNokkelhullet = productDTO.HasNokkelhullet;
+                existingProduct.ImageUrl = productDTO.ImageUrl;
+                existingProduct.Calories = productDTO.Calories;
+                existingProduct.Fat = productDTO.Fat;
+                existingProduct.SatFat = productDTO.SatFat;
+                existingProduct.Carbs = productDTO.Carbs;
+                existingProduct.NatSugar = productDTO.NatSugar;
+                existingProduct.AddedSugar = productDTO.AddedSugar;
+                existingProduct.Fiber = productDTO.Fiber;
+                existingProduct.Protein = productDTO.Protein;
+                existingProduct.Salt = productDTO.Salt;
+
+                // You can call the repository to update the product here
+                var success = await _productsRepository.UpdateProductAsync(existingProduct);
+                if (!success)
+                {
+                    return StatusCode(500, "An error occurred while updating the product.");
+                }
+                else
+                {
+                    return CreatedAtAction(nameof(GetProductByIdAsync), new { id = existingProduct.ProductId }, existingProduct);
+                }
+                //return NoContent(); // Status 204 means the update was successful, but there's no content to return
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "[ProductsController] an error occurred while executing UpdateProductAsync.");
+                return StatusCode(500, "Internal server error.");
+            }
+
+        }
+
+        // DELETE: api/products/{id}
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin, Producer")]
+        public async Task<IActionResult> DeleteProductAsync(int id)
         {
-            return BadRequest();
+            try
+            {
+                var existingProduct = await _productsRepository.GetProductByIdAsync(id);
+                if (existingProduct == null)
+                {
+                    return NotFound();
+                }
+
+                // Get the user ID from the authenticated user
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                // Check if the user is a producer and if they are the owner of the product
+                if (User.IsInRole("Producer") && existingProduct.UserId != userId)
+                {
+                    return Unauthorized("Producers can only delete their own products.");
+                }
+
+                var success = await _productsRepository.DeleteProductAsync(id);
+                if (!success)
+                {
+                    return NotFound();
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "[ProductsController] an error occurred while executing DeleteProduct.");
+                return StatusCode(500, "Internal server error.");
+            }
+
+            return NoContent();
         }
-
-        try
-        {
-            // TODO: Producers should only update their own products, 
-            // use GetProductsByUserIdAsync(userId)
-
-            var existingProduct = await _productsRepository.GetProductByIdAsync(id);
-            if (existingProduct == null)
-            {
-                return NotFound();
-            }
-
-            // Get the user ID from the authenticated user
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            // Check if the user is a producer and if they are the owner of the product
-            if (User.IsInRole("Producer") && existingProduct.UserId != userId)
-            {
-                return Unauthorized("Producers can only update their own products.");
-            }
-
-            existingProduct.Name = productDTO.Name;
-            existingProduct.Group = productDTO.Group;
-            existingProduct.Type = productDTO.Type;
-            existingProduct.HasEfsaHealth = productDTO.HasEfsaHealth;
-            existingProduct.HasEfsaNutrition = productDTO.HasEfsaNutrition;
-            existingProduct.HasNokkelhullet = productDTO.HasNokkelhullet;
-            existingProduct.ImageUrl = productDTO.ImageUrl;
-            existingProduct.Calories = productDTO.Calories;
-            existingProduct.Fat = productDTO.Fat;
-            existingProduct.SatFat = productDTO.SatFat;
-            existingProduct.Carbs = productDTO.Carbs;
-            existingProduct.NatSugar = productDTO.NatSugar;
-            existingProduct.AddedSugar = productDTO.AddedSugar;
-            existingProduct.Fiber = productDTO.Fiber;
-            existingProduct.Protein = productDTO.Protein;
-            existingProduct.Salt = productDTO.Salt;
-
-            // You can call the repository to update the product here
-            var success = await _productsRepository.UpdateProductAsync(existingProduct);
-            if (!success)
-            {
-                return StatusCode(500, "An error occurred while updating the product.");
-            }
-            else
-            {
-                return CreatedAtAction(nameof(GetProductByIdAsync), new { id = existingProduct.ProductId }, existingProduct);
-            }
-            //return NoContent(); // Status 204 means the update was successful, but there's no content to return
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "[ProductsController] an error occurred while executing UpdateProductAsync.");
-            return StatusCode(500, "Internal server error.");
-        }
-
-    }
-
-    // DELETE: api/products/{id}
-    [HttpDelete("{id}")]
-    [Authorize(Roles = "Admin, Producer")]
-    public async Task<IActionResult> DeleteProductAsync(int id)
-    {
-        try
-        {
-            var existingProduct = await _productsRepository.GetProductByIdAsync(id);
-            if (existingProduct == null)
-            {
-                return NotFound();
-            }
-
-            // Get the user ID from the authenticated user
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            // Check if the user is a producer and if they are the owner of the product
-            if (User.IsInRole("Producer") && existingProduct.UserId != userId)
-            {
-                return Unauthorized("Producers can only delete their own products.");
-            }
-
-            var success = await _productsRepository.DeleteProductAsync(id);
-            if (!success)
-            {
-                return NotFound();
-            }
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "[ProductsController] an error occurred while executing DeleteProduct.");
-            return StatusCode(500, "Internal server error.");
-        }
-
-        return NoContent();
     }
 }
