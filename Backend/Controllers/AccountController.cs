@@ -19,6 +19,7 @@ public class AccountController : Controller
         _logger = logger;
     }
 
+    // Register method for Producers and Researchers, Takes email, password, and role, returns HTTP message OK on success, Bad Request otherwise
     [HttpPost("register")]
     [AllowAnonymous]
     public async Task<IActionResult> Register([FromBody] Backend.Models.RegisterRequest request)
@@ -36,11 +37,8 @@ public class AccountController : Controller
         return BadRequest(new { message = "Registration failed", errors = result.Errors });
     }
     
-    /// <summary>
-    ///     Example method for logging in.
-    /// </summary>
-    /// <param name="request">Takes email and password</param>
-    /// <returns>HTTP message OK on success, Unauthorized otherwise</returns>
+    
+    // Login method for all users, Takes email and password, returns HTTP message OK on success, Unauthorized otherwise
     [HttpPost("login")]
     [AllowAnonymous]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
@@ -73,7 +71,24 @@ public class AccountController : Controller
             _logger.LogError(e, "[AccountController] Error during authTest execution.");
             return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An unexpected error occurred!" });
         }
+    }
 
+    // Lists all registered users in the logger for an admin to view
+    [HttpGet("list-users")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> ListUsersAsync()
+    {
+        try
+        {
+            _logger.LogInformation("[AccountController] User list accessed by Admin user {user}.", User.Identity?.Name);
+            var users = await _applicationRepository.ListUsersAsync();
+            return Ok(new { message = "Users listed in logger."});
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "[AccountController] Error during authTest execution.");
+            return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An unexpected error occurred!" });
+        }
     }
 
     [HttpPost("logout")]
@@ -93,4 +108,25 @@ public class AccountController : Controller
         }
     }
 
+    [HttpPost("change-password")]
+    [Authorize]
+    public async Task<IActionResult> ChangePasswordAsync([FromBody] Backend.Models.ChangePasswordRequest request)
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        var user = await _userManager.FindByEmailAsync(request.Email);
+        if (user == null)
+        {
+            return NotFound(new { message = "User not found!" });
+        }
+
+        var result = await _applicationRepository.ChangePasswordAsync(request);
+
+        if (result.Succeeded)
+        {
+            return Ok(new { message = "Password changed successfully!" });
+        }
+
+        return BadRequest(new { message = "Password change failed!", errors = result.Errors });
+    }
 }

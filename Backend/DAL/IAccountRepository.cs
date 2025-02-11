@@ -9,4 +9,6 @@ public interface IAccountRepository
     Task<SignInResult> LoginAsync(string email, string password);
     Task LogoutAsync();
     Task<IdentityResult> RegisterAsync(Backend.Models.RegisterRequest request);
+    Task<IdentityResult> ListUsersAsync();
+    Task<IdentityResult> ChangePasswordAsync(Models.ChangePasswordRequest request);//Backend.Models.ChangePasswordRequest request);
 }
