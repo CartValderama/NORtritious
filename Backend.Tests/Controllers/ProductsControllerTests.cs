@@ -8,7 +8,10 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Backend.Models; // Assuming Product is in the Models namespace
+using Backend.Models;
+using Backend.DTO;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http; // Assuming Product is in the Models namespace
 
 namespace ControllerTests
 {
@@ -136,6 +139,126 @@ namespace ControllerTests
             var objectResult = Assert.IsType<ObjectResult>(result); // Verifies it returns ObjectResult
             Assert.Equal(500, objectResult.StatusCode); // Verifies that the status code is 500
             Assert.Equal("Internal server error.", objectResult.Value); // Verifies the returned message
+        }
+
+        [Fact]
+        public async Task CreateProductAsync_ReturnsCreatedAtAction_WhenValidProduct()
+        {
+            // Arrange
+            var productDTO = new ProductDTO
+            {
+                Name = "Product 1",
+                Group = "Group A",
+                Type = "Type 1",
+                HasEfsaHealth = true,
+                HasEfsaNutrition = true,
+                HasNokkelhullet = false,
+                ImageUrl = "https://example.com/product.jpg",
+                Calories = 100,
+                Fat = 10,
+                SatFat = 5,
+                Carbs = 20,
+                NatSugar = 10,
+                AddedSugar = 5,
+                Fiber = 3,
+                Protein = 10,
+                Salt = 1
+            };
+
+            var userId = "user-id";
+            var user = new IdentityUser { Id = userId };
+
+            // Mock the user manager to return the user when called with userId
+            _mockUserManager.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
+
+            // Mock the repository to return true when creating a product
+            _mockProductsRepository.Setup(repo => repo.CreateProductAsync(It.IsAny<Product>())).ReturnsAsync(true);
+
+            // Simulate that the User is already authenticated with the correct user ID
+            var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+            {
+            new Claim(ClaimTypes.NameIdentifier, userId)
+            }));
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = claimsPrincipal }
+            };
+
+            // Act
+            var result = await _controller.CreateProductAsync(productDTO);
+
+            // Assert
+            var actionResult = Assert.IsType<CreatedAtActionResult>(result);  // Check for CreatedAtAction
+            Assert.Equal("GetProductByIdAsync", actionResult.ActionName);  // Check if the action is correct
+            Assert.IsType<Product>(actionResult.Value);  // Verify that the result is of type Product
+        }
+
+        [Fact]
+        public async Task CreateProductAsync_ReturnsBadRequest_WhenProductDataIsNull()
+        {
+            // Act
+            var result = await _controller.CreateProductAsync(null);
+
+            // Assert
+            var actionResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("Product data is null.", actionResult.Value);
+        }
+
+        [Fact]
+        public async Task CreateProductAsync_ReturnsNotFound_WhenUserNotFound()
+        {
+            // Arrange
+            var productDTO = new ProductDTO { Name = "Product 1" };
+            var userId = "user-id";
+
+            // Mock the user manager to return null for the user
+            _mockUserManager.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync((IdentityUser)null);
+
+            // Simulate the User is authenticated
+            var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+            {
+            new Claim(ClaimTypes.NameIdentifier, userId)
+            }));
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = claimsPrincipal }
+            };
+
+            // Act
+            var result = await _controller.CreateProductAsync(productDTO);
+
+            // Assert
+            var actionResult = Assert.IsType<NotFoundObjectResult>(result);
+            Assert.Equal("User not found.", actionResult.Value);
+        }
+
+        [Fact]
+        public async Task CreateProductAsync_ReturnsStatusCode500_WhenExceptionOccurs()
+        {
+            // Arrange
+            var productDTO = new ProductDTO { Name = "Product 1" };
+            var userId = "user-id";
+
+            // Mock the user manager to throw an exception
+            _mockUserManager.Setup(um => um.FindByIdAsync(userId)).ThrowsAsync(new Exception("Test exception"));
+
+            // Simulate the User is authenticated
+            var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+            {
+        new Claim(ClaimTypes.NameIdentifier, userId)
+            }));
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = claimsPrincipal }
+            };
+
+            // Act
+            var result = await _controller.CreateProductAsync(productDTO);
+
+            // Assert
+            var actionResult = Assert.IsType<ObjectResult>(result);  // Check for ObjectResult instead of StatusCodeResult
+            Assert.Equal(500, actionResult.StatusCode);  // Verify that the status code is 500
+            Assert.Equal("Internal server error.", actionResult.Value);  // Verify that the error message matches
         }
     }
 }
