@@ -1,0 +1,51 @@
+.navbar-custom {
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+    z-index: 100;
+  }
+  
+  .navbar-custom .navbar-brand {
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .navbar-custom .nav-link {
+    color: #666;
+    padding: 0.5rem 1rem;
+    transition: all 0.5s ease;
+  }
+  
+  .navbar-custom .nav-link:hover {
+    color: #000000;
+    transform: scale(1.05);
+
+  }
+  
+  /* Active link styling */
+  .navbar-custom .nav-link.active {
+    color: #007bff;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 991.98px) {
+    .navbar-custom .navbar-collapse {
+      padding: 1rem 0;
+    }
+    
+    .navbar-custom .nav-link {
+      padding: 0.5rem 0;
+    }
+
+    .navbar-custom .nav-link:hover {
+      transition: 0.2s ease;
+      transform: scale(1.02);
+    }
+  }
+
+
+.brand{
+  transition: 0.1s ease;
+}
+.brand:hover{
+  transform: scale(1.05);
+  
+}

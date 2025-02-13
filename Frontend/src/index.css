@@ -1,3 +1,4 @@
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -21,7 +22,7 @@ a {
 a:hover {
   color: #535bf2;
 }
-
+/*
 body {
   margin: 0;
   display: flex;
@@ -29,7 +30,7 @@ body {
   min-width: 320px;
   min-height: 100vh;
 }
-
+*/
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
@@ -42,13 +43,18 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: #2f2d80;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: ease-out 0.25s;
+  margin: 0 10px;
 }
+/*
 button:hover {
-  border-color: #646cff;
+  border-color: #020650;
+  background-color: #040964;
+  transition: ease-in 0.1s;
 }
+  */
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
@@ -65,4 +71,30 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+input{
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  transition: border-color 0.25s;
 }

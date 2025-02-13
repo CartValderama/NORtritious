@@ -1,6 +1,6 @@
 import React, { useState, } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+//import { Link } from "react-router-dom";
 
 const LoginTest: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -77,24 +77,30 @@ const LoginTest: React.FC = () => {
         onChange={(e) => setPassword(e.target.value)}
         className="border p-2 rounded w-full mb-2"
       />
+
+      <br/>
       <button
         onClick={handleLogin}
-        className="bg-blue-500 text-white px-4 py-2 rounded"
+        className="bg-blue-500 text-white px-4 py-2 rounded mb-2"
         disabled={loading}
       >
         {loading ? "Laster..." : "Logg inn"}
       </button>
 
+      &ensp;
+
       <button
         onClick={handleLogout}
-        className="bg-red-500 text-white px-4 py-2 rounded mt-2"
+        className="bg-red-500 text-white px-4 py-2 rounded mb-2"
       >
         Logg ut
       </button>
 
+      &ensp;
+
       <button
         onClick={checkAdminRole}
-        className="bg-green-500 text-white px-4 py-2 rounded mt-2"
+        className="bg-green-500 text-white px-4 py-2 rounded"
       >
         Sjekk admin-rolle
       </button>
@@ -106,8 +112,6 @@ const LoginTest: React.FC = () => {
           {isAdmin ? "Brukeren er admin" : "Brukeren er ikke admin"}
         </p>
       )}
-
-      <Link to="../products">Products</Link>
 
     </div>
   );
