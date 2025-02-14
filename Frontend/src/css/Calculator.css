@@ -1,0 +1,227 @@
+
+/* From previous bachelro group */
+
+/* Add padding to the bottom of the container */
+.container {
+    padding-block-end: 2rem;
+  }
+  
+  /* Style the search form */
+  .form-search {
+    background: #f6f6f6;
+    padding: 0.5rem;
+    border: solid 1px #adacac;
+  }
+  
+  /* Set the dimensions of the logo image */
+  .img-logo {
+    width: 10rem;
+    height: auto;
+  }
+  
+  /* Set the height and padding for the keyhole logo */
+  .keyhole-logo {
+    height: 4.125rem;
+    padding-bottom: 0.5rem;
+  }
+  
+  /* Set the height, padding, and color for the navigation logo */
+  .nav-logo {
+    height: 2rem;
+    padding: 1rem;
+    color: #000000;
+  }
+  
+  /* Add a border to the table */
+  .table {
+    border: 1px solid #dee2e6;
+  }
+  
+  /* Set the background opacity for the light background */
+  .bg-light {
+    --bs-bg-opacity: 0;
+  }
+  
+  /* Set the font weight for the table */
+  .table-font {
+    font-weight: 500;
+  }
+  
+  /* Style the foodproducts result containers */
+  .nøkkelhullet-food-result-container {
+    background: #daecd8; /* green */
+    padding: 1rem;
+  }
+  
+  .nøkkelhullet-food-negResult-container {
+    background: #f3b7b7; /* red */
+    padding: 1rem;
+  }
+  
+  /* Styles for the "Ernæringspåstander" container when all claims are true */
+  .ernæringspåstander-food-result-container-all {
+    background: #daecd8; /* green */
+    padding: 1rem;
+  }
+   
+  /* Styles for the "Ernæringspåstander" container when at least one claim is true */
+  .ernæringspåstander-food-result-container-some {
+    background: #f3b7b7; /* red */
+    padding: 1rem;
+  }
+  
+  /* Styles for the "Ernæringspåstander" container when all claims are false */
+  .ernæringspåstander-food-result-container-none {
+    background: #f3b7b7; /* red */
+    padding: 1rem;
+  }
+  
+  .helsepåstander-food-result-container {
+    background: #f2f0b5;
+    padding: 1rem;
+  }
+  
+  .helsepåstander-food-negResult-container {
+    background: #f3b7b7; /* red */
+    padding: 1rem;
+  }
+  
+  /* Center align the buttons */
+  .button-div {
+    text-align: center;
+  }
+  
+  /* Add padding to the top of the search button */
+  .button-front-search {
+    padding-top: 1.2rem;
+  }
+  
+  /* Style the search button */
+  .button-search {
+    background-color: #00205b;
+    border-block-color: #00205b;
+    float: right;
+  }
+  
+  /* Add focus styles for search and view buttons */
+  .button-search:focus,
+  .button-view:focus {
+    outline: 2px solid #00205b;
+  }
+  
+  /* Style the view button */
+  .button-view {
+    border: solid 1px #c1c1c1;
+  }
+  
+  /* Style the alert box */
+  .alert-box {
+    border: 2px solid red;
+  }
+  
+  /* Style the info div */
+  .info-div {
+    background: #ffffff;
+    border: 1px solid;
+    padding: unset;
+    float: right;
+    padding-top: 1rem;
+  }
+  
+  /* Add cursor style for the info button */
+  .info-button {
+    cursor: pointer;
+  }
+  
+  /* Style the close button */
+  .x-button {
+    float: right;
+    cursor: pointer;
+  }
+  
+  /* Style the alert icon */
+  .alert-icon {
+    color: red;
+    cursor: help;
+  }
+  /* Set display style for the icon */
+  .icon {
+    display: inline-block;
+  }
+  
+  /* Add margin to the bottom of the form group */
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  /* Set font sizes for headings */
+  h1 {
+    font-size: 2.5rem;
+  }
+  
+  h2 {
+    font-size: 2rem;
+  }
+  
+  h3 {
+    font-size: 1.75rem;
+  }
+  
+  h4 {
+    font-size: 1.5rem;
+  }
+  
+  h5 {
+    font-size: 1.25rem;
+  }
+  
+  h6 {
+    font-size: 1rem;
+  }
+  
+  /* Set font size for paragraphs and list items */
+  p,
+  li {
+    font-size: 1rem;
+  }
+  
+  /* Set font size for small text */
+  .small-text {
+    font-size: 0.875rem;
+  }
+  
+  /* Add focus styles for buttons */
+  button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5); /* You can adjust the color and size of the focus ring */
+  }
+  
+  /* Container for all buttons.Uses flexbox for layout and spaces the elements evenly */
+  .button-container {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  /* Sets the width for each button's wrapper.This way each button has the same width and aligns correctly */
+  .button-wrapper {
+    width: 200px;
+  }
+  
+  /* Button styling. 
+     Buttons are made to take up full width, a fixed height and centered contents */
+  .custom-button {
+    width: 100%;
+    height: 44px; /* Set an explicit height*/
+    display: flex; /*  Use flex to center the contents */
+    align-items: center; /*  Center contents vertically*/
+    justify-content: center; /* Center contents horizontally */
+  }
+  
+  /* Adds a little space after each icon to separate it from the text */
+  .icon-right-spacing {
+    margin-right: 5px;
+  }
+  li {
+    list-style-type: none;
+  }
+  
