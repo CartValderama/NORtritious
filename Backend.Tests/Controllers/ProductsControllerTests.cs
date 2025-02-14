@@ -32,233 +32,734 @@ namespace ControllerTests
             _mockProductsRepository = new Mock<IProductsRepository>();
             _mockLogger = new Mock<ILogger<ProductsController>>();
 
-            _controller = new ProductsController(_mockUserManager.Object, _mockProductsRepository.Object, _mockLogger.Object);
+            _controller = new ProductsController(_mockUserManager.Object, _mockProductsRepository.Object, _mockLogger.Object)
+            {
+                /*ControllerContext = new ControllerContext
+                {
+                    HttpContext = new DefaultHttpContext
+                    {
+                        User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                        {
+                            new Claim(ClaimTypes.NameIdentifier, "test-user-id")
+                        }))
+                    }
+                }*/
+            };
         }
 
-        [Fact]
-        public async Task GetAllProductsAsync_ReturnsOkResult_WhenProductsAreFound()
-        {
-            // Arrange: Mock a list of products
-            var products = new List<Product>
-        {
-            new Product
-            {
-                ProductId = 1,
-                Name = "Product 1",
-                Group = "Group 1",
-                Type = "Type 1",
-                HasEfsaHealth = true,
-                HasEfsaNutrition = true,
-                HasNokkelhullet = false,
-                ImageUrl = "",
-                Calories = 100,
-                Fat = 5,
-                SatFat = 2,
-                Carbs = 10,
-                NatSugar = 5,
-                AddedSugar = 2,
-                Fiber = 3,
-                Protein = 4,
-                Salt = 1,
-                UserId = "user123",
-                CreatedByUser = new IdentityUser { UserName = "user123" } // Mock the CreatedByUser
-            }
-        };
+        /*
+        Get All Products Tests
+        */
 
-            _mockProductsRepository.Setup(repo => repo.GetAllProductsAsync()).ReturnsAsync(products);
+        [Fact]
+        public async Task GetAllProductsAsync_ReturnsOk_WhenProductsExist()
+        {
+            // Arrange
+            var products = new List<Product>
+            {
+                new Product { ProductId = 1, Name = "Product 1" },
+                new Product { ProductId = 2, Name = "Product 2" }
+            };
+            _mockProductsRepository.Setup(x => x.GetAllProductsAsync()).ReturnsAsync(products);
+
+            // Set the user role to Admin
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, "test-user-id"),
+                        new Claim(ClaimTypes.Role, "Admin") // Any role will do
+                    }))
+                }
+            };
 
             // Act
             var result = await _controller.GetAllProductsAsync();
 
-            // Assert: Check that the result is an OkObjectResult
+            // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
-            var returnValue = Assert.IsType<List<Product>>(okResult.Value);
-            Assert.Equal(products.Count, returnValue.Count);
+            Assert.Equal(products, okResult.Value);
+        }
+
+        [Fact]
+        public async Task GetAllProductsAsync_ReturnsOk_WhenNoProductsExist()
+        {
+            // Arrange
+            var products = new List<Product>();
+            _mockProductsRepository.Setup(x => x.GetAllProductsAsync()).ReturnsAsync(products);
+
+            // Set the user role to Researcher
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, "test-user-id"),
+                        new Claim(ClaimTypes.Role, "Researcher") // Any role will do
+                    }))
+                }
+            };
+
+            // Act
+            var result = await _controller.GetAllProductsAsync();
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(products, okResult.Value);
         }
 
         [Fact]
         public async Task GetAllProductsAsync_ReturnsInternalServerError_WhenExceptionOccurs()
         {
-            // Arrange: Make the repository throw an exception
-            _mockProductsRepository.Setup(repo => repo.GetAllProductsAsync()).ThrowsAsync(new Exception("Test exception"));
+            // Arrange
+            _mockProductsRepository.Setup(x => x.GetAllProductsAsync()).Throws(new Exception("Test Exception"));
+
+            // Set the user role to Producer
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, "test-user-id"),
+                        new Claim(ClaimTypes.Role, "Producer")
+                    }))
+                }
+            };
 
             // Act
             var result = await _controller.GetAllProductsAsync();
 
-            // Assert: Check that the result is an Internal Server Error (500)
+            // Assert
             var statusCodeResult = Assert.IsType<ObjectResult>(result);
             Assert.Equal(500, statusCodeResult.StatusCode);
             Assert.Equal("Internal server error.", statusCodeResult.Value);
         }
 
+        /*
+        Get Product By Id Tests
+        */
+
         [Fact]
-        public async Task GetProductByIdAsync_ReturnsOkResult_WhenProductIsFound()
+        public async Task GetProductByIdAsync_ReturnsOk_WhenProductExists()
         {
             // Arrange
-            var productId = 1;
-            var mockProduct = new Product { ProductId = productId, Name = "Product 1" };
-            _mockProductsRepository.Setup(repo => repo.GetProductByIdAsync(productId))
-                                    .ReturnsAsync(mockProduct);
+            var product = new Product { ProductId = 1, Name = "Product 1" };
+            _mockProductsRepository.Setup(x => x.GetProductByIdAsync(It.IsAny<int>())).ReturnsAsync(product);
+
+            // Set the user role to Admin
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, "test-user-id"),
+                        new Claim(ClaimTypes.Role, "Admin") // Any role will do
+                    }))
+                }
+            };
 
             // Act
-            var result = await _controller.GetProductByIdAsync(productId);
+            var result = await _controller.GetProductByIdAsync(1);
 
             // Assert
-            var okResult = Assert.IsType<OkObjectResult>(result); // Verifies it returns OkResult
-            var returnValue = Assert.IsType<Product>(okResult.Value); // Verifies that the returned value is of type Product
-            Assert.Equal(productId, returnValue.ProductId); // Verifies the returned product has the correct ID
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(product, okResult.Value);
         }
 
         [Fact]
         public async Task GetProductByIdAsync_ReturnsNotFound_WhenProductDoesNotExist()
         {
             // Arrange
-            var productId = 1;
-            _mockProductsRepository.Setup(repo => repo.GetProductByIdAsync(productId))
-                                    .ReturnsAsync((Product)null); // Simulating no product found
+            _mockProductsRepository.Setup(x => x.GetProductByIdAsync(It.IsAny<int>())).ReturnsAsync((Product)null);
 
-            // Act
-            var result = await _controller.GetProductByIdAsync(productId);
-
-            // Assert
-            Assert.IsType<NotFoundResult>(result); // Verifies it returns NotFound
-        }
-
-        [Fact]
-        public async Task GetProductByIdAsync_ReturnsStatusCode500_WhenExceptionOccurs()
-        {
-            // Arrange
-            var productId = 1;
-            _mockProductsRepository.Setup(repo => repo.GetProductByIdAsync(productId))
-                                    .ThrowsAsync(new Exception("Database error"));
-
-            // Act
-            var result = await _controller.GetProductByIdAsync(productId);
-
-            // Assert
-            var objectResult = Assert.IsType<ObjectResult>(result); // Verifies it returns ObjectResult
-            Assert.Equal(500, objectResult.StatusCode); // Verifies that the status code is 500
-            Assert.Equal("Internal server error.", objectResult.Value); // Verifies the returned message
-        }
-
-        [Fact]
-        public async Task CreateProductAsync_ReturnsCreatedAtAction_WhenValidProduct()
-        {
-            // Arrange
-            var productDTO = new ProductDTO
-            {
-                Name = "Product 1",
-                Group = "Group A",
-                Type = "Type 1",
-                HasEfsaHealth = true,
-                HasEfsaNutrition = true,
-                HasNokkelhullet = false,
-                ImageUrl = "https://example.com/product.jpg",
-                Calories = 100,
-                Fat = 10,
-                SatFat = 5,
-                Carbs = 20,
-                NatSugar = 10,
-                AddedSugar = 5,
-                Fiber = 3,
-                Protein = 10,
-                Salt = 1
-            };
-
-            var userId = "user-id";
-            var user = new IdentityUser { Id = userId };
-
-            // Mock the user manager to return the user when called with userId
-            _mockUserManager.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync(user);
-
-            // Mock the repository to return true when creating a product
-            _mockProductsRepository.Setup(repo => repo.CreateProductAsync(It.IsAny<Product>())).ReturnsAsync(true);
-
-            // Simulate that the User is already authenticated with the correct user ID
-            var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
-            {
-            new Claim(ClaimTypes.NameIdentifier, userId)
-            }));
+            // Set the user role to Researcher
             _controller.ControllerContext = new ControllerContext
             {
-                HttpContext = new DefaultHttpContext { User = claimsPrincipal }
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, "test-user-id"),
+                        new Claim(ClaimTypes.Role, "Researcher") // Any role will do
+                    }))
+                }
             };
 
             // Act
-            var result = await _controller.CreateProductAsync(productDTO);
+            var result = await _controller.GetProductByIdAsync(1);
 
             // Assert
-            var actionResult = Assert.IsType<CreatedAtActionResult>(result);  // Check for CreatedAtAction
-            Assert.Equal("GetProductByIdAsync", actionResult.ActionName);  // Check if the action is correct
-            Assert.IsType<Product>(actionResult.Value);  // Verify that the result is of type Product
+            Assert.IsType<NotFoundResult>(result);
         }
 
         [Fact]
-        public async Task CreateProductAsync_ReturnsBadRequest_WhenProductDataIsNull()
+        public async Task GetProductByIdAsync_ReturnsInternalServerError_WhenExceptionOccurs()
         {
+            // Arrange
+            _mockProductsRepository.Setup(x => x.GetProductByIdAsync(It.IsAny<int>())).Throws(new Exception("Test Exception"));
+
+            // Set the user role to Producer
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, "test-user-id"),
+                        new Claim(ClaimTypes.Role, "Producer") // Any role will do
+                    }))
+                }
+            };
+
+            // Act
+            var result = await _controller.GetProductByIdAsync(1);
+
+            // Assert
+            var statusCodeResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(500, statusCodeResult.StatusCode);
+            Assert.Equal("Internal server error.", statusCodeResult.Value);
+        }
+
+        /*
+        Create Product Tests
+        */
+
+        [Fact]
+        public async Task CreateProductAsync_ReturnsBadRequest_WhenProductDtoIsNull()
+        {
+            // Arrange
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, "test-user-id"),
+                        new Claim(ClaimTypes.Role, "Producer")
+                    }))
+                }
+            };
+
             // Act
             var result = await _controller.CreateProductAsync(null);
 
             // Assert
-            var actionResult = Assert.IsType<BadRequestObjectResult>(result);
-            Assert.Equal("Product data is null.", actionResult.Value);
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("Product data is null.", badRequestResult.Value);
+        }
+
+        [Fact]
+        public async Task CreateProductAsync_ReturnsUnauthorized_WhenUserIdIsNull()
+        {
+            // Arrange
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity())
+                }
+            };
+
+            // Act
+            var result = await _controller.CreateProductAsync(new ProductDTO());
+
+            // Assert
+            var unauthorizedResult = Assert.IsType<UnauthorizedObjectResult>(result);
+            Assert.Equal("User not authenticated.", unauthorizedResult.Value);
         }
 
         [Fact]
         public async Task CreateProductAsync_ReturnsNotFound_WhenUserNotFound()
         {
             // Arrange
-            var productDTO = new ProductDTO { Name = "Product 1" };
-            var userId = "user-id";
+            _mockUserManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync((IdentityUser)null);
 
-            // Mock the user manager to return null for the user
-            _mockUserManager.Setup(um => um.FindByIdAsync(userId)).ReturnsAsync((IdentityUser)null);
-
-            // Simulate the User is authenticated
-            var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
-            {
-            new Claim(ClaimTypes.NameIdentifier, userId)
-            }));
             _controller.ControllerContext = new ControllerContext
             {
-                HttpContext = new DefaultHttpContext { User = claimsPrincipal }
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, "test-user-id"),
+                        new Claim(ClaimTypes.Role, "Producer")
+                    }))
+                }
             };
 
             // Act
-            var result = await _controller.CreateProductAsync(productDTO);
+            var result = await _controller.CreateProductAsync(new ProductDTO());
 
             // Assert
-            var actionResult = Assert.IsType<NotFoundObjectResult>(result);
-            Assert.Equal("User not found.", actionResult.Value);
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+            Assert.Equal("User not found.", notFoundResult.Value);
         }
 
         [Fact]
-        public async Task CreateProductAsync_ReturnsStatusCode500_WhenExceptionOccurs()
+        public async Task CreateProductAsync_ReturnsCreatedAtAction_WhenProductCreatedSuccessfully()
         {
             // Arrange
-            var productDTO = new ProductDTO { Name = "Product 1" };
-            var userId = "user-id";
+            var user = new IdentityUser { Id = "test-user-id" };
+            _mockUserManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(user);
+            _mockProductsRepository.Setup(x => x.CreateProductAsync(It.IsAny<Product>())).ReturnsAsync(true);
 
-            // Mock the user manager to throw an exception
-            _mockUserManager.Setup(um => um.FindByIdAsync(userId)).ThrowsAsync(new Exception("Test exception"));
-
-            // Simulate the User is authenticated
-            var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+            var productDto = new ProductDTO
             {
-        new Claim(ClaimTypes.NameIdentifier, userId)
-            }));
+                Name = "Test Product",
+                Group = "Test Group",
+                Type = "Test Type",
+                HasEfsaHealth = true,
+                HasEfsaNutrition = true,
+                HasNokkelhullet = true,
+                ImageUrl = "http://test.com/image.png",
+                Calories = 100,
+                Fat = 10,
+                SatFat = 5,
+                Carbs = 20,
+                NatSugar = 10,
+                AddedSugar = 5,
+                Fiber = 2,
+                Protein = 5,
+                Salt = 1
+            };
+
             _controller.ControllerContext = new ControllerContext
             {
-                HttpContext = new DefaultHttpContext { User = claimsPrincipal }
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, "test-user-id"),
+                        new Claim(ClaimTypes.Role, "Producer")
+                    }))
+                }
             };
 
             // Act
-            var result = await _controller.CreateProductAsync(productDTO);
+            var result = await _controller.CreateProductAsync(productDto);
 
             // Assert
-            var actionResult = Assert.IsType<ObjectResult>(result);  // Check for ObjectResult instead of StatusCodeResult
-            Assert.Equal(500, actionResult.StatusCode);  // Verify that the status code is 500
-            Assert.Equal("Internal server error.", actionResult.Value);  // Verify that the error message matches
+            var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(result);
+            Assert.Equal(nameof(_controller.GetProductByIdAsync), createdAtActionResult.ActionName);
+            Assert.IsType<Product>(createdAtActionResult.Value);
+        }
+
+        [Fact]
+        public async Task CreateProductAsync_ReturnsBadRequest_WhenProductCreationFails()
+        {
+            // Arrange
+            var user = new IdentityUser { Id = "test-user-id" };
+            _mockUserManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(user);
+            _mockProductsRepository.Setup(x => x.CreateProductAsync(It.IsAny<Product>())).ReturnsAsync(false);
+
+            var productDto = new ProductDTO
+            {
+                Name = "Test Product",
+                Group = "Test Group",
+                Type = "Test Type",
+                HasEfsaHealth = true,
+                HasEfsaNutrition = true,
+                HasNokkelhullet = true,
+                ImageUrl = "http://test.com/image.png",
+                Calories = 100,
+                Fat = 10,
+                SatFat = 5,
+                Carbs = 20,
+                NatSugar = 10,
+                AddedSugar = 5,
+                Fiber = 2,
+                Protein = 5,
+                Salt = 1
+            };
+
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, "test-user-id"),
+                        new Claim(ClaimTypes.Role, "Producer")
+                    }))
+                }
+            };
+
+            // Act
+            var result = await _controller.CreateProductAsync(productDto);
+
+            // Assert
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("Failed to create product.", badRequestResult.Value);
+        }
+
+        [Fact]
+        public async Task CreateProductAsync_ReturnsInternalServerError_WhenExceptionOccurs()
+        {
+            // Arrange
+            _mockUserManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).Throws(new Exception("Test Exception"));
+
+            var productDto = new ProductDTO
+            {
+                Name = "Test Product",
+                Group = "Test Group",
+                Type = "Test Type",
+                HasEfsaHealth = true,
+                HasEfsaNutrition = true,
+                HasNokkelhullet = true,
+                ImageUrl = "http://test.com/image.png",
+                Calories = 100,
+                Fat = 10,
+                SatFat = 5,
+                Carbs = 20,
+                NatSugar = 10,
+                AddedSugar = 5,
+                Fiber = 2,
+                Protein = 5,
+                Salt = 1
+            };
+
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, "test-user-id"),
+                        new Claim(ClaimTypes.Role, "Producer")
+                    }))
+                }
+            };
+
+            // Act
+            var result = await _controller.CreateProductAsync(productDto);
+
+            // Assert
+            var statusCodeResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(500, statusCodeResult.StatusCode);
+            Assert.Equal("Internal server error.", statusCodeResult.Value);
+        }
+
+        /*
+        Update Product Tests
+        */
+        [Fact]
+        public async Task UpdateProductAsync_ReturnsBadRequest_WhenProductDtoIsNull()
+        {
+            // Act
+            var result = await _controller.UpdateProductAsync(1, null);
+
+            // Assert
+            Assert.IsType<BadRequestResult>(result);
+        }
+
+        [Fact]
+        public async Task UpdateProductAsync_ReturnsBadRequest_WhenProductDtoIdDoesNotMatch()
+        {
+            // Arrange
+            var productDto = new ProductDTO { ProductId = 2 };
+
+            // Act
+            var result = await _controller.UpdateProductAsync(1, productDto);
+
+            // Assert
+            Assert.IsType<BadRequestResult>(result);
+        }
+
+        [Fact]
+        public async Task UpdateProductAsync_ReturnsNotFound_WhenProductDoesNotExist()
+        {
+            // Arrange
+            _mockProductsRepository.Setup(x => x.GetProductByIdAsync(It.IsAny<int>())).ReturnsAsync((Product)null);
+            var productDto = new ProductDTO { ProductId = 1 };
+
+            // Act
+            var result = await _controller.UpdateProductAsync(1, productDto);
+
+            // Assert
+            var notFoundResult = Assert.IsType<NotFoundResult>(result);
+        }
+
+
+        [Fact]
+        public async Task UpdateProductAsync_ReturnsUnauthorized_WhenProducerUpdatesOthersProduct()
+        {
+            // Arrange
+            var existingProduct = new Product { ProductId = 1, UserId = "other-user-id" };
+            _mockProductsRepository.Setup(x => x.GetProductByIdAsync(It.IsAny<int>())).ReturnsAsync(existingProduct);
+            var productDto = new ProductDTO { ProductId = 1 };
+
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, "test-user-id"),
+                        new Claim(ClaimTypes.Role, "Producer")
+                    }))
+                }
+            };
+
+            // Act
+            var result = await _controller.UpdateProductAsync(1, productDto);
+
+            // Assert
+            var unauthorizedResult = Assert.IsType<UnauthorizedObjectResult>(result);
+            Assert.Equal("Producers can only update their own products.", unauthorizedResult.Value);
+        }
+
+        [Fact]
+        public async Task UpdateProductAsync_ReturnsCreatedAtAction_WhenProductUpdatedSuccessfully()
+        {
+            // Arrange
+            var existingProduct = new Product { ProductId = 1, UserId = "test-user-id" };
+            _mockProductsRepository.Setup(x => x.GetProductByIdAsync(It.IsAny<int>())).ReturnsAsync(existingProduct);
+            _mockProductsRepository.Setup(x => x.UpdateProductAsync(It.IsAny<Product>())).ReturnsAsync(true);
+            var productDto = new ProductDTO
+            {
+                ProductId = 1,
+                Name = "Updated Product",
+                Group = "Updated Group",
+                Type = "Updated Type",
+                HasEfsaHealth = true,
+                HasEfsaNutrition = true,
+                HasNokkelhullet = true,
+                ImageUrl = "http://test.com/updated-image.png",
+                Calories = 150,
+                Fat = 15,
+                SatFat = 7,
+                Carbs = 30,
+                NatSugar = 15,
+                AddedSugar = 8,
+                Fiber = 3,
+                Protein = 7,
+                Salt = 2
+            };
+
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, "test-user-id"),
+                        new Claim(ClaimTypes.Role, "Producer")
+                    }))
+                }
+            };
+
+            // Act
+            var result = await _controller.UpdateProductAsync(1, productDto);
+
+            // Assert
+            var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(result);
+            Assert.Equal(nameof(_controller.GetProductByIdAsync), createdAtActionResult.ActionName);
+            Assert.IsType<Product>(createdAtActionResult.Value);
+        }
+
+        [Fact]
+        public async Task UpdateProductAsync_ReturnsInternalServerError_WhenExceptionOccurs()
+        {
+            // Arrange
+            _mockProductsRepository.Setup(x => x.GetProductByIdAsync(It.IsAny<int>())).Throws(new Exception("Test Exception"));
+            var productDto = new ProductDTO { ProductId = 1 };
+
+            // Act
+            var result = await _controller.UpdateProductAsync(1, productDto);
+
+            // Assert
+            var statusCodeResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(500, statusCodeResult.StatusCode);
+            Assert.Equal("Internal server error.", statusCodeResult.Value);
+        }
+
+        [Fact]
+        public async Task UpdateProductAsync_ReturnsInternalServerError_WhenUpdateFails()
+        {
+            // Arrange
+            var existingProduct = new Product { ProductId = 1, UserId = "test-user-id" };
+            _mockProductsRepository.Setup(x => x.GetProductByIdAsync(It.IsAny<int>())).ReturnsAsync(existingProduct);
+            _mockProductsRepository.Setup(x => x.UpdateProductAsync(It.IsAny<Product>())).ReturnsAsync(false);
+            var productDto = new ProductDTO { ProductId = 1 };
+
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, "test-user-id"),
+                        new Claim(ClaimTypes.Role, "Producer")
+                    }))
+                }
+            };
+
+            // Act
+            var result = await _controller.UpdateProductAsync(1, productDto);
+
+            // Assert
+            var statusCodeResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(500, statusCodeResult.StatusCode);
+            Assert.Equal("An error occurred while updating the product.", statusCodeResult.Value);
+        }
+
+        /* 
+        Delete Product Tests
+        */
+        [Fact]
+        public async Task DeleteProductAsync_ReturnsNotFound_WhenProductDoesNotExist()
+        {
+            // Arrange
+            _mockProductsRepository.Setup(x => x.GetProductByIdAsync(It.IsAny<int>())).ReturnsAsync((Product)null);
+
+            // Act
+            var result = await _controller.DeleteProductAsync(1);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task DeleteProductAsync_ReturnsUnauthorized_WhenProducerDeletesOthersProduct()
+        {
+            // Arrange
+            var existingProduct = new Product { ProductId = 1, UserId = "other-user-id" };
+            _mockProductsRepository.Setup(x => x.GetProductByIdAsync(It.IsAny<int>())).ReturnsAsync(existingProduct);
+
+            // Set the user role to Producer
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(ClaimTypes.Role, "Producer")
+                    }))
+                }
+            };
+
+            // Act
+            var result = await _controller.DeleteProductAsync(1);
+
+            // Assert
+            var unauthorizedResult = Assert.IsType<UnauthorizedObjectResult>(result);
+            Assert.Equal("Producers can only delete their own products.", unauthorizedResult.Value);
+        }
+
+        [Fact]
+        public async Task DeleteProductAsync_ReturnsNoContent_WhenProductDeletedSuccessfully_AsAdmin()
+        {
+            // Arrange
+            var existingProduct = new Product { ProductId = 1, UserId = "other-user-id" };
+            _mockProductsRepository.Setup(x => x.GetProductByIdAsync(It.IsAny<int>())).ReturnsAsync(existingProduct);
+            _mockProductsRepository.Setup(x => x.DeleteProductAsync(It.IsAny<int>())).ReturnsAsync(true);
+
+            // Set the user role to Admin
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        //new Claim(ClaimTypes.NameIdentifier, "test-user-id"),
+                        new Claim(ClaimTypes.Role, "Admin")
+                    }))
+                }
+            };
+
+            // Act
+            var result = await _controller.DeleteProductAsync(1);
+
+            // Assert
+            Assert.IsType<NoContentResult>(result);
+        }
+
+        [Fact]
+        public async Task DeleteProductAsync_ReturnsNoContent_WhenProductDeletedSuccessfully_AsProducer()
+        {
+            // Arrange
+            var existingProduct = new Product { ProductId = 1, UserId = "test-user-id" };
+            _mockProductsRepository.Setup(x => x.GetProductByIdAsync(It.IsAny<int>())).ReturnsAsync(existingProduct);
+            _mockProductsRepository.Setup(x => x.DeleteProductAsync(It.IsAny<int>())).ReturnsAsync(true);
+
+            // Set the user role to Producer
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, "test-user-id"),
+                        new Claim(ClaimTypes.Role, "Producer")
+                    }))
+                }
+            };
+
+            // Act
+            var result = await _controller.DeleteProductAsync(1);
+
+            // Assert
+            Assert.IsType<NoContentResult>(result);
+        }
+
+        [Fact]
+        public async Task DeleteProductAsync_ReturnsNotFound_WhenProductDeletionFails()
+        {
+            // Arrange
+            var existingProduct = new Product { ProductId = 1, UserId = "test-user-id" };
+            _mockProductsRepository.Setup(x => x.GetProductByIdAsync(It.IsAny<int>())).ReturnsAsync(existingProduct);
+            _mockProductsRepository.Setup(x => x.DeleteProductAsync(It.IsAny<int>())).ReturnsAsync(false);
+
+            // Set the user role to Producer
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, "test-user-id"),
+                        new Claim(ClaimTypes.Role, "Producer")
+                    }))
+                }
+            };
+
+            // Act
+            var result = await _controller.DeleteProductAsync(1);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task DeleteProductAsync_ReturnsInternalServerError_WhenExceptionOccurs()
+        {
+            // Arrange
+            _mockProductsRepository.Setup(x => x.GetProductByIdAsync(It.IsAny<int>())).Throws(new Exception("Test Exception"));
+
+            // Set the user role to Producer
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, "test-user-id"),
+                        new Claim(ClaimTypes.Role, "Producer")
+                    }))
+                }
+            };
+
+            // Act
+            var result = await _controller.DeleteProductAsync(1);
+
+            // Assert
+            var statusCodeResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(500, statusCodeResult.StatusCode);
+            Assert.Equal("Internal server error.", statusCodeResult.Value);
         }
     }
 }
