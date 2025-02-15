@@ -61,43 +61,70 @@ const LoginTest: React.FC = () => {
   };
 
   return (
-    <div className="p-4 max-w-lg mx-auto">
-      <h1 className="text-xl font-bold mb-4">Login Test</h1>
-      <input
-        type="email"
-        placeholder="E-post"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className="border p-2 rounded w-full mb-2"
-      />
-      <input
-        type="password"
-        placeholder="Passord"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        className="border p-2 rounded w-full mb-2"
-      />
-      <br />
-      <button
-        onClick={handleLogin}
-        className="btn btn-primary"
-        disabled={loading}
-      >
-        {loading ? "Laster..." : "Logg inn"}
-      </button>
-      &ensp;
-      <button onClick={handleLogout} className="btn btn-danger">
-        Logg ut
-      </button>
-      &ensp;
-      <button onClick={checkAdminRole} className="btn btn-secondary">
+    <div className="container">
+      <h1 className="h1">Login Test</h1>
+      <form className="mb-4">
+        <div className="mb-3">
+          <label htmlFor="email" className="form-label">
+            Epost
+          </label>
+          <input
+            type="email"
+            className="form-control"
+            id="email"
+            placeholder="E-post"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+        <label htmlFor="password" className="form-label">
+          Passord
+        </label>
+        <input
+          type="password"
+          className="form-control mb-4"
+          id="password"
+          placeholder="Passord"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button
+          type="submit"
+          onClick={handleLogin}
+          className="btn btn-primary me-2"
+          disabled={loading}
+        >
+          {loading ? "Laster..." : "Logg inn"}
+        </button>
+        <button type="submit" onClick={handleLogout} className="btn btn-danger">
+          Logg ut
+        </button>
+      </form>
+
+      <h2 className="h2">Tilgangskontroll for Admin-rolle</h2>
+      <button onClick={checkAdminRole} className="btn btn-outline-primary">
         Sjekk admin-rolle
       </button>
-      {message && <p className="text-green-500 mt-4">{message}</p>}
-      {error && <p className="text-red-500 mt-4">{error}</p>}
+
+      {message && (
+        <div className="mt-2 alert alert-success" role="alert">
+          {message}
+        </div>
+      )}
+      {error && (
+        <div className="mt-2 alert alert-danger" role="alert">
+          {error}
+        </div>
+      )}
       {isAdmin !== null && (
         <p className="mt-4">
-          {isAdmin ? "Brukeren er admin" : "Brukeren er ikke admin"}
+          {isAdmin ? (
+            <div className="mt-2 alert alert-success">"Brukeren er admin"</div>
+          ) : (
+            <div className="mt-2 alert alert-danger">
+              "Brukeren er ikke admin"
+            </div>
+          )}
         </p>
       )}
     </div>
