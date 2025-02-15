@@ -101,11 +101,6 @@ const LoginTest: React.FC = () => {
         </button>
       </form>
 
-      <h2 className="h2">Tilgangskontroll for Admin-rolle</h2>
-      <button onClick={checkAdminRole} className="btn btn-outline-primary">
-        Sjekk admin-rolle
-      </button>
-
       {message && (
         <div className="mt-2 alert alert-success" role="alert">
           {message}
@@ -116,6 +111,11 @@ const LoginTest: React.FC = () => {
           {error}
         </div>
       )}
+
+      <h2 className="h2">Tilgangskontroll for Admin-rolle</h2>
+      <button onClick={checkAdminRole} className="btn btn-outline-primary">
+        Sjekk admin-rolle
+      </button>
       {isAdmin !== null && (
         <p className="mt-4">
           {isAdmin ? (
