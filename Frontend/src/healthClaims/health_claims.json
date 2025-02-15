@@ -87,8 +87,8 @@
           {
                 "claim": "ALA contributes to the maintenance of normal blood cholesterol levels.",
                 "conditions": {
-                    "min_amount": 2,
-                    "unit": "g",
+                  "requirement": "source_of_omega_3_acids",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
                     "info": "The claim may be used only for food which is at least a source of ALA as referred to in the claim SOURCE OF OMEGA 3 FATTY ACIDS as listed in the Annex to Regulation (EC) No 1924/2006. Information shall be given to the consumer that the beneficial effect is obtained with a daily intake of 2 g of ALA."
             }
           }
@@ -126,6 +126,8 @@
           {
             "claim": "Barley grain fibre contributes to an increase in faecal bulk.",
             "conditions": {
+              "requirement": "high_fibre",
+              "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
               "info": "The claim may be used only for food which is high in that fibre as referred to in the claim HIGH FIBRE as listed in the Annex to Regulation (EC) No 1924/2006."
             }
           }
@@ -404,12 +406,10 @@
                 "total_carbohydrates": "at least 130 g per day from all sources",
                 "food_carbohydrates": "at least 20 g per quantified portion"
               },
-              "restrictions": {
-                "excluded": "foods that are 100% sugars",
-                "allowed": "foods that comply with the claim 'LOW SUGARS' or 'WITH NO ADDED SUGARS' as per Regulation (EC) No 1924/2006"
-              },
-              "info": "In order to bear the claim, information shall be given to the consumer that the beneficial effect is obtained with a daily intake of 130 g of carbohydrates from all sources."
-            }
+              "requirement": ["low_sugars", "with_no_added_sugars"],
+              "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+              "info": "In order to bear the claim, information shall be given to the consumer that the beneficial effect is obtained with a daily intake of 130 g of carbohydrates from all sources. The claim may be used for food which contains at least 20 g carbohydrates which are metabolised by humans, excluding polyols, per quantified portion and complies with the nutrition claim LOW SUGARS or WITH NO ADDED SUGARS as listed in the Annex to Regulation (EC) No 1924/2006. The claim shall not be used on food which is 100% sugars."
+              }
           },
           {
             "claim": "Carbohydrates contribute to the recovery of normal muscle function (contraction) after highly intensive and/or long-lasting physical exercise leading to muscle fatigue and the depletion of glycogen stores in skeletal muscle.",
@@ -1383,7 +1383,853 @@
                 }
             }
         ]
-    },  
+    }, 
+    {
+        "nutrient": "Niacin",
+        "claims": [
+            {
+              "claim": "Niacin contributes to normal psychological function",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of niacin as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Niacin contributes to normal energy-yielding metabolism",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of niacin as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Niacin contributes to normal functioning of the nervous system",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of niacin as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Niacin contributes to the maintenance of normal mucous membranes",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of niacin as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Niacin contributes to the maintenance of normal skin",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of niacin as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Niacin contributes to the reduction of tiredness and fatigue",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of niacin as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          }
+        ]
+    }, 
+    {
+        "nutrient": "Non-digestible carbohydrates",
+        "claims": [
+            {
+                "claim": "Consumption of foods/drinks containing non-digestible carbohydrates instead of sugars induces a lower blood glucose rise after their consumption compared to sugar-containing foods/drinks.",
+                "conditions": {
+                    "requirement": "replacement",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "In order to bear the claim, sugars should be replaced in foods or drinks by non-digestible carbohydrates, which are carbohydrates neither digested nor absorbed in the small intestine, so that foods or drinks contain reduced amounts of sugars by at least the amount referred to in the claim 'REDUCED [NAME OF NUTRIENT]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Oat beta-glucan",
+        "claims": [
+            {
+                "claim": "Oat beta-glucan has been shown to lower/reduce blood cholesterol. High cholesterol is a risk factor in the development of coronary heart disease.",
+                "conditions": {
+                    "requirement": "minimum_intake",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "Information shall be given to the consumer that the beneficial effect is obtained with a daily intake of 3 g of oat beta-glucan. The claim can be used for foods which provide at least 1 g of oat beta-glucan per quantified portion."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Oat grain fibre",
+        "claims": [
+            {
+                "claim": "Oat grain fibre contributes to an increase in faecal bulk.",
+                "conditions": {
+                    "requirement": "high_fibre",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which is high in that fibre as referred to in the claim 'HIGH FIBRE' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Oleic acid",
+        "claims": [
+            {
+                "claim": "Replacing saturated fats in the diet with unsaturated fats contributes to the maintenance of normal blood cholesterol levels. Oleic acid is an unsaturated fat.",
+                "conditions": {
+                    "requirement": "high_unsaturated_fat",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which is high in unsaturated fatty acids, as referred to in the claim 'HIGH UNSATURATED FAT' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Olive oil polyphenols",
+        "claims": [
+            {
+                "claim": "Olive oil polyphenols contribute to the protection of blood lipids from oxidative stress.",
+                "conditions": {
+                    "requirement": "minimum_intake",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for olive oil which contains at least 5 mg of hydroxytyrosol and its derivatives (e.g. oleuropein complex and tyrosol) per 20 g of olive oil. In order to bear the claim, information shall be given to the consumer that the beneficial effect is obtained with a daily intake of 20 g of olive oil."
+                }
+            }
+        ]
+    },
+      {
+        "nutrient": "Pantothenic acid",
+        "claims": [
+            {
+                "claim": "Pantothenic acid contributes to normal energy-yielding metabolism",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which is at least a source of pantothenic acid as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Pantothenic acid contributes to normal mental performance",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which is at least a source of pantothenic acid as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Pantothenic acid contributes to normal synthesis and metabolism of steroid hormones, vitamin D and some neurotransmitters",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which is at least a source of pantothenic acid as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Pantothenic acid contributes to the reduction of tiredness and fatigue",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which is at least a source of pantothenic acid as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Pectins",
+        "claims": [
+            {
+                "claim": "Pectins contribute to the maintenance of normal blood cholesterol levels",
+                "conditions": {
+                    "requirement": "minimum_intake",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which provides a daily intake of 6 g of pectins. In order to bear the claim, information shall be given to the consumer that the beneficial effect is obtained with a daily intake of 6 g of pectins.",
+                    "warning": "Warning of choking to be given for people with swallowing difficulties or when ingesting with inadequate fluid intake - advice on taking with plenty of water to ensure substance reaches stomach."
+                }
+            },
+            {
+                "claim": "Consumption of pectins with a meal contributes to the reduction of the blood glucose rise after that meal",
+                "conditions": {
+                    "requirement": "minimum_intake",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which contains 10 g of pectins per quantified portion. In order to bear the claim, information shall be given to the consumer that the beneficial effect is obtained by consuming 10 g of pectins as part of the meal.",
+                    "warning": "Warning of choking to be given for people with swallowing difficulties or when ingesting with inadequate fluid intake - advice on taking with plenty of water to ensure substance reaches stomach."
+                }
+            }
+        ]
+    },
+    {
+      "nutrient": "Phosphorus",
+      "claims": [
+          {
+              "claim": "Phosphorus contributes to normal energy-yielding metabolism",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of phosphorus as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Phosphorus contributes to normal function of cell membranes",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of phosphorus as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Phosphorus contributes to the maintenance of normal bones",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of phosphorus as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Phosphorus contributes to the maintenance of normal teeth",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of phosphorus as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Phosphorus is needed for the normal growth and development of bone in children",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation 1924/2006",
+                  "info": "The claim can be used only for food which is at least a source of phosphorus as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation 1924/2006."
+              }
+          }
+      ]
+    },
+    {
+      "nutrient": "Plant stanol esters",
+      "claims": [
+          {
+              "claim": "Plant stanol esters have been shown to lower/reduce blood cholesterol. High cholesterol is a risk factor in the development of coronary heart disease.",
+              "conditions": {
+                  "requirement": "minimum_intake",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "Information to the consumer that the beneficial effect is obtained with a daily intake of 1.5-3 g plant stanols. Reference to the magnitude of the effect may only be made for foods within the following categories: yellow fat spreads, dairy products, mayonnaise, and salad dressings. When referring to the magnitude of the effect, the range '7% to 10%' for foods that provide a daily intake of 1.5-2.4 g plant stanols or the range '10%-12.5%' for foods that provide a daily intake of 2.5-3 g plant stanols and the duration to obtain the effect 'in 2 to 3 weeks' must be communicated to the consumer."
+              }
+          }
+      ]
+  },
+  {
+      "nutrient": "Plant sterols and plant stanols",
+      "claims": [
+          {
+              "claim": "Plant sterols/stanols contribute to the maintenance of normal blood cholesterol levels",
+              "conditions": {
+                  "requirement": "minimum_intake",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "In order to bear the claim information shall be given to the consumer that the beneficial effect is obtained with a daily intake of at least 0.8 g of plant sterols/stanols."
+              }
+          }
+      ]
+  },
+  {
+      "nutrient": "Plant sterols/Plant stanol esters",
+      "claims": [
+          {
+              "claim": "Plant sterols and plant stanol esters have been shown to lower/reduce blood cholesterol. High cholesterol is a risk factor in the development of coronary heart disease.",
+              "conditions": {
+                  "requirement": "minimum_intake",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "Information to the consumer that the beneficial effect is obtained with a daily intake of 1.5-3 g plant sterols/stanols. Reference to the magnitude of the effect may only be made for foods within the following categories: yellow fat spreads, dairy products, mayonnaise, and salad dressings. When referring to the magnitude of the effect, the range '7% to 10%' for foods that provide a daily intake of 1.5-2.4 g plant sterols/stanols or the range '10%-12.5%' for foods that provide a daily intake of 2.5-3 g plant sterols/stanols and the duration to obtain the effect 'in 2 to 3 weeks' must be communicated to the consumer."
+              }
+          }
+      ]
+  },
+  {
+      "nutrient": "Plant sterols",
+      "claims": [
+          {
+              "claim": "Plant sterols have been shown to lower/reduce blood cholesterol. High cholesterol is a risk factor in the development of coronary heart disease.",
+              "conditions": {
+                  "requirement": "minimum_intake",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "Information to the consumer that the beneficial effect is obtained with a daily intake of 1.5-3 g plant sterols. Reference to the magnitude of the effect may only be made for foods within the following categories: yellow fat spreads, dairy products, mayonnaise, and salad dressings. When referring to the magnitude of the effect, the range '7% to 10%' for foods that provide a daily intake of 1.5-2.4 g plant sterols or the range '10%-12.5%' for foods that provide a daily intake of 2.5-3 g plant sterols and the duration to obtain the effect 'in 2 to 3 weeks' must be communicated to the consumer."
+              }
+          }
+      ]
+  },
+  {
+      "nutrient": "Potassium",
+      "claims": [
+          {
+              "claim": "Potassium contributes to normal functioning of the nervous system",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of potassium as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Potassium contributes to normal muscle function",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of potassium as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Potassium contributes to the maintenance of normal blood pressure",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of potassium as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          }
+      ]
+    }, 
+      {
+        "nutrient": "Protein",
+        "claims": [
+            {
+                "claim": "Protein contributes to a growth in muscle mass",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which is at least a source of protein as referred to in the claim 'SOURCE OF PROTEIN' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Protein contributes to the maintenance of muscle mass",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which is at least a source of protein as referred to in the claim 'SOURCE OF PROTEIN' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Protein contributes to the maintenance of normal bones",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which is at least a source of protein as referred to in the claim 'SOURCE OF PROTEIN' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Protein is needed for normal growth and development of bone in children.",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim can be used only for food which is at least a source of protein as referred to in the claim 'SOURCE OF PROTEIN' as listed in the Annex to Regulation 1924/2006."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Resistant starch",
+        "claims": [
+            {
+                "claim": "Replacing digestible starches with resistant starch in a meal contributes to a reduction in the blood glucose rise after that meal.",
+                "conditions": {
+                    "requirement": "minimum_content",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food in which digestible starch has been replaced by resistant starch so that the final content of resistant starch is at least 14% of total starch."
+                }
+            }
+        ]
+    },
+      {
+        "nutrient": "Riboflavin (Vitamin B2)",
+        "claims": [
+            {
+                "claim": "Riboflavin contributes to normal energy-yielding metabolism",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which is at least a source of riboflavin as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Riboflavin contributes to normal functioning of the nervous system",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which is at least a source of riboflavin as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Riboflavin contributes to the maintenance of normal mucous membranes",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which is at least a source of riboflavin as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Riboflavin contributes to the maintenance of normal red blood cells",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which is at least a source of riboflavin as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Riboflavin contributes to the maintenance of normal skin",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which is at least a source of riboflavin as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Riboflavin contributes to the maintenance of normal vision",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which is at least a source of riboflavin as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Riboflavin contributes to the normal metabolism of iron",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which is at least a source of riboflavin as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Riboflavin contributes to the protection of cells from oxidative stress",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which is at least a source of riboflavin as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Riboflavin contributes to the reduction of tiredness and fatigue",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which is at least a source of riboflavin as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            }
+        ]
+    },
+    {
+      "nutrient": "Rye Fibre",
+      "claims": [
+          {
+              "claim": "Rye fibre contributes to normal bowel function",
+              "conditions": {
+                  "requirement": "high_fibre",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is high in that fibre as referred to in the claim 'HIGH FIBRE' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          }
+      ]
+  },
+  {
+      "nutrient": "Selenium",
+      "claims": [
+          {
+              "claim": "Selenium contributes to normal spermatogenesis",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of selenium as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Selenium contributes to the maintenance of normal hair",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of selenium as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Selenium contributes to the maintenance of normal nails",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of selenium as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Selenium contributes to the normal function of the immune system",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of selenium as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Selenium contributes to the normal thyroid function",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of selenium as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Selenium contributes to the protection of cells from oxidative stress",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of selenium as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          }
+      ]
+    },
+    {
+      "nutrient": "Slowly Digestible Starch",
+      "claims": [
+          {
+              "claim": "Consumption of products high in slowly digestible starch (SDS) raises blood glucose concentration less after a meal compared to products low in SDS",
+              "conditions": {
+                  "requirement": "minimum_content",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only on food where the digestible carbohydrates provide at least 60% of the total energy and where at least 55% of those carbohydrates is digestible starch, of which at least 40% is SDS."
+              }
+          }
+      ]
+  },
+  {
+      "nutrient": "Sugar Beet Fibre",
+      "claims": [
+          {
+              "claim": "Sugar beet fibre contributes to an increase in faecal bulk",
+              "conditions": {
+                  "requirement": "high_fibre",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is high in that fibre as referred to in the claim 'HIGH FIBRE' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          }
+      ]
+  },
+  {
+      "nutrient": "Sugar Replacers",
+      "claims": [
+          {
+              "claim": "Consumption of foods/drinks containing sugar replacers instead of sugar contributes to the maintenance of tooth mineralisation. In the case of D-tagatose and isomaltulose, this should read 'other sugars'.",
+              "conditions": {
+                  "requirement": "sugar_replacement",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "In order to bear the claim, sugars should be replaced in foods or drinks (which reduce plaque pH below 5.7) by sugar replacers, i.e. intense sweeteners, xylitol, sorbitol, mannitol, maltitol, lactitol, isomalt, erythritol, D-tagatose, isomaltulose, sucralose or polydextrose, or a combination of them, in amounts such that consumption of such foods or drinks does not lower plaque pH below 5.7 during and up to 30 minutes after consumption."
+              }
+          },
+          {
+              "claim": "Consumption of foods/drinks containing sugar replacers instead of sugar induces a lower blood glucose rise after their consumption compared to sugar-containing foods/drinks. In the case of D-tagatose and isomaltulose, this should read 'other sugars'.",
+              "conditions": {
+                  "requirement": "sugar_replacement",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "In order to bear the claim, sugars should be replaced in foods or drinks by sugar replacers, i.e. intense sweeteners, xylitol, sorbitol, mannitol, maltitol, lactitol, isomalt, erythritol, sucralose or polydextrose, or a combination of them, so that foods or drinks contain reduced amounts of sugars by at least the amount referred to in the claim 'REDUCED [NAME OF NUTRIENT]' as listed in the Annex to Regulation (EC) No 1924/2006. In the case of D-tagatose and isomaltulose, they should replace equivalent amounts of other sugars in the same proportion as that referred to in the claim 'REDUCED [NAME OF NUTRIENT]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          }
+      ]
+    },
+    {
+      "nutrient": "Sugar-Free Chewing Gum",
+      "claims": [
+          {
+              "claim": "Sugar-free chewing gum contributes to the maintenance of tooth mineralization",
+              "conditions": {
+                  "requirement": "sugars_free",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for chewing gum which complies with the conditions of use for the nutrition claim 'SUGARS FREE' as listed in the Annex to Regulation (EC) No 1924/2006. Information shall be given to the consumer that the beneficial effect is obtained with chewing, for at least 20 minutes, after eating or drinking."
+              }
+          },
+          {
+              "claim": "Sugar-free chewing gum contributes to the neutralisation of plaque acids",
+              "conditions": {
+                  "requirement": "sugars_free",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for chewing gum which complies with the conditions of use for the nutrition claim 'SUGARS FREE' as listed in the Annex to Regulation (EC) No 1924/2006. Information shall be given to the consumer that the beneficial effect is obtained with chewing, for at least 20 minutes, after eating or drinking."
+              }
+          },
+          {
+              "claim": "Sugar-free chewing gum contributes to the reduction of oral dryness",
+              "conditions": {
+                  "requirement": "sugars_free",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for chewing gum which complies with the conditions of use for the nutrition claim 'SUGARS FREE' as listed in the Annex to Regulation (EC) No 1924/2006. Information shall be given to the consumer that the beneficial effect is obtained with use of the chewing gum whenever the mouth feels dry."
+              }
+          },
+          {
+              "claim": "Sugar-free chewing gum helps neutralise plaque acids. Plaque acids are a risk factor in the development of dental caries.",
+              "conditions": {
+                  "requirement": "chewing_gum_usage",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "Information shall be given to the consumer that the beneficial effect is obtained with chewing of 2-3 g of sugar-free chewing gum for 20 minutes, at least three times per day after meals."
+              }
+          },
+          {
+              "claim": "Sugar-free chewing gum helps reduce tooth demineralisation. Tooth demineralisation is a risk factor in the development of dental caries.",
+              "conditions": {
+                  "requirement": "chewing_gum_usage",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "Information shall be given to the consumer that the beneficial effect is obtained with chewing of 2-3 g of sugar-free chewing gum for 20 minutes, at least three times per day after meals."
+              }
+          }
+      ]
+  },
+  {
+      "nutrient": "Sugar-Free Chewing Gum with Carbamide",
+      "claims": [
+          {
+              "claim": "Sugar-free chewing gum with carbamide neutralises plaque acids more effectively than sugar-free chewing gums without carbamide",
+              "conditions": {
+                  "requirement": "sugars_free",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for chewing gum which complies with the conditions of use for the nutrition claim 'SUGARS FREE' as listed in the Annex to Regulation (EC) No 1924/2006. In order to bear the claim each piece of sugar-free chewing gum should contain at least 20 mg carbamide. Information shall be given to the consumer that gum should be chewed for at least 20 minutes after eating or drinking."
+              }
+          }
+      ]
+    },
+    {
+      "nutrient": "Thiamine",
+      "claims": [
+          {
+              "claim": "Thiamine contributes to normal energy-yielding metabolism",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of thiamine as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Thiamine contributes to normal functioning of the nervous system",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of thiamine as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Thiamine contributes to normal psychological function",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of thiamine as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Thiamine contributes to the normal function of the heart",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of thiamine as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          }
+      ]
+    },
+    {
+      "nutrient": "Vitamin A",
+      "claims": [
+          {
+              "claim": "Vitamin A contributes to normal iron metabolism",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of vitamin A as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Vitamin A contributes to the maintenance of normal mucous membranes",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of vitamin A as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Vitamin A contributes to the maintenance of normal skin",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of vitamin A as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Vitamin A contributes to the maintenance of normal vision",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of vitamin A as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Vitamin A contributes to the normal function of the immune system",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of vitamin A as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Vitamin A has a role in the process of cell specialisation",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of vitamin A as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          }
+      ]
+    },
+    {
+      "nutrient": "Vitamin B12",
+      "claims": [
+          {
+              "claim": "Vitamin B12 contributes to normal energy-yielding metabolism",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of vitamin B12 as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Vitamin B12 contributes to normal functioning of the nervous system",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of vitamin B12 as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Vitamin B12 contributes to normal homocysteine metabolism",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of vitamin B12 as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Vitamin B12 contributes to normal psychological function",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of vitamin B12 as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Vitamin B12 contributes to normal red blood cell formation",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of vitamin B12 as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Vitamin B12 contributes to the normal function of the immune system",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of vitamin B12 as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Vitamin B12 contributes to the reduction of tiredness and fatigue",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of vitamin B12 as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Vitamin B12 has a role in the process of cell division",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                  "info": "The claim may be used only for food which is at least a source of vitamin B12 as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          }
+      ]
+    },
+    {
+        "nutrient": "Vitamin B6",
+        "claims": [
+            {
+                "claim": "Vitamin B6 contributes to normal homocysteine metabolism",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which is at least a source of vitamin B6 as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Vitamin B6 contributes to normal protein and glycogen metabolism",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which is at least a source of vitamin B6 as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Vitamin B6 contributes to normal psychological function",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which is at least a source of vitamin B6 as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Vitamin B6 contributes to normal red blood cell formation",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which is at least a source of vitamin B6 as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Vitamin B6 contributes to the normal function of the immune system",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which is at least a source of vitamin B6 as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Vitamin B6 contributes to the reduction of tiredness and fatigue",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which is at least a source of vitamin B6 as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Vitamin B6 contributes to the regulation of hormonal activity",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which is at least a source of vitamin B6 as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Vitamin B6 contributes to normal cysteine synthesis",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which is at least a source of vitamin B6 as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Vitamin B6 contributes to normal energy-yielding metabolism",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which is at least a source of vitamin B6 as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Vitamin B6 contributes to normal functioning of the nervous system",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+                    "info": "The claim may be used only for food which is at least a source of vitamin B6 as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            }
+        ]
+    },
     {
         "nutrient": "Vitamin C",
         "claims": [
