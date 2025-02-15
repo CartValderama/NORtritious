@@ -1,4 +1,4 @@
-import React, { useState, } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 //import { Link } from "react-router-dom";
 
@@ -77,34 +77,22 @@ const LoginTest: React.FC = () => {
         onChange={(e) => setPassword(e.target.value)}
         className="border p-2 rounded w-full mb-2"
       />
-
-      <br/>
+      <br />
       <button
         onClick={handleLogin}
-        className="bg-blue-500 text-white px-4 py-2 rounded mb-2"
+        className="btn btn-primary"
         disabled={loading}
       >
         {loading ? "Laster..." : "Logg inn"}
       </button>
-
       &ensp;
-
-      <button
-        onClick={handleLogout}
-        className="bg-red-500 text-white px-4 py-2 rounded mb-2"
-      >
+      <button onClick={handleLogout} className="btn btn-danger">
         Logg ut
       </button>
-
       &ensp;
-
-      <button
-        onClick={checkAdminRole}
-        className="bg-green-500 text-white px-4 py-2 rounded"
-      >
+      <button onClick={checkAdminRole} className="btn btn-secondary">
         Sjekk admin-rolle
       </button>
-
       {message && <p className="text-green-500 mt-4">{message}</p>}
       {error && <p className="text-red-500 mt-4">{error}</p>}
       {isAdmin !== null && (
@@ -112,7 +100,6 @@ const LoginTest: React.FC = () => {
           {isAdmin ? "Brukeren er admin" : "Brukeren er ikke admin"}
         </p>
       )}
-
     </div>
   );
 };
