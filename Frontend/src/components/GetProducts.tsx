@@ -24,7 +24,7 @@ const GetProducts: React.FC = () => {
         } else if (error.response.status === 401) {
           console.error("User not authorized:", error.response);
           setProducts([]);
-          navigate("/login"); // Redirect to login page
+          navigate("/account/login"); // Redirect to login page
         } else {
           console.error("Error fetching products:", error.response);
           setProducts([]);
@@ -49,7 +49,7 @@ const GetProducts: React.FC = () => {
         if (error.response.status === 401) {
           console.error("User not authorized:", error.response);
           setMyProducts([]);
-          navigate("/login"); // Redirect to login page
+          navigate("/account/login"); // Redirect to login page
         } else if (error.response.status === 403) {
           console.error("This is forbidden content:", error.response);
           setMessage("User not authorized to view this content");

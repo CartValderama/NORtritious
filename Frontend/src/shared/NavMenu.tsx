@@ -19,7 +19,7 @@ const NavMenu: React.FC = () => {
             <Nav.Link as={Link} to="/">Home</Nav.Link>
             <Nav.Link as={Link} to="/products">Products</Nav.Link>
             <Nav.Link as={Link} to="/calculator">Calculator</Nav.Link>
-            <Nav.Link as={Link} to="/login">Login</Nav.Link>
+            <Nav.Link as={Link} to="/account/login">Login</Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Container>
