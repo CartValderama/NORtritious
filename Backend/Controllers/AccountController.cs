@@ -58,6 +58,27 @@ namespace Backend.Controllers
             return Unauthorized(new { message = "Invalid email or password!" });
         }
 
+        // Check if the user is logged in
+        [HttpGet("check-login")]
+        [AllowAnonymous]
+        public IActionResult CheckLogin()
+        {
+            try
+            {
+                if (User.Identity?.IsAuthenticated == true)
+                {
+                    _logger.LogInformation("[AccountController] User {User} is authenticated.", User.Identity?.Name);
+                    return Ok(new { isLoggedIn = true });
+                }
+
+                return Ok(new { isLoggedIn = false, message = "User is not authenticated." });
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "[AccountController] Error during check-login execution.");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An unexpected error occurred!" });
+            }
+        }
 
         [HttpGet("admin-role-test")]
         [Authorize(Roles = "Admin")]
