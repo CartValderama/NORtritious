@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const ProfilePage: React.FC = () => {
-  const [userInfo, setUserInfo] = useState({ email: "", name: "" });
+  const [userInfo, setUserInfo] = useState({ email: "", name: "", role: "" });
   const [newPassword, setNewPassword] = useState("");
   const [oldPassword, setOldPassword] = useState(""); // Ny state for gammelt passord
   const [message, setMessage] = useState("");
@@ -167,28 +167,6 @@ const ProfilePage: React.FC = () => {
                 </div>
                 <form onSubmit={handleUpdateInfo}>
                   <div className="mb-3">
-                    <label htmlFor="email" className="form-label">
-                      Epost
-                    </label>
-                    <div className="input-group">
-                      <span className="input-group-text" id="basic-addon1">
-                        @
-                      </span>
-                      <input
-                        type="email"
-                        className="form-control"
-                        id="email"
-                        value={userInfo.email}
-                        onChange={(e) =>
-                          setUserInfo({ ...userInfo, email: e.target.value })
-                        }
-                        required
-                        disabled
-                        readOnly
-                      />
-                    </div>
-                  </div>
-                  <div className="mb-3">
                     <label htmlFor="name" className="form-label">
                       Navn
                     </label>
@@ -205,7 +183,51 @@ const ProfilePage: React.FC = () => {
                       />
                     </div>
                   </div>
-                  <button type="submit" className="btn btn-primary">
+                  <div className="mb-3">
+                    <label htmlFor="email" className="form-label">
+                      Epost
+                    </label>
+                    <div className="input-group">
+                      <span className="input-group-text" id="basic-addon1">
+                        <i className="bi bi-at"></i>
+                      </span>
+                      <input
+                        type="email"
+                        className="form-control"
+                        id="email"
+                        value={userInfo.email}
+                        onChange={(e) =>
+                          setUserInfo({ ...userInfo, email: e.target.value })
+                        }
+                        required
+                        disabled
+                        readOnly
+                      />
+                    </div>
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="role" className="form-label">
+                      Rolle
+                    </label>
+                    <div className="input-group">
+                      <span className="input-group-text" id="basic-addon2">
+                        <i className="bi bi-tag"></i>
+                      </span>
+                      <input
+                        type="role"
+                        className="form-control"
+                        id="role"
+                        value={userInfo.role}
+                        onChange={(e) =>
+                          setUserInfo({ ...userInfo, email: e.target.value })
+                        }
+                        required
+                        disabled
+                        readOnly
+                      />
+                    </div>
+                  </div>
+                  <button type="submit" className="btn btn-primary" disabled>
                     Oppdater
                   </button>
                 </form>
