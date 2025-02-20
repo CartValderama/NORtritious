@@ -1,29 +1,90 @@
-import React from 'react';
-import { Nav, Navbar, Container } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { Nav, Navbar, Container } from "react-bootstrap";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import logo from "../img/logo.jpg";
-
-//import LoginTest from '../components/LoginTest';
-import '../css/NavMenu.css';
+import "../css/NavMenu.css";
 
 const NavMenu: React.FC = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState("");
+  const navigate = useNavigate(); // Bruk useNavigate her
+
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        const response = await axios.get(
+          "https://localhost:7064/api/account/get-user-info",
+          { withCredentials: true }
+        );
+        if (response.data) {
+          setIsLoggedIn(true);
+          setUsername(response.data.name); // Brukernavn fra API
+        }
+      } catch (error) {
+        setIsLoggedIn(false);
+      }
+    };
+
+    checkLoginStatus();
+  }, []);
+
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      // Kall til backend for å logge ut (f.eks. fjerne token eller session)
+      await axios.post(
+        "https://localhost:7064/api/account/logout",
+        {},
+        { withCredentials: true }
+      );
+      setIsLoggedIn(false);
+      setUsername(""); // Tøm brukernavnet
+      navigate("/account/login"); // Naviger tilbake til login-siden
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+  };
   return (
-    <Navbar bg="light" expand="lg" className='navbar-custom mb3'>
-      <Container className='d-flex justify-content-between align-items-center'>
-          <Navbar.Brand as={Link} to="/" className='d-flex align-items-center'>
-          <img src={logo} className="img-logo img-fluid" alt="Logo" style={{ height: "50px"}} />{" "}
-          </Navbar.Brand>
+    <Navbar bg="light" expand="lg" className="navbar-custom mb3">
+      <Container className="d-flex justify-content-between align-items-center">
+        <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
+          <img
+            src={logo}
+            className="img-logo img-fluid"
+            alt="Logo"
+            style={{ height: "50px" }}
+          />{" "}
+        </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link as={Link} to="/" className='nav-link-custom'>Home</Nav.Link>
-            <Nav.Link as={Link} to="/products" className='nav-link-custom'>Products</Nav.Link>
+            <Nav.Link as={Link} to="/" className="nav-link-custom">
+              Home
+            </Nav.Link>
+            <Nav.Link as={Link} to="/products" className="nav-link-custom">
+              Products
+            </Nav.Link>
             {/*<Nav.Link as={Link} to="/calculator">Calculator</Nav.Link>*/}
-            <Nav.Link as={Link} to="/account/login" className='nav-link-custom'>Login</Nav.Link>
+          </Nav>
+          <Nav className="ms-auto">
+            {isLoggedIn ? (
+              <>
+                <Nav.Link as={Link} to="/account/profile">
+                  {username}
+                </Nav.Link>
+                <Nav.Link as="button" onClick={handleLogout}>
+                  Logout
+                </Nav.Link>
+              </>
+            ) : (
+              <Nav.Link as={Link} to="/account/login">
+                Login
+              </Nav.Link>
+            )}
           </Nav>
         </Navbar.Collapse>
       </Container>
-      
     </Navbar>
   );
 };

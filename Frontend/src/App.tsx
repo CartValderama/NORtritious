@@ -13,6 +13,7 @@ import HomePage from "./home/HomePage";
 import LoginPage from "./account/login";
 import ProductListPage from "./products/ProductListPage";
 import "./App.css";
+import ProfilePage from "./account/profile";
 //import UpdateCalculator from "./UpdateCalculator";
 
 //    <LoginTest />
@@ -32,6 +33,7 @@ const App: React.FC = () => {
                 <Route path="/login" element={<LoginTest />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
                 <Route path="account/login" element={<LoginPage />} />
+                <Route path="account/profile" element={<ProfilePage />} />
               </Routes>
             </Container>
           </main>

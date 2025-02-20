@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Backend.DAL;
+using Backend.Models;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Authorization;
 
@@ -76,6 +77,37 @@ namespace Backend.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "[AccountController] Error during check-login execution.");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An unexpected error occurred!" });
+            }
+        }
+
+        [HttpGet("get-user-info")]
+        [Authorize]
+        public async Task<IActionResult> GetUserInfo()
+        {
+            try
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                {
+                    return Unauthorized(new { message = "User not found" });
+                }
+
+                var roles = await _userManager.GetRolesAsync(user);
+                var role = roles.FirstOrDefault() ?? string.Empty; // Bruker første rolle eller en tom string
+
+                var response = new GetUserResponse
+                {
+                    Name = user.UserName ?? string.Empty,
+                    Email = user.Email ?? string.Empty,
+                    Role = role
+                };
+
+                return Ok(response);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "[AccountController] Error fetching user info.");
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An unexpected error occurred!" });
             }
         }
