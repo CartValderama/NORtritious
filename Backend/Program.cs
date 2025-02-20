@@ -92,8 +92,8 @@ builder.Services.ConfigureApplicationCookie(options =>
     // Cookie configuration for session security and expiration
     options.Cookie.HttpOnly = true;  // Prevent access via JavaScript
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;  // Use only over HTTPS
-    options.Cookie.SameSite = SameSiteMode.Strict;  // Prevent CSRF attacks
-    options.Cookie.Name = "YourAppAuthCookie";  // You can rename the cookie if needed
+    options.Cookie.SameSite = SameSiteMode.None;  // Prevent CSRF attacks
+    options.Cookie.Name = "FremtidsmatSession";  // You can rename the cookie if needed
     options.ExpireTimeSpan = TimeSpan.FromDays(14);  // Cookie expiration (e.g., 14 days)
 });
 
@@ -148,7 +148,7 @@ else
     app.UseHsts();
 }
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 //app.UseCors("CorsPolicy");
