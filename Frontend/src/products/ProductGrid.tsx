@@ -24,7 +24,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products, onProductDeleted })
               <Card.Img 
                 variant="top" 
                 className='mx-auto d-block'style={{ width: '150px', height: '150px', objectFit: 'cover'  }} 
-                src={`http://localhost:5047/images/${product.imageUrl}`} 
+                src={`https://localhost:7064/images/${product.imageUrl}`} 
                 alt={product.name} 
                 />
             </Link>

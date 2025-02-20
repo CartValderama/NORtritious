@@ -121,10 +121,10 @@ const ProductListPage: React.FC = () => {
       {error && <div className="alert alert-danger">{error}</div>}
       {showTable ? (
         <ProductTable products={filteredProducts.slice(0, visibleProducts)}
-        apiUrl={`http://localhost:5047`} onProductDeleted={handleProductDeleted} />
+        apiUrl={`https://localhost:7064`} onProductDeleted={handleProductDeleted} />
       ) : (
         // Assuming you have a ProductGrid component for grid view
-        <ProductGrid products={filteredProducts.slice(0, visibleProducts)} apiUrl={`http://localhost:5047`} onProductDeleted={handleProductDeleted} />
+        <ProductGrid products={filteredProducts.slice(0, visibleProducts)} apiUrl={`https://localhost:7064`} onProductDeleted={handleProductDeleted} />
       )}
       <div className='d-flex justify-content-between mt-3'>
       {visibleProducts < filteredProducts.length && (

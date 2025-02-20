@@ -79,7 +79,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onProductDeleted 
                           className='text-decoration-none'
                         >
                         <img 
-                          src={`http://localhost:5047/images/${product.imageUrl}`} 
+                          src={`https://localhost:7064/images/${product.imageUrl}`} 
                           alt={product.name} 
                           className="rounded" 
                           style={{ maxWidth: '120px', height: 'auto' }} 
