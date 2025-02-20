@@ -1,17 +1,14 @@
+
 .navbar-custom {
-    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+    box-shadow: 0 2px 4px rgba(241, 235, 235, 0.1);
     z-index: 100;
   }
-  
-  .navbar-custom .navbar-brand {
-    font-weight: 600;
-    color: #333;
-  }
+   
   
   .navbar-custom .nav-link {
     color: #666;
     padding: 0.5rem 1rem;
-    transition: all 0.5s ease;
+    transition: all 0.1s ease;
   }
   
   .navbar-custom .nav-link:hover {
@@ -44,8 +41,24 @@
 
 .brand{
   transition: 0.1s ease;
+  box-shadow: #000000;
 }
 .brand:hover{
   transform: scale(1.05);
   
+}
+
+
+.navbar-custom {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.nav-link-custom {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.img-logo {
+  height: 40px;
 }

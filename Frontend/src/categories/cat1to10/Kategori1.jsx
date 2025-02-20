@@ -15,7 +15,7 @@ import errorKeyhole from "../../img/ban_keyhole.png";
 
 import { ResultNokkelhulletFulfilled, ResultNokkelhulletNotFulfilled } from '../../ResultNokkelhullet.jsx';
 import {ResultEfsaFulfilled, ResultEfsaNotFulfilled} from '../../ResultEfsaClaims.jsx'; // EFSA claims
-import ProductButtons from "../../ProductButtons.jsx";
+import ProductButtons from "../../ProductButtons";
 
 // Imports for necessary claim check components, used in all categories 
 import * as Check from "../../NutritionClaimCheck.jsx"
@@ -23,8 +23,10 @@ import * as ResultComponents from "../../ResultComponents.jsx";
 import ErrorEfsaClaims from "../../errorMessages.jsx";
 import ErrorMessageBox from "../../errorMessages.jsx";
 
+import * as ProductService from "../../products/ProductService";
+
 // This component is called Kategori1
-const Kategori1 = () => {
+const Kategori1 = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete }) => {
 
   // State variables for showing results and empty result message
   const [showNokkelhulletResults, setShowNokkelhulletResults] = useState(null);
@@ -218,6 +220,28 @@ const Kategori1 = () => {
     salt: "",
   });
 
+  /*
+  const [product, setProduct] = useState({
+    name: '',
+    group: '',
+    type: '',
+    hasEfsaHealth: false,
+    hasEfsaNutrition: false,
+    hasNokkelhullet: false,
+    imageUrl: '',
+    calories: 1,
+    fat: 0,
+    satFat: 0,
+    carbs: 0,
+    natSugar: 0,
+    addedSugar: 0,
+    fiber: 0,
+    protein: 0,
+    salt: 0,
+  }); 
+  */
+
+  /*
   // Handler for updating nutrition state/state variable based on input field changes/input values
   const changeHandle = (event) => {
     console.log("changeHandle ===", event.target, event.target.value);
@@ -226,12 +250,105 @@ const Kategori1 = () => {
       [event.target.name]: event.target.value,
     });
   };
+  */
+
+  // Handler for updating nutrition state based on input field changes
+  const changeHandle = (event) => {
+    const { name, value } = event.target;
+    setNutrition((prevNutrition) => {
+      const updatedNutrition = {
+        ...prevNutrition,
+        [name]: parseFloat(value),
+      };
+      /*
+
+      // Update the product state with the latest nutrition values
+      handleNutrientChange({
+        target: {
+          name: 'calories',
+          value: updatedNutrition.energikcal,
+        },
+      });
+      handleNutrientChange({
+        target: {
+          name: 'fat',
+          value: updatedNutrition.fett,
+        },
+      });
+      handleNutrientChange({
+        target: {
+          name: 'satFat',
+          value: updatedNutrition.mettede,
+        },
+      });
+      handleNutrientChange({
+        target: {
+          name: 'carbs',
+          value: updatedNutrition.karbohydrat,
+        },
+      });
+      handleNutrientChange({
+        target: {
+          name: 'natSugar',
+          value: updatedNutrition.naturligSukker,
+        },
+      });
+      handleNutrientChange({
+        target: {
+          name: 'addedSugar',
+          value: updatedNutrition.hvoravSukkerarter,
+        },
+      });
+      handleNutrientChange({
+        target: {
+          name: 'fiber',
+          value: updatedNutrition.kostfiber,
+        },
+      });
+      handleNutrientChange({
+        target: {
+          name: 'protein',
+          value: updatedNutrition.protein,
+        },
+      });
+      */
+     onNutritionChange(updatedNutrition);
+      return updatedNutrition;
+    });
+  };
+
+  /*
+  // Creates a new product object and sends it to the backend when the form is submitted
+    const handleSubmit = async (e) => {
+      product.calories = nutrition.energikcal;
+      product.fat = nutrition.fett;
+      product.satFat = nutrition.mettede;
+      product.carbs = nutrition.karbohydrat;
+      product.natSugar = nutrition.naturligSukker;
+      product.addedSugar = nutrition.hvoravSukkerarter;
+      product.fiber = nutrition.kostfiber;
+      product.protein = nutrition.protein;
+      product.salt = nutrition.salt;
+      
+      e.preventDefault();
+      try {
+        await ProductService.createProduct(product);
+        alert('Product saved successfully!');
+      } catch (error) {
+        console.error('Error saving product:', error);
+        alert('Failed to save product.');
+      }
+    };
+    */
 
   // define function to handle form submission
   const onClick = (e) => {
     e.preventDefault();
     setButtonClicked(true);
     setShowButtons(true);
+    // Forteller kalkulatoren at "beregn" er trykket,
+    //  og lagring av reseptet er nå mulig
+    onCalculationComplete();
 
     console.log("onclick ===", selectsPart, nutrition);
 
@@ -1046,7 +1163,7 @@ const Kategori1 = () => {
   <div style={{ padding: "5px" }}></div>
 
   {/* Show "Product Buttons" */}
-  {buttonClicked && showResults && (<ProductButtons />)}
+  {/*{buttonClicked && showResults && (<ProductButtons />)}*/}
 </div>
 
       

@@ -8,14 +8,16 @@ import errorKeyhole from "../../img/ban_keyhole.png";
 
 import { ResultNokkelhulletFulfilled, ResultNokkelhulletNotFulfilled } from '../../ResultNokkelhullet.jsx';
 import {ResultEfsaFulfilled, ResultEfsaNotFulfilled} from '../../ResultEfsaClaims.jsx'; // EFSA claims
-import ProductButtons from "../../ProductButtons.jsx";
+import ProductButtons from "../../ProductButtons";
 
 // Imports for necessary claim check components, used in all categories 
 import * as Check from "../../NutritionClaimCheck.jsx"
 import ErrorMessageBox from "../../errorMessages.jsx";
 
+import * as ProductService from "../../products/ProductService";
+
 // This component is called Kategori1
-const Kategori5 = () => {
+const Kategori5 = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete }) => {
 
   // State variables for showing results and empty result message
   const [showNokkelhulletResults, setShowNokkelhulletResults] = useState(null);
@@ -164,6 +166,7 @@ const Kategori5 = () => {
     salt: "",
   });
 
+  /*
   // Handler for updating nutrition state/state variable based on input field changes/input values
   const changeHandle = (event) => {
     console.log("changeHandle ===", event.target, event.target.value);
@@ -172,12 +175,28 @@ const Kategori5 = () => {
       [event.target.name]: event.target.value,
     });
   };
+  */
+ // Handler for updating nutrition state based on input field changes
+ const changeHandle = (event) => {
+  const { name, value } = event.target;
+  setNutrition((prevNutrition) => {
+    const updatedNutrition = {
+      ...prevNutrition,
+      [name]: parseFloat(value),
+    };   
+   onNutritionChange(updatedNutrition);
+    return updatedNutrition;
+  });
+};
 
   // define function to handle form submission
   const onClick = (e) => {
     e.preventDefault();
     setButtonClicked(true);
     setShowButtons(true);
+     // Forteller kalkulatoren at "beregn" er trykket,
+    //  og lagring av reseptet er nå mulig
+    onCalculationComplete();
 
     console.log("onclick ===", selectsPart, nutrition);
 
@@ -862,7 +881,7 @@ const Kategori5 = () => {
   <div style={{ padding: "5px" }}></div>
 
   {/* Show "Product Buttons" */}
-  {buttonClicked && showResults && (<ProductButtons />)}
+  {/*{buttonClicked && showResults && (<ProductButtons />)}*/}
 </div>
 
       

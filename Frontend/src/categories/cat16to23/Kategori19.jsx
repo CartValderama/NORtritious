@@ -9,13 +9,14 @@ import keyholeLgog from "../../img/circle-keyhole-logo.png"; // import an image
 import { faCircleInfo } from "@fortawesome/free-solid-svg-icons"; // import an icon
 import { faXmarkCircle } from "@fortawesome/free-solid-svg-icons"; // import an icon
 import Select from "react-select"; // import Select component
+import * as ProductService from "../../products/ProductService";
 
 
 // Imports for necessary claim check components, used in all categories 
 import * as ResultComponents from "../../ResultComponents.jsx";
 import * as Check from "../../NutritionClaimCheck.jsx"
 
-const Kategori19 = () => {
+const Kategori19 = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete }) => {
 
   // State variables for showing results and empty result message
   const [showNokkelhulletResults, setShowNokkelhulletResults] = useState(null);
@@ -128,6 +129,7 @@ const Kategori19 = () => {
     salt: "",
   });
 
+  /*
   // Handler for updating nutrition state/state variable based on input field changes/input values
   const changeHandle = (event) => {
     console.log("changeHandle ===", event.target, event.target.value);
@@ -136,6 +138,19 @@ const Kategori19 = () => {
       [event.target.name]: event.target.value,
     });
   };
+  */
+  // Handler for updating nutrition state based on input field changes
+ const changeHandle = (event) => {
+  const { name, value } = event.target;
+  setNutrition((prevNutrition) => {
+    const updatedNutrition = {
+      ...prevNutrition,
+      [name]: parseFloat(value),
+    };   
+   onNutritionChange(updatedNutrition);
+    return updatedNutrition;
+  });
+};
 
   // define function to handle form submission
   const onClick = (e) => {
@@ -143,6 +158,9 @@ const Kategori19 = () => {
     setButtonClicked(true);
     setShowHelsepåstander(true);
     setShowButtons(true);
+    // Forteller kalkulatoren at "beregn" er trykket,
+    //  og lagring av reseptet er nå mulig
+    onCalculationComplete();
 
     console.log("onclick ===", selectsPart, nutrition);
 
@@ -986,176 +1004,7 @@ const Kategori19 = () => {
           </div>
         )}
 
-        {/* Spacer */}
-        <div style={{ padding: "15px" }}></div>
-
-        {/* conditional rendering for the buttons using showButtons state */}
-        {showButtons && (
-          <div className="button-container">
-            {/* Save button */}
-            <div className="button-wrapper">
-              {/* Dropdown menu for saving food product in various formats */}
-              <div className="dropdown">
-                <button
-                  className="btn btn-primary dropdown-toggle custom-button"
-                  type="button"
-                  id="lagreProduktDropdown"
-                  data-bs-toggle="dropdown" // Controls the presentation of the dropdown menu
-                >
-                  <FontAwesomeIcon
-                    icon={faSave}
-                    className="icon-right-spacing" // Allows space between the icon and the text
-                  />
-                  Lagre produkt
-                </button>
-                <ul
-                  className="dropdown-menu"
-                  aria-labelledby="lagreProduktDropdown" // Associates this menu with its button
-                >
-                  {/* Each list item represents a disabled save option */}
-                  {/* aria-describedby provides extra context for accessibility tools */}
-                  <li>
-                    <button
-                      className="dropdown-item"
-                      disabled
-                      aria-describedby="pdfDesc" // Disabled dropdown items with aria-describedby property for descriptive text
-                    >
-                      Lagre som PDF
-                    </button>
-                    <span
-                      id="pdfDesc"
-                      style={{ fontSize: "smaller", color: "gray" }}
-                    >
-                      (Denne funksjonen er under utvikling)
-                    </span>
-                  </li>
-                  <li>
-                    <button
-                      className="dropdown-item"
-                      disabled
-                      aria-describedby="bildeDesc"
-                    >
-                      Lagre som bilde
-                    </button>
-                    <span
-                      id="bildeDesc"
-                      style={{ fontSize: "smaller", color: "gray" }}
-                    >
-                      (Denne funksjonen er under utvikling)
-                    </span>
-                  </li>
-                  <li>
-                    <button
-                      className="dropdown-item"
-                      disabled
-                      aria-describedby="nettskyDesc"
-                    >
-                      Lagre i nettsky
-                    </button>
-                    <span
-                      id="nettskyDesc"
-                      style={{ fontSize: "smaller", color: "gray" }}
-                    >
-                      (Denne funksjonen er under utvikling)
-                    </span>
-                  </li>
-                  <li>
-                    <button
-                      className="dropdown-item"
-                      disabled
-                      aria-describedby="profilenDesc"
-                    >
-                      Lagre i profilen
-                    </button>
-                    <span
-                      id="profilenDesc"
-                      style={{ fontSize: "smaller", color: "gray" }}
-                    >
-                      (Denne funksjonen er under utvikling)
-                    </span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-            {/* Share button */}
-            <div className="button-wrapper">
-              <div className="dropdown">
-                <button
-                  className="btn btn-primary dropdown-toggle custom-button"
-                  type="button"
-                  id="delProduktDropdown"
-                  data-bs-toggle="dropdown"
-                >
-                  <FontAwesomeIcon
-                    icon={faShare}
-                    className="icon-right-spacing"
-                  />
-                  Del produkt
-                </button>
-                <ul
-                  className="dropdown-menu"
-                  aria-labelledby="delProduktDropdown"
-                >
-                  <li>
-                    <button
-                      className="dropdown-item"
-                      disabled
-                      aria-describedby="epost-description"
-                    >
-                      Send på e-post
-                    </button>
-                    <span
-                      id="epost-description"
-                      style={{ fontSize: "smaller", color: "gray" }}
-                    >
-                      (Denne funksjonen er under utvikling)
-                    </span>
-                  </li>
-                  <li>
-                    <button
-                      className="dropdown-item"
-                      disabled
-                      aria-describedby="samarbeidsplattformer-description"
-                    >
-                      Del på samarbeidsplattformer
-                    </button>
-                    <span
-                      id="samarbeidsplattformer-description"
-                      style={{ fontSize: "smaller", color: "gray" }}
-                    >
-                      (Denne funksjonen er under utvikling)
-                    </span>
-                  </li>
-                  <li>
-                    <button
-                      className="dropdown-item"
-                      disabled
-                      aria-describedby="lenke-description"
-                    >
-                      Kopier lenke
-                    </button>
-                    <span
-                      id="lenke-description"
-                      style={{ fontSize: "smaller", color: "gray" }}
-                    >
-                      (Denne funksjonen er under utvikling)
-                    </span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-            {/* A simple button for adding a new product, which reloads the page on click */}
-            <div className="button-wrapper">
-              <button
-                className="btn btn-primary custom-button"
-                onClick={() => window.location.reload()}
-              >
-                <FontAwesomeIcon icon={faPlus} className="icon-right-spacing" />
-                Legg til et nytt produkt
-              </button>
-            </div>
-          </div>
-        )}
+  
       </div>
     </div>
   );

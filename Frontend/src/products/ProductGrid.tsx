@@ -16,21 +16,24 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products, onProductDeleted })
       <Row xs={1} sm={2} md={3} lg={4} className="g-4">
         {products.map(product => (
           <Col key={product.productId}>
-            <Card>
+            <Card className='h-100'>
             <Link 
               to={`/productdetails/${product.productId}`}
               className='text-decoration-none'
             >
-              <Card.Img variant="top" src={`http://localhost:5047/${product.imageUrl}`} alt={product.name} />
+              <Card.Img 
+                variant="top" 
+                className='mx-auto d-block'style={{ width: '150px', height: '150px', objectFit: 'cover'  }} 
+                src={`http://localhost:5047/images/${product.imageUrl}`} 
+                alt={product.name} 
+                />
             </Link>
               <Card.Body>
-                <Card.Title>{product.name}</Card.Title>
+                <Card.Title className='align-middle text-center'>{product.name}</Card.Title>
                 <Card.Text>
                   {product.type}
                 </Card.Text>
-                <Card.Text>
-                  {product.group} 
-                </Card.Text>
+                
                 <div className="d-flex justify-content-between">
                     <Button href={`/productupdate/${product.productId}`} variant="primary"><i className="bi bi-pencil-square"></i></Button>
                     <Button onClick={() => onProductDeleted(product.productId)} variant="danger"><i className='bi bi-trash'></i></Button>                    

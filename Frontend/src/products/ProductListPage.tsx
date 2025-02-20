@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Form, InputGroup } from 'react-bootstrap';
+import { Button, Form, InputGroup, Spinner } from 'react-bootstrap';
 import ProductTable from './ProductTable';
 import ProductGrid from './ProductGrid';
 import { Product } from '../types/product';
@@ -14,7 +14,8 @@ const ProductListPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null); // State for storing error messages
   const [showTable, setShowTable] = useState<boolean>(true); // State to toggle between table and grid view
   const [searchQuery, setSearchQuery] = useState<string>(''); // State for search query
-  const [showUnauthorizedError, setShowUnauthorizedError] = useState(false);
+  //const [showUnauthorizedError, setShowUnauthorizedError] = useState(false);
+  const [visibleProducts, setVisibleProducts] = useState<number>(5); // State for the number of visible products
 
   const toggleTableOrGrid = () => setShowTable(prevShowTable => !prevShowTable);
 
@@ -46,6 +47,15 @@ const ProductListPage: React.FC = () => {
     fetchProducts();
   }, []);
 
+  const loadMoreProducts = () => {
+    setVisibleProducts(prevVisibleProducts => prevVisibleProducts + 5);
+  };
+
+  const showLessProducts = () => {
+    setVisibleProducts(prevVisibleProducts => Math.max(prevVisibleProducts - 5, 5));
+  };
+  
+
   // Save the view mode to local storage whenever it changes
   useEffect(() => {
     console.log('[save view state] Saving view mode:', showTable ? 'table' : 'grid');
@@ -65,7 +75,7 @@ const ProductListPage: React.FC = () => {
         setProducts(prevProducts => prevProducts.filter(product => product.productId !== productId));
         console.log('Product deleted:', productId);
       } catch (error: any) {
-        setShowUnauthorizedError(true);
+        //setShowUnauthorizedError(true);
         console.error('Error deleting product:', error);
         if (error.response.status === 404) {
             setError('Product not found.');
@@ -88,7 +98,7 @@ const ProductListPage: React.FC = () => {
       <Button onClick={toggleTableOrGrid} className="btn btn-primary mb-3 me-2">
         {showTable ? <i className="bi bi-grid"></i> : <i className="bi bi-list-ul"></i>}
       </Button>
-      <Button href='/productcreate' className="btn btn-secondary mb-3 me-2">
+      <Button href='/products/calculator' className="btn btn-secondary mb-3 me-2">
       <i className="bi bi-pencil-square"></i> New Product
       </Button>
       <Form.Group className="mb-3">
@@ -98,19 +108,46 @@ const ProductListPage: React.FC = () => {
         </InputGroup.Text>
         <Form.Control
           type="text"
-          placeholder='Search by name or description'
+          placeholder='Search by name or type'
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
         />
         
         </InputGroup>
       </Form.Group>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {showTable
-        ? <ProductTable products={filteredProducts} apiUrl={`http://localhost:5047`} onProductDeleted={handleProductDeleted} />
-        : <ProductGrid products={filteredProducts} apiUrl={`http://localhost:5047`} onProductDeleted={handleProductDeleted} />
-        }
-        {showUnauthorizedError}
+
+      <div>
+      {loading && <Spinner animation="border" />}
+      {error && <div className="alert alert-danger">{error}</div>}
+      {showTable ? (
+        <ProductTable products={filteredProducts.slice(0, visibleProducts)}
+        apiUrl={`http://localhost:5047`} onProductDeleted={handleProductDeleted} />
+      ) : (
+        // Assuming you have a ProductGrid component for grid view
+        <ProductGrid products={filteredProducts.slice(0, visibleProducts)} apiUrl={`http://localhost:5047`} onProductDeleted={handleProductDeleted} />
+      )}
+      <div className='d-flex justify-content-between mt-3'>
+      {visibleProducts < filteredProducts.length && (
+        <Button onClick={loadMoreProducts}>
+          Load More
+        </Button>
+      )}
+      {visibleProducts > 5 && (
+          <Button onClick={showLessProducts}>
+            Show Less
+          </Button>
+        )}
+      </div>
+      
+     </div>
+    {/*
+    *  {error && <p style={{ color: 'red' }}>{error}</p>}
+    * {showTable
+    *    ? <ProductTable products={filteredProducts} apiUrl={`http://localhost:5047`} onProductDeleted={handleProductDeleted} />
+    *    : <ProductGrid products={filteredProducts} apiUrl={`http://localhost:5047`} onProductDeleted={handleProductDeleted} />
+    *    }
+      */}
+        {/*{showUnauthorizedError}*/}
 
 
     </div>

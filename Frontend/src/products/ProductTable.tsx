@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Table, Button, Container, Row, Col } from 'react-bootstrap';
 import { Product } from '../types/product';
 import { Link } from 'react-router-dom';
-//import getScoreClass from './ProductForm';
+import '../css/ProductTable.css';
 
 interface ProductTableProps {
   products: Product[];
@@ -54,7 +54,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onProductDeleted 
                   <th className="align-middle">Image</th>
                   <th className="align-middle">Group</th>
                   <th className="align-middle">Type</th>
-                  {showNutrition && <th className="align-middle">Nutrition</th>}
+                  {showNutrition && <th className="align-middle">Nutrition per 100 g/ml</th>}
                   <th className="align-middle">Actions</th>
                 </tr>
               </thead>
@@ -79,18 +79,19 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onProductDeleted 
                           className='text-decoration-none'
                         >
                         <img 
-                          src={`${product.imageUrl}`} 
+                          src={`http://localhost:5047/images/${product.imageUrl}`} 
                           alt={product.name} 
-                          className="img-fluid rounded" 
+                          className="rounded" 
                           style={{ maxWidth: '120px', height: 'auto' }} 
                         />
                         </Link>
                       </td>
                     
                     
-                    <td className="align-middle">{product.group}</td>
+                    <td className="align-middle small">{product.group}</td>
                     <td className="align-middle">{product.type}</td>
-                    {showNutrition && <td className="align-middle small">Energi: {product.calories}<br/>
+                    {showNutrition && <td className="align-middle small">
+                    Energi: {product.calories}<br/>
                     Fett: {product.fat}<br/>
                     Mettet fett: {product.satFat}<br/>
                     Karbo: {product.carbs}<br/>
@@ -102,7 +103,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onProductDeleted 
                     }
                     <td className="align-middle text-center">
                       <Link 
-                        to={`/productupdate/${product.productId}`}
+                        to={`/products/updateCalculator/${product.productId}`}
                         className="btn btn-outline-primary btn-sm me-2"
                       >
                         <i className="bi bi-pencil-square"></i> Update

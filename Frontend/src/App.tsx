@@ -13,6 +13,7 @@ import HomePage from "./home/HomePage";
 import LoginPage from "./account/login";
 import ProductListPage from "./products/ProductListPage";
 import "./App.css";
+//import UpdateCalculator from "./UpdateCalculator";
 
 //    <LoginTest />
 //    <GetProducts />
@@ -27,7 +28,7 @@ const App: React.FC = () => {
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/products" element={<ProductListPage />} />
-                <Route path="/calculator" element={<Calculator />} />
+                <Route path="/products/calculator" element={<Calculator />} />
                 <Route path="/login" element={<LoginTest />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
                 <Route path="account/login" element={<LoginPage />} />

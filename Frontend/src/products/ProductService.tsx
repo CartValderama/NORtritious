@@ -37,10 +37,11 @@ export const createProduct = async (product: any) => {
     error.status = 401;
     throw error;
   }
-
+  /*
   if (!response.request.ok) {
     throw new Error('Network response was not ok');
   }
+    */
   return handleResponse(response);
 };
 // Put update item
@@ -62,9 +63,10 @@ export const deleteProduct = async (productId: number) => {
     error.status = 401;
     throw error;
   }
-
-  if (!response.request.ok) {
+  /*
+  if (!response.ok) {
     throw new Error('Network response was not ok');
   }
+    */
   return handleResponse(response);
 };

@@ -13,10 +13,12 @@ import Select from "react-select"; // import Select component
 import error from '../../img/error.png'; // Assuming you have an error image
 import ErrorMessageBox from "../../errorMessages.jsx";
 
+import * as ProductService from "../../products/ProductService";
+
 import CustomSelect from "../../CustomSelect.jsx";
 
 // This component is called Kategori1
-const Kategori0 = () => {
+const Kategori0 = ({ product, handleNutrientChange, onNutritionChange }) => {
   // State variables for showing results and empty result message
 
   const [showNokkelhulletResults, setShowNokkelhulletResults] = useState(null);
@@ -84,6 +86,7 @@ const Kategori0 = () => {
     salt: "",
   });
 
+  /*
   // Handler for updating nutrition state/state variable based on input field changes/input values
   const changeHandle = (event) => {
     console.log("changeHandle ===", event.target, event.target.value);
@@ -92,6 +95,20 @@ const Kategori0 = () => {
       [event.target.name]: event.target.value,
     });
   };
+  */
+
+ // Handler for updating nutrition state based on input field changes
+ const changeHandle = (event) => {
+  const { name, value } = event.target;
+  setNutrition((prevNutrition) => {
+    const updatedNutrition = {
+      ...prevNutrition,
+      [name]: parseFloat(value),
+    };   
+   onNutritionChange(updatedNutrition);
+    return updatedNutrition;
+  });
+};
 
   // define function to handle form submission
   const onClick = (e) => {
