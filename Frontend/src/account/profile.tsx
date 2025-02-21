@@ -171,6 +171,9 @@ const ProfilePage: React.FC = () => {
                       Navn
                     </label>
                     <div className="input-group">
+                      <span className="input-group-text" id="basic-addon1">
+                        <i className="bi bi-person-vcard"></i>
+                      </span>
                       <input
                         type="text"
                         className="form-control"
@@ -180,6 +183,8 @@ const ProfilePage: React.FC = () => {
                           setUserInfo({ ...userInfo, name: e.target.value })
                         }
                         required
+                        disabled
+                        readOnly
                       />
                     </div>
                   </div>
@@ -227,6 +232,30 @@ const ProfilePage: React.FC = () => {
                       />
                     </div>
                   </div>
+                  {userInfo.role === "Producer" && (
+                    <div className="mb-3">
+                      <label htmlFor="email" className="form-label">
+                        Organisasjonsnummer
+                      </label>
+                      <div className="input-group">
+                        <span className="input-group-text" id="basic-addon1">
+                          <i className="bi bi-building"></i>
+                        </span>
+                        <input
+                          type="email"
+                          className="form-control"
+                          id="email"
+                          value={""}
+                          onChange={(e) =>
+                            setUserInfo({ ...userInfo, email: e.target.value })
+                          }
+                          required
+                          disabled
+                          readOnly
+                        />
+                      </div>
+                    </div>
+                  )}
                   <button type="submit" className="btn btn-primary" disabled>
                     Oppdater
                   </button>
