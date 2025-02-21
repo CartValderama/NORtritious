@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import API_URL from "../apiConfig";
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -16,7 +17,7 @@ const LoginPage: React.FC = () => {
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
-        await axios.get("https://localhost:7064/api/account/get-user-info", {
+        await axios.get(`${API_URL}/api/account/get-user-info`, {
           withCredentials: true,
         });
         setIsLoggedIn(true);
@@ -34,7 +35,7 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
     try {
       await axios.post(
-        "https://localhost:7064/api/account/login",
+        `${API_URL}/api/account/login`,
         { email, password },
         { withCredentials: true }
       );
@@ -54,7 +55,7 @@ const LoginPage: React.FC = () => {
 
     try {
       await axios.post(
-        "https://localhost:7064/api/account/register",
+        `${API_URL}/api/account/register`,
         { email, password, role }, // Sender valgt rolle
         { withCredentials: true }
       );
@@ -85,7 +86,7 @@ const LoginPage: React.FC = () => {
   const handleLogout = async () => {
     try {
       await axios.post(
-        "https://localhost:7064/api/account/logout",
+        `${API_URL}/api/account/logout`,
         {},
         {
           withCredentials: true,

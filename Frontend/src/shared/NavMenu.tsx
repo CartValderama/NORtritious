@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import logo from "../img/logo.jpg";
 import "../css/NavMenu.css";
+import API_URL from "../apiConfig";
 
 const NavMenu: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -14,7 +15,7 @@ const NavMenu: React.FC = () => {
     const checkLoginStatus = async () => {
       try {
         const response = await axios.get(
-          "https://localhost:7064/api/account/get-user-info",
+          `${API_URL}/api/account/get-user-info`,
           { withCredentials: true }
         );
         if (response.data) {
@@ -34,7 +35,7 @@ const NavMenu: React.FC = () => {
     try {
       // Kall til backend for å logge ut (f.eks. fjerne token eller session)
       await axios.post(
-        "https://localhost:7064/api/account/logout",
+        `${API_URL}/api/account/logout`,
         {},
         { withCredentials: true }
       );

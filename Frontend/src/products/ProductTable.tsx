@@ -3,6 +3,7 @@ import { Table, Button, Container, Row, Col } from 'react-bootstrap';
 import { Product } from '../types/product';
 import { Link } from 'react-router-dom';
 import '../css/ProductTable.css';
+import API_URL from '../apiConfig';
 
 interface ProductTableProps {
   products: Product[];
@@ -79,7 +80,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onProductDeleted 
                           className='text-decoration-none'
                         >
                         <img 
-                          src={`https://localhost:7064/images/${product.imageUrl}`} 
+                          src={`${API_URL}/images/${product.imageUrl}`} 
                           alt={product.name} 
                           className="rounded" 
                           style={{ maxWidth: '120px', height: 'auto' }} 

@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, Col, Row, Button } from 'react-bootstrap';
 import { Product } from '../types/product';
 import { Link } from 'react-router-dom';
+import API_URL from '../apiConfig';
 
 interface ProductGridProps {
   products: Product[];
@@ -24,7 +25,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products, onProductDeleted })
               <Card.Img 
                 variant="top" 
                 className='mx-auto d-block'style={{ width: '150px', height: '150px', objectFit: 'cover'  }} 
-                src={`https://localhost:7064/images/${product.imageUrl}`} 
+                src={`${API_URL}/images/${product.imageUrl}`} 
                 alt={product.name} 
                 />
             </Link>

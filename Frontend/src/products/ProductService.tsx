@@ -1,4 +1,5 @@
 import axios from "axios";
+import API_URL from "../apiConfig";
 
 const handleResponse = async (response: any) => {
   if (response.status >= 200 && response.status < 300) {  // HTTP status code success 200-299
@@ -14,20 +15,20 @@ const handleResponse = async (response: any) => {
 
 // Get itemlist
 export const fetchProducts = async () => {
-  const response = await axios.get(`https://localhost:7064/api/products`,
+  const response = await axios.get(`${API_URL}/api/products`,
     { withCredentials: true, });
   return handleResponse(response);
 };
 // Get item by id
 export const fetchProductById = async (productId: string) => {
-  const response = await axios.get(`https://localhost:7064/api/products/${productId}`,
+  const response = await axios.get(`${API_URL}/api/products/${productId}`,
     {withCredentials: true, });
   return handleResponse(response);
 };
 
 // Post create item
 export const createProduct = async (product: any) => {
-  const response = await axios.post(`https://localhost:7064/api/products`, 
+  const response = await axios.post(`${API_URL}/api/products`, 
     product,
     {withCredentials: true, }
   );    
@@ -46,7 +47,7 @@ export const createProduct = async (product: any) => {
 };
 // Put update item
 export const updateProduct = async (productId: number, product: any) => {
-  const response = await axios.put(`https://localhost:7064/api/products/${productId}`, 
+  const response = await axios.put(`${API_URL}/api/products/${productId}`, 
     product,
     {withCredentials: true, }
 );
@@ -54,7 +55,7 @@ export const updateProduct = async (productId: number, product: any) => {
 };
 // Delete item
 export const deleteProduct = async (productId: number) => {
-  const response = await axios.delete(`https://localhost:7064/api/products/${productId}`, 
+  const response = await axios.delete(`${API_URL}/api/products/${productId}`, 
     {withCredentials: true, }
   );
 

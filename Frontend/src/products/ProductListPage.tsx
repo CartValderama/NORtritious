@@ -3,8 +3,9 @@ import { Button, Form, InputGroup, Spinner } from 'react-bootstrap';
 import ProductTable from './ProductTable';
 import ProductGrid from './ProductGrid';
 import { Product } from '../types/product';
-//import API_URL from '../apiConfig';
+import API_URL from '../apiConfig';
 import * as ProductService from './ProductService';
+import '../css/ProductTable.css';
 //import ErrorPopup from '../shared/ErrorPopup';
 
 
@@ -98,7 +99,7 @@ const ProductListPage: React.FC = () => {
       <Button onClick={toggleTableOrGrid} className="btn btn-primary mb-3 me-2">
         {showTable ? <i className="bi bi-grid"></i> : <i className="bi bi-list-ul"></i>}
       </Button>
-      <Button href='/products/calculator' className="btn btn-secondary mb-3 me-2">
+      <Button href='/products/calculator' className="btn btn-secondary mb-3 me-2" style={{ backgroundColor: 'darkblue'}}>
       <i className="bi bi-pencil-square"></i> New Product
       </Button>
       <Form.Group className="mb-3">
@@ -121,10 +122,9 @@ const ProductListPage: React.FC = () => {
       {error && <div className="alert alert-danger">{error}</div>}
       {showTable ? (
         <ProductTable products={filteredProducts.slice(0, visibleProducts)}
-        apiUrl={`https://localhost:7064`} onProductDeleted={handleProductDeleted} />
+        apiUrl={`${API_URL}`} onProductDeleted={handleProductDeleted} />
       ) : (
-        // Assuming you have a ProductGrid component for grid view
-        <ProductGrid products={filteredProducts.slice(0, visibleProducts)} apiUrl={`https://localhost:7064`} onProductDeleted={handleProductDeleted} />
+        <ProductGrid products={filteredProducts.slice(0, visibleProducts)} apiUrl={`${API_URL}`} onProductDeleted={handleProductDeleted} />
       )}
       <div className='d-flex justify-content-between mt-3'>
       {visibleProducts < filteredProducts.length && (

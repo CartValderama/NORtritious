@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API_URL from "../apiConfig";
 
 const ProfilePage: React.FC = () => {
   const [userInfo, setUserInfo] = useState({ email: "", name: "", role: "" });
@@ -21,7 +22,7 @@ const ProfilePage: React.FC = () => {
     const fetchUserInfo = async () => {
       try {
         const response = await axios.get(
-          "https://localhost:7064/api/account/get-user-info",
+          `${API_URL}/api/account/get-user-info`,
           {
             withCredentials: true,
           }
@@ -50,7 +51,7 @@ const ProfilePage: React.FC = () => {
     setIsProductsLoading(true); // Start loading
     try {
       const response = await axios.get(
-        "https://localhost:7064/api/products", // Endepunkt for å hente alle produkter
+        `${API_URL}/api/products`, // Endepunkt for å hente alle produkter
         { withCredentials: true }
       );
       setProducts(response.data); // Sett produkter i state
@@ -77,7 +78,7 @@ const ProfilePage: React.FC = () => {
         };
 
         await axios.post(
-          "https://localhost:7064/api/account/change-password",
+          `${API_URL}/api/account/change-password`,
           changePasswordRequest,
           { withCredentials: true }
         );
@@ -103,7 +104,7 @@ const ProfilePage: React.FC = () => {
 
       try {
         await axios.put(
-          "https://localhost:7064/api/account/update-info",
+          `${API_URL}/api/account/update-info`,
           userInfo,
           { withCredentials: true }
         );
