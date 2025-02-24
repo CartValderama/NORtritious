@@ -4,7 +4,7 @@ export interface Product {
     group: string;
     type: string;
     hasEfsaHealth: boolean; // EFSA Health Claim, will not be boolean
-    hasEfsaNutrition: boolean; // Will not be boolean
+    hasEfsaNutrition: string; // Will not be boolean
     hasNokkelhullet: boolean; // Will not be boolean
     imageUrl: string;
 

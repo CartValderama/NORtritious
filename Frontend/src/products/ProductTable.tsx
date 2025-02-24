@@ -51,12 +51,14 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onProductDeleted 
               <thead className="bg-light">
                 <tr>
                   {showId && <th className="align-middle">ID</th>}
-                  <th className="align-middle">Name</th>
-                  <th className="align-middle">Image</th>
-                  <th className="align-middle">Group</th>
-                  <th className="align-middle">Type</th>
-                  {showNutrition && <th className="align-middle">Nutrition per 100 g/ml</th>}
-                  <th className="align-middle">Actions</th>
+                  <th className="align-middle text-center">Navn</th>
+                  <th className="align-middle text-center">Bilde</th>
+                  <th className="align-middle text-center">Gruppe</th>
+                  <th className="align-middle text-center">Type</th>
+                  {showNutrition && <th className="align-middle">Næringsmiddel pr. 100 g/ml</th>}
+                  <th className='align-middle text-center'>Nøkkelhullet</th>
+                  <th className='align-middle text-center'>EFSA Ernæringspåstander</th>
+                  <th className="align-middle text-center">Behandling</th>
                 </tr>
               </thead>
               <tbody>
@@ -103,18 +105,32 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onProductDeleted 
                     Salt: {product.salt}</td>
                     }
                     <td className="align-middle text-center">
+                    <img 
+                          src={product.hasNokkelhullet ? `${API_URL}/images/circle-keyhole-logo.png` : `${API_URL}/images/ban_keyhole.png`}	 
+                          alt={product.hasNokkelhullet ? 'Oppfyller Nøkkelhullet' : 'Oppfyller ikke Nøkkelhullet'}
+                          style={{ width: '50px', height: '50px', padding: '2px' }} 
+                          className="rounded" 
+                        />
+                      
+                    </td>
+
+                    <td className="align-middle text-center">
+                      {product.hasEfsaNutrition}
+                    </td>
+  
+                    <td className="align-middle text-center">
                       <Link 
                         to={`/products/updateCalculator/${product.productId}`}
                         className="btn btn-outline-primary btn-sm me-2"
                       >
-                        <i className="bi bi-pencil-square"></i> Update
+                        <i className="bi bi-pencil-square"></i> Rediger
                       </Link>
                       <Button
                         variant="outline-danger"
                         size="sm"
                         onClick={() => onProductDeleted(product.productId)}
                       >
-                        <i className='bi bi-trash'></i> Delete
+                        <i className='bi bi-trash'></i> Fjern
                       </Button>
                       </td>
                   </tr>
