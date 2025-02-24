@@ -15,7 +15,7 @@ import * as ResultComponents from "../../ResultComponents.jsx";
 import * as Check from "../../NutritionClaimCheck.jsx"
 import * as ProductService from "../../products/ProductService";
 
-const Kategori31 = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete }) => {
+const Kategori31 = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition }) => {
   // State variables for showing results and empty result message
 
   const [showNokkelhulletResults, setShowNokkelhulletResults] = useState(null);
@@ -148,6 +148,31 @@ const Kategori31 = ({ product, handleNutrientChange, onNutritionChange, onCalcul
   });
 };
 
+
+    // Function to check all possible combinations of claims, 
+    // based on the active claims and returns the string of claims
+    const claims = [
+   
+      { name: 'Lavt Sukkerinnhold', value: lowSugars },
+      { name: 'Fritt for Sukker', value: sugarsFree },
+      { name: 'Uten tilsatt Sukker', value: withNoAddedSugars },
+    
+    ];
+  
+    // Function to check all possible combinations of claims, based on the active claims
+    const checkClaims = (claims) => {
+      // Filters out the active claims based on the current combination
+      const activeClaims = claims.filter(claim => claim.value).map(claim => claim.name);
+      //console.log(`Active claims: ${activeClaims.join(', ')}`);
+      // Calls the function to put all active claims the product meets, into the product object
+      hasEfsaNutrition(activeClaims.join(', '));
+    };
+  
+    // Use useEffect to run checkClaims whenever the state variables change
+    useEffect(() => {
+      checkClaims(claims);
+    }, [lowSugars, sugarsFree, withNoAddedSugars]);
+
   // define function to handle form submission
   const onClick = (e) => {
     e.preventDefault();
@@ -177,6 +202,7 @@ const Kategori31 = ({ product, handleNutrientChange, onNutritionChange, onCalcul
     ) {
       // If all requirements are met, display the nutrition results
       setShowNokkelhulletResults(true);
+      hasNokkelhullet(true);
       // Hide any empty result messages or error messages
       setShowEmptyResult(false);
 
@@ -211,6 +237,7 @@ const Kategori31 = ({ product, handleNutrientChange, onNutritionChange, onCalcul
           console.log("energikj ===", selectsPart, nutrition.energikj);
           setEnergikj(true);
           setShowNokkelhulletResults(false);
+          hasNokkelhullet(false);
           setShowEmptyResult(true);
         } else {
           setEnergikj(false);
@@ -223,6 +250,8 @@ const Kategori31 = ({ product, handleNutrientChange, onNutritionChange, onCalcul
           console.log("energikcal ===", selectsPart, nutrition.energikcal);
           setEnergikcal(true);
           setShowNokkelhulletResults(false);
+          hasNokkelhullet(false);
+
           setShowEmptyResult(true);
         } else {
           setEnergikcal(false);
@@ -233,6 +262,8 @@ const Kategori31 = ({ product, handleNutrientChange, onNutritionChange, onCalcul
       if (nutrition.fett === "" || nutrition.fett < 0) {
         setFett(true);
         setShowNokkelhulletResults(false);
+        hasNokkelhullet(false);
+
         setShowEmptyResult(true);
       } else {
         setFett(false);
@@ -241,6 +272,8 @@ const Kategori31 = ({ product, handleNutrientChange, onNutritionChange, onCalcul
       if (nutrition.mettede === "" || nutrition.mettede < 0) {
         setMettedeNull(true);
         setShowNokkelhulletResults(false);
+        hasNokkelhullet(false);
+
         setShowEmptyResult(true);
       } else {
         setMettedeNull(false);
@@ -248,6 +281,8 @@ const Kategori31 = ({ product, handleNutrientChange, onNutritionChange, onCalcul
       if (nutrition.mettede > nutrition.fett / 5) {
         setMettede(true);
         setShowNokkelhulletResults(false);
+        hasNokkelhullet(false);
+
       } else {
         setMettede(false);
       }
@@ -255,6 +290,8 @@ const Kategori31 = ({ product, handleNutrientChange, onNutritionChange, onCalcul
       if (nutrition.karbohydrat === "" || nutrition.karbohydrat < 0) {
         setKarbohydratNull(true);
         setShowNokkelhulletResults(false);
+        hasNokkelhullet(false);
+
         setShowEmptyResult(true);
       } else {
         setKarbohydratNull(false);
@@ -262,6 +299,8 @@ const Kategori31 = ({ product, handleNutrientChange, onNutritionChange, onCalcul
       if (nutrition.karbohydrat > 5) {
         setKarbohydrat(true);
         setShowNokkelhulletResults(false);
+        hasNokkelhullet(false);
+
       } else {
         setKarbohydrat(false);
       }
@@ -269,6 +308,8 @@ const Kategori31 = ({ product, handleNutrientChange, onNutritionChange, onCalcul
       if (nutrition.naturligSukker === "" || nutrition.naturligSukker < 0) {
         setNaturligSukker(true);
         setShowNokkelhulletResults(false);
+        hasNokkelhullet(false);
+
         setShowEmptyResult(true);
       } else {
         setNaturligSukker(false);
@@ -280,6 +321,8 @@ const Kategori31 = ({ product, handleNutrientChange, onNutritionChange, onCalcul
       ) {
         setHvoravSukkerarter(true);
         setShowNokkelhulletResults(false);
+        hasNokkelhullet(false);
+
         setShowEmptyResult(true);
       } else {
         setHvoravSukkerarter(false);
@@ -288,6 +331,8 @@ const Kategori31 = ({ product, handleNutrientChange, onNutritionChange, onCalcul
       if (nutrition.kostfiber === "" || nutrition.kostfiber < 0) {
         setKostfiber(true);
         setShowNokkelhulletResults(false);
+        hasNokkelhullet(false);
+
         setShowEmptyResult(true);
       } else {
         setKostfiber(false);
@@ -296,6 +341,8 @@ const Kategori31 = ({ product, handleNutrientChange, onNutritionChange, onCalcul
       if (nutrition.protein === "" || nutrition.protein < 0) {
         setProtein(true);
         setShowNokkelhulletResults(false);
+        hasNokkelhullet(false);
+
         setShowEmptyResult(true);
       } else {
         setProtein(false);
@@ -304,6 +351,8 @@ const Kategori31 = ({ product, handleNutrientChange, onNutritionChange, onCalcul
       if (nutrition.salt === "" || nutrition.salt < 0) {
         setSaltNull(true);
         setShowNokkelhulletResults(false);
+        hasNokkelhullet(false);
+
         setShowEmptyResult(true);
       } else {
         setSaltNull(false);
@@ -311,6 +360,8 @@ const Kategori31 = ({ product, handleNutrientChange, onNutritionChange, onCalcul
       if (nutrition.salt > 0.8) {
         setSalt(true);
         setShowNokkelhulletResults(false);
+        hasNokkelhullet(false);
+
       } else {
         setSalt(false);
       }

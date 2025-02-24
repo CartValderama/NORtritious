@@ -25,7 +25,7 @@ import ErrorEfsaClaims from "../../errorMessages.jsx";
 import ErrorMessageBox from "../../errorMessages.jsx";
 import * as ProductService from "../../products/ProductService";
 
-const Kategori24a1 = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete }) => {
+const Kategori24a1 = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition }) => {
 
   // State variables for showing results and empty result message
   const [showNokkelhulletResults, setShowNokkelhulletResults] = useState(null);
@@ -170,6 +170,34 @@ const Kategori24a1 = ({ product, handleNutrientChange, onNutritionChange, onCalc
     });
   };
 
+      // Function to check all possible combinations of claims, 
+      // based on the active claims and returns the string of claims
+      const claims = [
+        { name: 'Lavt Energiinnhold', value: lowEnergy },
+        { name: 'Lavt Fettinnhold', value: lowFat },
+        { name: 'Fritt for Fett', value: fatFree },
+        { name: 'Lavt Mettet Fettinnhold', value: lowSaturatedFat },
+        { name: 'Fritt for Mettet Fett', value: saturatedFatFree },
+        { name: 'Lavt Sukkerinnhold', value: lowSugars },
+        { name: 'Fritt for Sukker', value: sugarsFree },
+        { name: 'Uten tilsatt Sukker', value: withNoAddedSugars },
+        
+      ];
+    
+      // Function to check all possible combinations of claims, based on the active claims
+      const checkClaims = (claims) => {
+        // Filters out the active claims based on the current combination
+        const activeClaims = claims.filter(claim => claim.value).map(claim => claim.name);
+        //console.log(`Active claims: ${activeClaims.join(', ')}`);
+        // Calls the function to put all active claims the product meets, into the product object
+        hasEfsaNutrition(activeClaims.join(', '));
+      };
+    
+      // Use useEffect to run checkClaims whenever the state variables change
+      useEffect(() => {
+        checkClaims(claims);
+      }, [lowEnergy, lowFat, fatFree, lowSaturatedFat, saturatedFatFree, lowSugars, sugarsFree, withNoAddedSugars]);
+  
   // define function to handle form submission
   const onClick = (e) => {
     e.preventDefault();
@@ -199,7 +227,7 @@ const Kategori24a1 = ({ product, handleNutrientChange, onNutritionChange, onCalc
     ) {
       // If all requirements are met, display the nutrition results
       setShowNokkelhulletResults(true);
-
+      hasNokkelhullet(true);
       // Hide any empty result messages or error messages
       setShowEmptyResult(false);
 
@@ -236,6 +264,7 @@ const Kategori24a1 = ({ product, handleNutrientChange, onNutritionChange, onCalc
           console.log("energikj ===", selectsPart, nutrition.energikj);
           setEnergikj(true);
           setShowNokkelhulletResults(false);
+          hasNokkelhullet(false);
           setShowEmptyResult(true);
         } else {
           setEnergikj(false);
@@ -248,6 +277,8 @@ const Kategori24a1 = ({ product, handleNutrientChange, onNutritionChange, onCalc
           console.log("energikcal ===", selectsPart, nutrition.energikcal);
           setEnergikcal(true);
           setShowNokkelhulletResults(false);
+          hasNokkelhullet(false);
+
           setShowEmptyResult(true);
         } else {
           setEnergikcal(false);
@@ -258,6 +289,8 @@ const Kategori24a1 = ({ product, handleNutrientChange, onNutritionChange, onCalc
       if (nutrition.fett === "" || nutrition.fett < 0) {
         setFettNull(true);
         setShowNokkelhulletResults(false);
+        hasNokkelhullet(false);
+
         setShowEmptyResult(true);
       } else {
         setFettNull(false);
@@ -265,6 +298,8 @@ const Kategori24a1 = ({ product, handleNutrientChange, onNutritionChange, onCalc
       if (nutrition.fett > 10) {
         setFett(true);
         setShowNokkelhulletResults(false);
+        hasNokkelhullet(false);
+
       } else {
         setFett(false);
       }
@@ -272,6 +307,8 @@ const Kategori24a1 = ({ product, handleNutrientChange, onNutritionChange, onCalc
       if (nutrition.mettede === "" || nutrition.mettede < 0) {
         setMettede(true);
         setShowNokkelhulletResults(false);
+        hasNokkelhullet(false);
+
         setShowEmptyResult(true);
       } else {
         setMettede(false);
@@ -280,6 +317,8 @@ const Kategori24a1 = ({ product, handleNutrientChange, onNutritionChange, onCalc
       if (nutrition.karbohydrat === "" || nutrition.karbohydrat < 0) {
         setKarbohydratNull(true);
         setShowNokkelhulletResults(false);
+        hasNokkelhullet(false);
+
         setShowEmptyResult(true);
       } else {
         setKarbohydratNull(false);
@@ -287,6 +326,8 @@ const Kategori24a1 = ({ product, handleNutrientChange, onNutritionChange, onCalc
       if (nutrition.karbohydrat > 3) {
         setKarbohydrat(true);
         setShowNokkelhulletResults(false);
+        hasNokkelhullet(false);
+
       } else {
         setKarbohydrat(false);
       }
@@ -295,6 +336,8 @@ const Kategori24a1 = ({ product, handleNutrientChange, onNutritionChange, onCalc
       if (nutrition.naturligSukker === "" || nutrition.naturligSukker < 0) {
         setNaturligSukker(true);
         setShowNokkelhulletResults(false);
+        hasNokkelhullet(false);
+
         setShowEmptyResult(true);
       } else {
         setNaturligSukker(false);
@@ -308,6 +351,8 @@ const Kategori24a1 = ({ product, handleNutrientChange, onNutritionChange, onCalc
       ) {
         setHvoravSukkerarter(true);
         setShowNokkelhulletResults(false);
+        hasNokkelhullet(false);
+
         setShowEmptyResult(true);
       } else {
         setHvoravSukkerarter(false);
@@ -317,6 +362,8 @@ const Kategori24a1 = ({ product, handleNutrientChange, onNutritionChange, onCalc
       if (nutrition.kostfiber === "" || nutrition.kostfiber < 0) {
         setKostfiber(true);
         setShowNokkelhulletResults(false);
+        hasNokkelhullet(false);
+
         setShowEmptyResult(true);
       } else {
         setKostfiber(false);
@@ -325,6 +372,8 @@ const Kategori24a1 = ({ product, handleNutrientChange, onNutritionChange, onCalc
       if (nutrition.protein === "" || nutrition.protein < 0) {
         setProtein(true);
         setShowNokkelhulletResults(false);
+        hasNokkelhullet(false);
+
         setShowEmptyResult(true);
       } else {
         setProtein(false);
@@ -333,6 +382,8 @@ const Kategori24a1 = ({ product, handleNutrientChange, onNutritionChange, onCalc
       if (nutrition.salt === "" || nutrition.salt < 0) {
         setSaltNull(true);
         setShowNokkelhulletResults(false);
+        hasNokkelhullet(false);
+
         setShowEmptyResult(true);
       } else {
         setSaltNull(false);
@@ -340,6 +391,8 @@ const Kategori24a1 = ({ product, handleNutrientChange, onNutritionChange, onCalc
       if (nutrition.salt > 1) {
         setSalt(true);
         setShowNokkelhulletResults(false);
+        hasNokkelhullet(false);
+
       } else {
         setSalt(false);
       }
