@@ -7,6 +7,7 @@ const ProfilePage: React.FC = () => {
   const [userInfo, setUserInfo] = useState({ email: "", name: "", role: "" });
   const [newPassword, setNewPassword] = useState("");
   const [oldPassword, setOldPassword] = useState(""); // Ny state for gammelt passord
+  const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [selectedSection, setSelectedSection] = useState<
@@ -46,6 +47,10 @@ const ProfilePage: React.FC = () => {
 
     fetchUserInfo();
   }, [navigate]);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const fetchProducts = async () => {
     setIsProductsLoading(true); // Start loading
@@ -103,11 +108,9 @@ const ProfilePage: React.FC = () => {
       setError("");
 
       try {
-        await axios.put(
-          `${API_URL}/api/account/update-info`,
-          userInfo,
-          { withCredentials: true }
-        );
+        await axios.put(`${API_URL}/api/account/update-info`, userInfo, {
+          withCredentials: true,
+        });
         setMessage("Information updated successfully.");
       } catch (error) {
         if (axios.isAxiosError(error)) {
@@ -277,27 +280,53 @@ const ProfilePage: React.FC = () => {
                     <label htmlFor="oldPassword" className="form-label">
                       Gammelt passord
                     </label>
-                    <input
-                      type="password"
-                      className="form-control"
-                      id="oldPassword"
-                      value={oldPassword}
-                      onChange={(e) => setOldPassword(e.target.value)}
-                      required
-                    />
+                    <div className="input-group">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        className="form-control"
+                        id="oldPassword"
+                        value={oldPassword}
+                        onChange={(e) => setOldPassword(e.target.value)}
+                        required
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-outline-secondary"
+                        onClick={togglePasswordVisibility}
+                      >
+                        {showPassword ? (
+                          <i className="bi bi-eye-slash"></i>
+                        ) : (
+                          <i className="bi bi-eye"></i>
+                        )}
+                      </button>
+                    </div>
                   </div>
                   <div className="mb-3">
                     <label htmlFor="newPassword" className="form-label">
                       Nytt passord
                     </label>
-                    <input
-                      type="password"
-                      className="form-control"
-                      id="newPassword"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      required
-                    />
+                    <div className="input-group">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        className="form-control"
+                        id="newPassword"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        required
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-outline-secondary"
+                        onClick={togglePasswordVisibility}
+                      >
+                        {showPassword ? (
+                          <i className="bi bi-eye-slash"></i>
+                        ) : (
+                          <i className="bi bi-eye"></i>
+                        )}
+                      </button>
+                    </div>
                   </div>
                   <button type="submit" className="btn btn-primary">
                     Endre
