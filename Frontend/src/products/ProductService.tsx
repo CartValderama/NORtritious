@@ -14,6 +14,7 @@ const handleResponse = async (response: any) => {
 };
 
 // Get itemlist
+// Not currently used (see fetchMyProducts), but can be used to fetch all products
 export const fetchProducts = async () => {
   const response = await axios.get(`${API_URL}/api/products`,
     { withCredentials: true, });
@@ -23,6 +24,12 @@ export const fetchProducts = async () => {
 export const fetchProductById = async (productId: string) => {
   const response = await axios.get(`${API_URL}/api/products/${productId}`,
     {withCredentials: true, });
+  return handleResponse(response);
+};
+
+export const fetchMyProducts = async () => {
+  const response = await axios.get(`${API_URL}/api/products/my-products`,
+    { withCredentials: true, });
   return handleResponse(response);
 };
 

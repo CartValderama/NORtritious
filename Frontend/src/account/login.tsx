@@ -42,7 +42,8 @@ const LoginPage: React.FC = () => {
 
       setMessage("Login successful");
       setIsLoggedIn(true);
-      navigate("/account/profile");
+      // Client wants to navigate to homepage after login
+      navigate("/");
       window.location.reload();
     } catch (error) {
       setMessage("Login failed. Please check your credentials.");

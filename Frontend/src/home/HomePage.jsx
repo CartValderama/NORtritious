@@ -33,7 +33,7 @@ const HomePage = () => {
         </div>
         <div className="button-div col-md-4">
           <NavLink
-            to="/calculator"
+            to="/products/calculator"
             className="btn btn-primary btn-lg button-search"
           >
             Gå til webkalkulatoren

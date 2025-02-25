@@ -23,6 +23,7 @@ namespace Backend.Controllers
         }
 
         // GET: api/products
+        // Not currently used in the frontend
         [HttpGet]
         [Authorize(Roles = "Admin, Producer, Researcher")]
         public async Task<IActionResult> GetAllProductsAsync()
@@ -62,7 +63,7 @@ namespace Backend.Controllers
 
         // GET: api/products (by user ID)
         [HttpGet("my-products")]
-        [Authorize(Roles = "Producer")]
+        [Authorize(Roles = "Producer, Researcher, Admin")]
         public async Task<IActionResult> GetProductByUserIdAsync()
         {
             try
@@ -70,6 +71,17 @@ namespace Backend.Controllers
                 // Get the user ID from the authenticated user
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+                // Check if the user has the "Researcher" or "Admin" role
+                if (User.IsInRole("Researcher") || User.IsInRole("Admin"))
+                {
+                    // Fetch all products for the researcher
+                    var allProducts = await _productsRepository.GetAllProductsAsync();
+                    if (allProducts == null || !allProducts.Any())
+                    {
+                        return NotFound("No products found.");
+                    }
+                    return Ok(allProducts);
+                }
                 // Call the repository to get products by user ID
                 var products = await _productsRepository.GetProductsByUserIdAsync(userId);
                 if (products == null || !products.Any())

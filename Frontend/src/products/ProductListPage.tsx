@@ -25,7 +25,7 @@ const ProductListPage: React.FC = () => {
     setError(null);   // Clear any previous errors
 
     try {
-      const data = await ProductService.fetchProducts();
+      const data = await ProductService.fetchMyProducts();
       setProducts(data);
       console.log(data);
     } catch (error) {
