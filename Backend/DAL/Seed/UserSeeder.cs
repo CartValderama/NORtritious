@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Backend.Models;
 
 namespace Backend.DAL.Seed;
 
@@ -6,13 +7,20 @@ public static class UserSeeder
 {
     public static async Task SeedAdminUserAsync(IServiceProvider serviceProvider)
     {
-        var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
+        var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
         var adminEmail = "admin@example.com";
         var adminPassword = "Admin123!";
 
         if (await userManager.FindByEmailAsync(adminEmail) == null)
         {
-            var adminUser = new IdentityUser { UserName = adminEmail, Email = adminEmail };
+            var adminUser = new ApplicationUser
+            {
+                UserName = adminEmail, // UserName må fortsatt være unikt
+                Email = adminEmail,
+                Name = "Admin Account",
+                OrganizationNumber = "123456789"
+            };
+
             var result = await userManager.CreateAsync(adminUser, adminPassword);
 
             if (result.Succeeded)
@@ -24,31 +32,20 @@ public static class UserSeeder
 
     public static async Task SeedProducerUserAsync(IServiceProvider serviceProvider)
     {
-        var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
+        var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
         var producerEmail = "producer@example.com";
         var producerPassword = "Producer123!";
 
         if (await userManager.FindByEmailAsync(producerEmail) == null)
         {
-            var producerUser = new IdentityUser { UserName = producerEmail, Email = producerEmail };
-            var result = await userManager.CreateAsync(producerUser, producerPassword);
-
-            if (result.Succeeded)
+            var producerUser = new ApplicationUser
             {
-                await userManager.AddToRoleAsync(producerUser, "Producer");
-            }
-        }
-    }
+                UserName = producerEmail,
+                Email = producerEmail,
+                Name = "Producer Account",
+                OrganizationNumber = "123456789"
+            };
 
-    public static async Task SeedProducerUserAsync2(IServiceProvider serviceProvider)
-    {
-        var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
-        var producerEmail = "producer2@example.com";
-        var producerPassword = "Producer12345!";
-
-        if (await userManager.FindByEmailAsync(producerEmail) == null)
-        {
-            var producerUser = new IdentityUser { UserName = producerEmail, Email = producerEmail };
             var result = await userManager.CreateAsync(producerUser, producerPassword);
 
             if (result.Succeeded)
@@ -60,13 +57,20 @@ public static class UserSeeder
 
     public static async Task SeedResearcherUserAsync(IServiceProvider serviceProvider)
     {
-        var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
+        var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
         var researcherEmail = "researcher@example.com";
         var researcherPassword = "Researcher123!";
 
         if (await userManager.FindByEmailAsync(researcherEmail) == null)
         {
-            var researcherUser = new IdentityUser { UserName = researcherEmail, Email = researcherEmail };
+            var researcherUser = new ApplicationUser
+            {
+                UserName = researcherEmail,
+                Email = researcherEmail,
+                Name = "Researcher Account",
+                OrganizationNumber = "123456789"
+            };
+
             var result = await userManager.CreateAsync(researcherUser, researcherPassword);
 
             if (result.Succeeded)

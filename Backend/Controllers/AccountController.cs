@@ -11,11 +11,11 @@ namespace Backend.Controllers
     [ApiController]
     public class AccountController : Controller
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IAccountRepository _applicationRepository;
         private readonly ILogger<AccountController> _logger;
 
-        public AccountController(UserManager<IdentityUser> userManager, IAccountRepository applicationRepository, ILogger<AccountController> logger)
+        public AccountController(UserManager<ApplicationUser> userManager, IAccountRepository applicationRepository, ILogger<AccountController> logger)
         {
             _userManager = userManager;
             _applicationRepository = applicationRepository;
@@ -98,9 +98,10 @@ namespace Backend.Controllers
 
                 var response = new GetUserResponse
                 {
-                    Name = user.UserName ?? string.Empty,
+                    Name = user.Name ?? string.Empty,
                     Email = user.Email ?? string.Empty,
-                    Role = role
+                    Role = role,
+                    OrganizationNumber = user.OrganizationNumber ?? string.Empty
                 };
 
                 return Ok(response);

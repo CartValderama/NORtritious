@@ -4,7 +4,12 @@ import { useNavigate } from "react-router-dom";
 import API_URL from "../apiConfig";
 
 const ProfilePage: React.FC = () => {
-  const [userInfo, setUserInfo] = useState({ email: "", name: "", role: "" });
+  const [userInfo, setUserInfo] = useState({
+    email: "",
+    name: "",
+    role: "",
+    organizationNumber: "",
+  });
   const [newPassword, setNewPassword] = useState("");
   const [oldPassword, setOldPassword] = useState(""); // Ny state for gammelt passord
   const [showPassword, setShowPassword] = useState(false);

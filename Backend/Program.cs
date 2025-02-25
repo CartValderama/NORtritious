@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Backend.DAL;
 using Backend.DAL.Seed;
+using Backend.Models;
 using Backend.Services;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Serilog;
@@ -36,7 +37,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add Identity
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     // Password Settings
     options.Password.RequireDigit = true;
@@ -131,7 +132,6 @@ using (var scope = app.Services.CreateScope())
     await RoleSeeder.SeedRolesAsync(services);
     await UserSeeder.SeedAdminUserAsync(services);
     await UserSeeder.SeedProducerUserAsync(services);
-    await UserSeeder.SeedProducerUserAsync2(services);
     await UserSeeder.SeedResearcherUserAsync(services);
 }
 

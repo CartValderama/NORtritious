@@ -7,12 +7,12 @@ namespace Backend.DAL;
 
 public class AccountRepository : IAccountRepository
 {
-    private readonly SignInManager<IdentityUser> _signInManager;
-    private readonly UserManager<IdentityUser> _userManager;
+    private readonly SignInManager<ApplicationUser> _signInManager;
+    private readonly UserManager<ApplicationUser> _userManager;
     private readonly ApplicationDbContext _db;
     private readonly ILogger<AccountRepository> _logger;
 
-    public AccountRepository(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, ApplicationDbContext db, ILogger<AccountRepository> logger)
+    public AccountRepository(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ApplicationDbContext db, ILogger<AccountRepository> logger)
     {
         _userManager = userManager;
         _signInManager = signInManager;
@@ -53,7 +53,7 @@ public class AccountRepository : IAccountRepository
     // Registers a new user by creating a new IdentityUser object and adding it to the database with the specified role
     public async Task<IdentityResult> RegisterAsync(RegisterRequest request)
     {
-        var user = new IdentityUser { UserName = request.Email, Email = request.Email };
+        var user = new ApplicationUser { UserName = request.Email, Email = request.Email };
         var result = await _userManager.CreateAsync(user, request.Password);
         if (result.Succeeded)
         {

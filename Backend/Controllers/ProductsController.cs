@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Backend.DAL;
 using Backend.DTO;
+using Backend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -11,11 +12,11 @@ namespace Backend.Controllers
     [ApiController]
     public class ProductsController : Controller
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IProductsRepository _productsRepository;
         private readonly ILogger<ProductsController> _logger;
 
-        public ProductsController(UserManager<IdentityUser> userManager, IProductsRepository productsRepository, ILogger<ProductsController> logger)
+        public ProductsController(UserManager<ApplicationUser> userManager, IProductsRepository productsRepository, ILogger<ProductsController> logger)
         {
             _userManager = userManager;
             _productsRepository = productsRepository;

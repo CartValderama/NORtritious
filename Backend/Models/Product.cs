@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Backend.Models;
 
 public class Product
 {
@@ -24,5 +25,5 @@ public class Product
 
     // Foreign Key for User (CreatedBy)
     public string UserId { get; set; } = string.Empty; // Foreign key for IdentityUser
-    public IdentityUser CreatedByUser { get; set; } = null!; // Navigation property to IdentityUser
+    public ApplicationUser CreatedByUser { get; set; } = null!; // Navigation property to IdentityUser
 }
