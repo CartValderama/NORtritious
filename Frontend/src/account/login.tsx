@@ -6,6 +6,7 @@ import API_URL from "../apiConfig";
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState("Producer"); // Standardrolle
   const [message, setMessage] = useState("");
   const [isRegister, setIsRegister] = useState(false);
@@ -30,6 +31,10 @@ const LoginPage: React.FC = () => {
 
     checkLoginStatus();
   }, []);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -142,14 +147,27 @@ const LoginPage: React.FC = () => {
                     <label htmlFor="password" className="form-label">
                       Passord
                     </label>
-                    <input
-                      type="password"
-                      className="form-control"
-                      id="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                    />
+                    <div className="input-group">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        className="form-control"
+                        id="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-outline-secondary"
+                        onClick={togglePasswordVisibility}
+                      >
+                        {showPassword ? (
+                          <i className="bi bi-eye-slash"></i>
+                        ) : (
+                          <i className="bi bi-eye"></i>
+                        )}
+                      </button>
+                    </div>
                   </div>
                   {isRegister && (
                     <div className="mb-3">
