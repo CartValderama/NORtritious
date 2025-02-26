@@ -530,7 +530,7 @@ const Calculator = () => {
     hasEfsaHealth: false,
     hasEfsaNutrition: false,
     hasNokkelhullet: false,
-    imageUrl: '',
+    imageUrl: 'placeholder.png',
     calories: 0,
     fat: 0,
     satFat: 0,
@@ -710,7 +710,7 @@ const Calculator = () => {
             />
           </div>
 
-          <label for="basic-url">
+          <label htmlFor="imageUrl">
             <strong>Bilde URL</strong>
             </label>
             <div class="input-group mb-3">
@@ -721,7 +721,7 @@ const Calculator = () => {
                 placeholder="Enter image URL"
                 value={product.imageUrl}
                 onChange={(e) => setProduct({ ...product, imageUrl: e.target.value })} 
-                className="form-control" id="basic-url" aria-describedby="basic-addon3"
+                className="form-control" id="imageUrl"
               />
             </div>
 
@@ -1015,6 +1015,9 @@ const Calculator = () => {
           </p>
           <ProductButtons showSubmitButton={isCalculationCompleted} onSubmit={handleSubmit} />
 
+
+          {/* Render of claim descriptions */}
+          {/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/}
           {(vitaminClaim.description || mineralClaim.description) && (
             <Container className="claim-description mt-4" >
               <Row>

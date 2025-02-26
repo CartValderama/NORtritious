@@ -40,35 +40,32 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products, onProductDeleted })
                 />
             </Link>
               <Card.Body className='d-flex flex-column'>
-                <Card.Title className='align-middle text-center'>{product.name}</Card.Title>
-                <Card.Text>
-                  {product.type}
-                </Card.Text>
 
-                <div className=' d-flex justify-content-between'>
+                <Card.Title className='align-middle text-center'>{product.name}</Card.Title>                
+                 <div className=' d-flex justify-content-between'>
 
-                <Card.Img 
-                  className='mx-auto d-block mb-2'
-                  src={product.hasNokkelhullet ? `${API_URL}/images/circle-keyhole-logo.png` : `${API_URL}/images/ban_keyhole.png` } 
-                  alt={product.hasNokkelhullet ? 'Oppfyller Nøkkelhullet' : 'Oppfyller ikke Nøkkelhullet'}
-                  style={{ width: '50px', height: '50px', padding: '2px' }}
-                />
-                <br/>
-                <Button
-                  variant="outline-primary"
-                  size="sm"
-                  className='mb-2'
-                  onClick={() => handleShowClaims(product.hasEfsaHealth, product)}
-                >
                   <Card.Img 
-                      variant="bottom" 
-                      className='mx-auto d-block'
-                      style={{ width: '50px', height: '50px'  }} 
-                      src={`${API_URL}/images/efsaLogo.png`} 
-                      alt={product.name} 
-                    />
-                </Button>
-                </div>
+                    className='mx-auto d-block mb-2'
+                    src={product.hasNokkelhullet ? `${API_URL}/images/circle-keyhole-logo.png` : `${API_URL}/images/ban_keyhole.png` } 
+                    alt={product.hasNokkelhullet ? 'Oppfyller Nøkkelhullet' : 'Oppfyller ikke Nøkkelhullet'}
+                    style={{ width: '50px', height: '50px', padding: '2px' }}
+                  />
+                  <br/>
+                  <Button
+                    variant="outline-primary"
+                    size="sm"
+                    className='mb-2'
+                    onClick={() => handleShowClaims(product.hasEfsaHealth, product)}
+                  >
+                    <Card.Img 
+                        variant="bottom" 
+                        className='mx-auto d-block'
+                        style={{ width: '50px', height: '50px'  }} 
+                        src={`${API_URL}/images/efsaLogo.png`} 
+                        alt={product.name} 
+                      />
+                  </Button>
+                 </div>
                 
                 <div className="mt-auto d-flex justify-content-between">
                   <ButtonGroup className="mb-2 me-2">
