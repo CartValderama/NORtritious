@@ -173,6 +173,7 @@ function helpLowEnergyKcal(energy, foodType) {
 }
 
 function helpLowEnergyKj(energy, foodType){
+    console.log("ENERGI: ", energy)
     if (foodType === "liquid") {
         if (energy <= 80){ 
             return true 

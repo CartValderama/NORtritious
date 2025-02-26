@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Table, Button, Container, Row, Col } from 'react-bootstrap';
+import { Table, Button, Container, Row, Col, Card } from 'react-bootstrap';
 import { Product } from '../types/product';
 import { Link } from 'react-router-dom';
 import '../css/ProductTable.css';
 import API_URL from '../apiConfig';
+import CollapseCard from '../shared/CollapseCard';
+import ClaimsView from '../shared/ClaimsView';
 
 interface ProductTableProps {
   products: Product[];
@@ -15,6 +17,33 @@ interface ProductTableProps {
 const ProductTable: React.FC<ProductTableProps> = ({ products, onProductDeleted }) => {
   const [showId, setShowId] = useState<boolean>(false);  
   const [showNutrition, setShowNutrition] = useState<boolean>(false);
+  const [showClaims, setShowClaims] = React.useState<boolean>(false);
+  const [claimsContent, setClaimsContent] = React.useState<string>('');
+  const [visibleNutrition, setVisibleNutrition] = useState<{ [key: number]: boolean }>({});
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+
+  const handleToggleNutrition = (productId: number) => {
+    setVisibleNutrition((prevState) => ({
+      ...prevState,
+      [productId]: !prevState[productId],
+    }));
+  };
+
+  const handleShowClaims = (content: string, product: any) => {
+    setClaimsContent(content);
+    setShowClaims(true);
+    setSelectedProduct(product);
+  };
+
+  // Formaterer innholdet i kortet
+  const formatContent = (content: string) => {
+    return content.split('\n').map((line, index) => (
+      // For hver linje i innholdet, returnes en paragraf via HTML, 
+      // dangerouslySetInnerHTML er innerHTML i React
+      <p key={index} dangerouslySetInnerHTML={{__html: line }}/>
+    ));
+  };
+
   return (
     <Container fluid>
       <Row className="mb-3">
@@ -58,6 +87,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onProductDeleted 
                   {showNutrition && <th className="align-middle">Næringsmiddel pr. 100 g/ml</th>}
                   <th className='align-middle text-center'>Nøkkelhullet</th>
                   <th className='align-middle text-center'>EFSA Ernæringspåstander</th>
+                  <th className='align-middle text-center'>EFSA Helsepåstander</th>
                   <th className="align-middle text-center">Behandling</th>
                 </tr>
               </thead>
@@ -91,8 +121,9 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onProductDeleted 
                       </td>
                     
                     
-                    <td className="align-middle small">{product.group}</td>
-                    <td className="align-middle">{product.type}</td>
+                    <td className="align-middle">{formatContent(product.group)}</td>
+                    <td className="align-middle small">{formatContent(product.type)}</td>
+
                     {showNutrition && <td className="align-middle small">
                     Energi: {product.calories}<br/>
                     Fett: {product.fat}<br/>
@@ -115,16 +146,44 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onProductDeleted 
                     </td>
 
                     <td className="align-middle text-center">
-                      {product.hasEfsaNutrition}
+                      <Button variant='outline-primary'>
+                      <img
+                        src={product.hasEfsaNutrition ? `${API_URL}/images/efsaLogoGreen.png` : `${API_URL}/images/efsaLogoBlack.png`}
+                        alt={product.hasEfsaNutrition ? 'Has EFSA Nutrition' : 'No EFSA Nutrition'}
+                        style={{ width: '70px', height: '70px', cursor: 'pointer'  }}
+                        onClick={() => handleToggleNutrition(product.productId)}
+                      />
+                      </Button>
+                      
+                      {visibleNutrition[product.productId] && product.hasEfsaNutrition && (
+                        <Card><div><strong>Ernæringspåstander:<br/></strong>{product.hasEfsaNutrition}</div></Card>
+
+                      )}
                     </td>
-  
+
+                    <td className="align-middle text-center">
+                      <CollapseCard
+                        productId={product.productId}
+                        content={product.hasEfsaHealth}
+                      />
+                      <p></p>
+                      <Button
+                        variant="outline-primary"
+                        size="sm"
+                        onClick={() => handleShowClaims(product.hasEfsaHealth, product)}
+                      >
+                        Full oversikt
+                      </Button>
+                    </td>
+
                     <td className="align-middle text-center">
                       <Link 
                         to={`/products/updateCalculator/${product.productId}`}
-                        className="btn btn-outline-primary btn-sm me-2"
+                        className="btn btn-outline-primary btn-sm"
                       >
                         <i className="bi bi-pencil-square"></i> Rediger
                       </Link>
+                      <p></p>
                       <Button
                         variant="outline-danger"
                         size="sm"
@@ -140,6 +199,13 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onProductDeleted 
           </div>
         </Col>
       </Row>
+      {selectedProduct && (
+        <ClaimsView 
+        show={showClaims} 
+        onHide={() => setShowClaims(false)} 
+        content={claimsContent} 
+        product={selectedProduct} />
+      )}
     </Container>
   );
 };
