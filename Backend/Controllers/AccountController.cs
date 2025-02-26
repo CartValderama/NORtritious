@@ -185,5 +185,47 @@ namespace Backend.Controllers
 
             return BadRequest(new { message = "Password change failed!", errors = result.Errors });
         }
+
+        [HttpPut("update-user-info")]
+        [Authorize]
+        public async Task<IActionResult> UpdateUser([FromBody] Backend.Models.UpdateUserRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("[AccountController] UpdateUser request failed validation. ModelState: {@ModelState}", ModelState);
+                return BadRequest(ModelState);
+            }
+
+            // Hent den autentiserte brukeren
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                _logger.LogWarning("[AccountController] UpdateUser attempt failed - User not found. User: {User}", User.Identity?.Name);
+                return Unauthorized(new { message = "User not found" });
+            }
+
+            // Logg før oppdatering
+            _logger.LogInformation("[AccountController] Updating user {User}. Current Name: {OldName}, Current OrganizationNumber: {OldOrgNum}",
+                User.Identity?.Name, user.Name, user.OrganizationNumber);
+
+            // Oppdater de nødvendige feltene (uten å endre e-posten)
+            user.Name = request.Name ?? user.Name;
+            user.OrganizationNumber = request.OrganizationNumber ?? user.OrganizationNumber;
+
+            var result = await _userManager.UpdateAsync(user);
+
+            if (result.Succeeded)
+            {
+                _logger.LogInformation("[AccountController] User {User} updated successfully. New Name: {NewName}, New OrganizationNumber: {NewOrgNum}",
+                    User.Identity?.Name, user.Name, user.OrganizationNumber);
+                return Ok(new { message = "User updated successfully!" });
+            }
+
+            // Hvis oppdateringen mislykkes
+            _logger.LogError("[AccountController] User update failed for {User}. Errors: {@Errors}",
+                User.Identity?.Name, result.Errors);
+
+            return BadRequest(new { message = "User update failed", errors = result.Errors });
+        }
     }
 }

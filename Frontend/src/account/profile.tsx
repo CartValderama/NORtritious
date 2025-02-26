@@ -106,27 +106,36 @@ const ProfilePage: React.FC = () => {
     [newPassword, oldPassword, userInfo.email] // Inkluder gammelt passord i dependencies
   );
 
-  const handleUpdateInfo = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
-      setMessage("");
-      setError("");
+  const handleUpdateInfo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMessage("");
+    setError("");
 
-      try {
-        await axios.put(`${API_URL}/api/account/update-info`, userInfo, {
-          withCredentials: true,
-        });
-        setMessage("Information updated successfully.");
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          setError(
-            error.response?.data?.message || "Failed to update information."
-          );
-        }
+    try {
+      const updateUserInfoRequest = {
+        email: userInfo.email, // Brukerens epost
+        name: userInfo.name, // Brukerens navn
+        role: userInfo.role, // Brukerens rolle
+        organizationNumber: userInfo.organizationNumber, // Organisasjonsnummer (hvis det er en produsent)
+      };
+
+      // Send PUT-forespørsel til serveren for å oppdatere brukerens informasjon
+      await axios.put(
+        `${API_URL}/api/account/update-user-info`,
+        updateUserInfoRequest,
+        { withCredentials: true }
+      );
+
+      setMessage("Brukerinformasjon oppdatert.");
+      window.location.reload();
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        setError(
+          error.response?.data?.message || "Feil ved oppdatering av brukerinfo."
+        );
       }
-    },
-    [userInfo]
-  );
+    }
+  };
 
   if (loading) return <p>Loading...</p>;
 
@@ -171,8 +180,8 @@ const ProfilePage: React.FC = () => {
             <div className="card">
               <div className="card-body">
                 <h2 className="card-title">Oppdater informasjon</h2>
-                <div className="alert alert-warning" role="alert">
-                  Ikke implementert.
+                <div className="alert alert-success" role="alert">
+                  Implementert!
                 </div>
                 <form onSubmit={handleUpdateInfo}>
                   <div className="mb-3">
@@ -192,8 +201,6 @@ const ProfilePage: React.FC = () => {
                           setUserInfo({ ...userInfo, name: e.target.value })
                         }
                         required
-                        disabled
-                        readOnly
                       />
                     </div>
                   </div>
@@ -233,7 +240,7 @@ const ProfilePage: React.FC = () => {
                         id="role"
                         value={userInfo.role}
                         onChange={(e) =>
-                          setUserInfo({ ...userInfo, email: e.target.value })
+                          setUserInfo({ ...userInfo, role: e.target.value })
                         }
                         required
                         disabled
@@ -256,16 +263,16 @@ const ProfilePage: React.FC = () => {
                           id="org-num"
                           value={userInfo.organizationNumber}
                           onChange={(e) =>
-                            setUserInfo({ ...userInfo, email: e.target.value })
+                            setUserInfo({
+                              ...userInfo,
+                              organizationNumber: e.target.value,
+                            })
                           }
-                          required
-                          disabled
-                          readOnly
                         />
                       </div>
                     </div>
                   )}
-                  <button type="submit" className="btn btn-primary" disabled>
+                  <button type="submit" className="btn btn-primary">
                     Oppdater
                   </button>
                 </form>
