@@ -4,10 +4,12 @@ import axios from "axios";
 import API_URL from "../apiConfig";
 
 const LoginPage: React.FC = () => {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState("Producer"); // Standardrolle
+  const [organizationNumber, setOrganizationNumber] = useState("");
   const [message, setMessage] = useState("");
   const [isRegister, setIsRegister] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -62,7 +64,7 @@ const LoginPage: React.FC = () => {
     try {
       await axios.post(
         `${API_URL}/api/account/register`,
-        { email, password, role }, // Sender valgt rolle
+        { name, email, password, role, organizationNumber },
         { withCredentials: true }
       );
 
@@ -130,9 +132,24 @@ const LoginPage: React.FC = () => {
                 </div>
               ) : (
                 <form onSubmit={isRegister ? handleRegistration : handleLogin}>
+                  {isRegister && (
+                    <div className="mb-3">
+                      <label htmlFor="name" className="form-label">
+                        Navn*
+                      </label>
+                      <input
+                        type="name"
+                        className="form-control"
+                        id="name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
+                      />
+                    </div>
+                  )}
                   <div className="mb-3">
                     <label htmlFor="email" className="form-label">
-                      Epost
+                      Epost*
                     </label>
                     <input
                       type="email"
@@ -145,7 +162,7 @@ const LoginPage: React.FC = () => {
                   </div>
                   <div className="mb-3">
                     <label htmlFor="password" className="form-label">
-                      Passord
+                      Passord*
                     </label>
                     <div className="input-group">
                       <input
@@ -172,7 +189,7 @@ const LoginPage: React.FC = () => {
                   {isRegister && (
                     <div className="mb-3">
                       <label htmlFor="role" className="form-label">
-                        Velg rolle
+                        Rolle*
                       </label>
                       <select
                         className="form-select"
@@ -183,6 +200,20 @@ const LoginPage: React.FC = () => {
                         <option value="Producer">Producer</option>
                         <option value="Researcher">Researcher</option>
                       </select>
+                    </div>
+                  )}
+                  {isRegister && (
+                    <div className="mb-3">
+                      <label htmlFor="org-num" className="form-label">
+                        Organisasjonsnummer
+                      </label>
+                      <input
+                        type="org-num"
+                        className="form-control"
+                        id="org-num"
+                        value={organizationNumber}
+                        onChange={(e) => setOrganizationNumber(e.target.value)}
+                      />
                     </div>
                   )}
                   <button type="submit" className="btn btn-primary">
@@ -204,7 +235,7 @@ const LoginPage: React.FC = () => {
                 </button>
               </p>
               {message && (
-                <div className="alert alert-danger mt-3">{message}</div>
+                <div className="alert alert-info mt-3">{message}</div>
               )}
             </div>
           </div>

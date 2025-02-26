@@ -53,7 +53,7 @@ public class AccountRepository : IAccountRepository
     // Registers a new user by creating a new IdentityUser object and adding it to the database with the specified role
     public async Task<IdentityResult> RegisterAsync(RegisterRequest request)
     {
-        var user = new ApplicationUser { UserName = request.Email, Email = request.Email };
+        var user = new ApplicationUser { UserName = request.Email, Email = request.Email, Name = request.Name, OrganizationNumber = request.OrganizationNumber };
         var result = await _userManager.CreateAsync(user, request.Password);
         if (result.Succeeded)
         {
