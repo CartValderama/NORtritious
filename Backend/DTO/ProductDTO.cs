@@ -5,7 +5,7 @@ public class ProductDTO
     public string Name { get; set; } = string.Empty;
     public string Group { get; set; } = string.Empty;
     public string Type { get; set; } = string.Empty;
-    public bool HasEfsaHealth { get; set; } = false;
+    public string HasEfsaHealth { get; set; } = string.Empty;
     public string HasEfsaNutrition { get; set; } = string.Empty;
     public bool HasNokkelhullet { get; set; } = false;
     public string ImageUrl { get; set; } = string.Empty;

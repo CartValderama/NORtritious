@@ -12,7 +12,7 @@
   @media (max-width: 840px) {
     .table {
       font-size: 0.875rem;
-      white-space: nowrap;
+      white-space: wrap;
     }
     
     .btn-sm {
