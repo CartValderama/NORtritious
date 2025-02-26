@@ -29,3 +29,5 @@ packages/
 # SQLite temporary files
 *.db-shm
 *.db-wal
+
+.DS_Store

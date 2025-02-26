@@ -18,7 +18,7 @@ public static class UserSeeder
                 UserName = adminEmail, // UserName må fortsatt være unikt
                 Email = adminEmail,
                 Name = "Admin Account",
-                OrganizationNumber = "123456789"
+                OrganizationNumber = ""
             };
 
             var result = await userManager.CreateAsync(adminUser, adminPassword);

@@ -243,7 +243,7 @@ const ProfilePage: React.FC = () => {
                   </div>
                   {userInfo.role === "Producer" && (
                     <div className="mb-3">
-                      <label htmlFor="email" className="form-label">
+                      <label htmlFor="org-num" className="form-label">
                         Organisasjonsnummer
                       </label>
                       <div className="input-group">
@@ -251,10 +251,10 @@ const ProfilePage: React.FC = () => {
                           <i className="bi bi-building"></i>
                         </span>
                         <input
-                          type="email"
+                          type="org-num"
                           className="form-control"
-                          id="email"
-                          value={""}
+                          id="org-num"
+                          value={userInfo.organizationNumber}
                           onChange={(e) =>
                             setUserInfo({ ...userInfo, email: e.target.value })
                           }
