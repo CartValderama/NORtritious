@@ -1111,7 +1111,7 @@ const Calculator = () => {
           )}
           {/* Display component for melk 11a if group is selected as melk kategori and product is melk 11a */}
           {selectsGroup === "melk kategori" &&
-            selectsProduct === "melk 11a" && <Melk11a product={product} onNutritionChange={handleNutritionChange} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "melk 11a" && <Melk11a product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
           {/* Display component for melk 11b if group is selected as melk kategori and product is melk 11b */}
           {selectsGroup === "melk kategori" &&
             selectsProduct === "melk 11b" && <Melk11b product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
