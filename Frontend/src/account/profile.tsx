@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import API_URL from "../apiConfig";
+import { height } from "@fortawesome/free-solid-svg-icons/fa0";
 
 const ProfilePage: React.FC = () => {
   const [userInfo, setUserInfo] = useState({
@@ -61,10 +62,11 @@ const ProfilePage: React.FC = () => {
     setIsProductsLoading(true); // Start loading
     try {
       const response = await axios.get(
-        `${API_URL}/api/products`, // Endepunkt for å hente alle produkter
+        `${API_URL}/api/products/my-products`, // Endepunkt for å hente produkter
         { withCredentials: true }
       );
       setProducts(response.data); // Sett produkter i state
+      setError("");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setError(error.response?.data?.message || "Failed to fetch products.");
@@ -352,8 +354,8 @@ const ProfilePage: React.FC = () => {
             <div className="card">
               <div className="card-body">
                 <h2 className="card-title">Mine produkter</h2>
-                <div className="alert alert-warning" role="alert">
-                  Ikke implementert.
+                <div className="alert alert-success" role="alert">
+                  Implementert!
                 </div>
                 {/* Vise produkter eller loading state */}
                 {isProductsLoading ? (
@@ -364,7 +366,12 @@ const ProfilePage: React.FC = () => {
                       {products.length > 0 ? (
                         products.map((product) => (
                           <li key={product.id} className="list-group-item">
-                            {product.name} - {product.price} NOK
+                            <img
+                              className="img-thumbnail me-4"
+                              style={{ height: "50px" }}
+                              src={`${API_URL}/images/${product.imageUrl}`}
+                            ></img>
+                            {product.name}
                           </li>
                         ))
                       ) : (
