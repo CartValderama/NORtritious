@@ -6,5 +6,6 @@ namespace Backend.Models
     {
         public string? Name { get; set; } = string.Empty; // Tillater mellomrom
         public string? OrganizationNumber { get; set; }
+        public string? ProfilePicture { get; set; }
     }
 }

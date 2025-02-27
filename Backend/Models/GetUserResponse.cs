@@ -8,5 +8,6 @@ namespace Backend.Models
         public string Email { get; set; } = string.Empty;
         public string Role { get; set; } = string.Empty;
         public string OrganizationNumber { get; set; } = string.Empty;
+        public string ProfilePicture { get; set; } = string.Empty;
     }
 }

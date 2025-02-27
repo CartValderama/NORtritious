@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Backend.DAL;
@@ -14,12 +16,16 @@ namespace Backend.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IAccountRepository _applicationRepository;
         private readonly ILogger<AccountController> _logger;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public AccountController(UserManager<ApplicationUser> userManager, IAccountRepository applicationRepository, ILogger<AccountController> logger)
+        private static readonly string[] AllowedExtensions = { ".jpg", ".jpeg", ".png", ".gif" };
+
+        public AccountController(UserManager<ApplicationUser> userManager, IAccountRepository applicationRepository, ILogger<AccountController> logger, IWebHostEnvironment webHostEnvironment)
         {
             _userManager = userManager;
             _applicationRepository = applicationRepository;
             _logger = logger;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         // Register method for Producers and Researchers, Takes email, password, and role, returns HTTP message OK on success, Bad Request otherwise
@@ -101,7 +107,8 @@ namespace Backend.Controllers
                     Name = user.Name ?? string.Empty,
                     Email = user.Email ?? string.Empty,
                     Role = role,
-                    OrganizationNumber = user.OrganizationNumber ?? string.Empty
+                    OrganizationNumber = user.OrganizationNumber ?? string.Empty,
+                    ProfilePicture = user.ProfilePicture ?? string.Empty
                 };
 
                 return Ok(response);
@@ -226,6 +233,87 @@ namespace Backend.Controllers
                 User.Identity?.Name, result.Errors);
 
             return BadRequest(new { message = "User update failed", errors = result.Errors });
+        }
+
+        [HttpPost("upload-profile-picture")]
+        [Authorize]
+        public async Task<IActionResult> UploadProfilePicture([FromForm] IFormFile file)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                {
+                    _logger.LogWarning("[AccountController] No file uploaded.");
+                    return BadRequest(new { message = "No file uploaded." });
+                }
+
+                // Sjekk om filen er et bilde
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+                var fileExtension = Path.GetExtension(file.FileName).ToLower();
+
+                if (!allowedExtensions.Contains(fileExtension))
+                {
+                    _logger.LogWarning("[AccountController] Invalid file type: {FileName}", file.FileName);
+                    return BadRequest(new { message = "Invalid file type. Allowed types: jpg, jpeg, png, gif." });
+                }
+
+                // Finn brukeren
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                {
+                    _logger.LogWarning("[AccountController] User not found.");
+                    return Unauthorized(new { message = "User not found." });
+                }
+
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "profile_pictures");
+
+                // Slett gammelt bilde hvis det finnes
+                if (!string.IsNullOrEmpty(user.ProfilePicture))
+                {
+                    var oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", user.ProfilePicture.TrimStart('/'));
+                    if (System.IO.File.Exists(oldFilePath))
+                    {
+                        try
+                        {
+                            System.IO.File.Delete(oldFilePath);
+                            _logger.LogInformation("[AccountController] Old profile picture deleted: {FilePath}", oldFilePath);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "[AccountController] Failed to delete old profile picture: {FilePath}", oldFilePath);
+                        }
+                    }
+                }
+
+                // Lag et unikt filnavn (bruker UserId + timestamp)
+                var uniqueFileName = $"{user.Id}_{DateTime.UtcNow:yyyyMMddHHmmss}{fileExtension}";
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                // Lagre filen
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(fileStream);
+                }
+
+                // Oppdater brukerens bilde-URL i databasen
+                user.ProfilePicture = $"/images/profile_pictures/{uniqueFileName}";
+                var updateResult = await _userManager.UpdateAsync(user);
+
+                if (!updateResult.Succeeded)
+                {
+                    _logger.LogError("[AccountController] Failed to update user profile picture for {User}. Errors: {@Errors}",
+                        user.UserName, updateResult.Errors);
+                    return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Failed to update user profile picture." });
+                }
+
+                _logger.LogInformation("[AccountController] Profile picture uploaded successfully for user {User}.", user.UserName);
+                return Ok(new { message = "Profile picture uploaded successfully!", profilePictureUrl = user.ProfilePicture });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "[AccountController] Error uploading profile picture.");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An unexpected error occurred." });
+            }
         }
     }
 }
