@@ -148,6 +148,10 @@ const ProfilePage: React.FC = () => {
       <div className="row">
         {/* Sidemeny */}
         <div className="col-md-3">
+          <img
+            className="img-thumbnail mb-4 position-relative"
+            src={`${API_URL}/images/male-placeholder-image.png`}
+          ></img>
           <div className="list-group mb-2">
             <button
               className={`list-group-item list-group-item-action ${
