@@ -909,6 +909,7 @@ const Melk15b = ({ product, handleNutrientChange, onNutritionChange, onCalculati
             Beregn
           </button>
         <button
+                type='button'
                 className="btn btn-primary btn-lg button-search"
                 onClick={() => window.location.reload()}
               >

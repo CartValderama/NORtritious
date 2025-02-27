@@ -35,20 +35,21 @@ const popover = (
   return (
     <Modal show={show} onHide={onHide} centered>
       <Modal.Header closeButton>
-        <Modal.Title>Helsepåstander</Modal.Title>
+        <Modal.Title>
+            <Card.Img 
+                variant="bottom" 
+                className=''
+                style={{ width: '50px', height: '50px'  }} 
+                src={`${API_URL}/images/efsaLogo.png`} 
+                alt={"EFSA Helsepåstander"} 
+            />  
+             &nbsp;Helsepåstander
+        </Modal.Title>
             <OverlayTrigger trigger="click" placement="right" overlay={popover}>
-                <Button style={{marginLeft: '50px'}} variant="secondary">Ernæringspåstander</Button>
+                <Button style={{marginLeft: '30px', fontSize: '1.1rem'}} variant="primary" >Ernæringspåstander</Button>
             </OverlayTrigger>
       </Modal.Header>
-      <Modal.Body style={{ maxHeight: '400px', overflowY: 'auto' }}>
-        <Card.Img 
-            variant="bottom" 
-            className='mx-auto d-block'
-            style={{ width: '50px', height: '50px'  }} 
-            src={`${API_URL}/images/efsaLogo.png`} 
-            alt={"EFSA Helsepåstander"} 
-        />  
-
+      <Modal.Body style={{ maxHeight: '400px', overflowY: 'auto'}}>
         {formatContent(content)}
       </Modal.Body>
       <Modal.Footer>

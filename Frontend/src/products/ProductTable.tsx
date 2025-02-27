@@ -21,6 +21,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onProductDeleted 
   const [claimsContent, setClaimsContent] = React.useState<string>('');
   const [visibleNutrition, setVisibleNutrition] = useState<{ [key: number]: boolean }>({});
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [showType, setShowType] = useState<boolean>(false);
 
   const handleToggleNutrition = (productId: number) => {
     setVisibleNutrition((prevState) => ({
@@ -54,7 +55,15 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onProductDeleted 
             size="sm"
           >
             <i className="bi bi-list-ol"></i>
-            {showId ? ' Hide' : ' Show'}
+            {showId ? ' Gjem' : ' Vis'}
+          </Button>
+          <Button 
+            onClick={() => setShowType(!showType)} 
+            className="btn btn-primary me-2"
+            size="sm"
+          >
+            <i className="bi bi-tag"></i>
+            {showType ? ' Gjem' : ' Vis'}
           </Button>
           <Button 
             onClick={() => setShowNutrition(!showNutrition)} 
@@ -62,7 +71,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onProductDeleted 
             size="sm"
           >
             <i className="bi bi-clipboard-data"></i> 
-            {showNutrition ? ' Hide' : ' Show'}
+            {showNutrition ? ' Gjem' : ' Vis'}
           </Button>
 
         </Col>
@@ -83,7 +92,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onProductDeleted 
                   <th className="align-middle text-center">Navn</th>
                   <th className="align-middle text-center">Bilde</th>
                   <th className="align-middle text-center">Gruppe</th>
-                  <th className="align-middle text-center">Type</th>
+                  {showType && <th className="align-middle text-center">Type</th>}
                   {showNutrition && <th className="align-middle">Næringsmiddel pr. 100 g/ml</th>}
                   <th className='align-middle text-center'>Nøkkelhullet</th>
                   <th className='align-middle text-center'>EFSA Ernæringspåstander</th>
@@ -122,7 +131,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onProductDeleted 
                     
                     
                     <td className="align-middle">{formatContent(product.group)}</td>
-                    <td className="align-middle small">{formatContent(product.type)}</td>
+                    {showType && <td className="align-middle small">{formatContent(product.type)}</td>}
 
                     {showNutrition && <td className="align-middle small">
                     Energi: {product.calories}<br/>

@@ -1040,6 +1040,7 @@ const Kategori1 = ({ product, handleNutrientChange, onNutritionChange, onCalcula
             Beregn
           </button>
         <button
+                type='button'
                 className="btn btn-primary btn-lg button-search"
                 onClick={() => window.location.reload()}
               >

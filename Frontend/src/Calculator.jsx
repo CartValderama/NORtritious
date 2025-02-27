@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Button, FormText, Container, Row, Col, Card } from "react-bootstrap";
 //import Select from "react-select"; // import Select component
 import "./css/Calculator.css";
-
+import API_URL from "./apiConfig";
 import * as ProductService from './products/ProductService';
 import ProductButtons from "./ProductButtons";
 //import { useApi } from './hooks/useApi';
@@ -446,7 +446,9 @@ const Calculator = () => {
   //const [claimDescription, setClaimDescription] = useState(''); // for the health claim description
   const [vitaminClaim, setVitaminClaim] = useState(''); // for the health claim description
   const [mineralClaim, setMineralClaim] = useState(''); // for the health claim description
-  
+  const [showVitaminClaim, setShowVitaminClaim] = useState(false); // for the health claim description
+  const [showMineralClaim, setShowMineralClaim] = useState(false); // for the health claim description
+
   const handleVitaminChange = (selectedOption) => {
     setSelectVitamins(selectedOption.value);
   };
@@ -456,31 +458,88 @@ const Calculator = () => {
   };
   const selectVitamins = [
     {
-      value: "None",
-      label: "None",
+      value: "Ingen",
+      label: "Ingen",
+    },
+    {
+      value: "Vitamin A",
+      label: "Vitamin A",
+    },
+    {
+      value: "Thiamine",
+      label: "Thiamine",
+    },
+    {
+      value: "Riboflavin (Vitamin B2)",
+      label: "Riboflavin (Vitamin B2)",
+    },
+    {
+      value: "Vitamin B6",
+      label: "Vitamin B6",
+    },
+    {
+      value: "Vitamin B12",
+      label: "Vitamin B12",
+    },
+    {
+      value: "Vitamin C",
+      label: "Vitamin C",
     },
     {
       value: "Vitamin D",
       label: "Vitamin D",
     },
     {
-      value: "Vitamin A",
-      label: "Vitamin A",
+      value: "Vitamin E",
+      label: "Vitamin E",
+    },
+    {
+      value: "Vitamin K",
+      label: "Vitamin K",
     }
+    
+   
+
   ];
   const selectMinerals = [
     {
-      value: "None",
-      label: "None",
+      value: "Ingen",
+      label: "Ingen",
     },
     {
       value: "Calcium",
       label: "Calcium",
     },
     {
-      value: "Betaine",
-      label: "Betaine",
+      value: "Copper",
+      label: "Copper",
+    },
+    {
+      value: "Iron",
+      label: "Iron",
+    },
+    {
+      value: "Magnesium",
+      label: "Magnesium",
+    },
+    {
+      value: "Phosphorus",
+      label: "Phosphorus",
+    },
+    {
+      value: "Potassium",
+      label: "Potassium",
+    },
+    {
+      value: "Selenium",
+      label: "Selenium",
+    },
+    {
+      value: "Zinc",
+      label: "Zinc",
     }
+
+
   ];
 
   useEffect(() => {
@@ -967,38 +1026,30 @@ const Calculator = () => {
 
           {/* These are added inputs for Health Claims */}
           {/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/}
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <div className="d-flex flex-column me-3">
-            {/* Add a label for the vitamins select input */}
+          <Row className="mb-3">
+          <Col xs={12} md={6}>
             <label htmlFor="vitamins" className="form-label">
-              <strong>Vitamins</strong>
+              <strong>Vitaminer</strong>
             </label>
-
-            {/* Use the react-select component to style the food group select input and provide options */}
             <CustomSelect
               placeholder={<div>Velg Vitamin</div>}
-              className="form-select-md me-3"
+              className="form-select-md"
               onChange={handleVitaminChange}
               options={selectVitamins}
             />
-            </div>
-
-            <div className="d-flex flex-column me-3">
-            {/* Add a label for the vitamins select input */}
+          </Col>
+          <Col xs={12} md={6}>
             <label htmlFor="minerals" className="form-label">
               <strong>Mineraler</strong>
             </label>
-
-            {/* Use the react-select component to style the food group select input and provide options */}
             <CustomSelect
               placeholder={<div>Velg Mineral</div>}
               className="form-select-md"
               onChange={handleMineralChange}
               options={selectMinerals}
             />
-            </div>
-          </div>
-
+          </Col>
+        </Row>
 
         </div>
 
@@ -1015,36 +1066,59 @@ const Calculator = () => {
           </p>
           <ProductButtons showSubmitButton={isCalculationCompleted} onSubmit={handleSubmit} />
 
-
           {/* Render of claim descriptions */}
           {/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/}
+          {/* Hvis man ønsker at trekkmenyen ikke overlapper med andre objekter -> fjern styling på Container */}
           {(vitaminClaim.description || mineralClaim.description) && (
-            <Container className="claim-description mt-4" >
+            <Container className="claim-description mt-4"> {/*style={{ position: 'absolute', maxWidth: '600px'}} >*/}
               <Row>
-                {vitaminClaim.description && (
-                  <Col xs={12} md={6} className="mb-3">
-                    <Card>
-                      <Card.Header>
-                        <strong>{vitaminClaim.nutrient} Claim Description</strong>
-                      </Card.Header>
-                      <Card.Body style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                        {vitaminClaim.description}
-                      </Card.Body>
-                    </Card>
-                  </Col>
-                )}
-                  {mineralClaim.description && (
-                  <Col xs={12} md={6} className="mb-3">
-                    <Card >
-                      <Card.Header>
-                        <strong>{mineralClaim.nutrient} Claim Description</strong>
-                      </Card.Header>
-                      <Card.Body style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                        {mineralClaim.description}
-                      </Card.Body>
-                    </Card>
-                  </Col>
-                )}
+                <div className="accordion" id="accordionPanelsStayOpen">
+                  <div className="accordion-item">
+                    <h2 className="accordion-header" id="panelsStayOpen-headingOne">
+                      <button className="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+                        <img 
+                          alt="EFSA Logo"
+                          className="me-2"
+                          style={{ width: '50px', height: '50px', float: 'right' }}
+                          src={`${API_URL}/images/efsaLogo.png`}
+                          />
+                          &nbsp; EFSA Helsepåstander 
+
+                      </button>
+                    </h2>
+                    <div id="panelsStayOpen-collapseOne" className="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-headingOne">
+                      <div class="accordion-body">
+                        {vitaminClaim.description && (
+                          <>
+                            <button type='button' className="btn btn-primary mb-2" onClick={() => setShowVitaminClaim(!showVitaminClaim)}>
+                              {showVitaminClaim ? `Gjem ${vitaminClaim.nutrient}` : `Vis ${vitaminClaim.nutrient}`}
+                            </button>
+                          {showVitaminClaim && (
+                            <p>
+                              <strong>Gjeldende Helsepåstander for {vitaminClaim.nutrient}: <br/></strong>
+                              {vitaminClaim.description}
+                            </p>
+                          )}
+                          </>
+                        )}
+                        <br/>
+                        {mineralClaim.description && (
+                          <>
+                            <button type='button' className="btn btn-primary mb-2" onClick={() => setShowMineralClaim(!showMineralClaim)}>
+                              {showMineralClaim ? `Gjem ${mineralClaim.nutrient}` : `Vis ${mineralClaim.nutrient}`}
+                            </button>
+                          {showMineralClaim && (
+                            <p>
+                              <strong>Gjeldende Helsepåstander for {mineralClaim.nutrient}: <br/></strong>
+                              {mineralClaim.description}
+                            </p>
+                          )}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </Row>
             </Container>
           )}

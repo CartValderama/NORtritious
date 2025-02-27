@@ -61,10 +61,10 @@ const NavMenu: React.FC = () => {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
             <Nav.Link as={Link} to="/" className="nav-link-custom">
-              Home
+              Hjem
             </Nav.Link>
             <Nav.Link as={Link} to="/products" className="nav-link-custom">
-              Products
+              Produkter
             </Nav.Link>
             {/*<Nav.Link as={Link} to="/calculator">Calculator</Nav.Link>*/}
           </Nav>

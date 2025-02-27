@@ -44,16 +44,17 @@ const CollapseCard: React.FC<CollapsibleCardProps> = ({ productId, content }) =>
         <div id={`collapse-${productId}`}>
           <Card className="mt-2">
           <Card.Header>
-              <strong>Helsepåstander</strong>
-            </Card.Header>
-            <Card.Body style={{ maxHeight: '200px', overflowY: 'auto' }}>
-              <Card.Img 
+            <Card.Img 
                 variant="bottom" 
-                className='mx-auto d-block'
-                style={{ width: '50px', height: '50px'  }} 
+                className=''
+                style={{ width: '30px', height: '30px'  }} 
                 src={`${API_URL}/images/efsaLogo.png`} 
                 alt={"EFSA Helsepåstander"} 
               />
+              &nbsp;<strong>Helsepåstander</strong>
+            </Card.Header>
+            <Card.Body style={{ maxHeight: '200px', overflowY: 'auto' }}>
+              
 
               {formatContent(content)}
             </Card.Body>

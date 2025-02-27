@@ -65,11 +65,11 @@ const ProductListPage: React.FC = () => {
 
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    product.type.toLowerCase().includes(searchQuery.toLowerCase())
+    product.group.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleProductDeleted = async (productId: number) => {
-    const confirmDelete = window.confirm(`Are you sure you want to delete the product ${productId}?`);
+    const confirmDelete = window.confirm(`Er du sikker på at du vil fjerne vare med Id ${productId}?`);
     if (confirmDelete) {
       try {
         await ProductService.deleteProduct(productId);
@@ -91,16 +91,16 @@ const ProductListPage: React.FC = () => {
 
   return (
     <div>
-      <h1>Products</h1>
+      <h1>Produkter</h1>
       <Button onClick={fetchProducts} className="btn btn-primary mb-3 me-2" disabled={loading}>
         <i className="bi bi-arrow-clockwise"></i> 
-        {loading ? ' Loading...' : ' Refresh'}
+        {loading ? ' Loading...' : ' '}
       </Button>
       <Button onClick={toggleTableOrGrid} className="btn btn-primary mb-3 me-2">
         {showTable ? <i className="bi bi-grid"></i> : <i className="bi bi-list-ul"></i>}
       </Button>
       <Button href='/products/calculator' className="btn btn-secondary mb-3 me-2" style={{ backgroundColor: 'darkblue'}}>
-      <i className="bi bi-pencil-square"></i> New Product
+      <i className="bi bi-pencil-square"></i> Nytt Produkt
       </Button>
       <Form.Group className="mb-3">
         <InputGroup>
@@ -109,7 +109,7 @@ const ProductListPage: React.FC = () => {
         </InputGroup.Text>
         <Form.Control
           type="text"
-          placeholder='Search by name or type'
+          placeholder='Søk etter Navn eller Kategorier'
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
         />
@@ -129,25 +129,17 @@ const ProductListPage: React.FC = () => {
       <div className='d-flex justify-content-between mt-3'>
       {visibleProducts < filteredProducts.length && (
         <Button onClick={loadMoreProducts}>
-          Load More
+          Last inn flere produkter
         </Button>
       )}
       {visibleProducts > 5 && (
           <Button onClick={showLessProducts}>
-            Show Less
+            Vis færre produkter
           </Button>
         )}
       </div>
       
      </div>
-    {/*
-    *  {error && <p style={{ color: 'red' }}>{error}</p>}
-    * {showTable
-    *    ? <ProductTable products={filteredProducts} apiUrl={`http://localhost:5047`} onProductDeleted={handleProductDeleted} />
-    *    : <ProductGrid products={filteredProducts} apiUrl={`http://localhost:5047`} onProductDeleted={handleProductDeleted} />
-    *    }
-      */}
-        {/*{showUnauthorizedError}*/}
 
 
     </div>
