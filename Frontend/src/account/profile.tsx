@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import API_URL from "../apiConfig";
-import { height } from "@fortawesome/free-solid-svg-icons/fa0";
+//import { height } from "@fortawesome/free-solid-svg-icons/fa0";
 
 const ProfilePage: React.FC = () => {
   const [userInfo, setUserInfo] = useState({
@@ -10,6 +10,7 @@ const ProfilePage: React.FC = () => {
     name: "",
     role: "",
     organizationNumber: "",
+    profilePicture: "",
   });
   const [newPassword, setNewPassword] = useState("");
   const [oldPassword, setOldPassword] = useState(""); // Ny state for gammelt passord
@@ -17,8 +18,9 @@ const ProfilePage: React.FC = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [selectedSection, setSelectedSection] = useState<
-    "password" | "info" | "products"
+    "password" | "info" | "products" | "image"
   >("info");
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState<any[]>([]); // For å holde på produktlisten
   const [isProductsLoading, setIsProductsLoading] = useState(false); // For å vise loading spinner
@@ -139,6 +141,38 @@ const ProfilePage: React.FC = () => {
     }
   };
 
+  const handleImageUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedImage) {
+      setError("Vennligst velg et bilde.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", selectedImage);
+
+    try {
+      const response = await axios.post(
+        `${API_URL}/api/account/upload-profile-picture`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
+      );
+      setMessage("Profilbilde ble lastet opp!");
+      window.location.reload();
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        setError(
+          error.response?.data?.message || "Feil ved opplasting av bilde."
+        );
+      }
+    }
+  };
+
   if (loading) return <p>Loading...</p>;
 
   return (
@@ -148,10 +182,18 @@ const ProfilePage: React.FC = () => {
       <div className="row">
         {/* Sidemeny */}
         <div className="col-md-3">
-          <img
-            className="img-thumbnail mb-4 position-relative"
-            src={`${API_URL}/images/male-placeholder-image.png`}
-          ></img>
+          <div className="position-relative">
+            <img
+              className="img-thumbnail mb-4 position-relative"
+              src={
+                userInfo.profilePicture
+                  ? `${API_URL}${userInfo.profilePicture}`
+                  : `${API_URL}/images/profile_pictures/male-placeholder-image.png`
+              }
+              alt="Profile"
+            />
+          </div>
+
           <div className="list-group mb-2">
             <button
               className={`list-group-item list-group-item-action ${
@@ -160,6 +202,14 @@ const ProfilePage: React.FC = () => {
               onClick={() => setSelectedSection("info")}
             >
               <i className="bi bi-person-circle"></i> Oppdater informasjon
+            </button>
+            <button
+              className={`list-group-item list-group-item-action ${
+                selectedSection === "image" ? "active" : ""
+              }`}
+              onClick={() => setSelectedSection("image")}
+            >
+              <i className="bi bi-image"></i> Endre Profilbilde
             </button>
             <button
               className={`list-group-item list-group-item-action ${
@@ -280,6 +330,51 @@ const ProfilePage: React.FC = () => {
                   )}
                   <button type="submit" className="btn btn-primary">
                     Oppdater
+                  </button>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {selectedSection === "image" && (
+            <div className="card mb-3">
+              <div className="card-body">
+                <h2 className="card-title">Endre profilbilde</h2>
+                <div className="alert alert-success" role="alert">
+                  Implementert!
+                </div>
+                {selectedImage && (
+                  <div className="mb-3">
+                    <h5>Valgt bilde:</h5>
+                    <img
+                      src={URL.createObjectURL(selectedImage)}
+                      alt="Preview"
+                      className="img-thumbnail"
+                      width="150"
+                    />
+                  </div>
+                )}
+                <form onSubmit={handleImageUpload}>
+                  <div className="mb-3">
+                    <label htmlFor="oldPassword" className="form-label">
+                      Last opp profilbilde
+                    </label>
+                    <div className="input-group">
+                      <input
+                        type="file"
+                        className="form-control"
+                        id="image"
+                        accept="image/*"
+                        onChange={(e) =>
+                          setSelectedImage(
+                            e.target.files ? e.target.files[0] : null
+                          )
+                        }
+                      />
+                    </div>
+                  </div>
+                  <button type="submit" className="btn btn-primary">
+                    <i className="bi bi-upload"></i> Last opp
                   </button>
                 </form>
               </div>
