@@ -1,0 +1,41 @@
+.vitamins {
+    margin-top: 5px;
+    padding: 5px;
+    border-radius: 10px;
+    transition: 0.1s;
+}
+.vitamins:hover {
+    background-color: #e9ecef;
+    transition: 0.3s;
+}
+
+.minerals{
+    margin-top: 5px;
+    padding: 5px;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+.minerals:hover {
+    background-color: #e9ecef;
+}
+
+.vitamin-claims{
+    padding: 5px;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+.vitamin-claims::after{
+    transition: 0.3s;
+}
+.mineral-claims{
+    padding: 5px;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+.mineral-claims::after{
+    transition: 0.3s;
+}
+
+.notFullfilledContent{
+    padding: 5px;
+}

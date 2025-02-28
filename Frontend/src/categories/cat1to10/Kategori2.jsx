@@ -16,8 +16,12 @@ import * as ProductService from "../../products/ProductService";
 import * as ResultComponents from "../../ResultComponents.jsx";
 import * as Check from "../../NutritionClaimCheck.jsx"
 
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// ResultEfsaFullfilled og notFullfilled må implementers 
+import {ResultEfsaFulfilled, ResultEfsaHealthClaims, ResultEfsaNotFulfilled} from '../../ResultEfsaClaims.jsx'; // EFSA claims
+
 // This component is called Kategori2
-const Kategori2 = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition }) => {
+const Kategori2 = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition, vitaminClaims, mineralClaims, selectedVitamins, selectedMinerals }) => {
 
   // State variables for showing results and empty result message
   const [showNokkelhulletResults, setShowNokkelhulletResults] = useState(null);
@@ -750,7 +754,7 @@ const Kategori2 = ({ product, handleNutrientChange, onNutritionChange, onCalcula
         </div>
       </div>
 
-      <div className="col-md-6">
+      <div className="col-md-6" style={{marginTop: "-120px"}}>
         {/* container for "Nøkkelhullet" results  */}
         {showNokkelhulletResults && (
           <div className="container nøkkelhullet-food-result-container">
@@ -887,7 +891,9 @@ const Kategori2 = ({ product, handleNutrientChange, onNutritionChange, onCalcula
                   icon={faCircleInfo}
                   onClick={() => onClickInfo("ernaerings")}
                 />
+                
               </div>
+              
             </div>
             {infoErnaerings ? (
               // Information section for "Ernæringspåstander"
@@ -927,9 +933,7 @@ const Kategori2 = ({ product, handleNutrientChange, onNutritionChange, onCalcula
           >
             <h5>Helsepåstander</h5>
             <div className="row">
-              <div className="col-md-10">
-                <p>Under utvikling. </p>
-              </div>
+
               <div className="col-md-2">
                 <FontAwesomeIcon
                   className="info-button"
@@ -937,6 +941,12 @@ const Kategori2 = ({ product, handleNutrientChange, onNutritionChange, onCalcula
                   onClick={() => onClickInfo("helsepåstander")}
                 />
               </div>
+              <ResultEfsaHealthClaims
+                  vitaminClaims={vitaminClaims}
+                  mineralClaims={mineralClaims}
+                  selectedVitamins={selectedVitamins}
+                  selectedMinerals={selectedMinerals}
+              />
             </div>
             {infoHelsepåstander ? (
               // Information section for "Helsepåstander"

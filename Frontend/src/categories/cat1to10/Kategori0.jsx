@@ -674,7 +674,7 @@ const Kategori0 = ({ product, handleNutrientChange, onNutritionChange }) => {
       <div className="col-md-6">
         {/*Negative results nøkkelhullet container" */}
         {showNokkelhulletResults === false && (
-          <div className="container nøkkelhullet-food-negResult-container">
+          <div className="container nøkkelhullet-food-negResult-container" style={{ borderRadius: '5px'}}>
             {/* An image with class "keyhole-logo" and alt text "keyhole logo" */}
             <ErrorMessageBox>
             <div style={{ display: 'flex'}}>

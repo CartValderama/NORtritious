@@ -53,42 +53,54 @@
   }
   
   /* Style the foodproducts result containers */
-  .calculator .nøkkelhullet-food-result-container {
+  .nøkkelhullet-food-result-container {
     background: #daecd8; /* green */
     padding: 1rem;
+    border-radius: 5px;
   }
   
-  .calculator .nøkkelhullet-food-negResult-container {
+  .nøkkelhullet-food-negResult-container {
     background: #f3b7b7; /* red */
     padding: 1rem;
+    border-radius: '5px';
   }
   
   /* Styles for the "Ernæringspåstander" container when all claims are true */
-  .calculator .ernæringspåstander-food-result-container-all {
+  .ernæringspåstander-food-result-container-all {
     background: #daecd8; /* green */
     padding: 1rem;
+    border-radius: '5px';
+
   }
    
   /* Styles for the "Ernæringspåstander" container when at least one claim is true */
-  .calculator .ernæringspåstander-food-result-container-some {
+  .ernæringspåstander-food-result-container-some {
     background: #f3b7b7; /* red */
     padding: 1rem;
+    border-radius: '5px';
+
   }
   
   /* Styles for the "Ernæringspåstander" container when all claims are false */
-  .calculator .ernæringspåstander-food-result-container-none {
+  .ernæringspåstander-food-result-container-none {
     background: #f3b7b7; /* red */
     padding: 1rem;
+    border-radius: '5px';
+
   }
   
-  .calculator .helsepåstander-food-result-container {
+  .helsepåstander-food-result-container {
     background: #f2f0b5;
     padding: 1rem;
+    border-radius: '5px';
+
   }
   
-  .calculator .helsepåstander-food-negResult-container {
+  .helsepåstander-food-negResult-container {
     background: #f3b7b7; /* red */
     padding: 1rem;
+    border-radius: '5px';
+
   }
   
   /* Center align the buttons */

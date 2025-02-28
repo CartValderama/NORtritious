@@ -16,8 +16,12 @@ import * as Check from "../../NutritionClaimCheck.jsx"
 
 import * as ProductService from "../../products/ProductService";
 
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// ResultEfsaFullfilled og notFullfilled må implementers 
+import {ResultEfsaFulfilled, ResultEfsaHealthClaims, ResultEfsaNotFulfilled} from '../../ResultEfsaClaims.jsx'; // EFSA claims
+
 // This component is called Kategori3
-const Kategori3 = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition }) => {
+const Kategori3 = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition, vitaminClaims, mineralClaims, selectedVitamins, selectedMinerals }) => {
 
   // State variables for showing results and empty result message
   const [showNokkelhulletResults, setShowNokkelhulletResults] = useState(null);
@@ -810,7 +814,7 @@ const Kategori3 = ({ product, handleNutrientChange, onNutritionChange, onCalcula
         </div>
       </div>
 
-      <div className="col-md-6">
+      <div className="col-md-6" style={{marginTop: "-125px"}}>
         {/* positive results nøkkelhullet container" */}
         {showNokkelhulletResults ? (
           <div className="container nøkkelhullet-food-result-container">
@@ -987,9 +991,6 @@ const Kategori3 = ({ product, handleNutrientChange, onNutritionChange, onCalcula
           >
             <h5>Helsepåstander</h5>
             <div className="row">
-              <div className="col-md-10">
-                <p>Under utvikling. </p>
-              </div>
               <div className="col-md-2">
                 <FontAwesomeIcon
                   className="info-button"
@@ -997,6 +998,12 @@ const Kategori3 = ({ product, handleNutrientChange, onNutritionChange, onCalcula
                   onClick={() => onClickInfo("helsepåstander")}
                 />
               </div>
+              <ResultEfsaHealthClaims
+                  vitaminClaims={vitaminClaims}
+                  mineralClaims={mineralClaims}
+                  selectedVitamins={selectedVitamins}
+                  selectedMinerals={selectedMinerals}
+              />
             </div>
             {infoHelsepåstander ? (
               // Information section for "Helsepåstander"

@@ -15,7 +15,7 @@ import efsaLogo from "../../img/efsaLogo.png"; // import an image
 import errorKeyhole from "../../img/ban_keyhole.png";
 
 import { ResultNokkelhulletFulfilled, ResultNokkelhulletNotFulfilled } from '../../ResultNokkelhullet.jsx';
-import {ResultEfsaFulfilled, ResultEfsaNotFulfilled} from '../../ResultEfsaClaims.jsx'; // EFSA claims
+import {ResultEfsaFulfilled, ResultEfsaNotFulfilled, ResultEfsaHealthClaims} from '../../ResultEfsaClaims.jsx'; // EFSA claims
 import ProductButtons from "../../ProductButtons";
 
 // Imports for necessary claim check components, used in all categories 
@@ -25,7 +25,7 @@ import ErrorEfsaClaims from "../../errorMessages.jsx";
 import ErrorMessageBox from "../../errorMessages.jsx";
 import * as ProductService from "../../products/ProductService";
 
-const Kategori27 = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition }) => {
+const Kategori27 = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition, vitaminClaims, mineralClaims, selectedVitamins, selectedMinerals }) => {
 
   // State variables for showing results and empty result message
   const [showNokkelhulletResults, setShowNokkelhulletResults] = useState(null);
@@ -884,7 +884,7 @@ const Kategori27 = ({ product, handleNutrientChange, onNutritionChange, onCalcul
 
   {/* Positive results nøkkelhullet container */}
   {buttonClicked && showResults && showNokkelhulletResults ? (
-    <div style={{ backgroundColor: '#daecd8' }}>
+    <div style={{ backgroundColor: '#daecd8', borderRadius: '5px' }}>
     <ResultNokkelhulletFulfilled category={'Kategori27'} className="container nøkkelhullet-food-result-container">
     </ResultNokkelhulletFulfilled>
     </div>
@@ -893,7 +893,7 @@ const Kategori27 = ({ product, handleNutrientChange, onNutritionChange, onCalcul
 
   {/* Negative results nøkkelhullet container */}
   {buttonClicked && !showNokkelhulletResults && showResults && (
-    <div style={{ backgroundColor: '#f3b7b7' }}>
+    <div style={{ backgroundColor: '#f3b7b7', borderRadius: '5px' }}>
     <ResultNokkelhulletNotFulfilled
       category={'Kategori27'} 
       fett={fett} setFett={setFett}
@@ -910,7 +910,7 @@ const Kategori27 = ({ product, handleNutrientChange, onNutritionChange, onCalcul
   {/* Container for ernæringspåstander result - fulfilled */}
   {buttonClicked && showResults && (lowEnergy || lowFat || fatFree || lowSaturatedFat || saturatedFatFree || lowSugars || sugarsFree || withNoAddedSugars) ? (
     <div className={`container ernæringspåstander-food-result-container-${showErnaeringsResults ? 'true' : 'false'}`}
-         style={{ backgroundColor: '#daecd8' }}>
+         style={{ backgroundColor: '#daecd8', borderRadius: '5px' }}>
       <ResultEfsaFulfilled
         lowEnergy={lowEnergy}
         lowFat={lowFat}
@@ -921,6 +921,12 @@ const Kategori27 = ({ product, handleNutrientChange, onNutritionChange, onCalcul
         sugarsFree={sugarsFree}
         withNoAddedSugars={withNoAddedSugars}>
       </ResultEfsaFulfilled>
+      <ResultEfsaHealthClaims
+        vitaminClaims={vitaminClaims}
+        mineralClaims={mineralClaims}
+        selectedVitamins={selectedVitamins}
+        selectedMinerals={selectedMinerals}
+      />
     </div>
   ) : null}
 
@@ -930,7 +936,7 @@ const Kategori27 = ({ product, handleNutrientChange, onNutritionChange, onCalcul
   {/* Container for ernæringspåstander results - Not fulfilled */}
   {buttonClicked && showResults && (!lowEnergy || !lowFat || !fatFree || !lowSaturatedFat || !saturatedFatFree || !lowSugars || !sugarsFree || !withNoAddedSugars) ? (
     <div className={`container ernæringspåstander-food-result-container-${showErnaeringsResults}`}
-    style={{ backgroundColor: '#f3b7b7' }}
+    style={{ backgroundColor: '#f3b7b7', borderRadius: '5px' }}
         >
       <ResultEfsaNotFulfilled
         lowEnergy={lowEnergy}

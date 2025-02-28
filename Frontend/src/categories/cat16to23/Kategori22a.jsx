@@ -15,7 +15,11 @@ import * as ResultComponents from "../../ResultComponents.jsx";
 import * as Check from "../../NutritionClaimCheck.jsx"
 import * as ProductService from "../../products/ProductService";
 
-const Kategori22a = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition }) => {
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// ResultEfsaFullfilled og notFullfilled må implementers 
+import {ResultEfsaFulfilled, ResultEfsaHealthClaims, ResultEfsaNotFulfilled} from '../../ResultEfsaClaims.jsx'; // EFSA claims
+
+const Kategori22a = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition, vitaminClaims, mineralClaims, selectedVitamins, selectedMinerals }) => {
 
   // State variables for showing results and empty result message
   const [showNokkelhulletResults, setShowNokkelhulletResults] = useState(null);
@@ -834,7 +838,7 @@ const Kategori22a = ({ product, handleNutrientChange, onNutritionChange, onCalcu
         </div>
       </div>
 
-      <div className="col-md-6">
+      <div className="col-md-6" style={{marginTop: "-120px"}}>
         {/* positive results nøkkelhullet container" */}
         {showNokkelhulletResults ? (
           <div className="container nøkkelhullet-food-result-container">
@@ -1033,6 +1037,13 @@ const Kategori22a = ({ product, handleNutrientChange, onNutritionChange, onCalcu
                   onClick={() => onClickInfo("helsepåstander")}
                 />
               </div>
+                            <ResultEfsaHealthClaims
+                                vitaminClaims={vitaminClaims}
+                                mineralClaims={mineralClaims}
+                                selectedVitamins={selectedVitamins}
+                                selectedMinerals={selectedMinerals}
+                            />
+              
             </div>
             {infoHelsepåstander ? (
               // Information section for "Helsepåstander"

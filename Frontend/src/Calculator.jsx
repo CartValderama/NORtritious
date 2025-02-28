@@ -70,9 +70,9 @@ import Kategori31 from "./categories/cat25to32/Kategori31";
 import Kategori32 from "./categories/cat25to32/Kategori32";
 
 import healthClaims from './healthClaims/health_claims.json';
+import { ResultEfsaHealthClaims } from "./ResultEfsaClaims";
 
 // This code defines the options for four selectors, one for food groups and one for food categories within those groups and one for the sub foodcategories within those categories and the same logic for the last selector.
-
 const Calculator = () => {
   // The first selector is for food groups (matvaregruppe).
   const selectOption = [
@@ -441,20 +441,20 @@ const Calculator = () => {
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     */ 
 
-  const [selectsMinerals, setSelectVitamins] = useState(""); // for the "Minerals" selector
-  const [selectsVitamins, setSelectMinerals] = useState(""); // for the "Vitamins" selector
+  const [selectedMinerals, setSelectedVitamins] = useState([]); // for the "Minerals" selector
+  const [selectedVitamins, setSelectedMinerals] = useState([]); // for the "Vitamins" selector
   //const [claimDescription, setClaimDescription] = useState(''); // for the health claim description
-  const [vitaminClaim, setVitaminClaim] = useState(''); // for the health claim description
-  const [mineralClaim, setMineralClaim] = useState(''); // for the health claim description
+  const [vitaminClaims, setVitaminClaims] = useState([]); // for the health claim description
+  const [mineralClaims, setMineralClaims] = useState([]); // for the health claim description
   const [showVitaminClaim, setShowVitaminClaim] = useState(false); // for the health claim description
   const [showMineralClaim, setShowMineralClaim] = useState(false); // for the health claim description
 
-  const handleVitaminChange = (selectedOption) => {
-    setSelectVitamins(selectedOption.value);
+  const handleVitaminChange = (selectedOptions) => {
+    setSelectedVitamins(selectedOptions);
   };
 
-  const handleMineralChange = (selectedOption) => {
-    setSelectMinerals(selectedOption.value);
+  const handleMineralChange = (selectedOptions) => {
+    setSelectedMinerals(selectedOptions);
   };
   const selectVitamins = [
     {
@@ -543,18 +543,15 @@ const Calculator = () => {
   ];
 
   useEffect(() => {
-    if (selectsVitamins) {
-      const description = getClaimDescription(selectsVitamins);
-      setVitaminClaim({ nutrient: selectsVitamins, description});
-    }
-  }, [selectsVitamins]);
+    const descriptions = selectedVitamins.map(option => getClaimDescription(option.value));
+    setVitaminClaims(descriptions);
+  }, [selectedVitamins]);
 
   useEffect(() => {
-    if (selectsMinerals) {
-      const description = getClaimDescription(selectsMinerals);
-      setMineralClaim({ nutrient: selectsMinerals, description});
-    }
-  }, [selectsMinerals]);
+    const descriptions = selectedMinerals.map(option => getClaimDescription(option.value));
+    setMineralClaims(descriptions);
+    
+  }, [selectedMinerals]);
 
   const getClaimDescription = (selectedItem) => {
     console.log('selectedItem:', selectedItem);
@@ -642,12 +639,12 @@ const Calculator = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const vitaminClaimDescription = vitaminClaim.description
-    ? `<strong>${vitaminClaim.nutrient} Claim Description:</strong> ${vitaminClaim.description}`
-    : '';
-    const mineralClaimDescription = mineralClaim.description
-    ? `<strong>${mineralClaim.nutrient} Claim Description:</strong> ${mineralClaim.description}`
-    : '';
+    const vitaminClaimDescriptions = vitaminClaims.map((description, index) => 
+      `<strong>${selectedVitamins[index].label} Claim Description:</strong> ${description}`
+    ).join('\n');
+    const mineralClaimDescriptions = mineralClaims.map((description, index) => 
+      `<strong>${selectedMinerals[index].label} Claim Description:</strong> ${description}`
+    ).join('\n');
 
 
     // Check if the product has the Nøkkelhullet label
@@ -657,7 +654,7 @@ const Calculator = () => {
     // Sets EFSA nutritin claims
     product.hasEfsaNutrition = hasEfsaNutrition;
     // Sets EFSA health claims
-    product.hasEfsaHealth = `${vitaminClaimDescription}\n${mineralClaimDescription}`;//mineralClaimDescription+vitaminClaimDescription;
+    product.hasEfsaHealth = `${vitaminClaimDescriptions}\n${mineralClaimDescriptions}`;//mineralClaimDescription+vitaminClaimDescription;
 
     // Checks if input values are KJ or Kcal
     const calories = nutrition.energikcal !== '' ? nutrition.energikcal : nutrition.energikj;
@@ -1024,14 +1021,15 @@ const Calculator = () => {
             </div>
           )}
 
-          {/* These are added inputs for Health Claims */}
           {/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/}
+          {/* These are added inputs for Health Claims */}
           <Row className="mb-3">
           <Col xs={12} md={6}>
             <label htmlFor="vitamins" className="form-label">
               <strong>Vitaminer</strong>
             </label>
             <CustomSelect
+              isMulti
               placeholder={<div>Velg Vitamin</div>}
               className="form-select-md"
               onChange={handleVitaminChange}
@@ -1043,6 +1041,7 @@ const Calculator = () => {
               <strong>Mineraler</strong>
             </label>
             <CustomSelect
+              isMulti
               placeholder={<div>Velg Mineral</div>}
               className="form-select-md"
               onChange={handleMineralChange}
@@ -1064,64 +1063,18 @@ const Calculator = () => {
             høyre side. Hvis en "feil" oppstår, hold musepekeren over feilikonet
             i venstre kolonne for å se detaljene om den spesifikke feilen.
           </p>
+
           <ProductButtons showSubmitButton={isCalculationCompleted} onSubmit={handleSubmit} />
 
           {/* Render of claim descriptions */}
           {/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/}
-          {/* Hvis man ønsker at trekkmenyen ikke overlapper med andre objekter -> fjern styling på Container */}
-          {(vitaminClaim.description || mineralClaim.description) && (
-            <Container className="claim-description mt-4"> {/*style={{ position: 'absolute', maxWidth: '600px'}} >*/}
-              <Row>
-                <div className="accordion" id="accordionPanelsStayOpen">
-                  <div className="accordion-item">
-                    <h2 className="accordion-header" id="panelsStayOpen-headingOne">
-                      <button className="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
-                        <img 
-                          alt="EFSA Logo"
-                          className="me-2"
-                          style={{ width: '50px', height: '50px', float: 'right' }}
-                          src={`${API_URL}/images/efsaLogo.png`}
-                          />
-                          &nbsp; EFSA Helsepåstander 
-
-                      </button>
-                    </h2>
-                    <div id="panelsStayOpen-collapseOne" className="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-headingOne">
-                      <div class="accordion-body">
-                        {vitaminClaim.description && (
-                          <>
-                            <button type='button' className="btn btn-primary mb-2" onClick={() => setShowVitaminClaim(!showVitaminClaim)}>
-                              {showVitaminClaim ? `Gjem ${vitaminClaim.nutrient}` : `Vis ${vitaminClaim.nutrient}`}
-                            </button>
-                          {showVitaminClaim && (
-                            <p>
-                              <strong>Gjeldende Helsepåstander for {vitaminClaim.nutrient}: <br/></strong>
-                              {vitaminClaim.description}
-                            </p>
-                          )}
-                          </>
-                        )}
-                        <br/>
-                        {mineralClaim.description && (
-                          <>
-                            <button type='button' className="btn btn-primary mb-2" onClick={() => setShowMineralClaim(!showMineralClaim)}>
-                              {showMineralClaim ? `Gjem ${mineralClaim.nutrient}` : `Vis ${mineralClaim.nutrient}`}
-                            </button>
-                          {showMineralClaim && (
-                            <p>
-                              <strong>Gjeldende Helsepåstander for {mineralClaim.nutrient}: <br/></strong>
-                              {mineralClaim.description}
-                            </p>
-                          )}
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </Row>
-            </Container>
-          )}
+          {/*    <ResultEfsaHealthClaims 
+                vitaminClaims={vitaminClaims}
+                mineralClaims={mineralClaims}
+                selectedVitamins={selectedVitamins}
+                selectedMinerals={selectedMinerals}
+              />
+          */}
           </div>
 
 
@@ -1133,216 +1086,518 @@ const Calculator = () => {
         <div>
         
           {/* Display default component if no group is selected */}
-          {selectsGroup === "" && <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+          {selectsGroup === "" && <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} 
+            />
+          }
           {/* Display default component if group is selected but no product is selected */}
           {selectsGroup === "grønnsaker, frukt, bær og nøtter" &&
-            selectsProduct === "" && <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "" && <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete}/>}
           {/* Display component for Kategori1 if group is selected as grønnsaker, frukt, bær og nøtter and Kategori1 is selected as product */}
           {selectsGroup === "grønnsaker, frukt, bær og nøtter" &&
-            selectsProduct === "kategori 1" && <Kategori1 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "kategori 1" && 
+            <Kategori1 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}/>
+          }
           {/* Display component for Kategori2 if group is selected as grønnsaker, frukt, bær og nøtter and Kategori2 is selected as product */}
           {selectsGroup === "grønnsaker, frukt, bær og nøtter" &&
-            selectsProduct === "kategori 2" && <Kategori2 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "kategori 2" && <Kategori2 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
 
           {/* Display component for Kategori3 if group is selected as grønnsaker, frukt, bær og nøtter and Kategori3 is selected as product */}
           {selectsGroup === "grønnsaker, frukt, bær og nøtter" &&
-            selectsProduct === "kategori 3" && <Kategori3 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "kategori 3" && <Kategori3 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
 
           {/* Display default component if group is selected as mel, gryn og ris but no product is selected */}
           {selectsGroup === "mel, gryn og ris" && selectsProduct === "" && (
-            <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>
+            <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete}/>
           )}
           {/* Display component for Kategori4 if group is selected as mel, gryn og ris and Kategori4 is selected as product */}
           {selectsGroup === "mel, gryn og ris" &&
-            selectsProduct === "kategori 4" && <Kategori4 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "kategori 4" && <Kategori4 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {/* Display component for Kategori5 if group is selected as mel, gryn og ris and Kategori5 is selected as product */}
           {selectsGroup === "mel, gryn og ris" &&
-            selectsProduct === "kategori 5" && <Kategori5 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "kategori 5" && <Kategori5 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {/* Display component for Kategori6 if group is selected as mel, gryn og ris and Kategori6 is selected as product */}
           {selectsGroup === "mel, gryn og ris" &&
-            selectsProduct === "kategori 6" && <Kategori6 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "kategori 6" && <Kategori6 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
 
           {/* Display default component if group is selected as grøt, brød og pasta but no product is selected */}
           {selectsGroup === "grøt, brød og pasta" && selectsProduct === "" && (
-            <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>
+            <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete}/>
           )}
           {/* Display component for kategori 7 if group is selected as grøt, brød og pasta and product is kategori 7 */}
           {selectsGroup === "grøt, brød og pasta" &&
-            selectsProduct === "kategori 7" && <Kategori7 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "kategori 7" && <Kategori7 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {/* Display component for kategori 8a if group is selected as grøt, brød og pasta and product is kategori 8a */}
           {selectsGroup === "grøt, brød og pasta" &&
-            selectsProduct === "kategori 8a" && <Kategori8a product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "kategori 8a" && <Kategori8a product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {/* Display component for kategori 8b if group is selected as grøt, brød og pasta and product is kategori 8b */}
           {selectsGroup === "grøt, brød og pasta" &&
-            selectsProduct === "kategori 8b" && <Kategori8b product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "kategori 8b" && <Kategori8b product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {/* Display component for kategori 9 if group is selected as grøt, brød og pasta and product is kategori 9 */}
           {selectsGroup === "grøt, brød og pasta" &&
-            selectsProduct === "kategori 9" && <Kategori9 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "kategori 9" && <Kategori9 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {/* Display component for kategori 10 if group is selected as grøt, brød og pasta and product is kategori 10 */}
           {selectsGroup === "grøt, brød og pasta" &&
-            selectsProduct === "kategori 10" && <Kategori10 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "kategori 10" && <Kategori10 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
 
           {/* Display default component if group is selected as melk kategori but no product is selected */}
           {selectsGroup === "melk kategori" && selectsProduct === "" && (
-            <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>
+            <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete}/>
           )}
           {/* Display component for melk 11a if group is selected as melk kategori and product is melk 11a */}
           {selectsGroup === "melk kategori" &&
-            selectsProduct === "melk 11a" && <Melk11a product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "melk 11a" && <Melk11a product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {/* Display component for melk 11b if group is selected as melk kategori and product is melk 11b */}
           {selectsGroup === "melk kategori" &&
-            selectsProduct === "melk 11b" && <Melk11b product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "melk 11b" && <Melk11b product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {/* Display component for melk 12a if group is selected as melk kategori and product is melk 12a */}
           {selectsGroup === "melk kategori" &&
-            selectsProduct === "melk 12a" && <Melk12a product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "melk 12a" && <Melk12a product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {/* Display component for melk 12b if group is selected as melk kategori and product is melk 12b */}
           {selectsGroup === "melk kategori" &&
-            selectsProduct === "melk 12b" && <Melk12b product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "melk 12b" && <Melk12b product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {/* Display component for melk 13a if group is selected as melk kategori and product is melk 13a */}
           {selectsGroup === "melk kategori" &&
-            selectsProduct === "melk 13a" && <Melk13a product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "melk 13a" && <Melk13a product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {/* Display component for melk 13b if group is selected as melk kategori and product is melk 13b */}
           {selectsGroup === "melk kategori" &&
-            selectsProduct === "melk 13b" && <Melk13b product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "melk 13b" && <Melk13b product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {/* Display component for melk 14a if group is selected as melk kategori and product is melk 14a */}
           {selectsGroup === "melk kategori" &&
-            selectsProduct === "melk 14a" && <Melk14a product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "melk 14a" && <Melk14a product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {/* Display component for melk 14b if group is selected as melk kategori and product is melk 14b */}
           {selectsGroup === "melk kategori" &&
-            selectsProduct === "melk 14b" && <Melk14b product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "melk 14b" && <Melk14b product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {/* Display component for melk 15a if group is selected as melk kategori and product is melk 15a */}
           {selectsGroup === "melk kategori" &&
-            selectsProduct === "melk 15a" && <Melk15a product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "melk 15a" && <Melk15a product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {/* Display component for melk 15b if group is selected as melk kategori and product is melk 15b */}
           {selectsGroup === "melk kategori" &&
-            selectsProduct === "melk 15b" && <Melk15b product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "melk 15b" && <Melk15b product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
 
           {/* Repeat the above conditional rendering code that renders a different component based on the user's selection of product category, group, and subcategory.  */}
           {selectsGroup === "ost og vegetabilske alternativer" &&
-            selectsProduct === "" && <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "" && <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete}/>}
           {selectsGroup === "ost og vegetabilske alternativer" &&
-            selectsProduct === "kategori 16" && <Kategori16 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "kategori 16" && <Kategori16 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {selectsGroup === "ost og vegetabilske alternativer" &&
-            selectsProduct === "kategori 17" && <Kategori17 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "kategori 17" && <Kategori17 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {selectsGroup === "ost og vegetabilske alternativer" &&
-            selectsProduct === "kategori 18" && <Kategori18 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "kategori 18" && <Kategori18 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
 
           {selectsGroup === "matfett og oljer" && selectsProduct === "" && (
-            <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>
+            <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} />
           )}
           {selectsGroup === "matfett og oljer" &&
-            selectsProduct === "kategori 19" && <Kategori19 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "kategori 19" && <Kategori19 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {selectsGroup === "matfett og oljer" &&
-            selectsProduct === "kategori 20" && <Kategori20 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "kategori 20" && <Kategori20 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
 
           {selectsGroup === "fiskerivarer og produkter av fiskerivarer" &&
-            selectsProduct === "" && <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "" && <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} />}
           {selectsGroup === "fiskerivarer og produkter av fiskerivarer" &&
-            selectsProduct === "kategori 21" && <Kategori21 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
-          {selectsGroup === "fiskerivarer og produkter av fiskerivarer" &&
-            selectsProduct === "kategori 22" &&
-            selectsFragment === "" && <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
-          {selectsGroup === "fiskerivarer og produkter av fiskerivarer" &&
-            selectsProduct === "kategori 22" &&
-            selectsFragment === "kategori 22 a" && <Kategori22a product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
-          {selectsGroup === "fiskerivarer og produkter av fiskerivarer" &&
-            selectsProduct === "kategori 22" &&
-            selectsFragment === "kategori 22 b" && <Kategori22b product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "kategori 21" && <Kategori21 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {selectsGroup === "fiskerivarer og produkter av fiskerivarer" &&
             selectsProduct === "kategori 22" &&
-            selectsFragment === "kategori 22 c" && <Kategori22c product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsFragment === "" && <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} />}
           {selectsGroup === "fiskerivarer og produkter av fiskerivarer" &&
             selectsProduct === "kategori 22" &&
-            selectsFragment === "kategori 22 d" && <Kategori22d product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsFragment === "kategori 22 a" && <Kategori22a product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
+          {selectsGroup === "fiskerivarer og produkter av fiskerivarer" &&
+            selectsProduct === "kategori 22" &&
+            selectsFragment === "kategori 22 b" && <Kategori22b product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
+          {selectsGroup === "fiskerivarer og produkter av fiskerivarer" &&
+            selectsProduct === "kategori 22" &&
+            selectsFragment === "kategori 22 c" && <Kategori22c product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
+          {selectsGroup === "fiskerivarer og produkter av fiskerivarer" &&
+            selectsProduct === "kategori 22" &&
+            selectsFragment === "kategori 22 d" && <Kategori22d product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
 
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
-            selectsProduct === "" && <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "" && <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} />}
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
-            selectsProduct === "kategori 23" && <Kategori23 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "kategori 23" && <Kategori23 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
 
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
-            selectsFragment === "" && <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsFragment === "" && <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
             selectsFragment === "kategori 24 a" &&
-            selectsRation === "" && <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsRation === "" && <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} />}
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
             selectsFragment === "kategori 24 a" &&
-            selectsRation === "kategori 24 a 1" && <Kategori24a1 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsRation === "kategori 24 a 1" && <Kategori24a1 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
             selectsFragment === "kategori 24 a" &&
-            selectsRation === "kategori 24 a 2" && <Kategori24a2 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsRation === "kategori 24 a 2" && <Kategori24a2 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
 
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
             selectsFragment === "kategori 24 b" &&
-            selectsRation === "" && <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsRation === "" && <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete}/>}
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
             selectsFragment === "kategori 24 b" &&
-            selectsRation === "kategori 24 b 1" && <Kategori24b1 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsRation === "kategori 24 b 1" && <Kategori24b1 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
             selectsFragment === "kategori 24 b" &&
-            selectsRation === "kategori 24 b 2" && <Kategori24b2 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsRation === "kategori 24 b 2" && <Kategori24b2 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
             selectsFragment === "kategori 24 b" &&
-            selectsRation === "kategori 24 b 3" && <Kategori24b3 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsRation === "kategori 24 b 3" && <Kategori24b3 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
             selectsFragment === "kategori 24 b" &&
-            selectsRation === "kategori 24 b 4" && <Kategori24b4 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsRation === "kategori 24 b 4" && <Kategori24b4 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
 
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
             selectsFragment === "kategori 24 c" &&
-            selectsRation === "" && <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsRation === "" && <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} />}
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
             selectsFragment === "kategori 24 c" &&
-            selectsRation === "kategori 24 c 1" && <Kategori24c1 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsRation === "kategori 24 c 1" && <Kategori24c1 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
             selectsFragment === "kategori 24 c" &&
-            selectsRation === "kategori 24 c 2" && <Kategori24c2 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsRation === "kategori 24 c 2" && <Kategori24c2 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
 
           {selectsGroup === "helt eller delvis vegetabilske produkter" &&
-            selectsProduct === "" && <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "" && <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} />}
           {selectsGroup === "helt eller delvis vegetabilske produkter" &&
             selectsProduct === "kategori 25" &&
-            selectsFragment === "" && <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsFragment === "" && <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} />}
           {selectsGroup === "helt eller delvis vegetabilske produkter" &&
             selectsProduct === "kategori 25" &&
-            selectsFragment === "kategori 25 a" && <Kategori25a product={product} onNutritionChange={handleNutritionChange} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsFragment === "kategori 25 a" && <Kategori25a product={product} onNutritionChange={handleNutritionChange} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {selectsGroup === "helt eller delvis vegetabilske produkter" &&
             selectsProduct === "kategori 25" &&
-            selectsFragment === "kategori 25 b" && <Kategori25b product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsFragment === "kategori 25 b" && <Kategori25b product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
 
           {selectsGroup === "ferdigretter" && selectsProduct === "" && (
-            <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>
+            <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete}/>
           )}
           {selectsGroup === "ferdigretter" &&
-            selectsProduct === "kategori 26" && <Kategori26 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "kategori 26" && <Kategori26 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {selectsGroup === "ferdigretter" &&
-            selectsProduct === "kategori 27" && <Kategori27 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "kategori 27" && <Kategori27 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {selectsGroup === "ferdigretter" &&
-            selectsProduct === "kategori 28" && <Kategori28 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "kategori 28" && <Kategori28 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {selectsGroup === "ferdigretter" &&
-            selectsProduct === "kategori 29" && <Kategori29 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "kategori 29" && <Kategori29 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {selectsGroup === "ferdigretter" &&
-            selectsProduct === "kategori 30" && <Kategori30 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "kategori 30" && <Kategori30 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
 
           {selectsGroup === "dressinger og sauser" && selectsProduct === "" && (
-            <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>
+            <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} />
           )}
           {selectsGroup === "dressinger og sauser" &&
-            selectsProduct === "kategori 31" && <Kategori31 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "kategori 31" && <Kategori31 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
           {selectsGroup === "dressinger og sauser" &&
-            selectsProduct === "kategori 32" && <Kategori32 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}/>}
+            selectsProduct === "kategori 32" && <Kategori32 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            vitaminClaims={vitaminClaims}
+            mineralClaims={mineralClaims}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            />
+          }
 
           {/*{isCalculationCompleted && (
           <button type="submit">Save Product</button>

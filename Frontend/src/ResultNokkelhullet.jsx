@@ -9,9 +9,7 @@ const InfoSection = ({ onClose }) => {
   return (
     <div style={{
       position: 'absolute',
-      top: '70%',
-      left: '50%',
-      backgroundColor: 'white',
+        backgroundColor: 'white',
       border: '0.1em solid black',
       padding: '1em',
       zIndex: 100,
@@ -47,11 +45,11 @@ function ResultNokkelhulletFulfilled( {category} ) {
   const requirements = kategorier[category] || {};
 
   return (
-    <div style={{ backgroundColor: '#daecd8', padding: '1em', position: 'relative' }}>
+    <div style={{ backgroundColor: '#daecd8', padding: '1em', position: 'relative', borderRadius: '0.5em' }}>
       <div style={{ display: 'flex', alignItems: 'center', margin: '1em' }}>
         <img 
           src={keyholeLogo}
-          className="keyhole-logo img-fluid"
+          className="keyhole-logo"
           alt="keyhole logo"
           style={{ width:'2.5rem', height: 'auto', objectFit: 'contain', marginRight: '1em'}}
         />
@@ -98,13 +96,13 @@ function ResultNokkelhulletNotFulfilled({ category, fett, mettede, hvoravSukkera
   const requirements = kategorier[category] || {};
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", padding: '1.5em'}}>
+    <div style={{ display: "flex", flexDirection: "column", padding: '2.2em', borderRadius: '0.5em' }}>
       <div style={{ display: "flex", alignItems: "center", marginBottom: '0.2em' }}>
         <img 
           src={keyholeLogo}
-          className="keyhole-logo img-fluid"
+          className="keyhole-logo"
           alt="keyhole logo"
-          style={{width:'2.5rem', height: 'auto', objectFit: 'contain', marginLeft: '0.4em', marginTop: '1em' }}
+          style={{width:'2.5rem', height: 'auto', objectFit: 'contain', marginLeft: '-0.7em', marginTop: '1em' }}
         />
         <h5 style={{ marginTop: '1em', marginLeft: '0.7em' }}>Nøkkelhullet</h5>
         <FontAwesomeIcon
@@ -116,7 +114,7 @@ function ResultNokkelhulletNotFulfilled({ category, fett, mettede, hvoravSukkera
       </div>
       {infoNokkelhullet && <InfoSection onClose={onClickClose} />}
       <div style={{ display: 'flex'}}>
-        <p style={{marginLeft: '60px',}}>Produktet innfrir <span style={{ textDecoration: 'underline' }}>ikke</span> kravene for Nøkkelhullmerket. </p>
+        <p style={{marginLeft: '40px',}}>Produktet innfrir <span style={{ textDecoration: 'underline' }}>ikke</span> kravene for Nøkkelhullmerket. </p>
         <div
           style={{ marginLeft: 'auto', cursor: 'pointer' }}
           onClick={toggleExpanded}

@@ -17,7 +17,7 @@ const ErrorMessageBox = () => {
             <div onClick={toggleExpanded} style={{ display: 'flex', alignItems: 'center', padding: '1em', cursor: 'pointer', userSelect: 'none', borderRadius: '5px'}}>
                 <img 
                     src={error}
-                    className="error-logo img-fluid"
+                    className="error-logo"
                     alt="error logo"
                     style={{ width:'2.5rem', height: '2.5rem', objectFit: 'contain', marginRight: '0.5em'}}
                 />

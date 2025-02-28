@@ -28,7 +28,7 @@ const HomePage = () => {
         <div className="col-md-8">
           <p>
             Ved å bruke denne webkalkulatoren kan du sjekke om resept på nytt
-            matvareprodukt møter kravet for Nøkkelhullsmerking.
+            matvareprodukt møter krav for Nøkkelhullsmerking, EFSA Næringspåstander og EFSA Helsepåstander.
           </p>
         </div>
         <div className="button-div col-md-4">
