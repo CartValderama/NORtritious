@@ -14,6 +14,7 @@ import LoginPage from "./account/login";
 import ProductListPage from "./products/ProductListPage";
 import "./App.css";
 import ProfilePage from "./account/profile";
+import ProductDetails from "./products/PoductDetails";
 //import UpdateCalculator from "./UpdateCalculator";
 
 //    <LoginTest />
@@ -30,6 +31,10 @@ const App: React.FC = () => {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/products" element={<ProductListPage />} />
                 <Route path="/products/calculator" element={<Calculator />} />
+                <Route
+                  path="/products/details/:productId"
+                  element={<ProductDetails />}
+                />
                 <Route path="/login" element={<LoginTest />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
                 <Route path="account/login" element={<LoginPage />} />
