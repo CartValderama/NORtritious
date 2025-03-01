@@ -9,6 +9,7 @@ import API_URL from "../apiConfig";
 const NavMenu: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
+  const [profilePicture, setProfilePicture] = useState("");
   const navigate = useNavigate(); // Bruk useNavigate her
 
   useEffect(() => {
@@ -21,6 +22,7 @@ const NavMenu: React.FC = () => {
         if (response.data) {
           setIsLoggedIn(true);
           setUsername(response.data.name); // Brukernavn fra API
+          setProfilePicture(response.data.profilePicture); // Profilbilde fra API
         }
       } catch (error) {
         setIsLoggedIn(false);
@@ -41,6 +43,7 @@ const NavMenu: React.FC = () => {
       );
       setIsLoggedIn(false);
       setUsername(""); // Tøm brukernavnet
+      setProfilePicture(""); // Tøm profilbildet
       navigate("/account/login"); // Naviger tilbake til login-siden
     } catch (error) {
       console.error("Logout failed", error);
@@ -71,7 +74,18 @@ const NavMenu: React.FC = () => {
           <Nav className="ms-auto">
             {isLoggedIn ? (
               <>
-                <Nav.Link as={Link} to="/account/profile">
+                <Nav.Link as={Link} to="/account/profile" className="d-flex align-items-center">
+                    <img
+                      src={
+                        profilePicture                  
+                      ? `${API_URL}${profilePicture}`
+                      : `${API_URL}/images/profile_pictures/male-placeholder-image.png`
+                      }
+                      alt="Profile"
+                      className="rounded-circle"
+                      style={{ width: "30px", height: "30px", marginRight: "10px" }}
+                    />
+                  
                   {username}
                 </Nav.Link>
                 <Nav.Link as="button" onClick={handleLogout}>

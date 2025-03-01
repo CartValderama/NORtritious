@@ -13,13 +13,27 @@ interface ClaimsModalProps {
 
 // Modalen setter bakgrunnen til en grå farge og viser innholdet (Health-claims)
 const ClaimsModal: React.FC<ClaimsModalProps> = ({ show, onHide, content, product }) => {
-    // Formaterer innholdet i modalen
+  /*
+  // Formaterer innholdet i modalen
   const formatContent = (content: string) => {
     return content.split('\n').map((line, index) => (
         // For hver linje i innholdet, returnes en paragraf med HTML,
         // dangerouslySetInnerHTML er innerHTML i React
       <p key={index} dangerouslySetInnerHTML={{ __html: line }} />
     ));
+  };
+  */
+
+  // Formaterer innholdet i modalen
+  const formatContent = (content: string) => {
+    return content.split('\n').map((line, index) => {
+      const label = line.split(':')[0];
+      return (
+      // For hver linje etter ':' i innholdet (claim label), returnes en paragraf via HTML, 
+      // *dangerouslySetInnerHTML er innerHTML i React
+      <p key={index} dangerouslySetInnerHTML={{__html: label }}/>
+      );
+    });
   };
 
 // Popover for ernæringspåstander
