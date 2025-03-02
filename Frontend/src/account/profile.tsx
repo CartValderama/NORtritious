@@ -190,7 +190,7 @@ const ProfilePage: React.FC = () => {
                   ? `${API_URL}${userInfo.profilePicture}`
                   : `${API_URL}/images/profile_pictures/male-placeholder-image.png`
               }
-              alt="Profile"
+              alt="Profile picture"
             />
           </div>
 
@@ -236,9 +236,6 @@ const ProfilePage: React.FC = () => {
             <div className="card">
               <div className="card-body">
                 <h2 className="card-title">Oppdater informasjon</h2>
-                <div className="alert alert-success" role="alert">
-                  Implementert!
-                </div>
                 <form onSubmit={handleUpdateInfo}>
                   <div className="mb-3">
                     <label htmlFor="name" className="form-label">
@@ -340,9 +337,6 @@ const ProfilePage: React.FC = () => {
             <div className="card mb-3">
               <div className="card-body">
                 <h2 className="card-title">Endre profilbilde</h2>
-                <div className="alert alert-success" role="alert">
-                  Implementert!
-                </div>
                 {selectedImage && (
                   <div className="mb-3">
                     <h5>Valgt bilde:</h5>
@@ -385,9 +379,6 @@ const ProfilePage: React.FC = () => {
             <div className="card mb-3">
               <div className="card-body">
                 <h2 className="card-title">Endre passord</h2>
-                <div className="alert alert-success" role="alert">
-                  Implementert!
-                </div>
                 <form onSubmit={handleChangePassword}>
                   <div className="mb-3">
                     <label htmlFor="oldPassword" className="form-label">
@@ -453,9 +444,6 @@ const ProfilePage: React.FC = () => {
             <div className="card">
               <div className="card-body">
                 <h2 className="card-title">Mine produkter</h2>
-                <div className="alert alert-success" role="alert">
-                  Implementert!
-                </div>
                 {/* Vise produkter eller loading state */}
                 {isProductsLoading ? (
                   <p>Laster produkter...</p>

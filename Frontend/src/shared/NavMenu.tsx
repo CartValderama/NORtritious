@@ -56,7 +56,7 @@ const NavMenu: React.FC = () => {
           <img
             src={logo}
             className="img-logo img-fluid"
-            alt="Logo"
+            alt="Fremtidsmat logo"
             style={{ height: "50px" }}
           />{" "}
         </Navbar.Brand>
@@ -74,18 +74,26 @@ const NavMenu: React.FC = () => {
           <Nav className="ms-auto">
             {isLoggedIn ? (
               <>
-                <Nav.Link as={Link} to="/account/profile" className="d-flex align-items-center">
-                    <img
-                      src={
-                        profilePicture                  
-                      ? `${API_URL}${profilePicture}`
-                      : `${API_URL}/images/profile_pictures/male-placeholder-image.png`
-                      }
-                      alt="Profile"
-                      className="rounded-circle"
-                      style={{ width: "30px", height: "30px", marginRight: "10px" }}
-                    />
-                  
+                <Nav.Link
+                  as={Link}
+                  to="/account/profile"
+                  className="d-flex align-items-center"
+                >
+                  <img
+                    src={
+                      profilePicture
+                        ? `${API_URL}${profilePicture}`
+                        : `${API_URL}/images/profile_pictures/male-placeholder-image.png`
+                    }
+                    alt="Profile picture"
+                    className="rounded-circle"
+                    style={{
+                      width: "30px",
+                      height: "30px",
+                      marginRight: "10px",
+                    }}
+                  />
+
                   {username}
                 </Nav.Link>
                 <Nav.Link as="button" onClick={handleLogout}>
