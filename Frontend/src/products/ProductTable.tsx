@@ -26,6 +26,17 @@ const ProductTable: React.FC<ProductTableProps> = ({
   }>({});
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [showType, setShowType] = useState<boolean>(false);
+  const [sortColumn, setSortColumn] = useState<string>("name"); 
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortColumn(column);
+      setSortDirection("asc");
+    }
+  };
 
   const handleToggleNutrition = (productId: number) => {
     setVisibleNutrition((prevState) => ({
@@ -39,6 +50,21 @@ const ProductTable: React.FC<ProductTableProps> = ({
     setShowClaims(true);
     setSelectedProduct(product);
   };
+
+  // Sorterer produktene
+  const sortedProducts = [...products].sort((a, b) => {
+    // Ensure TypeScript knows `sortColumn` is a valid key of `Product`
+    const key = sortColumn as keyof Product;
+  
+    if (!a[key] || !b[key]) return 0; // Handle missing data
+  
+    const valueA = typeof a[key] === "string" ? (a[key] as string).toLowerCase() : a[key];
+    const valueB = typeof b[key] === "string" ? (b[key] as string).toLowerCase() : b[key];
+  
+    if (valueA < valueB) return sortDirection === "asc" ? -1 : 1;
+    if (valueA > valueB) return sortDirection === "asc" ? 1 : -1;
+    return 0;
+  });
 
   // Formaterer innholdet i kortet
   const formatContent = (content: string) => {
@@ -92,9 +118,9 @@ const ProductTable: React.FC<ProductTableProps> = ({
               <thead className="bg-light">
                 <tr>
                   {showId && <th className="align-middle">ID</th>}
-                  <th className="align-middle text-center">Navn</th>
+                  <th className="align-middle text-center" onClick={() => handleSort("name")} style={{ cursor: "pointer" }}>Navn {sortColumn === "name" ? (sortDirection === "asc" ? "▲" : "▼") : ""}</th>
                   <th className="align-middle text-center">Bilde</th>
-                  <th className="align-middle text-center">Gruppe</th>
+                  <th className="align-middle text-center" onClick={() => handleSort("name")} style={{ cursor: "pointer" }}>Gruppe {sortColumn === "name" ? (sortDirection === "asc" ? "▲" : "▼") : ""}</th>
                   {showType && (
                     <th className="align-middle text-center">Type</th>
                   )}
@@ -112,7 +138,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                 </tr>
               </thead>
               <tbody>
-                {products.map((product) => (
+                {sortedProducts.map((product) => (
                   <tr key={product.productId}>
                     {showId && (
                       <td className="align-middle">{product.productId}</td>
