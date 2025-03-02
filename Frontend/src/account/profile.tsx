@@ -194,7 +194,13 @@ const ProfilePage: React.FC = () => {
             />
           </div>
 
-          <div className="list-group mb-2">
+          <div className="list-group mb-4">
+            <div className="list-group-item">
+              <strong>{userInfo.name}</strong>
+            </div>
+          </div>
+
+          <div className="list-group mb-4">
             <button
               className={`list-group-item list-group-item-action ${
                 selectedSection === "info" ? "active" : ""
@@ -325,7 +331,11 @@ const ProfilePage: React.FC = () => {
                       </div>
                     </div>
                   )}
-                  <button type="submit" className="btn btn-primary">
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    aria-label="Oppdater informasjon"
+                  >
                     Oppdater
                   </button>
                 </form>
@@ -350,7 +360,7 @@ const ProfilePage: React.FC = () => {
                 )}
                 <form onSubmit={handleImageUpload}>
                   <div className="mb-3">
-                    <label htmlFor="oldPassword" className="form-label">
+                    <label htmlFor="image" className="form-label">
                       Last opp profilbilde
                     </label>
                     <div className="input-group">
@@ -358,6 +368,7 @@ const ProfilePage: React.FC = () => {
                         type="file"
                         className="form-control"
                         id="image"
+                        name="image"
                         accept="image/*"
                         onChange={(e) =>
                           setSelectedImage(
@@ -367,7 +378,11 @@ const ProfilePage: React.FC = () => {
                       />
                     </div>
                   </div>
-                  <button type="submit" className="btn btn-primary">
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    aria-label="Last opp profilbilde"
+                  >
                     <i className="bi bi-upload"></i> Last opp
                   </button>
                 </form>
@@ -396,6 +411,9 @@ const ProfilePage: React.FC = () => {
                       <button
                         type="button"
                         className="btn btn-outline-secondary"
+                        aria-label={
+                          showPassword ? "Skjul passord" : "Vis passord"
+                        }
                         onClick={togglePasswordVisibility}
                       >
                         {showPassword ? (
@@ -422,6 +440,9 @@ const ProfilePage: React.FC = () => {
                       <button
                         type="button"
                         className="btn btn-outline-secondary"
+                        aria-label={
+                          showPassword ? "Skjul passord" : "Vis passord"
+                        }
                         onClick={togglePasswordVisibility}
                       >
                         {showPassword ? (
@@ -432,7 +453,11 @@ const ProfilePage: React.FC = () => {
                       </button>
                     </div>
                   </div>
-                  <button type="submit" className="btn btn-primary">
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    aria-label="Endre passord"
+                  >
                     Endre
                   </button>
                 </form>
@@ -469,6 +494,7 @@ const ProfilePage: React.FC = () => {
                     </ul>
                     <button
                       className="btn btn-secondary"
+                      aria-label="Se alle mine produkter"
                       onClick={fetchProducts}
                     >
                       Se alle produkter
