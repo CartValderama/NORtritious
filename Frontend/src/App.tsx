@@ -14,7 +14,7 @@ import LoginPage from "./account/login";
 import ProductListPage from "./products/ProductListPage";
 import "./App.css";
 import ProfilePage from "./account/profile";
-import ProductDetails from "./products/PoductDetails";
+import ProductDetails from "./products/ProductDetails";
 //import UpdateCalculator from "./UpdateCalculator";
 
 //    <LoginTest />
