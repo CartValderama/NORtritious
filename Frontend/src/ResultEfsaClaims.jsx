@@ -189,7 +189,7 @@ function ResultEfsaHealthClaims({ vitaminClaims, mineralClaims, otherClaims, sel
   // so if an object that is visible is removed from the list, the visibility state will not be reset. 
   useEffect(() => {
     // Resets visibility state for vitamins
-    setVisibleVitaminClaims(prevState => {
+    setVisibleVitaminClaims((prevState) => {
       const newState = {};
       selectedVitamins.forEach((_, index) => {
         newState[index] = prevState[index] || false;
@@ -251,7 +251,7 @@ function ResultEfsaHealthClaims({ vitaminClaims, mineralClaims, otherClaims, sel
         <div className="accordion" id="accordionPanelsStayOpen">
           <div className="accordion-item">
             <h2 className="accordion-header" id="panelsStayOpen-headingOne">
-              <button className="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+              <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
                 <img 
                   alt="EFSA Logo"
                   className="me-2"
@@ -262,7 +262,7 @@ function ResultEfsaHealthClaims({ vitaminClaims, mineralClaims, otherClaims, sel
               </button>  
             </h2>
 
-            <div id="panelsStayOpen-collapseOne" className="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-headingOne">
+            <div id="panelsStayOpen-collapseOne" className="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingOne">
               <div class="accordion-body" style={{ display: 'flex', flexDirection: 'column', padding: '1em'}}>
                 {vitaminClaims.length > 0 && (
                   <>
