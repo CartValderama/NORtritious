@@ -108,7 +108,7 @@ const LoginPage: React.FC = () => {
   };
 
   if (loading) {
-    return <div>Laster...</div>;
+    return <div aria-live="assertive">Laster...</div>;
   }
 
   return (
@@ -176,6 +176,9 @@ const LoginPage: React.FC = () => {
                       <button
                         type="button"
                         className="btn btn-outline-secondary"
+                        aria-label={
+                          showPassword ? "Skjul passord" : "Vis passord"
+                        }
                         onClick={togglePasswordVisibility}
                       >
                         {showPassword ? (
@@ -185,6 +188,9 @@ const LoginPage: React.FC = () => {
                         )}
                       </button>
                     </div>
+                    <span id="passwordHelp" className="visually-hidden">
+                      Trykk på knappen for å vise eller skjule passordet.
+                    </span>
                   </div>
                   {isRegister && (
                     <div className="mb-3">
@@ -195,6 +201,7 @@ const LoginPage: React.FC = () => {
                         className="form-select"
                         id="role"
                         value={role}
+                        aria-label="Velg din rolle"
                         onChange={(e) => setRole(e.target.value)}
                       >
                         <option value="Producer">Producer</option>
@@ -216,7 +223,15 @@ const LoginPage: React.FC = () => {
                       />
                     </div>
                   )}
-                  <button type="submit" className="btn btn-primary">
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    aria-label={
+                      isRegister
+                        ? "Send inn registreringsskjema"
+                        : "Send inn innloggingsskjema"
+                    }
+                  >
                     {isRegister ? "Registrer" : "Logg inn"}
                   </button>
                 </form>
@@ -229,13 +244,23 @@ const LoginPage: React.FC = () => {
                 )}
                 <button
                   className="btn btn-link"
+                  role="button"
+                  aria-label={
+                    isRegister ? "Gå til innlogging" : "Gå til registrering"
+                  }
                   onClick={() => setIsRegister(!isRegister)}
                 >
                   {isRegister ? "Tilbake til innlogging" : "Registrering"}
                 </button>
               </p>
               {message && (
-                <div className="alert alert-info mt-3">{message}</div>
+                <div
+                  className="alert alert-info mt-3"
+                  role="alert"
+                  aria-live="polite"
+                >
+                  {message}
+                </div>
               )}
             </div>
           </div>

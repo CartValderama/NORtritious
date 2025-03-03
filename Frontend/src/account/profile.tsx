@@ -190,11 +190,17 @@ const ProfilePage: React.FC = () => {
                   ? `${API_URL}${userInfo.profilePicture}`
                   : `${API_URL}/images/profile_pictures/male-placeholder-image.png`
               }
-              alt="Profile"
+              alt="Profile picture"
             />
           </div>
 
-          <div className="list-group mb-2">
+          <div className="list-group mb-4">
+            <div className="list-group-item">
+              <strong>{userInfo.name}</strong>
+            </div>
+          </div>
+
+          <div className="list-group mb-4">
             <button
               className={`list-group-item list-group-item-action ${
                 selectedSection === "info" ? "active" : ""
@@ -236,9 +242,6 @@ const ProfilePage: React.FC = () => {
             <div className="card">
               <div className="card-body">
                 <h2 className="card-title">Oppdater informasjon</h2>
-                <div className="alert alert-success" role="alert">
-                  Implementert!
-                </div>
                 <form onSubmit={handleUpdateInfo}>
                   <div className="mb-3">
                     <label htmlFor="name" className="form-label">
@@ -328,7 +331,11 @@ const ProfilePage: React.FC = () => {
                       </div>
                     </div>
                   )}
-                  <button type="submit" className="btn btn-primary">
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    aria-label="Oppdater informasjon"
+                  >
                     Oppdater
                   </button>
                 </form>
@@ -340,9 +347,6 @@ const ProfilePage: React.FC = () => {
             <div className="card mb-3">
               <div className="card-body">
                 <h2 className="card-title">Endre profilbilde</h2>
-                <div className="alert alert-success" role="alert">
-                  Implementert!
-                </div>
                 {selectedImage && (
                   <div className="mb-3">
                     <h5>Valgt bilde:</h5>
@@ -356,7 +360,7 @@ const ProfilePage: React.FC = () => {
                 )}
                 <form onSubmit={handleImageUpload}>
                   <div className="mb-3">
-                    <label htmlFor="oldPassword" className="form-label">
+                    <label htmlFor="image" className="form-label">
                       Last opp profilbilde
                     </label>
                     <div className="input-group">
@@ -364,6 +368,7 @@ const ProfilePage: React.FC = () => {
                         type="file"
                         className="form-control"
                         id="image"
+                        name="image"
                         accept="image/*"
                         onChange={(e) =>
                           setSelectedImage(
@@ -373,7 +378,11 @@ const ProfilePage: React.FC = () => {
                       />
                     </div>
                   </div>
-                  <button type="submit" className="btn btn-primary">
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    aria-label="Last opp profilbilde"
+                  >
                     <i className="bi bi-upload"></i> Last opp
                   </button>
                 </form>
@@ -385,9 +394,6 @@ const ProfilePage: React.FC = () => {
             <div className="card mb-3">
               <div className="card-body">
                 <h2 className="card-title">Endre passord</h2>
-                <div className="alert alert-success" role="alert">
-                  Implementert!
-                </div>
                 <form onSubmit={handleChangePassword}>
                   <div className="mb-3">
                     <label htmlFor="oldPassword" className="form-label">
@@ -405,6 +411,9 @@ const ProfilePage: React.FC = () => {
                       <button
                         type="button"
                         className="btn btn-outline-secondary"
+                        aria-label={
+                          showPassword ? "Skjul passord" : "Vis passord"
+                        }
                         onClick={togglePasswordVisibility}
                       >
                         {showPassword ? (
@@ -431,6 +440,9 @@ const ProfilePage: React.FC = () => {
                       <button
                         type="button"
                         className="btn btn-outline-secondary"
+                        aria-label={
+                          showPassword ? "Skjul passord" : "Vis passord"
+                        }
                         onClick={togglePasswordVisibility}
                       >
                         {showPassword ? (
@@ -441,7 +453,11 @@ const ProfilePage: React.FC = () => {
                       </button>
                     </div>
                   </div>
-                  <button type="submit" className="btn btn-primary">
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    aria-label="Endre passord"
+                  >
                     Endre
                   </button>
                 </form>
@@ -453,9 +469,6 @@ const ProfilePage: React.FC = () => {
             <div className="card">
               <div className="card-body">
                 <h2 className="card-title">Mine produkter</h2>
-                <div className="alert alert-success" role="alert">
-                  Implementert!
-                </div>
                 {/* Vise produkter eller loading state */}
                 {isProductsLoading ? (
                   <p>Laster produkter...</p>
@@ -481,6 +494,7 @@ const ProfilePage: React.FC = () => {
                     </ul>
                     <button
                       className="btn btn-secondary"
+                      aria-label="Se alle mine produkter"
                       onClick={fetchProducts}
                     >
                       Se alle produkter

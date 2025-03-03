@@ -19,15 +19,15 @@ namespace ControllerTests
     {
         private readonly Mock<IProductsRepository> _mockProductsRepository;
         private readonly Mock<ILogger<ProductsController>> _mockLogger;
-        private readonly Mock<UserManager<IdentityUser>> _mockUserManager;
+        private readonly Mock<UserManager<ApplicationUser>> _mockUserManager;
         private readonly ProductsController _controller;
 
         public ProductsControllerTests()
         {
             // Mock dependencies
-            var userStoreMock = new Mock<IUserStore<IdentityUser>>();
+            var userStoreMock = new Mock<IUserStore<ApplicationUser>>();
 #nullable disable
-            _mockUserManager = new Mock<UserManager<IdentityUser>>(userStoreMock.Object, null, null, null, null, null, null, null, null);
+            _mockUserManager = new Mock<UserManager<ApplicationUser>>(userStoreMock.Object, null, null, null, null, null, null, null, null);
 #nullable restore
             _mockProductsRepository = new Mock<IProductsRepository>();
             _mockLogger = new Mock<ILogger<ProductsController>>();
@@ -277,7 +277,7 @@ namespace ControllerTests
         public async Task CreateProductAsync_ReturnsNotFound_WhenUserNotFound()
         {
             // Arrange
-            _mockUserManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync((IdentityUser)null);
+            _mockUserManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync((ApplicationUser)null);
 
             _controller.ControllerContext = new ControllerContext
             {
@@ -303,7 +303,7 @@ namespace ControllerTests
         public async Task CreateProductAsync_ReturnsCreatedAtAction_WhenProductCreatedSuccessfully()
         {
             // Arrange
-            var user = new IdentityUser { Id = "test-user-id" };
+            var user = new ApplicationUser { Id = "test-user-id" };
             _mockUserManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(user);
             _mockProductsRepository.Setup(x => x.CreateProductAsync(It.IsAny<Product>())).ReturnsAsync(true);
 
@@ -312,8 +312,8 @@ namespace ControllerTests
                 Name = "Test Product",
                 Group = "Test Group",
                 Type = "Test Type",
-                HasEfsaHealth = true,
-                HasEfsaNutrition = true,
+                HasEfsaHealth = "true",
+                HasEfsaNutrition = "true",
                 HasNokkelhullet = true,
                 ImageUrl = "http://test.com/image.png",
                 Calories = 100,
@@ -352,7 +352,7 @@ namespace ControllerTests
         public async Task CreateProductAsync_ReturnsBadRequest_WhenProductCreationFails()
         {
             // Arrange
-            var user = new IdentityUser { Id = "test-user-id" };
+            var user = new ApplicationUser { Id = "test-user-id" };
             _mockUserManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(user);
             _mockProductsRepository.Setup(x => x.CreateProductAsync(It.IsAny<Product>())).ReturnsAsync(false);
 
@@ -361,8 +361,8 @@ namespace ControllerTests
                 Name = "Test Product",
                 Group = "Test Group",
                 Type = "Test Type",
-                HasEfsaHealth = true,
-                HasEfsaNutrition = true,
+                HasEfsaHealth = "true",
+                HasEfsaNutrition = "true",
                 HasNokkelhullet = true,
                 ImageUrl = "http://test.com/image.png",
                 Calories = 100,
@@ -407,8 +407,8 @@ namespace ControllerTests
                 Name = "Test Product",
                 Group = "Test Group",
                 Type = "Test Type",
-                HasEfsaHealth = true,
-                HasEfsaNutrition = true,
+                HasEfsaHealth = "true",
+                HasEfsaNutrition = "true",
                 HasNokkelhullet = true,
                 ImageUrl = "http://test.com/image.png",
                 Calories = 100,
@@ -525,8 +525,8 @@ namespace ControllerTests
                 Name = "Updated Product",
                 Group = "Updated Group",
                 Type = "Updated Type",
-                HasEfsaHealth = true,
-                HasEfsaNutrition = true,
+                HasEfsaHealth = "true",
+                HasEfsaNutrition = "true",
                 HasNokkelhullet = true,
                 ImageUrl = "http://test.com/updated-image.png",
                 Calories = 150,
