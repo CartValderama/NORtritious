@@ -25,7 +25,7 @@ import ErrorEfsaClaims from "../../errorMessages.jsx";
 import ErrorMessageBox from "../../errorMessages.jsx";
 import * as ProductService from "../../products/ProductService";
 
-const Kategori24b2 = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition, vitaminClaims, mineralClaims, selectedVitamins, selectedMinerals }) => {
+const Kategori24b2 = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition, vitaminClaims, mineralClaims, selectedVitamins, selectedMinerals, otherClaims, selectedOthers }) => {
 
   // State variables for showing results and empty result message
   const [showNokkelhulletResults, setShowNokkelhulletResults] = useState(null);
@@ -901,7 +901,7 @@ const Kategori24b2 = ({ product, handleNutrientChange, onNutritionChange, onCalc
   {buttonClicked && !showResults && <ErrorMessageBox />}
 
   {/* Spacer */}
-  <div style={{ padding: "5px" }}></div>
+  <div style={{ padding: "5px", marginTop: '-350px' }}></div>
 
   {/* Positive results nøkkelhullet container */}
   {buttonClicked && showResults && showNokkelhulletResults ? (
@@ -933,6 +933,16 @@ const Kategori24b2 = ({ product, handleNutrientChange, onNutritionChange, onCalc
     <div className={`container ernæringspåstander-food-result-container-${showErnaeringsResults ? 'true' : 'false'}`}
          style={{ backgroundColor: '#daecd8', borderRadius: '5px' }}>
       <ResultEfsaFulfilled
+      claimsToShow={{
+        lowEnergy: true,
+        lowFat: true,
+        fatFree: true,
+        lowSaturatedFat: true,
+        saturatedFatFree: true,
+        lowSugars: true,
+        sugarsFree: true,
+        withNoAddedSugars: true,
+        }}
         lowEnergy={lowEnergy}
         lowFat={lowFat}
         fatFree={fatFree}
@@ -947,6 +957,9 @@ const Kategori24b2 = ({ product, handleNutrientChange, onNutritionChange, onCalc
         mineralClaims={mineralClaims}
         selectedVitamins={selectedVitamins}
         selectedMinerals={selectedMinerals}
+        otherClaims={otherClaims}
+        selectedOthers={selectedOthers}
+
       />
     </div>
   ) : null}
@@ -960,6 +973,16 @@ const Kategori24b2 = ({ product, handleNutrientChange, onNutritionChange, onCalc
     style={{ backgroundColor: '#f3b7b7', borderRadius: '5px' }}
         >
       <ResultEfsaNotFulfilled
+      claimsToShow={{
+        lowEnergy: true,
+        lowFat: true,
+        fatFree: true,
+        lowSaturatedFat: true,
+        saturatedFatFree: true,
+        lowSugars: true,
+        sugarsFree: true,
+        withNoAddedSugars: true,
+        }}
         lowEnergy={lowEnergy}
         lowFat={lowFat}
         fatFree={fatFree}

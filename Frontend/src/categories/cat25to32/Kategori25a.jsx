@@ -19,7 +19,7 @@ import * as ProductService from "../../products/ProductService";
 // ResultEfsaFullfilled og notFullfilled må implementers 
 import {ResultEfsaFulfilled, ResultEfsaHealthClaims, ResultEfsaNotFulfilled} from '../../ResultEfsaClaims.jsx'; // EFSA claims
 
-const Kategori25a = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition, vitaminClaims, mineralClaims, selectedVitamins, selectedMinerals  }) => {
+const Kategori25a = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition, vitaminClaims, mineralClaims, selectedVitamins, selectedMinerals, otherClaims, selectedOthers  }) => {
   // State variables for showing results and empty result message
 
   const [showNokkelhulletResults, setShowNokkelhulletResults] = useState(null);
@@ -1109,6 +1109,9 @@ const Kategori25a = ({ product, handleNutrientChange, onNutritionChange, onCalcu
                   mineralClaims={mineralClaims}
                   selectedVitamins={selectedVitamins}
                   selectedMinerals={selectedMinerals}
+                  otherClaims={otherClaims}
+                  selectedOthers={selectedOthers}
+
               />
             </div>
             {infoHelsepåstander ? (

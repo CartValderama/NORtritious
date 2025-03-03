@@ -27,7 +27,7 @@ const ClaimsModal: React.FC<ClaimsModalProps> = ({ show, onHide, content, produc
   // Formaterer innholdet i modalen
   const formatContent = (content: string) => {
     return content.split('\n').map((line, index) => {
-      const label = line.split(':')[0];
+      const label = line.split(', ')[0];
       return (
       // For hver linje etter ':' i innholdet (claim label), returnes en paragraf via HTML, 
       // *dangerouslySetInnerHTML er innerHTML i React

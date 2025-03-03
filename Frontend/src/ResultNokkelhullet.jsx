@@ -41,7 +41,7 @@ function ResultNokkelhulletFulfilled( {category} ) {
   const toggleExpanded = () => { setIsExpanded(!isExpanded); };
   const onClickInfo = () => { setInfoNokkelhullet(!infoNokkelhullet); };
   const onClickClose = () => { setInfoNokkelhullet(false); };
-
+  
   const requirements = kategorier[category] || {};
 
   return (

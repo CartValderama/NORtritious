@@ -25,7 +25,7 @@ import ErrorEfsaClaims from "../../errorMessages.jsx";
 import ErrorMessageBox from "../../errorMessages.jsx";
 import * as ProductService from "../../products/ProductService";
 
-const Kategori24c2 = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition, vitaminClaims, mineralClaims, selectedVitamins, selectedMinerals }) => {
+const Kategori24c2 = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition, vitaminClaims, mineralClaims, selectedVitamins, selectedMinerals, otherClaims, selectedOthers }) => {
 
   // State variables for showing results and empty result message
   const [showNokkelhulletResults, setShowNokkelhulletResults] = useState(null);
@@ -947,6 +947,9 @@ const Kategori24c2 = ({ product, handleNutrientChange, onNutritionChange, onCalc
         mineralClaims={mineralClaims}
         selectedVitamins={selectedVitamins}
         selectedMinerals={selectedMinerals}
+        otherClaims={otherClaims}
+        selectedOthers={selectedOthers}
+
       />
     </div>
   ) : null}

@@ -26,7 +26,7 @@ import ErrorMessageBox from "../../errorMessages.jsx";
 import * as ProductService from "../../products/ProductService";
 
 // This component is called Kategori1
-const Kategori1 = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition, vitaminClaims, mineralClaims, selectedVitamins, selectedMinerals }) => {
+const Kategori1 = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition, vitaminClaims, mineralClaims, selectedVitamins, selectedMinerals, otherClaims, selectedOthers }) => {
 
   // State variables for showing results and empty result message
   const [showNokkelhulletResults, setShowNokkelhulletResults] = useState(null);
@@ -1051,7 +1051,7 @@ const Kategori1 = ({ product, handleNutrientChange, onNutritionChange, onCalcula
       {/* A simple button for adding a new product, which reloads the page on click */}  
       </div>        
       
-  <div className="col-md-6">
+  <div className="col-md-6" style={{ marginTop: '-350px'}}>
   {buttonClicked && !showResults && <ErrorMessageBox />}
 
   {/* Spacer */}
@@ -1089,7 +1089,7 @@ const Kategori1 = ({ product, handleNutrientChange, onNutritionChange, onCalcula
          style={{ backgroundColor: '#daecd8', borderRadius: '5px' }}>
       <ResultEfsaFulfilled
       claimsToShow={{
-        lowEnergy: false,
+        lowEnergy: true,
         lowFat: true,
         fatFree: true,
         lowSaturatedFat: true,
@@ -1119,6 +1119,8 @@ const Kategori1 = ({ product, handleNutrientChange, onNutritionChange, onCalcula
         mineralClaims={mineralClaims}
         selectedVitamins={selectedVitamins}
         selectedMinerals={selectedMinerals}
+        otherClaims={otherClaims}
+        selectedOthers={selectedOthers}
         />
     </div>
   ) : null}

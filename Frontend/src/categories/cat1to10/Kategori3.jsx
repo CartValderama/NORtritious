@@ -21,7 +21,7 @@ import * as ProductService from "../../products/ProductService";
 import {ResultEfsaFulfilled, ResultEfsaHealthClaims, ResultEfsaNotFulfilled} from '../../ResultEfsaClaims.jsx'; // EFSA claims
 
 // This component is called Kategori3
-const Kategori3 = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition, vitaminClaims, mineralClaims, selectedVitamins, selectedMinerals }) => {
+const Kategori3 = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition, vitaminClaims, mineralClaims, selectedVitamins, selectedMinerals, otherClaims, selectedOthers }) => {
 
   // State variables for showing results and empty result message
   const [showNokkelhulletResults, setShowNokkelhulletResults] = useState(null);
@@ -1003,6 +1003,9 @@ const Kategori3 = ({ product, handleNutrientChange, onNutritionChange, onCalcula
                   mineralClaims={mineralClaims}
                   selectedVitamins={selectedVitamins}
                   selectedMinerals={selectedMinerals}
+                  otherClaims={otherClaims}
+                  selectedOthers={selectedOthers}
+
               />
             </div>
             {infoHelsepåstander ? (

@@ -25,7 +25,7 @@ import ErrorMessageBox from "../../errorMessages.jsx";
 import * as ProductService from "../../products/ProductService";
 
 // This component is called Kategori1
-const Melk14b = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition, vitaminClaims, mineralClaims, selectedVitamins, selectedMinerals }) => {
+const Melk14b = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition, vitaminClaims, mineralClaims, selectedVitamins, selectedMinerals, otherClaims, selectedOthers }) => {
 
   // State variables for showing results and empty result message
   const [showNokkelhulletResults, setShowNokkelhulletResults] = useState(null);
@@ -920,11 +920,11 @@ const Melk14b = ({ product, handleNutrientChange, onNutritionChange, onCalculati
       {/* A simple button for adding a new product, which reloads the page on click */}  
       </div>        
       
-  <div className="col-md-6">
+  <div className="col-md-6" >
   {buttonClicked && !showResults && <ErrorMessageBox />}
 
   {/* Spacer */}
-  <div style={{ padding: "5px" }}></div>
+  <div style={{ padding: "5px",marginTop: "-350px"  }}></div>
 
   {/* Positive results nøkkelhullet container */}
   {buttonClicked && showResults && showNokkelhulletResults ? (
@@ -956,6 +956,16 @@ const Melk14b = ({ product, handleNutrientChange, onNutritionChange, onCalculati
     <div className={`container ernæringspåstander-food-result-container-${showErnaeringsResults ? 'true' : 'false'}`}
          style={{ backgroundColor: '#daecd8', borderRadius: '5px' }}>
       <ResultEfsaFulfilled
+      claimsToShow={{
+        lowEnergy: true,
+        lowFat: true,
+        fatFree: true,
+        lowSaturatedFat: true,
+        saturatedFatFree: true,
+        lowSugars: true,
+        sugarsFree: true,
+        withNoAddedSugars: true,
+        }}
         lowEnergy={lowEnergy}
         lowFat={lowFat}
         fatFree={fatFree}
@@ -970,6 +980,9 @@ const Melk14b = ({ product, handleNutrientChange, onNutritionChange, onCalculati
         mineralClaims={mineralClaims}
         selectedVitamins={selectedVitamins}
         selectedMinerals={selectedMinerals}
+        otherClaims={otherClaims}
+        selectedOthers={selectedOthers}
+
       />
     </div>
   ) : null}
@@ -983,6 +996,16 @@ const Melk14b = ({ product, handleNutrientChange, onNutritionChange, onCalculati
     style={{ backgroundColor: '#f3b7b7', borderRadius: '5px' }}
         >
       <ResultEfsaNotFulfilled
+      claimsToShow={{
+        lowEnergy: true,
+        lowFat: true,
+        fatFree: true,
+        lowSaturatedFat: true,
+        saturatedFatFree: true,
+        lowSugars: true,
+        sugarsFree: true,
+        withNoAddedSugars: true,
+        }}
         lowEnergy={lowEnergy}
         lowFat={lowFat}
         fatFree={fatFree}

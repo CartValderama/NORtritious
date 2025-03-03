@@ -443,11 +443,16 @@ const Calculator = () => {
 
   const [selectedMinerals, setSelectedVitamins] = useState([]); // for the "Minerals" selector
   const [selectedVitamins, setSelectedMinerals] = useState([]); // for the "Vitamins" selector
+  const [selectedOthers, setSelectedOthers] = useState([]); // for the "Others" selector
+
   //const [claimDescription, setClaimDescription] = useState(''); // for the health claim description
   const [vitaminClaims, setVitaminClaims] = useState([]); // for the health claim description
   const [mineralClaims, setMineralClaims] = useState([]); // for the health claim description
+  const [otherClaims, setOtherClaims] = useState([]); // for the health claim description
+
   const [showVitaminClaim, setShowVitaminClaim] = useState(false); // for the health claim description
   const [showMineralClaim, setShowMineralClaim] = useState(false); // for the health claim description
+  const [showOtherClaim, setShowOtherClaim] = useState(false); // for the health claim description
 
   const handleVitaminChange = (selectedOptions) => {
     setSelectedVitamins(selectedOptions);
@@ -456,6 +461,11 @@ const Calculator = () => {
   const handleMineralChange = (selectedOptions) => {
     setSelectedMinerals(selectedOptions);
   };
+
+  const handleOtherChange = (selectedOptions) => {
+    setSelectedOthers(selectedOptions);
+  };
+
   const selectVitamins = [
     {
       value: "Ingen",
@@ -472,6 +482,14 @@ const Calculator = () => {
     {
       value: "Riboflavin (Vitamin B2)",
       label: "Riboflavin (Vitamin B2)",
+    },
+    {
+      value: "Niacin",
+      label: "Niacin (Vitamin B3)",
+    },
+    {
+      value: "Pantothenic acid",
+      label: "Pantothenic acid (Vitamin B5)",
     },
     {
       value: "Vitamin B6",
@@ -511,8 +529,16 @@ const Calculator = () => {
       label: "Calcium",
     },
     {
+      value: "Chromium",
+      label: "Chromium",
+    },
+    {
       value: "Copper",
       label: "Copper",
+    },
+    {
+      value: "Iodine",
+      label: "Iodine",
     },
     {
       value: "Iron",
@@ -521,6 +547,14 @@ const Calculator = () => {
     {
       value: "Magnesium",
       label: "Magnesium",
+    },
+    {
+      value: "Manganese",
+      label: "Manganese",
+    },
+    {
+      value: "Molybdenum",
+      label: "Molybdenum",
     },
     {
       value: "Phosphorus",
@@ -538,26 +572,148 @@ const Calculator = () => {
       value: "Zinc",
       label: "Zinc",
     }
+  ];
+
+  const selectOthers = [
+    {
+      value: "Ingen",
+      label: "Ingen",
+    },
+    {
+      value: "Activated Charcoal",
+      label: "Activated Charcoal (min. 1g per porsjon)",
+    },
+    {
+      value: "Alpha-cyclodextrin",
+      label: "Alpha-cyclodextrin (min. 5g per 50g stivelse per porsjon)",
+    },
+    {
+      value: "Arabinoxylan produced from wheat endosperm",
+      label: "Arabinoxylan produced from wheat endosperm (min. 8g per 100g karbohydrater per porsjon)",
+    },
+    {
+      value: "Beta-glucans",
+      label: "Beta-glucans (min. 1g per porsjon)",
+    },
+    {
+      value: "Barley beta-glucans",
+      label: "Barley beta-glucans (min. 1g per porsjon)",
+    },
+    {
+      value: "Beta-glucans from oats and barley",
+      label: "Beta-glucans from oats and barley (min. 4g per 30 g karbohydrater per porsjon)",
+    },
+    {
+      value: "Betaine",
+      label: "Betaine (min. 500mg per porsjon)",
+    },
+    {
+      value: "Bitoin",
+      label: "Bitoin",
+    },
+    {
+      value: "Chloride",
+      label: "Chloride (ikke fra Sodium Chloride)",
+    },
+    {
+      value: "Eicosapentaenoic acid and docosahexaenoic acid (EPA/DHA)",
+      label: "Eicosapentaenoic acid and docosahexaenoic acid (EPA/DHA)",
+    },
+    {
+      value: "Fluoride",
+      label: "Fluoride",
+    },
+    {
+      value: "Folate",
+      label: "Folate",
+    },
+    {
+      value: "Folic Acid",
+      label: "Folic Acid (min. 400μg per daglig dose)",
+    },
+    {
+      value: "Guar Gum",
+      label: "Guar Gum (min. 10g per daglig dose)",
+    },
+    {
+      value: "Lactase enzyme",
+      label: "Lactase enzyme (min. 4500 FCC units per porsjon)",
+    },
+    {
+      value: "Lactitol",
+      label: "Lactitol (min. 10g per daglig porsjon)",
+    },
+    {
+      value: "Lactulose",
+      label: "Lactulose (min. 10g per porsjon)",
+    },
+    {
+      value: "Molybdenum",
+      label: "Molybdenum",
+    },
+    {
+      value: "Native chicory inulin",
+      label: "Native chicory inulin (min. 12g per daglig dose)",
+    },
+    {
+      value: "Oat beta-glucan",
+      label: "Oat beta-glucan (min. 1g per porsjon)",
+    },
+    {
+      value: "Olive oil polyphenols",
+      label: "Olive oil polyphenols (min. 5mg per 20g olivenolje)",
+    },
+    {
+      value: "Plant stanol esters",
+      label: "Plant stanol esters (min. 1.5-3g per daglig dose)",
+    },
+    {
+      value: "Plant sterols and plant stanols",
+      label: "Plant sterols and plant stanols (min. 0.8g per daglig dose)",
+    },
+    {
+      value: "Resistant starch",
+      label: "Resistant starch (min. 14% av total stivelse)",
+    },
+    {
+      value: "Walnuts",
+      label: "Walnuts (min. 30g per daglig dose)",
+    },
+    {
+      value: "Water",
+      label: "Water (min. 2L per daglig dose)",
+    },
+    {
+      value: "Essential Fatty Acids (ALA & LA)",
+      label: "Essential Fatty Acids (ALA & LA) (min. 2g α-linolenisk syre (ALA) og 10g linoleisk syre (LA) per daglig dose)",
+    }
 
 
   ];
-
+  // Gets the claims descriptions for every selected vitamins, and sets the state variable
   useEffect(() => {
     const descriptions = selectedVitamins.map(option => getClaimDescription(option.value));
     setVitaminClaims(descriptions);
   }, [selectedVitamins]);
 
+  // Gets the claims descriptions for every selected minerals, and sets the state variable
   useEffect(() => {
     const descriptions = selectedMinerals.map(option => getClaimDescription(option.value));
     setMineralClaims(descriptions);
     
   }, [selectedMinerals]);
 
+  // Gets the claims descriptions for every selected other type, and sets the state variable
+  useEffect(() => {
+    const descriptions = selectedOthers.map(option => getClaimDescription(option.value));
+    setOtherClaims(descriptions);
+  }, [selectedOthers]);
+
   const getClaimDescription = (selectedItem) => {
     console.log('selectedItem:', selectedItem);
     for (const nutrient of healthClaims) {
       if (nutrient.nutrient === selectedItem) {
-        return nutrient.claims.map(claim => claim.claim).join('\n');
+        return nutrient.claims.map(claim => claim.claim).join('.\n');
       }
     }
     return 'No claim found for the selected item.';
@@ -640,10 +796,13 @@ const Calculator = () => {
     e.preventDefault();
 
     const vitaminClaimDescriptions = vitaminClaims.map((description, index) => 
-      `<strong>${selectedVitamins[index].label} Claim Description:</strong> ${description}`
+      `<strong>${selectedVitamins[index].label} Claim Description:</strong>\n${description}`
     ).join('\n');
     const mineralClaimDescriptions = mineralClaims.map((description, index) => 
-      `<strong>${selectedMinerals[index].label} Claim Description:</strong> ${description}`
+      `<strong>${selectedMinerals[index].label} Claim Description:</strong>\n${description}`
+    ).join('\n');
+    const otherClaimDescriptions = otherClaims.map((description, index) =>
+      `<strong>${selectedOthers[index].label} Claim Description:</strong>\n${description}`
     ).join('\n');
 
 
@@ -654,7 +813,7 @@ const Calculator = () => {
     // Sets EFSA nutritin claims
     product.hasEfsaNutrition = hasEfsaNutrition;
     // Sets EFSA health claims
-    product.hasEfsaHealth = `${vitaminClaimDescriptions}\n${mineralClaimDescriptions}`;//mineralClaimDescription+vitaminClaimDescription;
+    product.hasEfsaHealth = `${vitaminClaimDescriptions}\n${mineralClaimDescriptions}\n${otherClaimDescriptions}`;//mineralClaimDescription+vitaminClaimDescription;
 
     // Checks if input values are KJ or Kcal
     const calories = nutrition.energikcal !== '' ? nutrition.energikcal : nutrition.energikj;
@@ -1023,14 +1182,25 @@ const Calculator = () => {
 
           {/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/}
           {/* These are added inputs for Health Claims */}
+          <Container style={{border: '1px solid #ccc', padding: '10px', borderRadius: '5px', marginTop: '10px', marginBottom: '10px', backgroundColor: '#f9f9f9'}}>
+          <h4>
+            <img 
+              alt="EFSA Logo"
+              className=""
+              style={{ width: '30px', height: '30px', float: 'left' }}
+              src={`${API_URL}/images/efsaLogo.png`}
+            />
+            &nbsp;EFSA Helsepåstander
+          </h4>
+          <hr/>
           <Row className="mb-3">
           <Col xs={12} md={6}>
             <label htmlFor="vitamins" className="form-label">
-              <strong>Vitaminer</strong>
+              <strong>Kilde til Vitaminer</strong>
             </label>
             <CustomSelect
               isMulti
-              placeholder={<div>Velg Vitamin</div>}
+              placeholder={<div>Velg Vitaminer</div>}
               className="form-select-md"
               onChange={handleVitaminChange}
               options={selectVitamins}
@@ -1038,17 +1208,35 @@ const Calculator = () => {
           </Col>
           <Col xs={12} md={6}>
             <label htmlFor="minerals" className="form-label">
-              <strong>Mineraler</strong>
+              <strong>Kilde til Mineraler</strong>
             </label>
             <CustomSelect
               isMulti
-              placeholder={<div>Velg Mineral</div>}
+              placeholder={<div>Velg Mineraler</div>}
               className="form-select-md"
               onChange={handleMineralChange}
               options={selectMinerals}
             />
           </Col>
         </Row>
+
+        <Row className="mb-3">
+          <Col>
+            <label htmlFor="others" className="form-label">
+              <strong>Kilde til Annet</strong>
+            </label>
+            <CustomSelect
+              isMulti
+              placeholder={<div>Velg Andre</div>}
+              className="form-select-md"
+              onChange={handleOtherChange}
+              options={selectOthers}
+            />
+          </Col>
+        </Row>
+        </Container>
+
+
 
         </div>
 
@@ -1099,7 +1287,9 @@ const Calculator = () => {
             vitaminClaims={vitaminClaims}
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
-            selectedMinerals={selectedMinerals}/>
+            selectedMinerals={selectedMinerals}
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {/* Display component for Kategori2 if group is selected as grønnsaker, frukt, bær og nøtter and Kategori2 is selected as product */}
           {selectsGroup === "grønnsaker, frukt, bær og nøtter" &&
@@ -1108,7 +1298,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
 
           {/* Display component for Kategori3 if group is selected as grønnsaker, frukt, bær og nøtter and Kategori3 is selected as product */}
@@ -1118,7 +1309,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
 
           {/* Display default component if group is selected as mel, gryn og ris but no product is selected */}
@@ -1132,7 +1324,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {/* Display component for Kategori5 if group is selected as mel, gryn og ris and Kategori5 is selected as product */}
           {selectsGroup === "mel, gryn og ris" &&
@@ -1141,7 +1334,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {/* Display component for Kategori6 if group is selected as mel, gryn og ris and Kategori6 is selected as product */}
           {selectsGroup === "mel, gryn og ris" &&
@@ -1150,7 +1344,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
 
           {/* Display default component if group is selected as grøt, brød og pasta but no product is selected */}
@@ -1164,7 +1359,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {/* Display component for kategori 8a if group is selected as grøt, brød og pasta and product is kategori 8a */}
           {selectsGroup === "grøt, brød og pasta" &&
@@ -1173,7 +1369,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {/* Display component for kategori 8b if group is selected as grøt, brød og pasta and product is kategori 8b */}
           {selectsGroup === "grøt, brød og pasta" &&
@@ -1182,7 +1379,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {/* Display component for kategori 9 if group is selected as grøt, brød og pasta and product is kategori 9 */}
           {selectsGroup === "grøt, brød og pasta" &&
@@ -1191,7 +1389,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {/* Display component for kategori 10 if group is selected as grøt, brød og pasta and product is kategori 10 */}
           {selectsGroup === "grøt, brød og pasta" &&
@@ -1200,7 +1399,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
 
           {/* Display default component if group is selected as melk kategori but no product is selected */}
@@ -1214,7 +1414,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {/* Display component for melk 11b if group is selected as melk kategori and product is melk 11b */}
           {selectsGroup === "melk kategori" &&
@@ -1223,7 +1424,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {/* Display component for melk 12a if group is selected as melk kategori and product is melk 12a */}
           {selectsGroup === "melk kategori" &&
@@ -1232,7 +1434,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {/* Display component for melk 12b if group is selected as melk kategori and product is melk 12b */}
           {selectsGroup === "melk kategori" &&
@@ -1241,7 +1444,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {/* Display component for melk 13a if group is selected as melk kategori and product is melk 13a */}
           {selectsGroup === "melk kategori" &&
@@ -1250,7 +1454,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {/* Display component for melk 13b if group is selected as melk kategori and product is melk 13b */}
           {selectsGroup === "melk kategori" &&
@@ -1259,7 +1464,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {/* Display component for melk 14a if group is selected as melk kategori and product is melk 14a */}
           {selectsGroup === "melk kategori" &&
@@ -1268,7 +1474,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {/* Display component for melk 14b if group is selected as melk kategori and product is melk 14b */}
           {selectsGroup === "melk kategori" &&
@@ -1277,7 +1484,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {/* Display component for melk 15a if group is selected as melk kategori and product is melk 15a */}
           {selectsGroup === "melk kategori" &&
@@ -1286,7 +1494,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {/* Display component for melk 15b if group is selected as melk kategori and product is melk 15b */}
           {selectsGroup === "melk kategori" &&
@@ -1295,7 +1504,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
 
           {/* Repeat the above conditional rendering code that renders a different component based on the user's selection of product category, group, and subcategory.  */}
@@ -1307,7 +1517,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {selectsGroup === "ost og vegetabilske alternativer" &&
             selectsProduct === "kategori 17" && <Kategori17 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
@@ -1315,7 +1526,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {selectsGroup === "ost og vegetabilske alternativer" &&
             selectsProduct === "kategori 18" && <Kategori18 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
@@ -1323,7 +1535,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
 
           {selectsGroup === "matfett og oljer" && selectsProduct === "" && (
@@ -1335,7 +1548,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {selectsGroup === "matfett og oljer" &&
             selectsProduct === "kategori 20" && <Kategori20 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
@@ -1343,7 +1557,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
 
           {selectsGroup === "fiskerivarer og produkter av fiskerivarer" &&
@@ -1354,7 +1569,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {selectsGroup === "fiskerivarer og produkter av fiskerivarer" &&
             selectsProduct === "kategori 22" &&
@@ -1366,7 +1582,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {selectsGroup === "fiskerivarer og produkter av fiskerivarer" &&
             selectsProduct === "kategori 22" &&
@@ -1375,7 +1592,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {selectsGroup === "fiskerivarer og produkter av fiskerivarer" &&
             selectsProduct === "kategori 22" &&
@@ -1384,7 +1602,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {selectsGroup === "fiskerivarer og produkter av fiskerivarer" &&
             selectsProduct === "kategori 22" &&
@@ -1393,7 +1612,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
 
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
@@ -1404,7 +1624,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
 
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
@@ -1414,7 +1635,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
@@ -1428,7 +1650,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
@@ -1438,7 +1661,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
 
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
@@ -1453,7 +1677,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
@@ -1463,7 +1688,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
@@ -1473,7 +1699,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
@@ -1483,7 +1710,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
 
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
@@ -1498,7 +1726,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
@@ -1508,7 +1737,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
 
           {selectsGroup === "helt eller delvis vegetabilske produkter" &&
@@ -1523,7 +1753,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {selectsGroup === "helt eller delvis vegetabilske produkter" &&
             selectsProduct === "kategori 25" &&
@@ -1532,7 +1763,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
 
           {selectsGroup === "ferdigretter" && selectsProduct === "" && (
@@ -1544,7 +1776,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {selectsGroup === "ferdigretter" &&
             selectsProduct === "kategori 27" && <Kategori27 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
@@ -1552,7 +1785,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {selectsGroup === "ferdigretter" &&
             selectsProduct === "kategori 28" && <Kategori28 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
@@ -1560,7 +1794,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {selectsGroup === "ferdigretter" &&
             selectsProduct === "kategori 29" && <Kategori29 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
@@ -1568,7 +1803,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {selectsGroup === "ferdigretter" &&
             selectsProduct === "kategori 30" && <Kategori30 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
@@ -1576,7 +1812,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
 
           {selectsGroup === "dressinger og sauser" && selectsProduct === "" && (
@@ -1588,7 +1825,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
           {selectsGroup === "dressinger og sauser" &&
             selectsProduct === "kategori 32" && <Kategori32 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
@@ -1596,7 +1834,8 @@ const Calculator = () => {
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
-            />
+            otherClaims={otherClaims}
+            selectedOthers={selectedOthers}/>
           }
 
           {/*{isCalculationCompleted && (

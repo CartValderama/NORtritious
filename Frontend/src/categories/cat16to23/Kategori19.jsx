@@ -20,7 +20,7 @@ import * as Check from "../../NutritionClaimCheck.jsx"
 // ResultEfsaFullfilled og notFullfilled må implementers 
 import {ResultEfsaFulfilled, ResultEfsaHealthClaims, ResultEfsaNotFulfilled} from '../../ResultEfsaClaims.jsx'; // EFSA claims
 
-const Kategori19 = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition, vitaminClaims, mineralClaims, selectedVitamins, selectedMinerals }) => {
+const Kategori19 = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition, vitaminClaims, mineralClaims, selectedVitamins, selectedMinerals, otherClaims, selectedOthers }) => {
 
   // State variables for showing results and empty result message
   const [showNokkelhulletResults, setShowNokkelhulletResults] = useState(null);
@@ -1026,6 +1026,9 @@ const Kategori19 = ({ product, handleNutrientChange, onNutritionChange, onCalcul
                   mineralClaims={mineralClaims}
                   selectedVitamins={selectedVitamins}
                   selectedMinerals={selectedMinerals}
+                  otherClaims={otherClaims}
+                  selectedOthers={selectedOthers}
+
               />
               
             </div>

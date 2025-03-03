@@ -8,6 +8,10 @@
     background-color: #e9ecef;
     transition: 0.3s;
 }
+.vitamins.active {
+    background-color: #e9ecef;
+    transition: 0.3s;
+}
 
 .minerals{
     margin-top: 5px;
@@ -17,6 +21,10 @@
 }
 .minerals:hover {
     background-color: #e9ecef;
+}
+.minerals.active{
+    background-color: #e9ecef;
+    transition: 0.3s;
 }
 
 .vitamin-claims{
@@ -35,7 +43,29 @@
 .mineral-claims::after{
     transition: 0.3s;
 }
+.others{
+    margin-top: 5px;
+    padding: 5px;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+.others:hover {
+    background-color: #e9ecef;
+}
+.others.active{
+    background-color: #e9ecef;
+    transition: 0.3s;
+}
+.other-claims{
+    padding: 5px;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
 
 .notFullfilledContent{
-    padding: 5px;
+    padding: 2px;
+    flex-wrap: nowrap;
+
 }
+
