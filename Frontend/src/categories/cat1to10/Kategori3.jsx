@@ -21,7 +21,22 @@ import * as ProductService from "../../products/ProductService";
 import {ResultEfsaFulfilled, ResultEfsaHealthClaims, ResultEfsaNotFulfilled} from '../../ResultEfsaClaims.jsx'; // EFSA claims
 
 // This component is called Kategori3
-const Kategori3 = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition, vitaminClaims, mineralClaims, selectedVitamins, selectedMinerals, otherClaims, selectedOthers }) => {
+const Kategori3 = ({ product,  
+  handleNutrientChange, 
+  onNutritionChange, 
+  onCalculationComplete, 
+  hasNokkelhullet, 
+  hasEfsaNutrition, 
+  vitaminClaims, 
+  mineralClaims, 
+  selectedVitamins, 
+  selectedMinerals, 
+  otherClaims, 
+  selectedOthers, 
+  hasLowSugar, 
+  hasSugarsFree, 
+  meetsReqClaims, 
+  selectedMeetsReqs }) => {
 
   // State variables for showing results and empty result message
   const [showNokkelhulletResults, setShowNokkelhulletResults] = useState(null);
@@ -359,6 +374,18 @@ const Kategori3 = ({ product, handleNutrientChange, onNutritionChange, onCalcula
     setLowSugars(Check.claimLowSugars(foodType, nutrition.naturligSukker, nutrition.hvoravSukkerarter))
     setSugarsFree(Check.claimSugarsFree(nutrition.naturligSukker, nutrition.hvoravSukkerarter))
     setWithNoAddedSugars(Check.ClaimWithNoAddedSugars(nutrition.karbohydrat, nutrition.hvoravSukkerarter))
+
+    if (Check.claimLowSugars(foodType, nutrition.naturligSukker, nutrition.hvoravSukkerarter)) {
+      hasLowSugar(true);
+    } else {
+      hasLowSugar(false);
+    }
+    if (Check.claimSugarsFree(nutrition.naturligSukker, nutrition.hvoravSukkerarter)) {
+      hasSugarsFree(true);
+    } else {
+      hasSugarsFree(false);
+    }
+    
 
     // Check for the "LOW SUGARS" claim
     if (foodType === "solid" && parseFloat(nutrition.karbohydrat) <= 5) {
@@ -1005,7 +1032,8 @@ const Kategori3 = ({ product, handleNutrientChange, onNutritionChange, onCalcula
                   selectedMinerals={selectedMinerals}
                   otherClaims={otherClaims}
                   selectedOthers={selectedOthers}
-
+                  meetsReqClaims={meetsReqClaims}
+                  selectedMeetsReqs={selectedMeetsReqs}
               />
             </div>
             {infoHelsepåstander ? (

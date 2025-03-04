@@ -101,7 +101,8 @@ export const claimSugarsFree = function(naturalSugars, addedSugars){
 
 // Claim: 10. With no added sugars
 export const ClaimWithNoAddedSugars = function(carbohydrate, addedSugars){
-    if (carbohydrate > 0 && addedSugars ==="0"){
+    // 2025 group - changes from '0' to 0 because it's a number, not a string
+    if (carbohydrate > 0 && addedSugars === 0){
         return true
     }
     else {
@@ -110,11 +111,12 @@ export const ClaimWithNoAddedSugars = function(carbohydrate, addedSugars){
 }
 
 // Claim: 18: High Fibre
-export const claimHighFibre = function(kostfiber, fibreUnit, energyUnit){
-    if (fibreUnit === "g" && energyUnit === "kcal"){
-        if (kostfiber >= 6){
+// 2025 group - added energyamount as a parameter to see if it's less than 100 kcal
+export const claimHighFibre = function(measureUnit, kostfiber, energyUnit, energyAmount){
+    if (measureUnit === 'g' && energyUnit === "kcal"){
+        if (kostfiber >= 6 && energyAmount < 100){
             return true
-        } else if (kostfiber >= 3){
+        } else if (kostfiber >= 3 && energyAmount >= 100){
             return true;
         }
         return false
@@ -122,16 +124,18 @@ export const claimHighFibre = function(kostfiber, fibreUnit, energyUnit){
 }
 
 //Claim: 19: Proteinsource
+// 2025 group - changed from  -> else return false; to -> return false;
 export const claimSourceOfProtein = function(energy){
     if (energy >= 12){
         return true;
-    }else 
-        return false;
+    }
+    return false;
 }
 
 // Claim 23.1: Reduced [Fat]
 export const claimReducedFat = function(fat){
-    if(fat >= (3 - (fat * 0.3))){ return true }
+    // 2025 group - Changed from >= to <= because otherwise it doesn't make sense
+    if(fat <= (3 - (fat * 0.3))){ return true }
     else { return false }
 }
 

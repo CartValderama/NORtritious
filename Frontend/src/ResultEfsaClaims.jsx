@@ -33,7 +33,8 @@ const InfoSection = ({ onClose }) => (
   </div>
 );
 
-function ResultEfsaFulfilled({ claimsToShow, lowEnergy, lowFat, fatFree, lowSaturatedFat, saturatedFatFree, lowSugars, sugarsFree, withNoAddedSugars, highFibre, SourceOfProtein, reducedFat, reducedSaturatedFat, reducedSalt }) {
+// Changes from upper to lowercase for sourceOfProtein
+function ResultEfsaFulfilled({ claimsToShow, lowEnergy, lowFat, fatFree, lowSaturatedFat, saturatedFatFree, lowSugars, sugarsFree, withNoAddedSugars, highFibre, sourceOfProtein, reducedFat, reducedSaturatedFat, reducedSalt }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [infoEfsa, setInfoEfsa] = useState(false);
 
@@ -80,7 +81,7 @@ function ResultEfsaFulfilled({ claimsToShow, lowEnergy, lowFat, fatFree, lowSatu
             {claimsToShow.sugarsFree && <ResultComponents.ClaimSugarsFreeResult sugarsFree={sugarsFree} />}
             {claimsToShow.withNoAddedSugars && <ResultComponents.ClaimWithNoAddedSugarsResult withNoAddedSugars={withNoAddedSugars} />}
             {claimsToShow.highFibre && <ResultComponents.ClaimHighFibreResult highFibre={highFibre} />}
-            {claimsToShow.SourceOfProtein && <ResultComponents.ClaimSourceOfProteinResult SourceOfProtein={SourceOfProtein}/>}
+            {claimsToShow.sourceOfProtein && <ResultComponents.ClaimSourceOfProteinResult sourceOfProtein={sourceOfProtein}/>}
             {claimsToShow.reducedFat && <ResultComponents.ClaimReducedFatResult reducedFat={reducedFat}/>}
             {claimsToShow.reducedSaturatedFat && <ResultComponents.ClaimReducedSaturatedFatResult reducedSaturatedFat={reducedSaturatedFat}/>}
             {claimsToShow.reducedSalt && <ResultComponents.ClaimReducedSaltResult reducedSalt={reducedSalt}/>}
@@ -92,7 +93,7 @@ function ResultEfsaFulfilled({ claimsToShow, lowEnergy, lowFat, fatFree, lowSatu
   );
 }
 
-function ResultEfsaNotFulfilled({ claimsToShow, lowEnergy, lowFat, fatFree, lowSaturatedFat, saturatedFatFree, lowSugars, sugarsFree, withNoAddedSugars, highFibre, SourceOfProtein, reducedFat, reducedSaturatedFat, reducedSalt }) {
+function ResultEfsaNotFulfilled({ claimsToShow, lowEnergy, lowFat, fatFree, lowSaturatedFat, saturatedFatFree, lowSugars, sugarsFree, withNoAddedSugars, highFibre, sourceOfProtein, reducedFat, reducedSaturatedFat, reducedSalt }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [infoEfsa, setInfoEfsa] = useState(false);
   const toggleExpanded = () => { setIsExpanded(!isExpanded); };
@@ -158,7 +159,7 @@ function ResultEfsaNotFulfilled({ claimsToShow, lowEnergy, lowFat, fatFree, lowS
             {claimsToShow.highFibre && !highFibre && <ResultComponents.ClaimHighFibreResult highFibre={highFibre} />}
             </div>
             <div className='notFullfilledContent'>
-            {claimsToShow.SourceOfProtein && !SourceOfProtein && <ResultComponents.ClaimSourceOfProteinResult SourceOfProtein={SourceOfProtein}/>}
+            {claimsToShow.sourceOfProtein && !sourceOfProtein && <ResultComponents.ClaimSourceOfProteinResult sourceOfProtein={sourceOfProtein}/>}
             </div>
             <div className='notFullfilledContent'>
             {claimsToShow.reducedFat && !reducedFat && <ResultComponents.ClaimReducedFatResult reducedFat={reducedFat}/>}
@@ -177,13 +178,13 @@ function ResultEfsaNotFulfilled({ claimsToShow, lowEnergy, lowFat, fatFree, lowS
 }
 
 
-function ResultEfsaHealthClaims({ vitaminClaims, mineralClaims, otherClaims, selectedVitamins, selectedMinerals, selectedOthers }) {
+function ResultEfsaHealthClaims({ vitaminClaims, mineralClaims, otherClaims, selectedVitamins, selectedMinerals, selectedOthers, meetsReqClaims, selectedMeetsReqs }) {
   //const [showVitaminClaim, setShowVitaminClaim] = useState(false);
   //const [showMineralClaim, setShowMineralClaim] = useState(false);
   const [visibleVitaminClaims, setVisibleVitaminClaims] = useState({});
   const [visibleMineralClaims, setVisibleMineralClaims] = useState({});
   const [visibleOtherClaims, setVisibleOtherClaims] = useState({});
-
+  const [visibleMeetsReqClaims, setVisibleMeetsReqClaims] = useState({});
   // These two useEffects are neccessary to avoid uncaught Type Errors,
   // The selectedVitamins and selectedMinerals are empty arrays, 
   // so if an object that is visible is removed from the list, the visibility state will not be reset. 
@@ -220,6 +221,17 @@ function ResultEfsaHealthClaims({ vitaminClaims, mineralClaims, otherClaims, sel
     });
   }, [selectedOthers]);
 
+  useEffect(() => {
+    // Resets visibility state for requirements
+    setVisibleMeetsReqClaims((prevState) => {
+      const newState = {};
+      selectedMeetsReqs.forEach((_, index) => {
+        newState[index] = prevState[index] || false;
+      });
+      return newState;
+    });
+  }, [selectedMeetsReqs]);
+
   // Toggles visibility of individual vitamin claims, sorted by index
   const toggleVitaminClaim = (index) => {
     setVisibleVitaminClaims((prevState) => ({
@@ -239,6 +251,14 @@ function ResultEfsaHealthClaims({ vitaminClaims, mineralClaims, otherClaims, sel
   // Toggles visibility of individual other claims, sorted by index
   const toggleOtherClaim = (index) => {
     setVisibleOtherClaims((prevState) => ({
+      ...prevState,
+      [index]: !prevState[index],
+    }));
+  };
+
+  // Toggles visibility of individual req claims, sorted by index
+  const toggleMeetReqClaim = (index) => {
+    setVisibleMeetsReqClaims((prevState) => ({
       ...prevState,
       [index]: !prevState[index],
     }));
@@ -333,6 +353,32 @@ function ResultEfsaHealthClaims({ vitaminClaims, mineralClaims, otherClaims, sel
                 ))}
                 </>
                 )}
+
+                <br/>
+                {meetsReqClaims.length > 0 && (
+                <>
+                {meetsReqClaims.map((description, index) => (
+                  <div key={index}>
+                  <div style={{display: 'flex', alignItems: 'center', cursor: 'pointer'}} className={`minerals mb-2 ${visibleMeetsReqClaims[index] ? 'active' : ''}`} onClick={() => toggleMeetReqClaim(index)}>
+                    <h6 className='mb-0'>{visibleMeetsReqClaims[index] ? 'Gjem' : 'Vis'} Påstander for {selectedMeetsReqs[index]?.label}</h6>
+                    <FontAwesomeIcon icon={visibleMeetsReqClaims[index] ? faChevronUp : faChevronDown} className='ms-auto'/>
+                  </div>
+                  <div className="mineral-claims">
+                  {visibleMeetsReqClaims[index] && (
+                    <div>
+                        <p>
+                          <strong>Gjeldende Helsepåstander for {selectedMeetsReqs[index]?.label}: <br/></strong>
+                          {description}
+                        </p>
+                    </div>
+                  )}
+                  </div>
+                  </div>
+                ))}
+                </>
+                )}
+                
+
               </div>
             </div>
           </div>

@@ -25,7 +25,24 @@ import ErrorEfsaClaims from "../../errorMessages.jsx";
 import ErrorMessageBox from "../../errorMessages.jsx";
 import * as ProductService from "../../products/ProductService";
 
-const Kategori27 = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition, vitaminClaims, mineralClaims, selectedVitamins, selectedMinerals, otherClaims, selectedOthers }) => {
+const Kategori27 = ({ product, 
+  handleNutrientChange, 
+  onNutritionChange, 
+  onCalculationComplete, 
+  hasNokkelhullet, 
+  hasEfsaNutrition, 
+  vitaminClaims, 
+  mineralClaims, 
+  selectedVitamins, 
+  selectedMinerals, 
+  otherClaims, 
+  selectedOthers, 
+  hasLowSugar, 
+  hasSugarsFree,
+  hasLowSatFat, 
+  meetsReqClaims, 
+  selectedMeetsReqs }) => {
+
 
   // State variables for showing results and empty result message
   const [showNokkelhulletResults, setShowNokkelhulletResults] = useState(null);
@@ -64,7 +81,7 @@ const Kategori27 = ({ product, handleNutrientChange, onNutritionChange, onCalcul
       nutrition.salt
 
         // containsNaturallyOccurringSugars, // Uncomment if this condition is also to be checked
-      ].every(condition => condition); // `every` returns true only if all conditions are truthy
+      ].every(condition => condition !== null && condition !== undefined); // `every` returns true only if all conditions are truthy
   
       setShowResults(isEveryInputFilled); // True if all inputs are filled, false if any is empty
   
@@ -411,6 +428,23 @@ const Kategori27 = ({ product, handleNutrientChange, onNutritionChange, onCalcul
     setSugarsFree(Check.claimSugarsFree(nutrition.naturligSukker, nutrition.hvoravSukkerarter))
     setWithNoAddedSugars(Check.ClaimWithNoAddedSugars(nutrition.karbohydrat, nutrition.hvoravSukkerarter))
 
+
+    if (Check.claimLowSugars(foodType, nutrition.naturligSukker, nutrition.hvoravSukkerarter)) {
+      hasLowSugar(true);
+    } else {
+      hasLowSugar(false);
+    }
+    if (Check.claimSugarsFree(nutrition.naturligSukker, nutrition.hvoravSukkerarter)) {
+      hasSugarsFree(true);
+    } else {
+      hasSugarsFree(false);
+    }
+    if (Check.claimLowSaturatedFat(foodType, selectsPart, nutrition.mettede, nutrition.energikcal, nutrition.energikj)) {
+      hasLowSatFat(true);
+    } else {
+      hasLowSatFat(false);
+    }
+    
   };
 
   // create an array of energy units to select from
@@ -938,7 +972,8 @@ const Kategori27 = ({ product, handleNutrientChange, onNutritionChange, onCalcul
         selectedMinerals={selectedMinerals}
         otherClaims={otherClaims}
         selectedOthers={selectedOthers}
-
+        meetsReqClaims={meetsReqClaims}
+        selectedMeetsReqs={selectedMeetsReqs}
       />
     </div>
   ) : null}

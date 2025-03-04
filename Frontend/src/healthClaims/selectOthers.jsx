@@ -110,6 +110,10 @@ const selectOthers = [
     {
       value: "Essential Fatty Acids (ALA & LA)",
       label: "Essential Fatty Acids (ALA & LA) (min. 2g α-linolenisk syre (ALA) og 10g linoleisk syre (LA) per daglig dose)",
+    },
+    {
+      value: "Alpha-linolenic acid (ALA)",
+      label: "Alpha-linolenic acid (ALA) (kilde av omega 3 syrer. 2g per daglig dose,)",
     }
 ];
 

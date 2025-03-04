@@ -75,6 +75,7 @@ import { ResultEfsaHealthClaims } from "./ResultEfsaClaims";
 import selectOthers from "./healthClaims/selectOthers";
 import selectVitamins from "./healthClaims/selectVitamins";
 import selectMinerals from "./healthClaims/selectMinerals";
+import selectMeetsReqs from "./healthClaims/selectMeetsReqs";
 
 // This code defines the options for four selectors, one for food groups and one for food categories within those groups and one for the sub foodcategories within those categories and the same logic for the last selector.
 const Calculator = () => {
@@ -443,17 +444,23 @@ const Calculator = () => {
     Add types under selectVitamins and selectMinerals to add more inputs
     useEffects keep track of the selected item and updates the health claim description with corresponding claim.
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    */ 
+  */ 
 
   const [selectedMinerals, setSelectedVitamins] = useState([]); // for the "Minerals" selector
   const [selectedVitamins, setSelectedMinerals] = useState([]); // for the "Vitamins" selector
   const [selectedOthers, setSelectedOthers] = useState([]); // for the "Others" selector
-
+  const [selectedMeetsReqs, setSelectedMeetsReqs] = useState([]); // for the "Meets requirements" checkbox
   //const [claimDescription, setClaimDescription] = useState(''); // for the health claim description
   const [vitaminClaims, setVitaminClaims] = useState([]); // for the health claim description
   const [mineralClaims, setMineralClaims] = useState([]); // for the health claim description
   const [otherClaims, setOtherClaims] = useState([]); // for the health claim description
-
+  const [meetsReqsClaims, setMeetsReqsClaims] = useState([]); // for the health claim description
+  
+  const [hasLowSatFat, setHasLowSatFat] = useState(false); // for the health claim description
+  const [hasLowSalt, setHasLowSalt] = useState(false); // for the health claim description
+  const [hasSugarsFree, setHasSugarsFree] = useState(false); // for the health claim description
+  const [hasLowSugar, setHasLowSugar] = useState(false); // for the health claim description
+  const [hasHighFibre, setHasHighFibre] = useState(false); // for the health claim description
   const [showVitaminClaim, setShowVitaminClaim] = useState(false); // for the health claim description
   const [showMineralClaim, setShowMineralClaim] = useState(false); // for the health claim description
   const [showOtherClaim, setShowOtherClaim] = useState(false); // for the health claim description
@@ -471,6 +478,61 @@ const Calculator = () => {
   };
 
   
+  // Checks if product meets requirements for high fibre claims
+  const handleHighFibreClaims = (value) => {
+    if (value === true) {
+      setHasHighFibre(true);
+    } else {
+      console.log('Not high fibre:', value);
+      setHasHighFibre(false);
+      setSelectedMeetsReqs(prevstate => prevstate.filter(option => option.requirement !== 'high_fibre'));
+    }
+  };
+
+  // Checks if product meets requirements for low sugar claims
+  const handleLowSugarClaims = (value) => {
+    if (value === true) {
+      setHasLowSugar(true);
+    } else {
+      console.log('Not low sugar:', value);
+      setHasLowSugar(false);
+      setSelectedMeetsReqs(prevstate => prevstate.filter(option => option.requirement !== 'low_sugar'));
+    }
+  };
+
+  // Checks if product meets requirements for sugar free claims
+  const handleSugarsFreeClaims = (value) => {
+    if (value === true) {
+      setHasSugarsFree(true);
+    } else {
+      console.log('Not sugar free:', value);
+      setHasSugarsFree(false);
+      setSelectedMeetsReqs(prevstate => prevstate.filter(option => option.requirement !== 'sugars_free'));
+    }
+  };
+
+  // Checks if product meets requirements for low salt claims and sets various states
+  const handleLowSaltClaims = (value) => {
+    if (value === true) {
+      setHasLowSalt(true);
+    } else {
+      console.log('Not low salt:', value);
+      setHasLowSalt(false);
+      setSelectedMeetsReqs(prevstate => prevstate.filter(option => option.requirement !== 'low_salt'));
+    }
+  };
+
+  // Checks if product meets requirements for low saturated fat claims
+  const handleLowSatFatClaims = (value) => {
+    if (value === true) {
+      setHasLowSatFat(true);
+    } else {
+      console.log('Not low sat fat:', value);
+      setHasLowSatFat(false);
+      setSelectedMeetsReqs(prevstate => prevstate.filter(option => option.requirement !== 'low_saturated_fat'));
+    }
+  };
+
   // Gets the claims descriptions for every selected vitamins, and sets the state variable
   useEffect(() => {
     const descriptions = selectedVitamins.map(option => getClaimDescription(option.value));
@@ -481,7 +543,6 @@ const Calculator = () => {
   useEffect(() => {
     const descriptions = selectedMinerals.map(option => getClaimDescription(option.value));
     setMineralClaims(descriptions);
-    
   }, [selectedMinerals]);
 
   // Gets the claims descriptions for every selected other type, and sets the state variable
@@ -490,8 +551,15 @@ const Calculator = () => {
     setOtherClaims(descriptions);
   }, [selectedOthers]);
 
+  // Gets the claims descriptions for every requirement met, and sets the state variable
+  useEffect(() => {
+    const descriptions = selectedMeetsReqs.map(option => getClaimDescription(option.value));
+    setMeetsReqsClaims(descriptions);
+  }, [selectedMeetsReqs]);
+
   const getClaimDescription = (selectedItem) => {
     console.log('selectedItem:', selectedItem);
+    // Itererer gjennom helsepåstander for å finne riktig påstand for valgt vitamin/mineral/andre og returnerer en toString
     for (const nutrient of healthClaims) {
       if (nutrient.nutrient === selectedItem) {
         return nutrient.claims.map(claim => claim.claim).join('.\n');
@@ -499,6 +567,8 @@ const Calculator = () => {
     }
     return 'No claim found for the selected item.';
   };
+
+
 
 
   // Define state variables for the dropdown selectors
@@ -585,6 +655,9 @@ const Calculator = () => {
     const otherClaimDescriptions = otherClaims.map((description, index) =>
       `<strong>${selectedOthers[index].label} Claim Description:</strong>\n${description}`
     ).join('\n');
+    const meetsReqsClaimDescriptions = meetsReqsClaims.map((description, index) =>
+      `<strong>${selectedMeetsReqs[index].label} Claim Description:</strong>\n${description}`
+    ).join('\n');
 
 
     // Check if the product has the Nøkkelhullet label
@@ -594,7 +667,7 @@ const Calculator = () => {
     // Sets EFSA nutritin claims
     product.hasEfsaNutrition = hasEfsaNutrition;
     // Sets EFSA health claims
-    product.hasEfsaHealth = `${vitaminClaimDescriptions}\n${mineralClaimDescriptions}\n${otherClaimDescriptions}`;//mineralClaimDescription+vitaminClaimDescription;
+    product.hasEfsaHealth = `${vitaminClaimDescriptions}\n${mineralClaimDescriptions}\n${otherClaimDescriptions}\n${meetsReqsClaimDescriptions}`;//mineralClaimDescription+vitaminClaimDescription;
 
     // Checks if input values are KJ or Kcal
     const calories = nutrition.energikcal !== '' ? nutrition.energikcal : nutrition.energikj;
@@ -675,6 +748,27 @@ const Calculator = () => {
   const handleEfsaNutrition = (value) => {
     setHasEfsaNutrition(value);
   };
+
+  // Filter options based on the high fiber and low sugar requirements
+  const filteredOptions = selectMeetsReqs.filter(option => {
+    if (option.requirement === 'high_fibre' && hasHighFibre) {
+      return true;
+    }
+    if (option.requirement === 'low_sugar' && hasLowSugar) {
+      return true;
+    }
+    if (option.requirement === 'sugars_free' && hasSugarsFree) {
+      return true;
+    }
+    if (option.requirement === 'low_salt' && hasLowSalt) {
+      return true;
+    }
+    if (option.requirement === 'low_saturated_fat' && hasLowSatFat) {
+      return true;
+    }
+    return false;
+  });
+
 
   // This component returns a form that allows users to input nutritional data for a food item.
   // It includes various fields for selecting the food name, food group, and food category.
@@ -1015,6 +1109,21 @@ const Calculator = () => {
             />
           </Col>
         </Row>
+        <Row className="mb-3">
+          <Col>
+            <label htmlFor="reqs" className="form-label">
+              <strong>Møter EFSA Næringskrav</strong>
+            </label>
+            <CustomSelect
+              isMulti
+              placeholder={<div>Velg Muligheter</div>}
+              className="form-select-md"
+              onChange={setSelectedMeetsReqs}
+              options={filteredOptions}
+              value={selectedMeetsReqs}
+            />
+          </Col>
+        </Row>
         </Container>
 
 
@@ -1070,7 +1179,15 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}
+            /> 
           }
           {/* Display component for Kategori2 if group is selected as grønnsaker, frukt, bær og nøtter and Kategori2 is selected as product */}
           {selectsGroup === "grønnsaker, frukt, bær og nøtter" &&
@@ -1080,7 +1197,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
 
           {/* Display component for Kategori3 if group is selected as grønnsaker, frukt, bær og nøtter and Kategori3 is selected as product */}
@@ -1091,7 +1215,15 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}
+            />
           }
 
           {/* Display default component if group is selected as mel, gryn og ris but no product is selected */}
@@ -1106,7 +1238,13 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {/* Display component for Kategori5 if group is selected as mel, gryn og ris and Kategori5 is selected as product */}
           {selectsGroup === "mel, gryn og ris" &&
@@ -1116,7 +1254,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {/* Display component for Kategori6 if group is selected as mel, gryn og ris and Kategori6 is selected as product */}
           {selectsGroup === "mel, gryn og ris" &&
@@ -1126,7 +1271,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
 
           {/* Display default component if group is selected as grøt, brød og pasta but no product is selected */}
@@ -1141,7 +1293,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {/* Display component for kategori 8a if group is selected as grøt, brød og pasta and product is kategori 8a */}
           {selectsGroup === "grøt, brød og pasta" &&
@@ -1151,7 +1310,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {/* Display component for kategori 8b if group is selected as grøt, brød og pasta and product is kategori 8b */}
           {selectsGroup === "grøt, brød og pasta" &&
@@ -1161,7 +1327,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {/* Display component for kategori 9 if group is selected as grøt, brød og pasta and product is kategori 9 */}
           {selectsGroup === "grøt, brød og pasta" &&
@@ -1171,7 +1344,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {/* Display component for kategori 10 if group is selected as grøt, brød og pasta and product is kategori 10 */}
           {selectsGroup === "grøt, brød og pasta" &&
@@ -1181,7 +1361,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}
+            />
           }
 
           {/* Display default component if group is selected as melk kategori but no product is selected */}
@@ -1196,7 +1383,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {/* Display component for melk 11b if group is selected as melk kategori and product is melk 11b */}
           {selectsGroup === "melk kategori" &&
@@ -1206,7 +1400,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {/* Display component for melk 12a if group is selected as melk kategori and product is melk 12a */}
           {selectsGroup === "melk kategori" &&
@@ -1216,7 +1417,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {/* Display component for melk 12b if group is selected as melk kategori and product is melk 12b */}
           {selectsGroup === "melk kategori" &&
@@ -1226,7 +1434,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {/* Display component for melk 13a if group is selected as melk kategori and product is melk 13a */}
           {selectsGroup === "melk kategori" &&
@@ -1236,7 +1451,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {/* Display component for melk 13b if group is selected as melk kategori and product is melk 13b */}
           {selectsGroup === "melk kategori" &&
@@ -1246,7 +1468,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {/* Display component for melk 14a if group is selected as melk kategori and product is melk 14a */}
           {selectsGroup === "melk kategori" &&
@@ -1256,7 +1485,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {/* Display component for melk 14b if group is selected as melk kategori and product is melk 14b */}
           {selectsGroup === "melk kategori" &&
@@ -1266,7 +1502,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {/* Display component for melk 15a if group is selected as melk kategori and product is melk 15a */}
           {selectsGroup === "melk kategori" &&
@@ -1276,7 +1519,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {/* Display component for melk 15b if group is selected as melk kategori and product is melk 15b */}
           {selectsGroup === "melk kategori" &&
@@ -1286,7 +1536,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
 
           {/* Repeat the above conditional rendering code that renders a different component based on the user's selection of product category, group, and subcategory.  */}
@@ -1299,7 +1556,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {selectsGroup === "ost og vegetabilske alternativer" &&
             selectsProduct === "kategori 17" && <Kategori17 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
@@ -1308,7 +1572,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {selectsGroup === "ost og vegetabilske alternativer" &&
             selectsProduct === "kategori 18" && <Kategori18 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
@@ -1317,7 +1588,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
 
           {selectsGroup === "matfett og oljer" && selectsProduct === "" && (
@@ -1330,7 +1608,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {selectsGroup === "matfett og oljer" &&
             selectsProduct === "kategori 20" && <Kategori20 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
@@ -1339,7 +1624,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
 
           {selectsGroup === "fiskerivarer og produkter av fiskerivarer" &&
@@ -1351,7 +1643,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {selectsGroup === "fiskerivarer og produkter av fiskerivarer" &&
             selectsProduct === "kategori 22" &&
@@ -1364,7 +1663,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {selectsGroup === "fiskerivarer og produkter av fiskerivarer" &&
             selectsProduct === "kategori 22" &&
@@ -1374,7 +1680,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {selectsGroup === "fiskerivarer og produkter av fiskerivarer" &&
             selectsProduct === "kategori 22" &&
@@ -1384,7 +1697,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {selectsGroup === "fiskerivarer og produkter av fiskerivarer" &&
             selectsProduct === "kategori 22" &&
@@ -1394,7 +1714,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
 
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
@@ -1406,7 +1733,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
 
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
@@ -1417,7 +1751,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
@@ -1432,7 +1773,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
@@ -1443,7 +1791,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
 
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
@@ -1459,7 +1814,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
@@ -1470,7 +1832,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
@@ -1481,7 +1850,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
@@ -1492,7 +1868,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
 
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
@@ -1508,7 +1891,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
@@ -1519,7 +1909,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
 
           {selectsGroup === "helt eller delvis vegetabilske produkter" &&
@@ -1535,7 +1932,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {selectsGroup === "helt eller delvis vegetabilske produkter" &&
             selectsProduct === "kategori 25" &&
@@ -1545,7 +1949,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
 
           {selectsGroup === "ferdigretter" && selectsProduct === "" && (
@@ -1558,7 +1969,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {selectsGroup === "ferdigretter" &&
             selectsProduct === "kategori 27" && <Kategori27 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
@@ -1567,7 +1985,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {selectsGroup === "ferdigretter" &&
             selectsProduct === "kategori 28" && <Kategori28 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
@@ -1576,7 +2001,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {selectsGroup === "ferdigretter" &&
             selectsProduct === "kategori 29" && <Kategori29 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
@@ -1585,7 +2017,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {selectsGroup === "ferdigretter" &&
             selectsProduct === "kategori 30" && <Kategori30 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
@@ -1594,7 +2033,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
 
           {selectsGroup === "dressinger og sauser" && selectsProduct === "" && (
@@ -1607,7 +2053,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
           {selectsGroup === "dressinger og sauser" &&
             selectsProduct === "kategori 32" && <Kategori32 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
@@ -1616,7 +2069,14 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}/>
+            selectedOthers={selectedOthers}
+            hasHighFibre={handleHighFibreClaims}
+            hasLowSugar={handleLowSugarClaims}
+            hasSugarsFree={handleSugarsFreeClaims}
+            hasLowSalt={handleLowSaltClaims}
+            hasLowSatFat={handleLowSatFatClaims}
+            meetsReqClaims={meetsReqsClaims}
+            selectedMeetsReqs={selectedMeetsReqs}/>
           }
 
           {/*{isCalculationCompleted && (

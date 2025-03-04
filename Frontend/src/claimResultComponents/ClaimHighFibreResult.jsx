@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp ,faTimes, faCheck} from '@fortawesome/free-solid-svg-icons';
 
-const ClaimHighFibreResult = ( { lowFat } ) => {
+// 2025 group - added highFibre as a parameter, was lowFat before 
+const ClaimHighFibreResult = ( { highFibre } ) => {
     const [isExpanded, setIsExpanded] = useState(false);
 
     const toggleExpanded = () => {
         setIsExpanded(!isExpanded);
      }
-    if (lowFat) {
+    if (highFibre) {
         return (
             <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
                 <div style={{ display: "flex", alignItems: "center" }}>
@@ -57,7 +58,7 @@ const ClaimHighFibreResult = ( { lowFat } ) => {
                  <li  style={{ marginLeft: '-15px' }}>
                  <FontAwesomeIcon icon={faTimes} style={{ color: 'red' , marginRight: '5px' , fontWeight: 'bold', fontSize: '1.2em' }} />
                  Produktet må inneholde 6 g fiber per 100 g eller 
-                    høyst 3 g fiber per 100 kcal. 
+                    høyst 3 g fiber per 100 kcal. *Husk å benytte kcal som enhet for energi.
                  </li>
                  </ul>
                 <br></br>

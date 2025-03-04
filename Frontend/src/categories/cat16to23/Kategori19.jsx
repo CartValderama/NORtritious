@@ -20,7 +20,22 @@ import * as Check from "../../NutritionClaimCheck.jsx"
 // ResultEfsaFullfilled og notFullfilled må implementers 
 import {ResultEfsaFulfilled, ResultEfsaHealthClaims, ResultEfsaNotFulfilled} from '../../ResultEfsaClaims.jsx'; // EFSA claims
 
-const Kategori19 = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition, vitaminClaims, mineralClaims, selectedVitamins, selectedMinerals, otherClaims, selectedOthers }) => {
+const Kategori19 = ({ product, 
+  handleNutrientChange, 
+  onNutritionChange, 
+  onCalculationComplete, 
+  hasNokkelhullet, 
+  hasEfsaNutrition, 
+  vitaminClaims, 
+  mineralClaims, 
+  selectedVitamins, 
+  selectedMinerals, 
+  otherClaims, 
+  selectedOthers, 
+  hasLowSugar, 
+  hasSugarsFree, 
+  meetsReqClaims, 
+  selectedMeetsReqs }) => {
 
   // State variables for showing results and empty result message
   const [showNokkelhulletResults, setShowNokkelhulletResults] = useState(null);
@@ -376,6 +391,19 @@ const Kategori19 = ({ product, handleNutrientChange, onNutritionChange, onCalcul
     setLowSugars(Check.claimLowSugars(foodType, nutrition.naturligSukker, nutrition.hvoravSukkerarter))
     setSugarsFree(Check.claimSugarsFree(nutrition.naturligSukker, nutrition.hvoravSukkerarter))
     setWithNoAddedSugars(Check.ClaimWithNoAddedSugars(nutrition.karbohydrat, nutrition.hvoravSukkerarter))
+
+
+        if (Check.claimLowSugars(foodType, nutrition.naturligSukker, nutrition.hvoravSukkerarter)) {
+          hasLowSugar(true);
+        } else {
+          hasLowSugar(false);
+        }
+        if (Check.claimSugarsFree(nutrition.naturligSukker, nutrition.hvoravSukkerarter)) {
+          hasSugarsFree(true);
+        } else {
+          hasSugarsFree(false);
+        }
+    
 
   };
 
@@ -1028,6 +1056,8 @@ const Kategori19 = ({ product, handleNutrientChange, onNutritionChange, onCalcul
                   selectedMinerals={selectedMinerals}
                   otherClaims={otherClaims}
                   selectedOthers={selectedOthers}
+                  meetsReqClaims={meetsReqClaims}
+                  selectedMeetsReqs={selectedMeetsReqs}
 
               />
               

@@ -41,7 +41,7 @@ const popover = (
     <Popover id="popover-basic" style={{ width: '500px', maxHeight: '300px' }}>
       <Popover.Header as="h2">EFSA Ernæringspåstander</Popover.Header>
       <Popover.Body>
-        <strong>{formatContent(product.hasEfsaNutrition)}</strong>
+        <strong>{product.hasEfsaNutrition}</strong>
       </Popover.Body>
     </Popover>
 );

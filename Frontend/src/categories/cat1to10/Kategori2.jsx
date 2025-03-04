@@ -21,7 +21,22 @@ import * as Check from "../../NutritionClaimCheck.jsx"
 import {ResultEfsaFulfilled, ResultEfsaHealthClaims, ResultEfsaNotFulfilled} from '../../ResultEfsaClaims.jsx'; // EFSA claims
 
 // This component is called Kategori2
-const Kategori2 = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition, vitaminClaims, mineralClaims, selectedVitamins, selectedMinerals, otherClaims, selectedOthers }) => {
+const Kategori2 = ({   product, 
+  handleNutrientChange, 
+  onNutritionChange, 
+  onCalculationComplete, 
+  hasNokkelhullet, 
+  hasEfsaNutrition, 
+  vitaminClaims, 
+  mineralClaims, 
+  selectedVitamins, 
+  selectedMinerals, 
+  otherClaims, 
+  selectedOthers, 
+  hasLowSugar, 
+  hasSugarsFree, 
+  meetsReqClaims, 
+  selectedMeetsReqs }) => {
 
   // State variables for showing results and empty result message
   const [showNokkelhulletResults, setShowNokkelhulletResults] = useState(null);
@@ -350,6 +365,17 @@ const Kategori2 = ({ product, handleNutrientChange, onNutritionChange, onCalcula
     setSugarsFree(Check.claimSugarsFree(nutrition.naturligSukker, nutrition.hvoravSukkerarter))
     setWithNoAddedSugars(Check.ClaimWithNoAddedSugars(nutrition.karbohydrat, nutrition.hvoravSukkerarter))
 
+        if (Check.claimLowSugars(foodType, nutrition.naturligSukker, nutrition.hvoravSukkerarter)) {
+          hasLowSugar(true);
+        } else {
+          hasLowSugar(false);
+        }
+        if (Check.claimSugarsFree(nutrition.naturligSukker, nutrition.hvoravSukkerarter)) {
+          hasSugarsFree(true);
+        } else {
+          hasSugarsFree(false);
+        }
+    
   };
 
   // create an array of energy units to select from
@@ -948,7 +974,8 @@ const Kategori2 = ({ product, handleNutrientChange, onNutritionChange, onCalcula
                   selectedMinerals={selectedMinerals}
                   otherClaims={otherClaims}
                   selectedOthers={selectedOthers}
-      
+                  meetsReqClaims={meetsReqClaims}
+                  selectedMeetsReqs={selectedMeetsReqs}          
               />
             </div>
             {infoHelsepåstander ? (

@@ -26,7 +26,26 @@ import ErrorMessageBox from "../../errorMessages.jsx";
 import * as ProductService from "../../products/ProductService";
 
 // This component is called Kategori1
-const Kategori1 = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition, vitaminClaims, mineralClaims, selectedVitamins, selectedMinerals, otherClaims, selectedOthers }) => {
+const Kategori1 = ({ 
+  product, 
+  handleNutrientChange, 
+  onNutritionChange, 
+  onCalculationComplete, 
+  hasNokkelhullet, 
+  hasEfsaNutrition, 
+  vitaminClaims, 
+  mineralClaims, 
+  selectedVitamins, 
+  selectedMinerals, 
+  otherClaims, 
+  selectedOthers, 
+  hasHighFibre, 
+  hasLowSugar, 
+  hasSugarsFree, 
+  hasLowSalt, 
+  hasLowSatFat,
+  meetsReqClaims, 
+  selectedMeetsReqs }) => {
 
   // State variables for showing results and empty result message
   const [showNokkelhulletResults, setShowNokkelhulletResults] = useState(null);
@@ -105,7 +124,7 @@ const Kategori1 = ({ product, handleNutrientChange, onNutritionChange, onCalcula
       nutrition.salt
 
         // containsNaturallyOccurringSugars, // Uncomment if this condition is also to be checked
-      ].every(condition => condition); // `every` returns true only if all conditions are truthy
+      ].every(condition => condition !== null && condition !== undefined); // `every` returns true only if all conditions are truthy
   
       setShowResults(isEveryInputFilled); // True if all inputs are filled, false if any is empty
   
@@ -529,12 +548,40 @@ const Kategori1 = ({ product, handleNutrientChange, onNutritionChange, onCalcula
     setLowSugars(Check.claimLowSugars(foodType, nutrition.naturligSukker, nutrition.hvoravSukkerarter))
     setSugarsFree(Check.claimSugarsFree(nutrition.naturligSukker, nutrition.hvoravSukkerarter))
     setWithNoAddedSugars(Check.ClaimWithNoAddedSugars(nutrition.karbohydrat, nutrition.hvoravSukkerarter))
-
-    setHighFibre(Check.claimHighFibre(nutrition.kostfiber))
+    const energyUnit = selectsPart === "energikcal" ? "kcal" : "kj";
+    const measureUnit = foodType === "solid" ? "g" : "ml";
+    setHighFibre(Check.claimHighFibre(measureUnit, nutrition.kostfiber, energyUnit, nutrition.energikcal))
     setSourceOfProtein(Check.claimSourceOfProtein(nutrition.protein))
     setReducedFat(Check.claimReducedFat(nutrition.fett))
     setReducedSaturatedFat(Check.claimReducedSaturatedFat(nutrition.mettede))
     setReducedSalt(Check.claimReducedSalt(nutrition.salt))
+    
+    if (Check.claimLowSugars(foodType, nutrition.naturligSukker, nutrition.hvoravSukkerarter)) {
+      hasLowSugar(true);
+    } else {
+      hasLowSugar(false);
+    }
+    if (Check.claimHighFibre(measureUnit, nutrition.kostfiber, energyUnit, nutrition.energikcal)) {
+      hasHighFibre(true);
+    } else {
+      hasHighFibre(false);
+    }
+    if (Check.claimSugarsFree(nutrition.naturligSukker, nutrition.hvoravSukkerarter)) {
+      hasSugarsFree(true);
+    } else {
+      hasSugarsFree(false);
+    }
+    if (Check.claimReducedSalt(nutrition.salt)) {
+      hasLowSalt(true);
+    } else {
+      hasLowSalt(false);
+    }
+    if (Check.claimLowSaturatedFat(foodType, selectsPart, nutrition.mettede, nutrition.energikcal, nutrition.energikj)) {
+      hasLowSatFat(true);
+    } else {
+      hasLowSatFat(false);
+    }
+    
 
     // Check the condition for the "WITH NO ADDED SUGARS" nutrition claim
     /*if (nutrition.hvoravSukkerarter === "0" && nutrition.karbohydrat > 0) {
@@ -1084,11 +1131,13 @@ const Kategori1 = ({ product, handleNutrientChange, onNutritionChange, onCalcula
   <div style={{ padding: "5px" }}></div>
 
   {/* Container for ernæringspåstander result - fulfilled */}
-  {buttonClicked && showResults && (lowEnergy || lowFat || fatFree || lowSaturatedFat || saturatedFatFree || lowSugars || sugarsFree || withNoAddedSugars || reducedFat || reducedSaturatedFat || reducedSalt) ? (
+  {buttonClicked && showResults && (sourceOfProtein || highFibre || lowEnergy || lowFat || fatFree || lowSaturatedFat || saturatedFatFree || lowSugars || sugarsFree || withNoAddedSugars || reducedFat || reducedSaturatedFat || reducedSalt) ? (
     <div className={`container ernæringspåstander-food-result-container-${showErnaeringsResults ? 'true' : 'false'}`}
          style={{ backgroundColor: '#daecd8', borderRadius: '5px' }}>
       <ResultEfsaFulfilled
       claimsToShow={{
+        sourceOfProtein: true,
+        highFibre: true,
         lowEnergy: true,
         lowFat: true,
         fatFree: true,
@@ -1101,6 +1150,8 @@ const Kategori1 = ({ product, handleNutrientChange, onNutritionChange, onCalcula
         reducedSaturatedFat: true,
         reducedSalt: true
       }}
+        sourceOfProtein={sourceOfProtein}
+        highFibre={highFibre}
         lowEnergy={lowEnergy}
         lowFat={lowFat}
         fatFree={fatFree}
@@ -1121,6 +1172,8 @@ const Kategori1 = ({ product, handleNutrientChange, onNutritionChange, onCalcula
         selectedMinerals={selectedMinerals}
         otherClaims={otherClaims}
         selectedOthers={selectedOthers}
+        meetsReqClaims={meetsReqClaims}
+        selectedMeetsReqs={selectedMeetsReqs}
         />
     </div>
   ) : null}
@@ -1129,13 +1182,15 @@ const Kategori1 = ({ product, handleNutrientChange, onNutritionChange, onCalcula
   <div style={{ padding: "5px" }}></div>
 
   {/* Container for ernæringspåstander results - Not fulfilled */}
-  {buttonClicked && showResults && (!lowEnergy || !lowFat || !fatFree || !lowSaturatedFat || !saturatedFatFree || !lowSugars || !sugarsFree || !withNoAddedSugars || !reducedFat || !reducedSaturatedFat || reducedSalt) ? (
+  {buttonClicked && showResults && (!sourceOfProtein || !highFibre || !lowEnergy || !lowFat || !fatFree || !lowSaturatedFat || !saturatedFatFree || !lowSugars || !sugarsFree || !withNoAddedSugars || !reducedFat || !reducedSaturatedFat || reducedSalt) ? (
     <div className={`container ernæringspåstander-food-result-container-${showErnaeringsResults}`}
     style={{ backgroundColor: '#f3b7b7', borderRadius: '5px' }}
         >
       <ResultEfsaNotFulfilled
       claimsToShow={{
-        lowEnergy: false,
+        sourceOfProtein: true,
+        highFibre: true,
+        lowEnergy: true,
         lowFat: true,
         fatFree: true,
         lowSaturatedFat: true,
@@ -1147,6 +1202,8 @@ const Kategori1 = ({ product, handleNutrientChange, onNutritionChange, onCalcula
         reducedSaturatedFat: true,
         reducedSalt: true
       }}
+        sourceOfProtein={sourceOfProtein}
+        highFibre={highFibre}
         lowEnergy={lowEnergy}
         lowFat={lowFat}
         fatFree={fatFree}

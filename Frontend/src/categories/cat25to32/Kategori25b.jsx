@@ -19,7 +19,23 @@ import * as ProductService from "../../products/ProductService";
 // ResultEfsaFullfilled og notFullfilled må implementers 
 import {ResultEfsaFulfilled, ResultEfsaHealthClaims, ResultEfsaNotFulfilled} from '../../ResultEfsaClaims.jsx'; // EFSA claims
 
-const Kategori25b = ({ product, handleNutrientChange, onNutritionChange, onCalculationComplete, hasNokkelhullet, hasEfsaNutrition, vitaminClaims, mineralClaims, selectedVitamins, selectedMinerals, otherClaims, selectedOthers }) => {
+const Kategori25b = ({ product, 
+  handleNutrientChange, 
+  onNutritionChange, 
+  onCalculationComplete, 
+  hasNokkelhullet, 
+  hasEfsaNutrition, 
+  vitaminClaims, 
+  mineralClaims, 
+  selectedVitamins, 
+  selectedMinerals, 
+  otherClaims, 
+  selectedOthers, 
+  hasLowSugar, 
+  hasSugarsFree,
+  hasLowSatFat, 
+  meetsReqClaims, 
+  selectedMeetsReqs }) => {
   // State variables for showing results and empty result message
 
   const [showNokkelhulletResults, setShowNokkelhulletResults] = useState(null);
@@ -433,6 +449,23 @@ const Kategori25b = ({ product, handleNutrientChange, onNutritionChange, onCalcu
     setLowSugars(Check.claimLowSugars(foodType, nutrition.naturligSukker, nutrition.hvoravSukkerarter))
     setSugarsFree(Check.claimSugarsFree(nutrition.naturligSukker, nutrition.hvoravSukkerarter))
     setWithNoAddedSugars(Check.ClaimWithNoAddedSugars(nutrition.karbohydrat, nutrition.hvoravSukkerarter))
+
+        if (Check.claimLowSugars(foodType, nutrition.naturligSukker, nutrition.hvoravSukkerarter)) {
+          hasLowSugar(true);
+        } else {
+          hasLowSugar(false);
+        }
+        if (Check.claimSugarsFree(nutrition.naturligSukker, nutrition.hvoravSukkerarter)) {
+          hasSugarsFree(true);
+        } else {
+          hasSugarsFree(false);
+        }
+        if (Check.claimLowSaturatedFat(foodType, selectsPart, nutrition.mettede, nutrition.energikcal, nutrition.energikj)) {
+          hasLowSatFat(true);
+        } else {
+          hasLowSatFat(false);
+        }
+    
   };
 
   // create an array of energy units to select from
@@ -1116,6 +1149,8 @@ const Kategori25b = ({ product, handleNutrientChange, onNutritionChange, onCalcu
                   selectedMinerals={selectedMinerals}
                   otherClaims={otherClaims}
                   selectedOthers={selectedOthers}
+                  meetsReqClaims={meetsReqClaims}
+                  selectedMeetsReqs={selectedMeetsReqs}
 
               />
             </div>

@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp ,faTimes, faCheck} from '@fortawesome/free-solid-svg-icons';
 
-const ClaimSourceOfProteinResult = ( { lowFat } ) => {
+// Changed from lowFat to sourceOfProtein
+const ClaimSourceOfProteinResult = ( { sourceOfProtein } ) => {
     const [isExpanded, setIsExpanded] = useState(false);
 
     const toggleExpanded = () => {
         setIsExpanded(!isExpanded);
      }
-    if (lowFat) {
+    if (sourceOfProtein) {
         return (
             <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
                 <div style={{ display: "flex", alignItems: "center" }}>
