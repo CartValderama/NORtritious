@@ -148,7 +148,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({
                 <div className="mt-auto d-flex justify-content-between">
                   <ButtonGroup className="mb-2 me-2">
                     <Button
-                      href={`/productupdate/${product.productId}`}
+                      href={`/products/calculatorUpdate/${product.productId}`}
                       variant="primary"
                     >
                       <i className="bi bi-pencil-square"></i>

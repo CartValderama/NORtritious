@@ -274,7 +274,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
 
                     <td className="align-middle text-center">
                       <Link
-                        to={`/products/updateCalculator/${product.productId}`}
+                        to={`/products/calculatorUpdate/${product.productId}`}
                         className="btn btn-outline-primary btn-sm"
                       >
                         <i className="bi bi-pencil-square"></i> Rediger
