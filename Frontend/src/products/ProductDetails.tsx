@@ -142,7 +142,6 @@ const ProductDetails = () => {
             <hr />
 
             <h2>Nutrition</h2>
-            <NutritionScoreGroup highlighted={nutriScore} />
             <table className="table table-striped table-hover">
               <caption>Nutrition per 100g</caption>
               <thead>
