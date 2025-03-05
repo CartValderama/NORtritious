@@ -86,7 +86,7 @@ const NavMenu: React.FC = () => {
                         : `${API_URL}/images/profile_pictures/male-placeholder-image.png`
                     }
                     alt="Profile picture"
-                    className="rounded-circle"
+                    className="rounded-circle object-fit-cover"
                     style={{
                       width: "30px",
                       height: "30px",
