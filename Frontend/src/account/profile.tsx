@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import API_URL from "../apiConfig";
+import RoleRightsTable from "../components/RoleRightsTable";
 //import { height } from "@fortawesome/free-solid-svg-icons/fa0";
 
 const ProfilePage: React.FC = () => {
@@ -18,7 +19,7 @@ const ProfilePage: React.FC = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [selectedSection, setSelectedSection] = useState<
-    "password" | "info" | "products" | "image"
+    "password" | "info" | "products" | "image" | "rights"
   >("info");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [loading, setLoading] = useState(true);
@@ -207,7 +208,7 @@ const ProfilePage: React.FC = () => {
               }`}
               onClick={() => setSelectedSection("info")}
             >
-              <i className="bi bi-person-circle"></i> Oppdater informasjon
+              <i className="bi bi-person-vcard"></i> Oppdater informasjon
             </button>
             <button
               className={`list-group-item list-group-item-action ${
@@ -223,7 +224,15 @@ const ProfilePage: React.FC = () => {
               }`}
               onClick={() => setSelectedSection("password")}
             >
-              <i className="bi bi-shield-lock"></i> Endre passord
+              <i className="bi bi-key"></i> Endre passord
+            </button>
+            <button
+              className={`list-group-item list-group-item-action ${
+                selectedSection === "rights" ? "active" : ""
+              }`}
+              onClick={() => setSelectedSection("rights")}
+            >
+              <i className="bi bi-person-lock"></i> Mine rollerettigheter
             </button>
             <button
               className={`list-group-item list-group-item-action ${
@@ -501,6 +510,21 @@ const ProfilePage: React.FC = () => {
                     </button>
                   </>
                 )}
+              </div>
+            </div>
+          )}
+
+          {selectedSection === "rights" && (
+            <div className="card mb-3">
+              <div className="card-body">
+                <h2 className="card-title">Mine rettigheter</h2>
+                <p>
+                  <strong>Min rolle: </strong>
+                  {userInfo.role}
+                </p>
+                <div className="table-responsive">
+                  <RoleRightsTable role={userInfo.role} />
+                </div>
               </div>
             </div>
           )}
