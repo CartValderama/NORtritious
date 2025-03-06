@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import API_URL from "../apiConfig";
+import RoleRightsTable from "../components/RoleRightsTable";
 
 const LoginPage: React.FC = () => {
   const [name, setName] = useState("");
@@ -115,7 +116,7 @@ const LoginPage: React.FC = () => {
     <div className="container mt-5">
       <div className="row justify-content-center">
         <div className="col-md-6">
-          <div className="card">
+          <div className="card shadow-sm">
             <div className="card-body">
               <h1 className="card-title">
                 {isRegister ? "Registrering" : "Innlogging"}
@@ -253,6 +254,54 @@ const LoginPage: React.FC = () => {
                   {isRegister ? "Tilbake til innlogging" : "Registrering"}
                 </button>
               </p>
+              {isRegister && (
+                <p>
+                  <span>Vil du vite mer om rollerettigheter?</span>
+                  <a
+                    type="button"
+                    className="btn btn-link"
+                    data-bs-toggle="modal"
+                    data-bs-target="#exampleModal"
+                  >
+                    Åpne oversikt
+                  </a>
+                </p>
+              )}
+              <div
+                className="modal fade"
+                id="exampleModal"
+                tabIndex={-1}
+                aria-labelledby="exampleModalLabel"
+                aria-hidden="true"
+              >
+                <div className="modal-dialog modal-dialog-centered">
+                  <div className="modal-content">
+                    <div className="modal-header">
+                      <h3 className="modal-title fs-5" id="exampleModalLabel">
+                        Rollerettigheter
+                      </h3>
+                      <button
+                        type="button"
+                        className="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                      ></button>
+                    </div>
+                    <div className="modal-body">
+                      <RoleRightsTable role="" />
+                    </div>
+                    <div className="modal-footer">
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        data-bs-dismiss="modal"
+                      >
+                        Lukk
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
               {message && (
                 <div
                   className="alert alert-info mt-3"
