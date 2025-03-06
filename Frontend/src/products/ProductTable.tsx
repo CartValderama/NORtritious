@@ -4,7 +4,6 @@ import { Product } from "../types/product";
 import { Link } from "react-router-dom";
 import "../css/ProductTable.css";
 import API_URL from "../apiConfig";
-import CollapseCard from "../shared/CollapseCard";
 import ClaimsView from "../shared/ClaimsView";
 
 interface ProductTableProps {
@@ -26,7 +25,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
   }>({});
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [showType, setShowType] = useState<boolean>(false);
-  const [sortColumn, setSortColumn] = useState<string>("name"); 
+  const [sortColumn, setSortColumn] = useState<string>("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const handleSort = (column: string) => {
@@ -55,12 +54,14 @@ const ProductTable: React.FC<ProductTableProps> = ({
   const sortedProducts = [...products].sort((a, b) => {
     // Ensure TypeScript knows `sortColumn` is a valid key of `Product`
     const key = sortColumn as keyof Product;
-  
+
     if (!a[key] || !b[key]) return 0; // Handle missing data
-  
-    const valueA = typeof a[key] === "string" ? (a[key] as string).toLowerCase() : a[key];
-    const valueB = typeof b[key] === "string" ? (b[key] as string).toLowerCase() : b[key];
-  
+
+    const valueA =
+      typeof a[key] === "string" ? (a[key] as string).toLowerCase() : a[key];
+    const valueB =
+      typeof b[key] === "string" ? (b[key] as string).toLowerCase() : b[key];
+
     if (valueA < valueB) return sortDirection === "asc" ? -1 : 1;
     if (valueA > valueB) return sortDirection === "asc" ? 1 : -1;
     return 0;
@@ -118,21 +119,54 @@ const ProductTable: React.FC<ProductTableProps> = ({
               <thead className="bg-light">
                 <tr>
                   {showId && <th className="align-middle">ID</th>}
-                  <th className="align-middle text-center" onClick={() => handleSort("name")} style={{ cursor: "pointer" }}>Navn {sortColumn === "name" ? (sortDirection === "asc" ? "▲" : "▼") : ""}</th>
+                  <th
+                    className="align-middle text-center"
+                    onClick={() => handleSort("name")}
+                    style={{ cursor: "pointer" }}
+                  >
+                    Navn{" "}
+                    {sortColumn === "name"
+                      ? sortDirection === "asc"
+                        ? "▲"
+                        : "▼"
+                      : ""}
+                  </th>
                   <th className="align-middle text-center">Bilde</th>
-                  <th className="align-middle text-center" onClick={() => handleSort("name")} style={{ cursor: "pointer" }}>Gruppe {sortColumn === "name" ? (sortDirection === "asc" ? "▲" : "▼") : ""}</th>
+                  <th
+                    className="align-middle text-center"
+                    onClick={() => handleSort("name")}
+                    style={{ cursor: "pointer" }}
+                  >
+                    Gruppe{" "}
+                    {sortColumn === "name"
+                      ? sortDirection === "asc"
+                        ? "▲"
+                        : "▼"
+                      : ""}
+                  </th>
                   {showType && (
                     <th className="align-middle text-center">Type</th>
                   )}
                   {showNutrition && (
                     <th className="align-middle">Næringsmiddel pr. 100 g/ml</th>
                   )}
-                  <th className="align-middle text-center">Nøkkelhullet</th>
                   <th className="align-middle text-center">
-                    EFSA Ernæringspåstander
+                    <img
+                      src={`${API_URL}/images/circle-keyhole-logo.png`}
+                      alt="Nøkkelhullet"
+                      className="img-fluid"
+                      style={{ maxHeight: "1.5rem" }} // Adjust size to match text
+                    />
+                    <span> Nøkkelhull</span>
                   </th>
                   <th className="align-middle text-center">
-                    EFSA Helsepåstander
+                    <img
+                      src={`${API_URL}/images/efsaLogo.png`}
+                      alt="EFSA Ernæringspåstander"
+                      className="img-fluid"
+                      style={{ maxHeight: "1.5rem" }}
+                    />
+                    <span> EFSA Påstander</span>
                   </th>
                   <th className="align-middle text-center">Behandling</th>
                 </tr>
@@ -197,96 +231,48 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       </td>
                     )}
                     <td className="align-middle text-center">
-                      <img
-                        src={
-                          product.hasNokkelhullet
-                            ? `${API_URL}/images/circle-keyhole-logo.png`
-                            : `${API_URL}/images/ban_keyhole.png`
-                        }
-                        alt={
-                          product.hasNokkelhullet
-                            ? "Oppfyller Nøkkelhullet"
-                            : "Oppfyller ikke Nøkkelhullet"
-                        }
-                        style={{
-                          width: "50px",
-                          height: "50px",
-                          padding: "2px",
-                        }}
-                        className="rounded"
-                      />
+                      {product.hasNokkelhullet ? (
+                        <i className="bi bi-check-circle-fill text-success h4"></i>
+                      ) : (
+                        <></>
+                      )}
                     </td>
 
                     <td className="align-middle text-center">
-                      <Button variant="outline-primary">
-                        <img
-                          src={
-                            product.hasEfsaNutrition
-                              ? `${API_URL}/images/efsaLogoGreen.png`
-                              : `${API_URL}/images/efsaLogoBlack.png`
-                          }
-                          alt={
-                            product.hasEfsaNutrition
-                              ? "Has EFSA Nutrition"
-                              : "No EFSA Nutrition"
-                          }
-                          style={{
-                            width: "70px",
-                            height: "70px",
-                            cursor: "pointer",
-                          }}
-                          onClick={() =>
-                            handleToggleNutrition(product.productId)
-                          }
-                        />
-                      </Button>
-
-                      {visibleNutrition[product.productId] &&
-                        product.hasEfsaNutrition && (
-                          <Card>
-                            <div>
-                              <strong>
-                                Ernæringspåstander:
-                                <br />
-                              </strong>
-                              {product.hasEfsaNutrition}
-                            </div>
-                          </Card>
-                        )}
-                    </td>
-
-                    <td className="align-middle text-center">
-                      <CollapseCard
-                        productId={product.productId}
-                        content={product.hasEfsaHealth}
-                      />
-                      <p></p>
-                      <Button
-                        variant="outline-primary"
-                        size="sm"
+                      <button
+                        type="button"
+                        className="btn btn-outline-success btn-sm"
                         onClick={() =>
                           handleShowClaims(product.hasEfsaHealth, product)
                         }
                       >
-                        Full oversikt
-                      </Button>
+                        <i className="bi bi-arrows-fullscreen"></i>
+                        <span> Vis påstander</span>
+                      </button>
                     </td>
 
                     <td className="align-middle text-center">
-                      <Link
-                        to={`/products/calculatorUpdate/${product.productId}`}
-                        className="btn btn-outline-primary btn-sm"
+                      <div
+                        className="btn-group"
+                        role="group"
+                        aria-label="Produkthandlingsknapper"
                       >
-                        <i className="bi bi-pencil-square"></i> Rediger
-                      </Link>
-                      <p></p>
-                      <Button
-                        variant="outline-danger"
-                        size="sm"
-                        onClick={() => onProductDeleted(product.productId)}
-                      >
-                        <i className="bi bi-trash"></i> Fjern
-                      </Button>
+                        {/* Navigate to the edit page with product ID */}
+                        <Link
+                          to="/edit-product"
+                          className="btn btn-outline-primary btn-sm"
+                        >
+                          <i className="bi bi-pencil-square"></i>
+                        </Link>
+
+                        {/* Call onProductDeleted function with product ID */}
+                        <button
+                          className="btn btn-outline-danger btn-sm"
+                          onClick={() => onProductDeleted(product.productId)}
+                        >
+                          <i className="bi bi-trash"></i>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
