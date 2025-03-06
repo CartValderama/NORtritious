@@ -780,7 +780,7 @@ const Kategori2 = ({   product,
         </div>
       </div>
 
-      <div className="col-md-6" style={{marginTop: "-120px"}}>
+      <div className="col-md-6" style={{marginTop: "0px"}}>
         {/* container for "Nøkkelhullet" results  */}
         {showNokkelhulletResults && (
           <div className="container nøkkelhullet-food-result-container">
@@ -952,62 +952,18 @@ const Kategori2 = ({   product,
         {/* Spacer */}
         <div style={{ padding: "5px" }}></div>
         {/* container for Helsepåstander results  */}
-        {showHelsepåstander && (
-          <div
-            className="container helsepåstander-food-result-container"
-            style={{ background: "#f2f0b5" }}
-          >
-            <h5>Helsepåstander</h5>
-            <div className="row">
-
-              <div className="col-md-2">
-                <FontAwesomeIcon
-                  className="info-button"
-                  icon={faCircleInfo}
-                  onClick={() => onClickInfo("helsepåstander")}
-                />
-              </div>
-              <ResultEfsaHealthClaims
-                  vitaminClaims={vitaminClaims}
-                  mineralClaims={mineralClaims}
-                  selectedVitamins={selectedVitamins}
-                  selectedMinerals={selectedMinerals}
-                  otherClaims={otherClaims}
-                  selectedOthers={selectedOthers}
-                  meetsReqClaims={meetsReqClaims}
-                  selectedMeetsReqs={selectedMeetsReqs}          
-              />
-            </div>
-            {infoHelsepåstander ? (
-              // Information section for "Helsepåstander"
-              <div className="container info-div row">
-                <div className="col-md-10">
-                  <p>
-                    Les mer om hvordan oppnå kriteriene på Lovdata’s Forskrift
-                    om ernærings- og helsepåstander om næringsmidler:
-                    <a
-                      href="https://lovdata.no/dokument/SF/forskrift/2010-02-17-187/KAPITTEL_1#KAPITTEL_1"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      lovdata.no
-                    </a>
-                  </p>
-                </div>
-                <div className="col-md-2">
-                  <FontAwesomeIcon
-                    className="x-button"
-                    icon={faXmarkCircle}
-                    onClick={() => onClickClose("helsepåstander")}
-                  />
-                </div>
-              </div>
-            ) : null}
-          </div>
-        )}
-
         
-        
+        <ResultEfsaHealthClaims
+          vitaminClaims={vitaminClaims}
+          mineralClaims={mineralClaims}
+          selectedVitamins={selectedVitamins}
+          selectedMinerals={selectedMinerals}
+          otherClaims={otherClaims}
+          selectedOthers={selectedOthers}
+          meetsReqClaims={meetsReqClaims}
+          selectedMeetsReqs={selectedMeetsReqs}          
+        />
+          
       </div>
     </div>
   );

@@ -1098,7 +1098,7 @@ const Kategori1 = ({
       {/* A simple button for adding a new product, which reloads the page on click */}  
       </div>        
       
-  <div className="col-md-6" style={{ marginTop: '-350px'}}>
+  <div className="col-md-6" style={{ marginTop: '0px'}}>
   {buttonClicked && !showResults && <ErrorMessageBox />}
 
   {/* Spacer */}
@@ -1165,16 +1165,6 @@ const Kategori1 = ({
         reducedSalt={reducedSalt}
       >
       </ResultEfsaFulfilled>
-      <ResultEfsaHealthClaims
-        vitaminClaims={vitaminClaims}
-        mineralClaims={mineralClaims}
-        selectedVitamins={selectedVitamins}
-        selectedMinerals={selectedMinerals}
-        otherClaims={otherClaims}
-        selectedOthers={selectedOthers}
-        meetsReqClaims={meetsReqClaims}
-        selectedMeetsReqs={selectedMeetsReqs}
-        />
     </div>
   ) : null}
 
@@ -1221,7 +1211,20 @@ const Kategori1 = ({
   ) : null}
 
   {/* Spacer */}
-  <div style={{ padding: "5px" }}></div>
+  <div style={{ padding: "5px" }}>
+  <ResultEfsaHealthClaims
+    vitaminClaims={vitaminClaims}
+    mineralClaims={mineralClaims}
+    selectedVitamins={selectedVitamins}
+    selectedMinerals={selectedMinerals}
+    otherClaims={otherClaims}
+    selectedOthers={selectedOthers}
+    meetsReqClaims={meetsReqClaims}
+    selectedMeetsReqs={selectedMeetsReqs}
+    />
+  </div>
+  
+
 
   {/* Show "Product Buttons" */}
   {/*{buttonClicked && showResults && (<ProductButtons />)}*/}

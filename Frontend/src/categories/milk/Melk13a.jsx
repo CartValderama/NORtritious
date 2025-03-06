@@ -956,7 +956,7 @@ const Melk13a = ({ product,
   {buttonClicked && !showResults && <ErrorMessageBox />}
 
   {/* Spacer */}
-  <div style={{ padding: "5px", marginTop: "-350px" }}></div>
+  <div style={{ padding: "5px", marginTop: "0px" }}></div>
 
   {/* Positive results nøkkelhullet container */}
   {buttonClicked && showResults && showNokkelhulletResults ? (
@@ -1007,17 +1007,6 @@ const Melk13a = ({ product,
         sugarsFree={sugarsFree}
         withNoAddedSugars={withNoAddedSugars}>
       </ResultEfsaFulfilled>
-      <ResultEfsaHealthClaims
-        vitaminClaims={vitaminClaims}
-        mineralClaims={mineralClaims}
-        selectedVitamins={selectedVitamins}
-        selectedMinerals={selectedMinerals}
-        otherClaims={otherClaims}
-        selectedOthers={selectedOthers}
-        meetsReqClaims={meetsReqClaims}
-        selectedMeetsReqs={selectedMeetsReqs}
-
-      />
     </div>
   ) : null}
 
@@ -1053,7 +1042,20 @@ const Melk13a = ({ product,
   ) : null}
 
   {/* Spacer */}
-  <div style={{ padding: "5px" }}></div>
+  <div style={{ padding: "5px" }}>
+  <ResultEfsaHealthClaims
+        vitaminClaims={vitaminClaims}
+        mineralClaims={mineralClaims}
+        selectedVitamins={selectedVitamins}
+        selectedMinerals={selectedMinerals}
+        otherClaims={otherClaims}
+        selectedOthers={selectedOthers}
+        meetsReqClaims={meetsReqClaims}
+        selectedMeetsReqs={selectedMeetsReqs}
+
+      />
+
+  </div>
 
   {/* Show "Product Buttons" */}
   {/*{buttonClicked && showResults && (<ProductButtons />)}*/}

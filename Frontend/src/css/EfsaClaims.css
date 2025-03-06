@@ -66,6 +66,20 @@
 .notFullfilledContent{
     padding: 2px;
     flex-wrap: nowrap;
-
 }
+/*
+@media (max-width: 991.98px){
+    .health_claims{
+        width: 300px;
+    }    
+}
+    */
 
+@media (max-width: 770px) {
+    .health_claims {
+        width: 100%;
+        margin-top: 420px;
+        position: relative;
+        left: 30px;
+    }
+}

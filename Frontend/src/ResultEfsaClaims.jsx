@@ -264,9 +264,24 @@ function ResultEfsaHealthClaims({ vitaminClaims, mineralClaims, otherClaims, sel
     }));
   };
 
+    // Formaterer innholdet i modalen
+    const formatContent = (content) => {
+      return content.split('\n').map((line, index) => {
+        const label = line.split(', ')[0];
+        return (
+        // For hver linje etter ':' i innholdet (claim label), returnes en paragraf via HTML, 
+        // *dangerouslySetInnerHTML er innerHTML i React
+        <p key={index} dangerouslySetInnerHTML={{__html: `&#9642; `+label }}/>
+        );
+      });
+    };
+  
+
   {/* Hvis man ønsker at trekkmenyen ikke overlapper med andre objekter -> fjern styling på Container */}
   return (
-    <Container className="claim-description mt-4" style={{ display: "flex", flexDirection: "column", width: "100%" }}> {/*style={{ position: 'absolute', maxWidth: '600px'}} >*/}
+    <div className="health_claims" style={{ display: "flex", flexDirection: "column", maxWidth: "610px", position: 'absolute' }}> {/*style={{ position: 'absolute', maxWidth: '600px'}} >*/}
+
+    <Container className="claim-description mt-4" >
       <Row>
         <div className="accordion" id="accordionPanelsStayOpen">
           <div className="accordion-item">
@@ -278,12 +293,12 @@ function ResultEfsaHealthClaims({ vitaminClaims, mineralClaims, otherClaims, sel
                   style={{ width: '50px', height: '50px', float: 'right' }}
                   src={`${API_URL}/images/efsaLogo.png`}
                   />
-                  &nbsp; EFSA Helsepåstander         
+                  &nbsp; EFSA Helsepåstander &nbsp;         
               </button>  
             </h2>
 
-            <div id="panelsStayOpen-collapseOne" className="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingOne">
-              <div class="accordion-body" style={{ display: 'flex', flexDirection: 'column', padding: '1em'}}>
+            <div id="panelsStayOpen-collapseOne" className="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingOne" >
+              <div class="accordion-body" style={{ display: 'flex', flexDirection: 'column', padding: '1em', overflowY: 'auto', maxHeight: '500px'}}>
                 {vitaminClaims.length > 0 && (
                   <>
                   {vitaminClaims.map((description, index) => (
@@ -297,7 +312,7 @@ function ResultEfsaHealthClaims({ vitaminClaims, mineralClaims, otherClaims, sel
                     <div>
                       <p>
                         <strong>Gjeldende Helsepåstander for {selectedVitamins[index]?.label}: <br/></strong>
-                        {description}
+                        {formatContent(description)}
                       </p>  
                     </div>
                   )}
@@ -312,7 +327,7 @@ function ResultEfsaHealthClaims({ vitaminClaims, mineralClaims, otherClaims, sel
                 <>
                 {mineralClaims.map((description, index) => (
                   <div key={index}>
-                  <div style={{display: 'flex', alignItems: 'center', cursor: 'pointer'}} className={`minerals mb-2 ${visibleMineralClaims[index] ? 'active' : ''}`} onClick={() => toggleMineralClaim(index)}>
+                  <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer'}} className={`minerals mb-2 ${visibleMineralClaims[index] ? 'active' : ''}`} onClick={() => toggleMineralClaim(index)}>
                     <h6 className='mb-0'>{visibleMineralClaims[index] ? 'Gjem' : 'Vis'} Påstander for {selectedMinerals[index]?.label}</h6>
                     <FontAwesomeIcon icon={visibleMineralClaims[index] ? faChevronUp : faChevronDown} className='ms-auto'/>
                   </div>
@@ -321,7 +336,7 @@ function ResultEfsaHealthClaims({ vitaminClaims, mineralClaims, otherClaims, sel
                     <div>
                         <p>
                           <strong>Gjeldende Helsepåstander for {selectedMinerals[index]?.label}: <br/></strong>
-                          {description}
+                          {formatContent(description)}
                         </p>
                     </div>
                   )}
@@ -344,7 +359,7 @@ function ResultEfsaHealthClaims({ vitaminClaims, mineralClaims, otherClaims, sel
                     <div>
                       <p>
                         <strong>Gjeldende Helsepåstander: <br/></strong>
-                        {description}
+                        {formatContent(description)}
                       </p>
                     </div>
                   )}
@@ -368,7 +383,7 @@ function ResultEfsaHealthClaims({ vitaminClaims, mineralClaims, otherClaims, sel
                     <div>
                         <p>
                           <strong>Gjeldende Helsepåstander for {selectedMeetsReqs[index]?.label}: <br/></strong>
-                          {description}
+                          {formatContent(description)}
                         </p>
                     </div>
                   )}
@@ -377,14 +392,14 @@ function ResultEfsaHealthClaims({ vitaminClaims, mineralClaims, otherClaims, sel
                 ))}
                 </>
                 )}
-                
-
               </div>
             </div>
           </div>
         </div>
       </Row>
     </Container>
+    </div>
+
 
   );
 }

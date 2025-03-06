@@ -1055,77 +1055,6 @@ const Calculator = () => {
             </div>
           )}
 
-          {/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/}
-          {/* These are added inputs for Health Claims */}
-          <Container style={{border: '1px solid #ccc', padding: '10px', borderRadius: '5px', marginTop: '10px', marginBottom: '10px', backgroundColor: '#f9f9f9'}}>
-          <h4>
-            <img 
-              alt="EFSA Logo"
-              className=""
-              style={{ width: '30px', height: '30px', float: 'left' }}
-              src={`${API_URL}/images/efsaLogo.png`}
-            />
-            &nbsp;EFSA Helsepåstander
-          </h4>
-          <hr/>
-          <Row className="mb-3">
-          <Col xs={12} md={6}>
-            <label htmlFor="vitamins" className="form-label">
-              <strong>Kilde til Vitaminer</strong>
-            </label>
-            <CustomSelect
-              isMulti
-              placeholder={<div>Velg Vitaminer</div>}
-              className="form-select-md"
-              onChange={handleVitaminChange}
-              options={selectVitamins}
-            />
-          </Col>
-          <Col xs={12} md={6}>
-            <label htmlFor="minerals" className="form-label">
-              <strong>Kilde til Mineraler</strong>
-            </label>
-            <CustomSelect
-              isMulti
-              placeholder={<div>Velg Mineraler</div>}
-              className="form-select-md"
-              onChange={handleMineralChange}
-              options={selectMinerals}
-            />
-          </Col>
-        </Row>
-
-        <Row className="mb-3">
-          <Col>
-            <label htmlFor="others" className="form-label">
-              <strong>Kilde til Annet</strong>
-            </label>
-            <CustomSelect
-              isMulti
-              placeholder={<div>Velg Andre</div>}
-              className="form-select-md"
-              onChange={handleOtherChange}
-              options={selectOthers}
-            />
-          </Col>
-        </Row>
-        <Row className="mb-3">
-          <Col>
-            <label htmlFor="reqs" className="form-label">
-              <strong>Møter EFSA Næringskrav</strong>
-            </label>
-            <CustomSelect
-              isMulti
-              placeholder={<div>Velg Muligheter</div>}
-              className="form-select-md"
-              onChange={setSelectedMeetsReqs}
-              options={filteredOptions}
-              value={selectedMeetsReqs}
-            />
-          </Col>
-        </Row>
-        </Container>
-
 
 
         </div>
@@ -1136,10 +1065,14 @@ const Calculator = () => {
 
           {/* Description of what the user should do */}
           <p>
-            Trykk på "søk"-knappen for å se resultatet. Først må du sette
+            Trykk på "beregn"-knappen for å se resultatet. Først må du sette
             ernæringsverdiene inne i ernæringskolonnen. Resultatet vises på
             høyre side. Hvis en "feil" oppstår, hold musepekeren over feilikonet
-            i venstre kolonne for å se detaljene om den spesifikke feilen.
+            i venstre kolonne for å se detaljene om den spesifikke feilen. 
+            En kan legge til næringsstoffer som befinner seg i produktet, nederst i venstre kolonne. 
+            Basert på valgte stoffer, vil EFSA Helsepåstander som tilhører bli generert. 
+            Hvis visse EFSA Næringskrav treffes, vil det tilføyes ekstra påstander som bare er tilgjengelige dersom kravet til påstanden er oppfylt.
+
           </p>
 
           <ProductButtons showSubmitButton={isCalculationCompleted} onSubmit={handleSubmit} />
@@ -2076,14 +2009,95 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs} />
           }
 
           {/*{isCalculationCompleted && (
           <button type="submit">Save Product</button>
         )}*/}
 
+
+
+
+
         </div>
+
+          {/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/}
+          {/* These are added inputs for Health Claims */}
+          <div className="col-md-6" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+
+          <Container style={{ border: '1px solid #ccc', padding: '10px', borderRadius: '5px', marginTop: '10px', marginBottom: '10px', backgroundColor: '#f9f9f9'}}>
+          <h4>
+            <img 
+              alt="EFSA Logo"
+              className=""
+              style={{ width: '30px', height: '30px', float: 'left' }}
+              src={`${API_URL}/images/efsaLogo.png`}
+            />
+            &nbsp;EFSA Helsepåstander
+          </h4>
+          <hr/>
+          <Row className="mb-3">
+          <Col xs={12} md={6}>
+            <label htmlFor="vitamins" className="form-label">
+              <strong>Kilde til Vitaminer</strong>
+            </label>
+            <CustomSelect
+              isMulti
+              placeholder={<div>Velg Vitaminer</div>}
+              className="form-select-md"
+              onChange={handleVitaminChange}
+              options={selectVitamins}
+            />
+          </Col>
+          <Col xs={12} md={6}>
+            <label htmlFor="minerals" className="form-label">
+              <strong>Kilde til Mineraler</strong>
+            </label>
+            <CustomSelect
+              isMulti
+              placeholder={<div>Velg Mineraler</div>}
+              className="form-select-md"
+              onChange={handleMineralChange}
+              options={selectMinerals}
+            />
+          </Col>
+        </Row>
+
+        <Row className="mb-3">
+          <Col>
+            <label htmlFor="others" className="form-label">
+              <strong>Kilde til Annet</strong>
+            </label>
+            <CustomSelect
+              isMulti
+              placeholder={<div>Velg Andre</div>}
+              className="form-select-md"
+              onChange={handleOtherChange}
+              options={selectOthers}
+            />
+          </Col>
+        </Row>
+        <Row className="mb-3">
+          <Col>
+            <label htmlFor="reqs" className="form-label">
+              <strong>Møter EFSA Næringskrav</strong>
+            </label>
+            <CustomSelect
+              isMulti
+              placeholder={<div>Velg Muligheter</div>}
+              className="form-select-md"
+              onChange={setSelectedMeetsReqs}
+              options={filteredOptions}
+              value={selectedMeetsReqs}
+            />
+          </Col>
+        </Row>
+        </Container>
+        </div>
+        <div style={{padding: '100px'}}></div>
+
+
       </div>
     </div>
     </div>

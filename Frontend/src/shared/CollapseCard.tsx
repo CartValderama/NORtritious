@@ -17,11 +17,11 @@ const CollapseCard: React.FC<CollapsibleCardProps> = ({ productId, content }) =>
   // Formaterer innholdet i kortet
   const formatContent = (content: string) => {
     return content.split('\n').map((line, index) => {
-      const label = line.split(':')[0];
+      const label = line.split(', ')[0];
       return (
       // For hver linje i innholdet, returnes en paragraf via HTML, 
       // dangerouslySetInnerHTML er innerHTML i React
-      <p key={index} dangerouslySetInnerHTML={{__html: label }}/>
+      <p key={index} dangerouslySetInnerHTML={{__html: `&#9642; `+label }}/>
       );
     });
   };
@@ -58,8 +58,8 @@ const CollapseCard: React.FC<CollapsibleCardProps> = ({ productId, content }) =>
             </Card.Header>
             <Card.Body style={{ maxHeight: '200px', overflowY: 'auto' }}>
               
-
               {formatContent(content)}
+
             </Card.Body>
           </Card>
         </div>
