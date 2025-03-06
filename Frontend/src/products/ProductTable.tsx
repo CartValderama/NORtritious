@@ -195,7 +195,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
 
                     <td className="align-middle text-center">
                       <Link
-                        to={`/productdetails/${product.productId}`}
+                        to={`/products/details/${product.productId}`}
                         className="text-decoration-none"
                       >
                         <img
