@@ -145,7 +145,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       : ""}
                   </th>
                   {showType && (
-                    <th className="align-middle text-center">Type</th>
+                    <th className="align-middle text-center">Kategori</th>
                   )}
                   {showNutrition && (
                     <th className="align-middle">Næringsmiddel pr. 100 g/ml</th>
