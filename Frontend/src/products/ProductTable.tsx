@@ -50,6 +50,12 @@ const ProductTable: React.FC<ProductTableProps> = ({
     setSelectedProduct(product);
   };
 
+  const handleShowNutritionClaims = (content: string, product: any) => {
+    setClaimsContent(content);
+    setShowClaims(true);
+    setSelectedProduct(product);
+  };
+
   // Sorterer produktene
   const sortedProducts = [...products].sort((a, b) => {
     // Ensure TypeScript knows `sortColumn` is a valid key of `Product`
@@ -116,6 +122,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
               className="shadow-sm"
               style={{ backgroundColor: "white" }}
             >
+              <caption>Produkttabell</caption>
               <thead className="bg-light">
                 <tr>
                   {showId && <th className="align-middle">ID</th>}
@@ -161,7 +168,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                   </th>
                   <th className="align-middle text-center">
                     <img
-                      src={`${API_URL}/images/efsaLogo.png`}
+                      src={`${API_URL}/images/efsaLogoGreen.png`}
                       alt="EFSA Ernæringspåstander"
                       className="img-fluid"
                       style={{ maxHeight: "1.5rem" }}
@@ -239,16 +246,43 @@ const ProductTable: React.FC<ProductTableProps> = ({
                     </td>
 
                     <td className="align-middle text-center">
-                      <button
-                        type="button"
-                        className="btn btn-outline-success btn-sm"
-                        onClick={() =>
-                          handleShowClaims(product.hasEfsaHealth, product)
-                        }
+                      <div
+                        className="btn-group-vertical"
+                        role="group"
+                        aria-label="EFSA Visningsknapper"
                       >
-                        <i className="bi bi-arrows-fullscreen"></i>
-                        <span> Vis påstander</span>
-                      </button>
+                        {product.hasEfsaHealth ? (
+                          <button
+                            type="button"
+                            className="btn btn-outline-success btn-sm"
+                            onClick={() =>
+                              handleShowClaims(product.hasEfsaHealth, product)
+                            }
+                          >
+                            <i className="bi bi-arrows-fullscreen"></i>
+                            <span> Helsepåstander</span>
+                          </button>
+                        ) : (
+                          ""
+                        )}
+                        {product.hasEfsaNutrition ? (
+                          <button
+                            type="button"
+                            className="btn btn-outline-success btn-sm"
+                            onClick={() =>
+                              handleShowNutritionClaims(
+                                product.hasEfsaHealth,
+                                product
+                              )
+                            }
+                          >
+                            <i className="bi bi-arrows-fullscreen"></i>
+                            <span> Næringspåstander</span>
+                          </button>
+                        ) : (
+                          ""
+                        )}
+                      </div>
                     </td>
 
                     <td className="align-middle text-center">
@@ -259,15 +293,19 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       >
                         {/* Navigate to the edit page with product ID */}
                         <Link
+                          type="button"
                           to="/edit-product"
                           className="btn btn-outline-primary btn-sm"
+                          aria-label="Rediger produkt"
                         >
                           <i className="bi bi-pencil-square"></i>
                         </Link>
 
                         {/* Call onProductDeleted function with product ID */}
                         <button
+                          type="button"
                           className="btn btn-outline-danger btn-sm"
+                          aria-label="Slett produkt"
                           onClick={() => onProductDeleted(product.productId)}
                         >
                           <i className="bi bi-trash"></i>

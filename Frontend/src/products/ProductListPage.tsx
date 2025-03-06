@@ -104,13 +104,16 @@ const ProductListPage: React.FC = () => {
         variant="outline-primary"
         onClick={fetchProducts}
         className="mb-3 me-2"
+        aria-label="Oppdater visning"
         disabled={loading}
       >
         <i className="bi bi-arrow-clockwise"></i>
         {loading ? " Loading..." : " "}
       </Button>
       <Button
+        type="button"
         variant="outline-primary"
+        aria-label={showTable ? "Rutenettvisning" : "Tabellvisning"}
         onClick={toggleTableOrGrid}
         className="mb-3 me-2"
       >
@@ -140,6 +143,7 @@ const ProductListPage: React.FC = () => {
           </InputGroup.Text>
           <Form.Control
             type="text"
+            aria-label="Søkefelt"
             placeholder="Søk etter Navn eller Kategorier"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
