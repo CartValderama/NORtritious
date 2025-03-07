@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import API_URL from "../apiConfig";
 import RoleRightsTable from "../components/RoleRightsTable";
 //import { height } from "@fortawesome/free-solid-svg-icons/fa0";
@@ -177,12 +177,14 @@ const ProfilePage: React.FC = () => {
   if (loading) return <p>Loading...</p>;
 
   return (
+    // Main Account profile container
     <div className="container">
       <h1 className="h1">Konto</h1>
 
       <div className="row">
-        {/* Sidemeny */}
+        {/* Left side navigation column */}
         <div className="col-md-3">
+          {/* Profile picture */}
           <div className="position-relative">
             <img
               className="img-thumbnail mb-4 position-relative"
@@ -195,13 +197,16 @@ const ProfilePage: React.FC = () => {
             />
           </div>
 
+          {/* Profile name */}
           <div className="list-group mb-4">
             <div className="list-group-item">
               <strong>{userInfo.name}</strong>
             </div>
           </div>
 
+          {/* Left side navigation nav items */}
           <div className="list-group mb-4">
+            {/* Information page */}
             <button
               className={`list-group-item list-group-item-action ${
                 selectedSection === "info" ? "active" : ""
@@ -210,6 +215,7 @@ const ProfilePage: React.FC = () => {
             >
               <i className="bi bi-person-vcard"></i> Oppdater informasjon
             </button>
+            {/* Profile picture upload nav item */}
             <button
               className={`list-group-item list-group-item-action ${
                 selectedSection === "image" ? "active" : ""
@@ -218,6 +224,7 @@ const ProfilePage: React.FC = () => {
             >
               <i className="bi bi-image"></i> Endre Profilbilde
             </button>
+            {/* Password change nav item */}
             <button
               className={`list-group-item list-group-item-action ${
                 selectedSection === "password" ? "active" : ""
@@ -226,6 +233,7 @@ const ProfilePage: React.FC = () => {
             >
               <i className="bi bi-key"></i> Endre passord
             </button>
+            {/* Role rights nav item */}
             <button
               className={`list-group-item list-group-item-action ${
                 selectedSection === "rights" ? "active" : ""
@@ -234,6 +242,7 @@ const ProfilePage: React.FC = () => {
             >
               <i className="bi bi-person-lock"></i> Mine rollerettigheter
             </button>
+            {/* My products nav item */}
             <button
               className={`list-group-item list-group-item-action ${
                 selectedSection === "products" ? "active" : ""
@@ -245,20 +254,26 @@ const ProfilePage: React.FC = () => {
           </div>
         </div>
 
-        {/* Hovedinnhold */}
+        {/* Right side main content */}
         <div className="col-md-9">
+          {/* If in Information state */}
           {selectedSection === "info" && (
             <div className="card">
               <div className="card-body">
                 <h2 className="card-title">Oppdater informasjon</h2>
+                {/* Form for updating profile information */}
                 <form onSubmit={handleUpdateInfo}>
+                  {/* Update name */}
                   <div className="mb-3">
                     <label htmlFor="name" className="form-label">
                       Navn
                     </label>
                     <div className="input-group">
                       <span className="input-group-text" id="basic-addon1">
-                        <i className="bi bi-person-vcard"></i>
+                        <i
+                          className="bi bi-person-vcard"
+                          aria-hidden="true"
+                        ></i>
                       </span>
                       <input
                         type="text"
@@ -272,13 +287,14 @@ const ProfilePage: React.FC = () => {
                       />
                     </div>
                   </div>
+                  {/* Display email */}
                   <div className="mb-3">
                     <label htmlFor="email" className="form-label">
                       Epost
                     </label>
                     <div className="input-group">
                       <span className="input-group-text" id="basic-addon1">
-                        <i className="bi bi-at"></i>
+                        <i className="bi bi-at" aria-hidden="true"></i>
                       </span>
                       <input
                         type="email"
@@ -294,13 +310,14 @@ const ProfilePage: React.FC = () => {
                       />
                     </div>
                   </div>
+                  {/* Display role */}
                   <div className="mb-3">
                     <label htmlFor="role" className="form-label">
                       Rolle
                     </label>
                     <div className="input-group">
                       <span className="input-group-text" id="basic-addon2">
-                        <i className="bi bi-tag"></i>
+                        <i className="bi bi-tag" aria-hidden="true"></i>
                       </span>
                       <input
                         type="role"
@@ -316,6 +333,7 @@ const ProfilePage: React.FC = () => {
                       />
                     </div>
                   </div>
+                  {/* If producer, update organisation number */}
                   {userInfo.role === "Producer" && (
                     <div className="mb-3">
                       <label htmlFor="org-num" className="form-label">
@@ -323,7 +341,7 @@ const ProfilePage: React.FC = () => {
                       </label>
                       <div className="input-group">
                         <span className="input-group-text" id="basic-addon1">
-                          <i className="bi bi-building"></i>
+                          <i className="bi bi-building" aria-hidden="true"></i>
                         </span>
                         <input
                           type="org-num"
@@ -340,10 +358,12 @@ const ProfilePage: React.FC = () => {
                       </div>
                     </div>
                   )}
+                  {/* Submission button */}
                   <button
                     type="submit"
                     className="btn btn-primary"
                     aria-label="Oppdater informasjon"
+                    title="Klikk for å oppdatere informasjon"
                   >
                     Oppdater
                   </button>
@@ -352,10 +372,12 @@ const ProfilePage: React.FC = () => {
             </div>
           )}
 
+          {/* If in Image upload state */}
           {selectedSection === "image" && (
             <div className="card mb-3">
               <div className="card-body">
                 <h2 className="card-title">Endre profilbilde</h2>
+                {/* Preview chosen picture */}
                 {selectedImage && (
                   <div className="mb-3">
                     <h5>Valgt bilde:</h5>
@@ -367,6 +389,7 @@ const ProfilePage: React.FC = () => {
                     />
                   </div>
                 )}
+                {/* Form for uploading new picture */}
                 <form onSubmit={handleImageUpload}>
                   <div className="mb-3">
                     <label htmlFor="image" className="form-label">
@@ -387,10 +410,12 @@ const ProfilePage: React.FC = () => {
                       />
                     </div>
                   </div>
+                  {/* Submission button */}
                   <button
                     type="submit"
                     className="btn btn-primary"
                     aria-label="Last opp profilbilde"
+                    title="Klikk for å laste opp bilde"
                   >
                     <i className="bi bi-upload"></i> Last opp
                   </button>
@@ -399,11 +424,14 @@ const ProfilePage: React.FC = () => {
             </div>
           )}
 
+          {/* If in Passowrd change state */}
           {selectedSection === "password" && (
             <div className="card mb-3">
               <div className="card-body">
                 <h2 className="card-title">Endre passord</h2>
+                {/* Form for changing password */}
                 <form onSubmit={handleChangePassword}>
+                  {/* Old password */}
                   <div className="mb-3">
                     <label htmlFor="oldPassword" className="form-label">
                       Gammelt passord
@@ -423,6 +451,11 @@ const ProfilePage: React.FC = () => {
                         aria-label={
                           showPassword ? "Skjul passord" : "Vis passord"
                         }
+                        title={
+                          showPassword
+                            ? "Klikk for å skjule passord"
+                            : "Klikk for å vise passord"
+                        }
                         onClick={togglePasswordVisibility}
                       >
                         {showPassword ? (
@@ -433,6 +466,7 @@ const ProfilePage: React.FC = () => {
                       </button>
                     </div>
                   </div>
+                  {/* New password */}
                   <div className="mb-3">
                     <label htmlFor="newPassword" className="form-label">
                       Nytt passord
@@ -452,6 +486,11 @@ const ProfilePage: React.FC = () => {
                         aria-label={
                           showPassword ? "Skjul passord" : "Vis passord"
                         }
+                        title={
+                          showPassword
+                            ? "Klikk for å skjule passord"
+                            : "Klikk for å vise passord"
+                        }
                         onClick={togglePasswordVisibility}
                       >
                         {showPassword ? (
@@ -462,10 +501,12 @@ const ProfilePage: React.FC = () => {
                       </button>
                     </div>
                   </div>
+                  {/* Submission button */}
                   <button
                     type="submit"
                     className="btn btn-primary"
                     aria-label="Endre passord"
+                    title="Klikk for å endre passord"
                   >
                     Endre
                   </button>
@@ -474,11 +515,29 @@ const ProfilePage: React.FC = () => {
             </div>
           )}
 
+          {/* If in Role Rights state */}
+          {selectedSection === "rights" && (
+            <div className="card mb-3">
+              <div className="card-body">
+                <h2 className="card-title">Mine rettigheter</h2>
+                <p>
+                  <strong>Min rolle: </strong>
+                  {userInfo.role}
+                </p>
+                {/* Displaying the role rights table */}
+                <div className="table-responsive">
+                  <RoleRightsTable role={userInfo.role} />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* If in My products state */}
           {selectedSection === "products" && (
             <div className="card">
               <div className="card-body">
                 <h2 className="card-title">Mine produkter</h2>
-                {/* Vise produkter eller loading state */}
+                {/* Display products of loading state */}
                 {isProductsLoading ? (
                   <p>Laster produkter...</p>
                 ) : (
@@ -491,8 +550,11 @@ const ProfilePage: React.FC = () => {
                               className="img-thumbnail me-4"
                               style={{ height: "50px" }}
                               src={`${API_URL}/images/${product.imageUrl}`}
+                              alt={`${product.name} produktbilde`}
                             ></img>
-                            {product.name}
+                            <Link to={`/products/details/${product.productId}`}>
+                              {product.name}
+                            </Link>
                           </li>
                         ))
                       ) : (
@@ -501,30 +563,17 @@ const ProfilePage: React.FC = () => {
                         </li>
                       )}
                     </ul>
+                    {/* Fetch products button */}
                     <button
-                      className="btn btn-secondary"
-                      aria-label="Se alle mine produkter"
+                      className="btn btn-primary"
+                      aria-label="Hent alle mine produkter"
+                      title="Klikk for å hente alle mine produkter"
                       onClick={fetchProducts}
                     >
                       Se alle produkter
                     </button>
                   </>
                 )}
-              </div>
-            </div>
-          )}
-
-          {selectedSection === "rights" && (
-            <div className="card mb-3">
-              <div className="card-body">
-                <h2 className="card-title">Mine rettigheter</h2>
-                <p>
-                  <strong>Min rolle: </strong>
-                  {userInfo.role}
-                </p>
-                <div className="table-responsive">
-                  <RoleRightsTable role={userInfo.role} />
-                </div>
               </div>
             </div>
           )}
