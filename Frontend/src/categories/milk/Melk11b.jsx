@@ -229,7 +229,7 @@ const Melk11b  = ({ product,
     // The if statement checks if all required inputs are non-empty and meet the nutritional requirements
     if (
       nutrition.fett !== "" &&
-      nutrition.fett <= 3 &&
+      nutrition.fett <= 1.5 && // Var opprinnelig 3, det skal være 1.5
       nutrition.mettede !== "" &&
       nutrition.mettede <= 0.6 &&
       nutrition.karbohydrat !== "" &&
@@ -310,7 +310,7 @@ const Melk11b  = ({ product,
       } else {
         setFettNull(false);
       }
-      if (nutrition.fett > 3) {
+      if (nutrition.fett > 1.5) { // Var opprinnelig 3, det skal være 1.5
         setFett(true);
         setShowNokkelhulletResults(false);
         hasNokkelhullet(false);
@@ -600,7 +600,7 @@ const Melk11b  = ({ product,
                 <th scope="row" className="table-font">
                   {fett ? (
                     <Tooltip
-                      title="Produktet innfrir ikke Nøkkelhullet på grunn av mengden fett. Mengden på fett må være lavere enn eller lik 3/ 100 g for å møte kravene for Nøkkelhullsmerking."
+                      title="Produktet innfrir ikke Nøkkelhullet på grunn av mengden fett. Mengden på fett må være lavere enn eller lik 1.5/ 100 g for å møte kravene for Nøkkelhullsmerking."
                       placement="right"
                       arrow
                     >
