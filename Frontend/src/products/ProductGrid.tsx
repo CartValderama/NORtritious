@@ -96,6 +96,8 @@ const ProductGrid: React.FC<ProductGridProps> = ({
                   {product.name}
                 </Card.Title>
                 <div className=" d-flex justify-content-between">
+                  {product.hasEfsaHealth && product.hasEfsaHealth.trim() !== "" ?(
+                    
                   <Button
                     variant="outline-primary"
                     size="sm"
@@ -112,6 +114,9 @@ const ProductGrid: React.FC<ProductGridProps> = ({
                       alt={product.name}
                     />
                   </Button>
+                  ) : (
+                    "Ingen helsepåstander"
+                  )}
                   <OverlayTrigger
                     trigger="click"
                     placement="right"
