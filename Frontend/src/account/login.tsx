@@ -277,14 +277,15 @@ const LoginPage: React.FC = () => {
                 <div className="modal-dialog modal-dialog-centered">
                   <div className="modal-content">
                     <div className="modal-header">
-                      <h3 className="modal-title fs-5" id="exampleModalLabel">
+                      <h2 className="modal-title fs-5" id="exampleModalLabel">
                         Rollerettigheter
-                      </h3>
+                      </h2>
                       <button
                         type="button"
                         className="btn-close"
                         data-bs-dismiss="modal"
-                        aria-label="Close"
+                        aria-label="Lukk oversikt"
+                        title="Lukk oversikt"
                       ></button>
                     </div>
                     <div className="modal-body">
@@ -295,6 +296,8 @@ const LoginPage: React.FC = () => {
                         type="button"
                         className="btn btn-secondary"
                         data-bs-dismiss="modal"
+                        aria-label="Lukk oversikt"
+                        title="Lukk oversikt"
                       >
                         Lukk
                       </button>
