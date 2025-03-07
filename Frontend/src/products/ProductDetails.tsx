@@ -74,7 +74,7 @@ const ProductDetails = () => {
         <div className="row gx-5">
           {/* Left column */}
           <div className="col-12 col-md-5">
-            <div className="p-4">
+            <div>
               <img
                 src={`${API_URL}/images/placeholder.png`}
                 width={"100%"}
@@ -89,11 +89,6 @@ const ProductDetails = () => {
                   height={"30px"}
                   className="pe-2"
                   alt="Nøkkelhull-merket"
-                />
-                <img
-                  src={`${API_URL}/images/efsaLogo.png`}
-                  height={"30px"}
-                  alt="EFSA-merket"
                 />
                 <img
                   src={`${API_URL}/images/efsaLogoGreen.png`}
