@@ -583,7 +583,7 @@ const Melk11a = ({ product,
                 <th scope="row" className="table-font">
                   {fett ? (
                     <Tooltip
-                      title="Produktet innfrir ikke Nøkkelhullet på grunn av mengden fett. Mengden på fett må være lavere enn eller lik 3/ 100 g for å møte kravene for Nøkkelhullsmerking."
+                      title="Produktet innfrir ikke Nøkkelhullet på grunn av mengden fett. Mengden på fett må være lavere enn eller lik 0.7/ 100 g for å møte kravene for Nøkkelhullsmerking."
                       placement="right"
                       arrow
                     >
