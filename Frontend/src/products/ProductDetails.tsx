@@ -156,68 +156,70 @@ const ProductDetails = () => {
             <hr />
 
             <h2>Nutrition</h2>
-            <table className="table table-striped table-hover">
-              <caption>Nutrition per 100g</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Næringsstoff</th>
-                  <th scope="col">Per 100g</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Kalorier</td>
-                  <td>{product.calories}</td>
-                </tr>
-                <tr>
-                  <td>Fett</td>
-                  <td>{product.fat}</td>
-                </tr>
-                <tr>
-                  <td className="ps-4">Hvorav mettet fett</td>
-                  <td>{product.satFat}</td>
-                </tr>
-                <tr>
-                  <td>Karohydrater</td>
-                  <td>{product.carbs}</td>
-                </tr>
-                <tr>
-                  <td className="ps-4">Hvorav naturlig sukker</td>
-                  <td>{product.natSugar}</td>
-                </tr>
-                <tr>
-                  <td className="ps-4">Hvorav tilsatt sukker</td>
-                  <td>{product.addedSugar}</td>
-                </tr>
-                <tr>
-                  <td className="ps-4">Hvorav fiber</td>
-                  <td>{product.fiber}</td>
-                </tr>
-                <tr>
-                  <td>Protein</td>
-                  <td>{product.protein}</td>
-                </tr>
-                <tr>
-                  <td>Salt</td>
-                  <td>{product.salt}</td>
-                </tr>
-              </tbody>
-            </table>
+            <div className="mb-4">
+              <table className="table table-striped table-hover">
+                <caption>Nutrition per 100g</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Næringsstoff</th>
+                    <th scope="col">Per 100g</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Kalorier</td>
+                    <td>{product.calories}</td>
+                  </tr>
+                  <tr>
+                    <td>Fett</td>
+                    <td>{product.fat}</td>
+                  </tr>
+                  <tr>
+                    <td className="ps-4">Hvorav mettet fett</td>
+                    <td>{product.satFat}</td>
+                  </tr>
+                  <tr>
+                    <td>Karohydrater</td>
+                    <td>{product.carbs}</td>
+                  </tr>
+                  <tr>
+                    <td className="ps-4">Hvorav naturlig sukker</td>
+                    <td>{product.natSugar}</td>
+                  </tr>
+                  <tr>
+                    <td className="ps-4">Hvorav tilsatt sukker</td>
+                    <td>{product.addedSugar}</td>
+                  </tr>
+                  <tr>
+                    <td className="ps-4">Hvorav fiber</td>
+                    <td>{product.fiber}</td>
+                  </tr>
+                  <tr>
+                    <td>Protein</td>
+                    <td>{product.protein}</td>
+                  </tr>
+                  <tr>
+                    <td>Salt</td>
+                    <td>{product.salt}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
             {product.hasEfsaNutrition && (
-              <>
+              <div className="mb-4">
                 <h2>EFSA Næringspåstander</h2>
                 <div
                   dangerouslySetInnerHTML={{ __html: product.hasEfsaNutrition }}
                 ></div>
-              </>
+              </div>
             )}
             {product.hasEfsaHealth !== "" && (
-              <>
+              <div className="mb-4">
                 <h2>EFSA Helsepåstander</h2>
                 <div
                   dangerouslySetInnerHTML={{ __html: product.hasEfsaHealth }}
                 ></div>
-              </>
+              </div>
             )}
           </div>
         </div>
