@@ -549,10 +549,17 @@ const ProfilePage: React.FC = () => {
                             <img
                               className="img-thumbnail me-4"
                               style={{ height: "50px" }}
-                              src={`${API_URL}/images/${product.imageUrl}`}
+                              src={
+                                product.imageUrl
+                                  ? `${API_URL}${product.imageUrl}`
+                                  : `${API_URL}/images/product_images/placeholder.png`
+                              }
                               alt={`${product.name} produktbilde`}
                             ></img>
-                            <Link to={`/products/details/${product.productId}`}>
+                            <Link
+                              to={`/products/details/${product.productId}`}
+                              className="text-decoration-none"
+                            >
                               {product.name}
                             </Link>
                           </li>

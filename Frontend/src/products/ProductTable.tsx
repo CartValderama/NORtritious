@@ -203,7 +203,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                         <img
                           alt={product.name}
                           className="rounded"
-                          style={{ maxWidth: "120px", height: "auto" }}
+                          style={{ maxWidth: "120px", maxHeight: "100px" }}
                           src={
                             product.imageUrl
                               ? `${API_URL}${product.imageUrl}`
