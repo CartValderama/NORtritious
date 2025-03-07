@@ -247,7 +247,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
 
                     <td className="align-middle text-center">
                       <div
-                        className="btn-group-vertical"
+                        className="btn-group"
                         role="group"
                         aria-label="EFSA Visningsknapper"
                       >
@@ -265,24 +265,9 @@ const ProductTable: React.FC<ProductTableProps> = ({
                         ) : (
                           ""
                         )}
-                        {product.hasEfsaNutrition ? (
-                          <button
-                            type="button"
-                            className="btn btn-outline-success btn-sm"
-                            onClick={() =>
-                              handleShowNutritionClaims(
-                                product.hasEfsaHealth,
-                                product
-                              )
-                            }
-                          >
-                            <i className="bi bi-arrows-fullscreen"></i>
-                            <span> Næringspåstander</span>
-                          </button>
-                        ) : (
-                          ""
-                        )}
                       </div>
+                      <br></br>
+                      {product.hasEfsaNutrition}
                     </td>
 
                     <td className="align-middle text-center">
