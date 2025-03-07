@@ -31,7 +31,7 @@ const ClaimsModal: React.FC<ClaimsModalProps> = ({ show, onHide, content, produc
       return (
       // For hver linje etter ':' i innholdet (claim label), returnes en paragraf via HTML, 
       // *dangerouslySetInnerHTML er innerHTML i React
-      <p key={index} dangerouslySetInnerHTML={{__html: `&#9642; `+label }}/>
+      <p key={index} dangerouslySetInnerHTML={{__html: label }}/>
       );
     });
   };

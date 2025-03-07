@@ -1,6 +1,8 @@
 // Import statements for React and other modules/components
 import React, { useState, useEffect } from "react";
-import { Button, FormText, Container, Row, Col, Card } from "react-bootstrap";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
+import { Button, FormText, Container, Row, Col, Card, Popover, OverlayTrigger } from "react-bootstrap";
 //import Select from "react-select"; // import Select component
 import "./css/Calculator.css";
 import API_URL from "./apiConfig";
@@ -446,8 +448,8 @@ const Calculator = () => {
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   */ 
 
-  const [selectedMinerals, setSelectedVitamins] = useState([]); // for the "Minerals" selector
-  const [selectedVitamins, setSelectedMinerals] = useState([]); // for the "Vitamins" selector
+  const [selectedMinerals, setSelectedMinerals] = useState([]); // for the "Minerals" selector
+  const [selectedVitamins, setSelectedVitamins] = useState([]); // for the "Vitamins" selector
   const [selectedOthers, setSelectedOthers] = useState([]); // for the "Others" selector
   const [selectedMeetsReqs, setSelectedMeetsReqs] = useState([]); // for the "Meets requirements" checkbox
   //const [claimDescription, setClaimDescription] = useState(''); // for the health claim description
@@ -465,16 +467,36 @@ const Calculator = () => {
   const [showMineralClaim, setShowMineralClaim] = useState(false); // for the health claim description
   const [showOtherClaim, setShowOtherClaim] = useState(false); // for the health claim description
 
+  const [vitaminInputValues, setVitaminInputValues] = useState({}); // for the health claim description
+  const [mineralInputValues, setMineralInputValues] = useState({}); // for the health claim description
+  const [otherInputValues, setOtherInputValues] = useState({}); // for the health claim description
+  const [meetsReqsInputValues, setMeetsReqsInputValues] = useState({}); // for the health claim description
+
+  const [vitaminUnits, setVitaminUnits] = useState({}); // for the health claim description
+  const [mineralUnits, setMineralUnits] = useState({}); // for the health claim description
+
+  // Validates input for claims
+  const validateInput = (value) => {
+    const regex = /^\d*\.?\d*$/;
+    return regex.test(value);
+  };
+
   const handleVitaminChange = (selectedOptions) => {
     setSelectedVitamins(selectedOptions);
+    // Resets vitamin input value when a new vitamin is selected
+    //setVitaminInputValues({});
   };
 
   const handleMineralChange = (selectedOptions) => {
     setSelectedMinerals(selectedOptions);
+    // Resets mineral input val when new one is selected
+    //setMineralInputValues({});
   };
 
   const handleOtherChange = (selectedOptions) => {
     setSelectedOthers(selectedOptions);
+    // Resets other input val when new one is selected
+    //setOtherInputValues({});
   };
 
   
@@ -533,36 +555,133 @@ const Calculator = () => {
     }
   };
 
+  const meetsMinimumRequirement = (other, value) => {
+    const selectedOther = selectOthers.find(item => item.value === other);
+    if (selectedOther && selectedOther.minimum !== undefined) {
+      return parseFloat(value) >= selectedOther.minimum;
+    }
+    return 'Ikke nødvendig';
+  };
+
+  // Function to handle unit change for vitamins
+  const handleVitaminUnitChange = (vitamin, unit) => {
+    setVitaminUnits(prevUnits => ({
+      ...prevUnits,
+      [vitamin]: unit,
+    }));
+  };
+
+  // Function to handle unit change for minerals
+  const handleMineralUnitChange = (mineral, unit) => {
+    setMineralUnits(prevUnits => ({
+      ...prevUnits,
+      [mineral]: unit,
+    }));
+  };
+
+  // Handles the input change of selected vitamins
+  const handleVitaminInputChange = (vitamin, value) => {
+    if (validateInput(value)) {
+      setVitaminInputValues(prevValues => ({
+        ...prevValues,
+        [vitamin]: value,
+      }));
+    }
+  };
+  // Handles the input change of selected minerals
+  const handleMineralInputChange = (mineral, value) => {
+    if (validateInput(value)) {
+      setMineralInputValues(prevValues => ({
+        ...prevValues,
+        [mineral]: value,
+      }));
+    }
+  };
+  // Handles the input change of selected others
+  const handleOtherInputChange = (other, value) => {
+    if (validateInput(value)) {
+      setOtherInputValues(prevValues => ({
+        ...prevValues,
+        [other]: value,
+      }));
+    }
+  };
+  // Handles the input change of selected meets requirements
+  const handleMeetsReqsInputChange = (meetsReqs, value) => {
+    if (validateInput(value)) {
+      setMeetsReqsInputValues(prevValues => ({
+        ...prevValues,
+        [meetsReqs]: value,
+      }));
+    }
+  };
+
   // Gets the claims descriptions for every selected vitamins, and sets the state variable
   useEffect(() => {
     const descriptions = selectedVitamins.map(option => getClaimDescription(option.value));
     setVitaminClaims(descriptions);
-  }, [selectedVitamins]);
+  }, [selectedVitamins, vitaminInputValues, vitaminUnits]);
 
   // Gets the claims descriptions for every selected minerals, and sets the state variable
   useEffect(() => {
     const descriptions = selectedMinerals.map(option => getClaimDescription(option.value));
     setMineralClaims(descriptions);
-  }, [selectedMinerals]);
+  }, [selectedMinerals, mineralInputValues, mineralUnits]);
 
   // Gets the claims descriptions for every selected other type, and sets the state variable
   useEffect(() => {
     const descriptions = selectedOthers.map(option => getClaimDescription(option.value));
     setOtherClaims(descriptions);
-  }, [selectedOthers]);
+  }, [selectedOthers, otherInputValues]);
 
   // Gets the claims descriptions for every requirement met, and sets the state variable
   useEffect(() => {
     const descriptions = selectedMeetsReqs.map(option => getClaimDescription(option.value));
     setMeetsReqsClaims(descriptions);
-  }, [selectedMeetsReqs]);
+  }, [selectedMeetsReqs, meetsReqsInputValues]);
 
   const getClaimDescription = (selectedItem) => {
     console.log('selectedItem:', selectedItem);
     // Itererer gjennom helsepåstander for å finne riktig påstand for valgt vitamin/mineral/andre og returnerer en toString
     for (const nutrient of healthClaims) {
       if (nutrient.nutrient === selectedItem) {
-        return nutrient.claims.map(claim => claim.claim).join('.\n');
+        const claims = nutrient.claims.map(claim => claim.claim).join('.\n');
+        
+        const vitaminInput = vitaminInputValues[selectedItem]; // Deler på 1000 for å få gram
+        const mineralInput = mineralInputValues[selectedItem]; // Deler på 1000 for å få gram
+        const otherInput = otherInputValues[selectedItem];
+        const meetsReqsInput = meetsReqsInputValues[selectedItem];
+
+        // Sjekker om inputverdien er satt, og setter den til 'ikke oppgitt' hvis den ikke er satt
+        // Sjekker også om målingsverdier er satt, og konverterer til mg hvis enheten er mikrogram
+        let inputValue = 'ikke oppgitt';
+        const vitaminUnit = vitaminUnits[selectedItem] || 'mg';
+        const convertedVitaminValue = vitaminUnit === 'µg' ? vitaminInput / 1000 : vitaminInput;
+        const mineralUnit = mineralUnits[selectedItem] || 'mg';
+        const convertedMineralValue = mineralUnit === 'µg' ? mineralInput / 1000 : mineralInput; 
+        if (vitaminInput !== undefined){
+          inputValue = convertedVitaminValue || 'ikke oppgitt';
+        } else if (mineralInput !== undefined){
+          inputValue = convertedMineralValue || 'ikke oppgitt';
+        } else if (otherInput !== undefined){
+          inputValue = otherInput || 'ikke oppgitt';
+        } else if (meetsReqsInput !== undefined){
+          inputValue = meetsReqsInput || 'ikke oppgitt';
+        }
+        if (inputValue !== 'ikke oppgitt' && inputValue !== ''){ //&& inputValue === ) {
+          if (vitaminInput !== undefined || mineralInput !== undefined) {
+            inputValue += ' mg';
+          } else {
+            inputValue += ' g';
+          }
+        }
+        
+        // Sjekker om inputverdien oppfyller kravet for helsepåstanden
+        let meetsMinimum = `<em>Ved å velge dette næringsstoffet er man sikker at mengden oppfyller kravet som er vedlagt til forordning (EF) nr. 1924/2006.</em>`;
+        if (otherInput !== undefined) {
+          meetsMinimum = meetsMinimumRequirement(selectedItem, inputValue.replace(' g', '')) ? `<strong>Oppfyller gitt krav</strong>` : `<strong>Oppfyller ikke gitt krav</strong>`;
+        }
+        return `<strong>Mengde: ${inputValue}</strong>\n${meetsMinimum}\n${claims}`;
       }
     }
     return 'No claim found for the selected item.';
@@ -647,16 +766,16 @@ const Calculator = () => {
     e.preventDefault();
 
     const vitaminClaimDescriptions = vitaminClaims.map((description, index) => 
-      `<strong>${selectedVitamins[index].label} Claim Description:</strong>\n${description}`
+      `<strong>${selectedVitamins[index].label} Helsepåstand(er):</strong>\n${description}`
     ).join('\n');
     const mineralClaimDescriptions = mineralClaims.map((description, index) => 
-      `<strong>${selectedMinerals[index].label} Claim Description:</strong>\n${description}`
+      `<strong>${selectedMinerals[index].label} Helsepåstand(er):</strong>\n${description}`
     ).join('\n');
     const otherClaimDescriptions = otherClaims.map((description, index) =>
-      `<strong>${selectedOthers[index].label} Claim Description:</strong>\n${description}`
+      `<strong>${selectedOthers[index].label} Helsepåstand(er):</strong>\n${description}`
     ).join('\n');
     const meetsReqsClaimDescriptions = meetsReqsClaims.map((description, index) =>
-      `<strong>${selectedMeetsReqs[index].label} Claim Description:</strong>\n${description}`
+      `<strong>${selectedMeetsReqs[index].label} Oppfyllende Helsepåstand(er):</strong>\n${description}`
     ).join('\n');
 
 
@@ -768,6 +887,26 @@ const Calculator = () => {
     }
     return false;
   });
+
+  // For info link to the regulation
+  const openInfoLink = () => {
+    window.open('https://lovdata.no/dokument/SF/forskrift/2010-02-17-187/KAPITTEL_1#KAPITTEL_1', '_blank', 'noopener,noreferrer');
+  };
+
+  // Popover for lovdata
+  const popover = (
+    <Popover data-trigger="focus" tabindex="0" id="popover-basic" style={{ maxWidth: '300px', maxHeight: '400px' }}>
+      <Popover.Header as="h2">EFSA Helsepåstander</Popover.Header>
+      <Popover.Body>
+        <strong>
+          Du kan søke etter et bestemt næringsstoff i hvert felt ved å taste inn navnet. 
+          <br/>For vitaminer og mineraler er mengden man oppgir frivillig. Det er forventet at matprodusent har kjennskap til at mengden oppfyller kravet for å kunne påstå at produktet inneholder en kilde til stoffet.
+          <hr/>Klikk på informasjonsikonet for å se hvilke krav som må møtes i henhold til forordning (EF) nr. 1924/2006.
+        </strong>
+      </Popover.Body>
+    </Popover>
+  );
+
 
 
   // This component returns a form that allows users to input nutritional data for a food item.
@@ -2026,15 +2165,20 @@ const Calculator = () => {
           {/* These are added inputs for Health Claims */}
           <div className="col-md-6" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
 
-          <Container style={{ border: '1px solid #ccc', padding: '10px', borderRadius: '5px', marginTop: '10px', marginBottom: '10px', backgroundColor: '#f9f9f9'}}>
+          <Container style={{ border: '1px solid #ccc', padding: '10px', borderRadius: '5px', marginTop: '10px', marginBottom: '10px', backgroundColor: '#f9f9f9', maxHeight: '1000px', overflowY: 'auto', overflowX: 'hidden' }}>
           <h4>
             <img 
               alt="EFSA Logo"
               className=""
-              style={{ width: '30px', height: '30px', float: 'left' }}
+              style={{ width: '35px', height: '35px', float: 'left' }}
               src={`${API_URL}/images/efsaLogo.png`}
             />
-            &nbsp;EFSA Helsepåstander
+            &nbsp;EFSA Helsepåstander &nbsp;
+
+            <OverlayTrigger data-trigger="hover" placement="right" overlay={popover}>
+            <FontAwesomeIcon icon={faCircleInfo} onClick={openInfoLink} style={{ cursor: 'pointer', float: 'right', padding: '5px' }}/>     
+            </OverlayTrigger>
+
           </h4>
           <hr/>
           <Row className="mb-3">
@@ -2049,6 +2193,32 @@ const Calculator = () => {
               onChange={handleVitaminChange}
               options={selectVitamins}
             />
+            {selectedVitamins.map((vitamin) => (
+              <div key={vitamin.value} className="mt-2">
+                <label htmlFor={`vitamin-input-${vitamin.value}`} className="form-label">
+                  Valgfri mengde {vitamin.label} 
+                </label>
+                <div className="input-group">
+                <input
+                  type="text"
+                  className="form-control"
+                  id={`vitamin-input-${vitamin.value}`}
+                  value={vitaminInputValues[vitamin.value] || ''}
+                  onChange={(e) => handleVitaminInputChange(vitamin.value, e.target.value)}
+                  placeholder={`${vitamin.label}`}
+                />
+                <select
+                  className="form-select"
+                  value={vitaminUnits[vitamin.value] || 'mg'}
+                  onChange={(e) => handleVitaminUnitChange(vitamin.value, e.target.value)}
+                  style={{flex: '0 0 25%'}}
+                >
+                  <option value="mg">mg</option>
+                  <option value="µg">µg</option>
+                </select>
+                </div>
+              </div>
+            ))}
           </Col>
           <Col xs={12} md={6}>
             <label htmlFor="minerals" className="form-label">
@@ -2061,10 +2231,37 @@ const Calculator = () => {
               onChange={handleMineralChange}
               options={selectMinerals}
             />
+            {selectedMinerals.map((mineral) => (
+              <div key={mineral.value} className="mt-2">
+                <label htmlFor={`mineral-input-${mineral.value}`} className="form-label">
+                  Valgfri mengde {mineral.label}
+                </label>
+                <div className="input-group">
+                <input
+                  type="text"
+                  className="form-control"
+                  id={`mineral-input-${mineral.value}`}
+                  value={mineralInputValues[mineral.value] || ''}
+                  onChange={(e) => handleMineralInputChange(mineral.value, e.target.value)}
+                  placeholder={`${mineral.label}`}
+                />
+                <select
+                  style={{flex: '0 0 25%'}}
+                  className="form-select"
+                  value={mineralUnits[mineral.value] || 'mg'}
+                  onChange={(e) => handleMineralUnitChange(mineral.value, e.target.value)}
+                >
+                  <option value="mg">mg</option>
+                  <option value="µg">µg</option>
+                </select>
+                </div>
+              </div>
+            ))}
           </Col>
         </Row>
+        <br/>
 
-        <Row className="mb-3">
+        <Row className="mb-3" >
           <Col>
             <label htmlFor="others" className="form-label">
               <strong>Kilde til Annet</strong>
@@ -2076,8 +2273,29 @@ const Calculator = () => {
               onChange={handleOtherChange}
               options={selectOthers}
             />
+            {selectedOthers.map((other) => (
+              <div key={other.value} className="mt-2">
+                <label htmlFor={`other-input-${other.value}`} className="form-label">
+                  Mengde {other.label}
+                </label>
+                <div className="input-group">
+                <input
+                  type="text"
+                  className="form-control"
+                  id={`other-input-${other.value}`}
+                  value={otherInputValues[other.value] || ''}
+                  onChange={(e) => handleOtherInputChange(other.value, e.target.value)}
+                  placeholder={`${other.label}`}
+                />
+                <span className="input-group-text">g</span>
+                
+                </div>
+              </div>
+            ))}
           </Col>
         </Row>
+        <br/>
+
         <Row className="mb-3">
           <Col>
             <label htmlFor="reqs" className="form-label">
@@ -2091,11 +2309,26 @@ const Calculator = () => {
               options={filteredOptions}
               value={selectedMeetsReqs}
             />
+            {selectedMeetsReqs.map((meetsReqs) => (
+              <div key={meetsReqs.value} className="mt-2">
+                <label htmlFor={`meetsReqs-input-${meetsReqs.value}`} className="form-label">
+                  Mengde {meetsReqs.label}
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id={`meetsReqs-input-${meetsReqs.value}`}
+                  value={meetsReqsInputValues[meetsReqs.value] || ''}
+                  onChange={(e) => handleMeetsReqsInputChange(meetsReqs.value, e.target.value)}
+                  placeholder={`${meetsReqs.label} (g)`}
+                />
+              </div>
+            ))}
           </Col>
         </Row>
         </Container>
         </div>
-        <div style={{padding: '100px'}}></div>
+        <div style={{padding: '200px'}}></div>
 
 
       </div>

@@ -21,7 +21,7 @@ const CollapseCard: React.FC<CollapsibleCardProps> = ({ productId, content }) =>
       return (
       // For hver linje i innholdet, returnes en paragraf via HTML, 
       // dangerouslySetInnerHTML er innerHTML i React
-      <p key={index} dangerouslySetInnerHTML={{__html: `&#9642; `+label }}/>
+      <p key={index} dangerouslySetInnerHTML={{__html: label }}/>
       );
     });
   };

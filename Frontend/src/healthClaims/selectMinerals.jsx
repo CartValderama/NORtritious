@@ -1,9 +1,5 @@
 const selectMinerals = [
     {
-      value: "Ingen",
-      label: "Ingen",
-    },
-    {
       value: "Kalsium",
       label: "Kalsium",
     },

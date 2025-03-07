@@ -891,6 +891,7 @@ const Kategori5 = ({
             Beregn
           </button>
         <button
+                style={{marginRight: '10px'}}
                 type='button'
                 className="btn btn-primary btn-lg button-search"
                 onClick={() => window.location.reload()}

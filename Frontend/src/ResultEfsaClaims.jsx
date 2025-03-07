@@ -275,6 +275,7 @@ function ResultEfsaHealthClaims({ vitaminClaims, mineralClaims, otherClaims, sel
         );
       });
     };
+
   
 
   {/* Hvis man ønsker at trekkmenyen ikke overlapper med andre objekter -> fjern styling på Container */}
@@ -283,8 +284,8 @@ function ResultEfsaHealthClaims({ vitaminClaims, mineralClaims, otherClaims, sel
 
     <Container className="claim-description mt-4" >
       <Row>
-        <div className="accordion" id="accordionPanelsStayOpen">
-          <div className="accordion-item">
+        <div className="accordion" id="accordionPanelsStayOpen" >
+          <div className="accordion-item" style={{border: '1px solid #ccc', boxShadow: '5px 5px 10px 0 rgba(0,0,0,0.1)'}}>
             <h2 className="accordion-header" id="panelsStayOpen-headingOne">
               <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
                 <img 
@@ -293,25 +294,26 @@ function ResultEfsaHealthClaims({ vitaminClaims, mineralClaims, otherClaims, sel
                   style={{ width: '50px', height: '50px', float: 'right' }}
                   src={`${API_URL}/images/efsaLogo.png`}
                   />
-                  &nbsp; EFSA Helsepåstander &nbsp;         
+                  &nbsp; EFSA Helsepåstander &nbsp;    
               </button>  
+
             </h2>
 
             <div id="panelsStayOpen-collapseOne" className="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingOne" >
-              <div class="accordion-body" style={{ display: 'flex', flexDirection: 'column', padding: '1em', overflowY: 'auto', maxHeight: '500px'}}>
+              <div class="accordion-body" style={{ display: 'flex', flexDirection: 'column', padding: '1em', overflowY: 'auto', maxHeight: '700px'}}>
                 {vitaminClaims.length > 0 && (
                   <>
                   {vitaminClaims.map((description, index) => (
                     <div key={index}>
                     <div style={{display: 'flex', alignItems: 'center', cursor: 'pointer'}} className={`vitamins mb-2 ${visibleVitaminClaims[index] ? 'active' : ''}`} onClick={() => toggleVitaminClaim(index)}>
-                      <h6 className='mb-0'>{visibleVitaminClaims[index] ? `Gjem` : `Vis`} Påstander for {selectedVitamins[index]?.label}</h6>
+                      <h6 className='mb-0'>{visibleVitaminClaims[index] ? `Gjem` : `Vis`} Påstand(er) for {selectedVitamins[index]?.label}</h6>
                       <FontAwesomeIcon icon={visibleVitaminClaims[index] ? faChevronUp : faChevronDown} className='ms-auto'/> 
                     </div>
                     <div className="vitamin-claims">
                   {visibleVitaminClaims[index] && (
                     <div>
                       <p>
-                        <strong>Gjeldende Helsepåstander for {selectedVitamins[index]?.label}: <br/></strong>
+                        <strong></strong>
                         {formatContent(description)}
                       </p>  
                     </div>
@@ -328,14 +330,14 @@ function ResultEfsaHealthClaims({ vitaminClaims, mineralClaims, otherClaims, sel
                 {mineralClaims.map((description, index) => (
                   <div key={index}>
                   <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer'}} className={`minerals mb-2 ${visibleMineralClaims[index] ? 'active' : ''}`} onClick={() => toggleMineralClaim(index)}>
-                    <h6 className='mb-0'>{visibleMineralClaims[index] ? 'Gjem' : 'Vis'} Påstander for {selectedMinerals[index]?.label}</h6>
+                    <h6 className='mb-0'>{visibleMineralClaims[index] ? 'Gjem' : 'Vis'} Påstand(er) for {selectedMinerals[index]?.label}</h6>
                     <FontAwesomeIcon icon={visibleMineralClaims[index] ? faChevronUp : faChevronDown} className='ms-auto'/>
                   </div>
                   <div className="mineral-claims">
                   {visibleMineralClaims[index] && (
                     <div>
                         <p>
-                          <strong>Gjeldende Helsepåstander for {selectedMinerals[index]?.label}: <br/></strong>
+                          <strong></strong>
                           {formatContent(description)}
                         </p>
                     </div>
@@ -351,14 +353,14 @@ function ResultEfsaHealthClaims({ vitaminClaims, mineralClaims, otherClaims, sel
                 {otherClaims.map((description, index) => (
                   <div key={index}>
                   <div style={{display: 'flex', alignItems: 'center', cursor: 'pointer'}} className={`others mb-2 ${visibleOtherClaims[index] ? 'active' : ''}`} onClick={() => toggleOtherClaim(index)}>
-                    <h6 className='mb-0'>{visibleOtherClaims[index] ? 'Gjem' : 'Vis'} Påstander for {selectedOthers[index]?.label}</h6>
+                    <h6 className='mb-0'>{visibleOtherClaims[index] ? 'Gjem' : 'Vis'} Påstand(er) for {selectedOthers[index]?.label}</h6>
                     <FontAwesomeIcon icon={visibleOtherClaims[index] ? faChevronUp : faChevronDown} className='ms-auto'/>
                   </div>
                   <div className="other-claims">
                   {visibleOtherClaims[index] && (
                     <div>
                       <p>
-                        <strong>Gjeldende Helsepåstander: <br/></strong>
+                        <strong></strong>
                         {formatContent(description)}
                       </p>
                     </div>
@@ -375,14 +377,14 @@ function ResultEfsaHealthClaims({ vitaminClaims, mineralClaims, otherClaims, sel
                 {meetsReqClaims.map((description, index) => (
                   <div key={index}>
                   <div style={{display: 'flex', alignItems: 'center', cursor: 'pointer'}} className={`minerals mb-2 ${visibleMeetsReqClaims[index] ? 'active' : ''}`} onClick={() => toggleMeetReqClaim(index)}>
-                    <h6 className='mb-0'>{visibleMeetsReqClaims[index] ? 'Gjem' : 'Vis'} Påstander for {selectedMeetsReqs[index]?.label}</h6>
+                    <h6 className='mb-0'>{visibleMeetsReqClaims[index] ? 'Gjem' : 'Vis'} Påstand(er) for {selectedMeetsReqs[index]?.label}</h6>
                     <FontAwesomeIcon icon={visibleMeetsReqClaims[index] ? faChevronUp : faChevronDown} className='ms-auto'/>
                   </div>
                   <div className="mineral-claims">
                   {visibleMeetsReqClaims[index] && (
                     <div>
                         <p>
-                          <strong>Gjeldende Helsepåstander for {selectedMeetsReqs[index]?.label}: <br/></strong>
+                          <strong></strong>
                           {formatContent(description)}
                         </p>
                     </div>

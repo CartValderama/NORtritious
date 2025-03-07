@@ -1,9 +1,5 @@
 const selectVitamins = [
     {
-      value: "Ingen",
-      label: "Ingen",
-    },
-    {
       value: "Vitamin A",
       label: "Vitamin A",
     },
