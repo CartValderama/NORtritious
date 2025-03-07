@@ -113,6 +113,7 @@ const LoginPage: React.FC = () => {
   }
 
   return (
+    // Main Registration and Login container
     <div className="container mt-5">
       <div className="row justify-content-center">
         <div className="col-md-6">
@@ -121,6 +122,7 @@ const LoginPage: React.FC = () => {
               <h1 className="card-title">
                 {isRegister ? "Registrering" : "Innlogging"}
               </h1>
+              {/* Display welcome message if in logged-in state */}
               {isLoggedIn ? (
                 <div>
                   <p>Velkommen! Du er nå logget inn.</p>
@@ -132,7 +134,9 @@ const LoginPage: React.FC = () => {
                   </button>
                 </div>
               ) : (
+                // Registration and Login Page if NOT in logged-in state
                 <form onSubmit={isRegister ? handleRegistration : handleLogin}>
+                  {/* Display Name input if in registration state */}
                   {isRegister && (
                     <div className="mb-3">
                       <label htmlFor="name" className="form-label">
@@ -148,6 +152,7 @@ const LoginPage: React.FC = () => {
                       />
                     </div>
                   )}
+                  {/* Display Email input in any state */}
                   <div className="mb-3">
                     <label htmlFor="email" className="form-label">
                       Epost*
@@ -161,6 +166,7 @@ const LoginPage: React.FC = () => {
                       required
                     />
                   </div>
+                  {/* Display Password input in any state */}
                   <div className="mb-3">
                     <label htmlFor="password" className="form-label">
                       Passord*
@@ -180,6 +186,7 @@ const LoginPage: React.FC = () => {
                         aria-label={
                           showPassword ? "Skjul passord" : "Vis passord"
                         }
+                        title={showPassword ? "Skjul passord" : "Vis passord"}
                         onClick={togglePasswordVisibility}
                       >
                         {showPassword ? (
@@ -189,10 +196,8 @@ const LoginPage: React.FC = () => {
                         )}
                       </button>
                     </div>
-                    <span id="passwordHelp" className="visually-hidden">
-                      Trykk på knappen for å vise eller skjule passordet.
-                    </span>
                   </div>
+                  {/* Display Role input if in registration state */}
                   {isRegister && (
                     <div className="mb-3">
                       <label htmlFor="role" className="form-label">
@@ -210,6 +215,7 @@ const LoginPage: React.FC = () => {
                       </select>
                     </div>
                   )}
+                  {/* Display Organisation Number input if in registration state */}
                   {isRegister && (
                     <div className="mb-3">
                       <label htmlFor="org-num" className="form-label">
@@ -232,11 +238,17 @@ const LoginPage: React.FC = () => {
                         ? "Send inn registreringsskjema"
                         : "Send inn innloggingsskjema"
                     }
+                    title={
+                      isRegister
+                        ? "Klikk for å registrere"
+                        : "Klikk for å logge inn"
+                    }
                   >
                     {isRegister ? "Registrer" : "Logg inn"}
                   </button>
                 </form>
               )}
+              {/* Section for switching between registration and Login */}
               <p className="mt-3">
                 {isRegister ? (
                   <span>Allerede har en konto?</span>
@@ -254,6 +266,7 @@ const LoginPage: React.FC = () => {
                   {isRegister ? "Tilbake til innlogging" : "Registrering"}
                 </button>
               </p>
+              {/* Display Role Rights Table if in registration state */}
               {isRegister && (
                 <p>
                   <span>Vil du vite mer om rollerettigheter?</span>
@@ -267,6 +280,7 @@ const LoginPage: React.FC = () => {
                   </a>
                 </p>
               )}
+              {/* Role Rights Table Modal */}
               <div
                 className="modal fade"
                 id="exampleModal"
@@ -305,6 +319,7 @@ const LoginPage: React.FC = () => {
                   </div>
                 </div>
               </div>
+              {/* Display HTTP messages */}
               {message && (
                 <div
                   className="alert alert-info mt-3"
