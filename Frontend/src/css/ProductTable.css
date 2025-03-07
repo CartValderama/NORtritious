@@ -25,6 +25,7 @@
     vertical-align: middle;
   }
   
+  /*
   .img-fluid {
     transition: 0.5s ease;
     box-shadow: 0 2px 4px rgba(228, 223, 223, 0.877);
@@ -35,6 +36,7 @@
     transform: scale(1);
     box-shadow: 0 4px 6px rgba(174, 172, 172, 0.473);
   }
+  */
   
   /* Optional: Add zebra striping with a more subtle color */
   .table-striped tbody tr:nth-of-type(odd) {
@@ -45,7 +47,7 @@
   .table-hover tbody tr:hover {
     background-color: rgba(0, 0, 0, 0.04);
   }
-
+  
   .btn-secondary{
     color: #fff;
     background-color: #00559f;
