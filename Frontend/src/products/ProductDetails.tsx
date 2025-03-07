@@ -206,13 +206,17 @@ const ProductDetails = () => {
             {product.hasEfsaNutrition && (
               <>
                 <h2>EFSA Næringspåstander</h2>
-                <p>{product.hasEfsaNutrition}</p>
+                <div
+                  dangerouslySetInnerHTML={{ __html: product.hasEfsaNutrition }}
+                ></div>
               </>
             )}
             {product.hasEfsaHealth !== "" && (
               <>
                 <h2>EFSA Helsepåstander</h2>
-                <p>{product.hasEfsaHealth}</p>
+                <div
+                  dangerouslySetInnerHTML={{ __html: product.hasEfsaHealth }}
+                ></div>
               </>
             )}
           </div>
