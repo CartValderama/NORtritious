@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { Button, FormText, Container, Row, Col, Card, Popover, OverlayTrigger } from "react-bootstrap";
+import axios from "axios";
 //import Select from "react-select"; // import Select component
 import "./css/Calculator.css";
 import API_URL from "./apiConfig";
@@ -440,6 +441,8 @@ const Calculator = () => {
     },
   ];
 
+    const [selectedImage, setSelectedImage] = useState(null);
+
   /*
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     The following section is added for Health Claims, for now only two inputs (vitamins and minerals)
@@ -761,14 +764,38 @@ const Calculator = () => {
     setNutrition(updatedNutrition);
   };
 
-  // Creates a new product object and sends it to the backend when the form is submitted
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const vitaminClaimDescriptions = vitaminClaims.map((description, index) => 
+  
+    let imageUrl = "";
+  
+    if (selectedImage) {
+      const formData = new FormData();
+      formData.append("file", selectedImage);
+  
+      try {
+        const response = await axios.post(
+          `${API_URL}/api/products/upload-product-image`,
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data", },
+            withCredentials: true,
+          }
+        );
+  
+        imageUrl = response.data.imageUrl; // Assume the server returns { imageUrl: "https://example.com/image.jpg" }
+      } catch (error) {
+        console.error("Image upload failed:", error.response?.data || error.message);
+        alert("Feil ved opplasting av bilde.");
+        return;
+      }
+    }
+  
+    // Format health claims
+    const vitaminClaimDescriptions = vitaminClaims.map((description, index) =>
       `<strong>${selectedVitamins[index].label} Helsepåstand(er):</strong>\n${description}`
     ).join('\n');
-    const mineralClaimDescriptions = mineralClaims.map((description, index) => 
+    const mineralClaimDescriptions = mineralClaims.map((description, index) =>
       `<strong>${selectedMinerals[index].label} Helsepåstand(er):</strong>\n${description}`
     ).join('\n');
     const otherClaimDescriptions = otherClaims.map((description, index) =>
@@ -777,25 +804,20 @@ const Calculator = () => {
     const meetsReqsClaimDescriptions = meetsReqsClaims.map((description, index) =>
       `<strong>${selectedMeetsReqs[index].label} Oppfyllende Helsepåstand(er):</strong>\n${description}`
     ).join('\n');
-
-
-    // Check if the product has the Nøkkelhullet label
-    if (hasNokkelhullet === true) {
+  
+    if (hasNokkelhullet) {
       product.hasNokkelhullet = true;
     }
-    // Sets EFSA nutritin claims
+  
     product.hasEfsaNutrition = hasEfsaNutrition;
-    // Sets EFSA health claims
-    product.hasEfsaHealth = `${vitaminClaimDescriptions}\n${mineralClaimDescriptions}\n${otherClaimDescriptions}\n${meetsReqsClaimDescriptions}`;//mineralClaimDescription+vitaminClaimDescription;
-
-    // Checks if input values are KJ or Kcal
+    product.hasEfsaHealth = `${vitaminClaimDescriptions}\n${mineralClaimDescriptions}\n${otherClaimDescriptions}\n${meetsReqsClaimDescriptions}`;
+  
     const calories = nutrition.energikcal !== '' ? nutrition.energikcal : nutrition.energikj;
-
-    // Sets the product's nutritional values and food group
+  
     const updatedProduct = {
       ...product,
       group: `<strong>Matgruppe:</strong> ${selectsGroup}`,
-      calories: calories,
+      calories,
       fat: nutrition.fett,
       satFat: nutrition.mettede,
       carbs: nutrition.karbohydrat,
@@ -804,18 +826,29 @@ const Calculator = () => {
       fiber: nutrition.kostfiber,
       protein: nutrition.protein,
       salt: nutrition.salt,
+      imageUrl, // Attach uploaded image URL
     };
-
+  
     try {
-      // Sends the product object to the backend
-      await ProductService.createProduct(updatedProduct);//product);
-      alert('Resept er nå lagret for dette produktet!\nDu kan behandle produktet på produkt-siden.');
-      // TODO: 
-      // Refresher vinduet fordi nullstill lagrer produkt. 
+      await ProductService.createProduct(updatedProduct);
+      alert("Resept er nå lagret for dette produktet!\nDu kan behandle produktet på produkt-siden.");
       window.location.reload();
     } catch (error) {
-      console.error('Error saving product:', error.response ? error.response.data : error.message);
-      alert(`Noe gikk galt.\nReseptet er ikke lagret.\nSjekk at du er logget inn som matprodusent. `);
+      console.error("Error saving product:", error.response ? error.response.data : error.message);
+      alert("Noe gikk galt.\nReseptet er ikke lagret.\nSjekk at du er logget inn som matprodusent.");
+  
+      // **Delete orphaned image if product submission fails**
+      if (imageUrl) {
+        try {
+          await axios.delete(`${API_URL}/api/products/delete-product-image`, {
+            data: { imageUrl },
+            withCredentials: true,
+          });
+        } catch (deleteError) {
+          console.error("Failed to delete orphaned image:", deleteError.response?.data || deleteError.message);
+        }
+      }
+  
       window.location.reload();
     }
   };
@@ -939,20 +972,34 @@ const Calculator = () => {
             />
           </div>
 
-          <label htmlFor="imageUrl">
-            <strong>Bilde URL</strong>
-            </label>
-            <div class="input-group mb-3">
-              <div class="input-group-prepend">
-                <span class="input-group-text" id="basic-addon3">logo.jpg</span>
-              </div>
-              <input type="text" name="imageUrl"
-                placeholder="Enter image URL"
-                value={product.imageUrl}
-                onChange={(e) => setProduct({ ...product, imageUrl: e.target.value })} 
-                className="form-control" id="imageUrl"
+          {/* Display image preview only if an image is selected */}
+          {selectedImage && (
+            <div className="mb-3">
+              <p>Valgt bilde:</p>
+              <img
+                src={URL.createObjectURL(selectedImage)}
+                alt="Preview"
+                className="img-thumbnail"
+                width="150"
               />
             </div>
+          )}
+
+          <label htmlFor="image" className="form-label">
+            <strong>Last opp profilbilde</strong>
+          </label>
+          <div className="input-group">
+            <input
+              type="file"
+              className="form-control"
+              id="image"
+              name="image"
+              accept="image/*"
+              onChange={(e) =>
+                setSelectedImage(e.target.files?.[0] || null)
+              }
+            />
+          </div>
 
           {/* Add a label for the food group select input */}
           <label htmlFor="matgruppe" className="form-label">

@@ -76,10 +76,15 @@ const ProductDetails = () => {
           <div className="col-12 col-md-5">
             <div>
               <img
-                src={`${API_URL}/images/placeholder.png`}
+                alt={product.name}
+                className="rounded"
                 width={"100%"}
-                alt="Gilde Kjøttpølse"
-              ></img>
+                src={
+                  product.imageUrl
+                    ? `${API_URL}${product.imageUrl}`
+                    : `${API_URL}/images/product_images/placeholder.png`
+                }
+              />
             </div>
             <div className="mt-4">
               <h2>Om produktet</h2>
