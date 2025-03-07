@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Table, Button, Container, Row, Col, Card } from "react-bootstrap";
+import { Table, Button, Container, Row, Col } from "react-bootstrap";
 import { Product } from "../types/product";
 import { Link } from "react-router-dom";
 import "../css/ProductTable.css";
@@ -20,9 +20,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
   const [showNutrition, setShowNutrition] = useState<boolean>(false);
   const [showClaims, setShowClaims] = React.useState<boolean>(false);
   const [claimsContent, setClaimsContent] = React.useState<string>("");
-  const [visibleNutrition, setVisibleNutrition] = useState<{
-    [key: number]: boolean;
-  }>({});
+  //const [visibleNutrition, setVisibleNutrition] = useState<{[key: number]: boolean;}>({});
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [showType, setShowType] = useState<boolean>(false);
   const [sortColumn, setSortColumn] = useState<string>("name");
@@ -37,12 +35,14 @@ const ProductTable: React.FC<ProductTableProps> = ({
     }
   };
 
+  /*
   const handleToggleNutrition = (productId: number) => {
     setVisibleNutrition((prevState) => ({
       ...prevState,
       [productId]: !prevState[productId],
     }));
   };
+  */
 
   const handleShowClaims = (content: string, product: any) => {
     setClaimsContent(content);
@@ -50,11 +50,13 @@ const ProductTable: React.FC<ProductTableProps> = ({
     setSelectedProduct(product);
   };
 
+  /*
   const handleShowNutritionClaims = (content: string, product: any) => {
     setClaimsContent(content);
     setShowClaims(true);
     setSelectedProduct(product);
   };
+  */
 
   // Sorterer produktene
   const sortedProducts = [...products].sort((a, b) => {
@@ -246,12 +248,13 @@ const ProductTable: React.FC<ProductTableProps> = ({
                     </td>
 
                     <td className="align-middle text-center">
-                      <div
-                        className="btn-group"
-                        role="group"
-                        aria-label="EFSA Visningsknapper"
-                      >
-                        {product.hasEfsaHealth ? (
+                      {product.hasEfsaHealth && product.hasEfsaHealth.trim() !== "" ? (
+                        <>
+                        <div
+                          className="btn-group"
+                          role="group"
+                          aria-label="EFSA Visningsknapper"
+                        >
                           <button
                             type="button"
                             className="btn btn-outline-success btn-sm"
@@ -262,11 +265,12 @@ const ProductTable: React.FC<ProductTableProps> = ({
                             <i className="bi bi-arrows-fullscreen"></i>
                             <span> Helsepåstander</span>
                           </button>
-                        ) : (
-                          ""
-                        )}
-                      </div>
-                      <br></br>
+                        </div>
+                        <br/>
+                        </>
+                      ) : (
+                        ""
+                      )}
                       {product.hasEfsaNutrition}
                     </td>
 
@@ -279,7 +283,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                         {/* Navigate to the edit page with product ID */}
                         <Link
                           type="button"
-                          to="/edit-product"
+                          to={`/products/calculatorUpdate/${product.productId}`}
                           className="btn btn-outline-primary btn-sm"
                           aria-label="Rediger produkt"
                         >
