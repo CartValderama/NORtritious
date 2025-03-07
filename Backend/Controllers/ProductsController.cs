@@ -271,5 +271,91 @@ namespace Backend.Controllers
 
             return NoContent();
         }
+
+        // Handles image upload
+        [HttpPost("upload-product-image")]
+        [Authorize]
+        public async Task<IActionResult> UploadProductImage([FromForm] IFormFile file)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                {
+                    _logger.LogWarning("[ProductsController] No file uploaded.");
+                    return BadRequest(new { message = "No file uploaded." });
+                }
+
+                // Check if the file is an image
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+                var fileExtension = Path.GetExtension(file.FileName).ToLower();
+
+                if (!allowedExtensions.Contains(fileExtension))
+                {
+                    _logger.LogWarning("[ProductsController] Invalid file type: {FileName}", file.FileName);
+                    return BadRequest(new { message = "Invalid file type. Allowed types: jpg, jpeg, png, gif." });
+                }
+
+                // Determine the upload folder for product images
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "product_images");
+
+                // Ensure the folder exists
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                // Generate a unique file name based on a timestamp and file extension
+                var uniqueFileName = $"{Guid.NewGuid()}{fileExtension}";
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                // Save the file
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(fileStream);
+                }
+
+                var imageUrl = $"/images/product_images/{uniqueFileName}";
+
+                _logger.LogInformation("[ProductsController] Product image uploaded successfully.");
+                return Ok(new { imageUrl });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "[ProductsController] Error uploading product image.");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An unexpected error occurred." });
+            }
+        }
+
+        // Deletes a product's image if there was an error in submission
+        [HttpDelete("delete-product-image")]
+        [Authorize]
+        public IActionResult DeleteProductImage([FromBody] ImageDeleteRequest request)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(request.ImageUrl))
+                {
+                    _logger.LogWarning("[ProductsController] No image URL provided.");
+                    return BadRequest(new { message = "No image URL provided." });
+                }
+
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", request.ImageUrl.TrimStart('/'));
+
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                    _logger.LogInformation("[ProductsController] Deleted orphaned image: {ImageUrl}", request.ImageUrl);
+                    return Ok(new { message = "Image deleted successfully." });
+                }
+
+                _logger.LogWarning("[ProductsController] Image not found: {ImageUrl}", request.ImageUrl);
+                return NotFound(new { message = "Image not found." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "[ProductsController] Error deleting product image.");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An unexpected error occurred." });
+            }
+        }
     }
 }

@@ -201,10 +201,14 @@ const ProductTable: React.FC<ProductTableProps> = ({
                         className="text-decoration-none"
                       >
                         <img
-                          src={`${API_URL}/images/${product.imageUrl}`}
                           alt={product.name}
                           className="rounded"
-                          style={{ maxWidth: "120px", height: "auto" }}
+                          style={{ maxWidth: "120px", maxHeight: "100px" }}
+                          src={
+                            product.imageUrl
+                              ? `${API_URL}${product.imageUrl}`
+                              : `${API_URL}/images/product_images/placeholder.png`
+                          }
                         />
                       </Link>
                     </td>
@@ -248,25 +252,26 @@ const ProductTable: React.FC<ProductTableProps> = ({
                     </td>
 
                     <td className="align-middle text-center">
-                      {product.hasEfsaHealth && product.hasEfsaHealth.trim() !== "" ? (
+                      {product.hasEfsaHealth &&
+                      product.hasEfsaHealth.trim() !== "" ? (
                         <>
-                        <div
-                          className="btn-group"
-                          role="group"
-                          aria-label="EFSA Visningsknapper"
-                        >
-                          <button
-                            type="button"
-                            className="btn btn-outline-success btn-sm"
-                            onClick={() =>
-                              handleShowClaims(product.hasEfsaHealth, product)
-                            }
+                          <div
+                            className="btn-group"
+                            role="group"
+                            aria-label="EFSA Visningsknapper"
                           >
-                            <i className="bi bi-arrows-fullscreen"></i>
-                            <span> Helsepåstander</span>
-                          </button>
-                        </div>
-                        <br/>
+                            <button
+                              type="button"
+                              className="btn btn-outline-success btn-sm"
+                              onClick={() =>
+                                handleShowClaims(product.hasEfsaHealth, product)
+                              }
+                            >
+                              <i className="bi bi-arrows-fullscreen"></i>
+                              <span> Helsepåstander</span>
+                            </button>
+                          </div>
+                          <br />
                         </>
                       ) : (
                         ""

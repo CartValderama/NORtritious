@@ -6,6 +6,7 @@ import { Product } from "../types/product"; // Importer Product-typen
 import CrudButtons from "../components/CrudButtons";
 import NutritionScoreGroup from "../components/NutritionScoreGroup";
 import { calculateNutriScore } from "../services/CalculateNutriScore";
+import { width } from "@fortawesome/free-solid-svg-icons/fa0";
 
 const ProductDetails = () => {
   const { productId } = useParams<{ productId: string }>();
@@ -74,27 +75,45 @@ const ProductDetails = () => {
         <div className="row gx-5">
           {/* Left column */}
           <div className="col-12 col-md-5">
-            <div>
+            <div className="d-flex justify-content-center align-items-center">
               <img
-                src={`${API_URL}/images/placeholder.png`}
+                alt={product.name}
+                className="rounded img-fluid"
                 width={"100%"}
-                alt="Gilde Kjøttpølse"
-              ></img>
+                style={{
+                  maxHeight: "300px",
+                  width: "auto",
+                  objectFit: "contain",
+                }}
+                src={
+                  product.imageUrl
+                    ? `${API_URL}${product.imageUrl}`
+                    : `${API_URL}/images/product_images/placeholder.png`
+                }
+              />
             </div>
             <div className="mt-4">
               <h2>Om produktet</h2>
               <div className="p-2">
-                <img
-                  src={`${API_URL}/images/circle-keyhole-logo.png`}
-                  height={"30px"}
-                  className="pe-2"
-                  alt="Nøkkelhull-merket"
-                />
-                <img
-                  src={`${API_URL}/images/efsaLogoGreen.png`}
-                  height={"30px"}
-                  alt="EFSA-merket"
-                />
+                {product.hasNokkelhullet && (
+                  <img
+                    src={`${API_URL}/images/circle-keyhole-logo.png`}
+                    height={"30px"}
+                    className="pe-2"
+                    alt="Støtter Nøkkelhulle"
+                    aria-label="Støtter Nøkkelhullet"
+                    title="Støtter Nøkkelhullet"
+                  />
+                )}
+                {product.hasEfsaNutrition !== "" && (
+                  <img
+                    src={`${API_URL}/images/efsaLogoGreen.png`}
+                    height={"30px"}
+                    alt="Har EFSA næringspåstander"
+                    aria-label="Har EFSA næringspåstander"
+                    title="Har EFSA næringspåstander"
+                  />
+                )}
               </div>
               <div className="p-2">
                 <dl className="row">
@@ -184,6 +203,12 @@ const ProductDetails = () => {
                 </tr>
               </tbody>
             </table>
+            {product.hasEfsaNutrition && (
+              <>
+                <h2>EFSA Næringspåstander</h2>
+                <p>{product.hasEfsaNutrition}</p>
+              </>
+            )}
           </div>
         </div>
       </div>
