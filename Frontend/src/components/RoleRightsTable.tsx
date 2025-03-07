@@ -15,7 +15,7 @@ const RoleRightsTable: React.FC<RoleRightsTableProps> = ({ role }) => {
       <caption>Rollerettigheter</caption>
       <thead>
         <tr>
-          <th style={{ width: "40%" }}></th>
+          <td style={{ width: "40%" }}></td>
           <th
             className={getColumnClass(role, "Researcher")}
             style={{ width: "20%" }}
@@ -40,18 +40,30 @@ const RoleRightsTable: React.FC<RoleRightsTableProps> = ({ role }) => {
         <tr>
           <th className="text-start">Vise alle produkter</th>
           <td>
-            <i className="bi bi-check-circle-fill text-success"></i>
+            <i
+              className="bi bi-check-circle-fill text-success"
+              aria-label="Researcher kan vise alle produkter"
+              title="Researcher kan vise alle produkter"
+            ></i>
           </td>
           <td></td>
           <td>
-            <i className="bi bi-check-circle-fill text-success"></i>
+            <i
+              className="bi bi-check-circle-fill text-success"
+              aria-label="Administrator kan vise alle produkter"
+              title="Administrator kan vise alle produkter"
+            ></i>
           </td>
         </tr>
         <tr>
           <th className="text-start">Vise egne produkter</th>
           <td></td>
           <td>
-            <i className="bi bi-check-circle-fill text-success"></i>
+            <i
+              className="bi bi-check-circle-fill text-success"
+              aria-label="Producer kan kun vise egne produkter"
+              title="Producer kan kun vise egne produkter"
+            ></i>
           </td>
           <td></td>
         </tr>
@@ -59,7 +71,11 @@ const RoleRightsTable: React.FC<RoleRightsTableProps> = ({ role }) => {
           <th className="text-start">Opprette eget produkt</th>
           <td></td>
           <td>
-            <i className="bi bi-check-circle-fill text-success"></i>
+            <i
+              className="bi bi-check-circle-fill text-success"
+              aria-label="Producer kan opprette eget produkt"
+              title="Producer kan opprette eget produkt"
+            ></i>
           </td>
           <td></td>
         </tr>
@@ -67,7 +83,11 @@ const RoleRightsTable: React.FC<RoleRightsTableProps> = ({ role }) => {
           <th className="text-start">Oppdatere eget produkt</th>
           <td></td>
           <td>
-            <i className="bi bi-check-circle-fill text-success"></i>
+            <i
+              className="bi bi-check-circle-fill text-success"
+              aria-label="Producer kan kun oppdatere eget produkt"
+              title="Producer kan kun oppdatere eget produkt"
+            ></i>
           </td>
           <td></td>
         </tr>
@@ -75,7 +95,11 @@ const RoleRightsTable: React.FC<RoleRightsTableProps> = ({ role }) => {
           <th className="text-start">Slette eget produkt</th>
           <td></td>
           <td>
-            <i className="bi bi-check-circle-fill text-success"></i>
+            <i
+              className="bi bi-check-circle-fill text-success"
+              aria-label="Producer kan kun slette eget produkt"
+              title="Producer kan kun slette eget produkt"
+            ></i>
           </td>
           <td></td>
         </tr>
@@ -84,7 +108,11 @@ const RoleRightsTable: React.FC<RoleRightsTableProps> = ({ role }) => {
           <td></td>
           <td></td>
           <td>
-            <i className="bi bi-check-circle-fill text-success"></i>
+            <i
+              className="bi bi-check-circle-fill text-success"
+              aria-label="Administrator kan oppdatere alle produkter"
+              title="Administrator kan oppdatere alle produkter"
+            ></i>
           </td>
         </tr>
         <tr>
@@ -92,7 +120,11 @@ const RoleRightsTable: React.FC<RoleRightsTableProps> = ({ role }) => {
           <td></td>
           <td></td>
           <td>
-            <i className="bi bi-check-circle-fill text-success"></i>
+            <i
+              className="bi bi-check-circle-fill text-success"
+              aria-label="Administrator kan slette alle produkter"
+              title="Administrator kan slette alle produkter"
+            ></i>
           </td>
         </tr>
       </tbody>
