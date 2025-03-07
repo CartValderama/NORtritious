@@ -209,6 +209,12 @@ const ProductDetails = () => {
                 <p>{product.hasEfsaNutrition}</p>
               </>
             )}
+            {product.hasEfsaHealth !== "" && (
+              <>
+                <h2>EFSA Helsepåstander</h2>
+                <p>{product.hasEfsaHealth}</p>
+              </>
+            )}
           </div>
         </div>
       </div>
