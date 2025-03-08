@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Table, Button, Container, Row, Col } from "react-bootstrap";
+import { Table, Container, Row, Col, Form, Accordion, AccordionBody} from "react-bootstrap";
 import { Product } from "../types/product";
 import { Link } from "react-router-dom";
 import "../css/ProductTable.css";
@@ -87,31 +87,42 @@ const ProductTable: React.FC<ProductTableProps> = ({
   return (
     <Container fluid>
       <Row className="mb-3">
-        <Col>
-          <Button
-            onClick={() => setShowId(!showId)}
-            className="btn btn-primary me-2"
-            size="sm"
-          >
-            <i className="bi bi-list-ol"></i>
-            {showId ? " Gjem" : " Vis"}
-          </Button>
-          <Button
-            onClick={() => setShowType(!showType)}
-            className="btn btn-primary me-2"
-            size="sm"
-          >
-            <i className="bi bi-tag"></i>
-            {showType ? " Gjem" : " Vis"}
-          </Button>
-          <Button
-            onClick={() => setShowNutrition(!showNutrition)}
-            className="btn btn-primary"
-            size="sm"
-          >
-            <i className="bi bi-clipboard-data"></i>
-            {showNutrition ? " Gjem" : " Vis"}
-          </Button>
+        <Col md={4} lg={3}>
+          <Accordion defaultActiveKey={"0"}>
+            <Accordion.Item eventKey="0">
+              <Accordion.Header>Filter</Accordion.Header>
+              <AccordionBody>
+                <Form>
+                  <div className="d-flex flex-column gap-2">
+                    <Form.Check 
+                      type="checkbox"
+                      id="showIdCheckbox"
+                      label="ID"
+                      onChange={() => setShowId(!showId)}
+                      className="me-2"
+                      style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+                    />
+                    <Form.Check 
+                        type="checkbox"
+                        id="showTypeCheckbox"
+                        label="Type"
+                        onChange={() => setShowType(!showType)}
+                        className="me-2"
+                        style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+                    />
+                    <Form.Check
+                      type="checkbox"
+                      id="showNutritionCheckbox"
+                      label="Næringsmiddel"
+                      onChange={() => setShowNutrition(!showNutrition)}
+                      className="me-2"
+                      style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+                    />
+                  </div>  
+                </Form>
+              </AccordionBody>
+            </Accordion.Item>
+          </Accordion>
         </Col>
       </Row>
       <Row>
