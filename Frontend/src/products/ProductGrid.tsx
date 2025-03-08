@@ -80,6 +80,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({
                 className="text-decoration-none"
               >
                 <Card.Img
+                  alt={product.name}
                   variant="top"
                   className="mx-auto d-block"
                   style={{
@@ -87,8 +88,11 @@ const ProductGrid: React.FC<ProductGridProps> = ({
                     height: "150px",
                     objectFit: "cover",
                   }}
-                  src={`${API_URL}/images/${product.imageUrl}`}
-                  alt={product.name}
+                  src={
+                    product.imageUrl
+                      ? `${API_URL}${product.imageUrl}`
+                      : `${API_URL}/images/product_images/placeholder.png`
+                  }                  
                 />
               </Link>
               <Card.Body className="d-flex flex-column">
@@ -115,7 +119,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({
                     />
                   </Button>
                   ) : (
-                    "Ingen helsepåstander"
+                    ""
                   )}
                   <OverlayTrigger
                     trigger="click"
