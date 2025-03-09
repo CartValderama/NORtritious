@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Table, Container, Row, Col, Form, Accordion, AccordionBody} from "react-bootstrap";
+import { Table, Container, Row, Col, Form, Accordion, AccordionBody, Button} from "react-bootstrap";
 import { Product } from "../types/product";
 import { Link } from "react-router-dom";
 import "../css/ProductTable.css";
@@ -25,6 +25,9 @@ const ProductTable: React.FC<ProductTableProps> = ({
   const [showType, setShowType] = useState<boolean>(false);
   const [sortColumn, setSortColumn] = useState<string>("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [sortById, setSortById] = useState<"nyest" | "eldst">("nyest"); // State for sorting order
+  // Switch between sorting by ID and by column
+  const [activeSortMode, setActiveSortMode] = useState<"id" | "column">("column");
 
   const handleSort = (column: string) => {
     if (sortColumn === column) {
@@ -33,16 +36,17 @@ const ProductTable: React.FC<ProductTableProps> = ({
       setSortColumn(column);
       setSortDirection("asc");
     }
+    setActiveSortMode("column");
   };
 
-  /*
-  const handleToggleNutrition = (productId: number) => {
-    setVisibleNutrition((prevState) => ({
-      ...prevState,
-      [productId]: !prevState[productId],
-    }));
+  const toggleSortById = () => {
+    setSortById((prevSortById) => (prevSortById === "nyest" ? "eldst" : "nyest"));
+    setActiveSortMode("id");
   };
-  */
+
+  const toggleSortMode = (mode: "id" | "column") => {
+    setActiveSortMode(mode);
+  };
 
   const handleShowClaims = (content: string, product: any) => {
     setClaimsContent(content);
@@ -50,29 +54,33 @@ const ProductTable: React.FC<ProductTableProps> = ({
     setSelectedProduct(product);
   };
 
-  /*
-  const handleShowNutritionClaims = (content: string, product: any) => {
-    setClaimsContent(content);
-    setShowClaims(true);
-    setSelectedProduct(product);
-  };
-  */
-
   // Sorterer produktene
   const sortedProducts = [...products].sort((a, b) => {
     // Ensure TypeScript knows `sortColumn` is a valid key of `Product`
-    const key = sortColumn as keyof Product;
+    if (activeSortMode === "column") {
+      const key = sortColumn as keyof Product;
 
-    if (!a[key] || !b[key]) return 0; // Handle missing data
+      if (!a[key] || !b[key]) return 0; // Handle missing data
 
-    const valueA =
-      typeof a[key] === "string" ? (a[key] as string).toLowerCase() : a[key];
-    const valueB =
-      typeof b[key] === "string" ? (b[key] as string).toLowerCase() : b[key];
+      const valueA =
+        typeof a[key] === "string" ? (a[key] as string).toLowerCase() : a[key];
+      const valueB =
+        typeof b[key] === "string" ? (b[key] as string).toLowerCase() : b[key];
+      
+      if (valueA < valueB) return sortDirection === "asc" ? -1 : 1;
+      if (valueA > valueB) return sortDirection === "asc" ? 1 : -1;
+      return 0;
+    } else {
+      return 0;
+    }
+  });
 
-    if (valueA < valueB) return sortDirection === "asc" ? -1 : 1;
-    if (valueA > valueB) return sortDirection === "asc" ? 1 : -1;
-    return 0;
+  const finalSortedProducts = sortedProducts.sort((a, b) => {
+    if (activeSortMode === "id") {
+      return sortById === "nyest" ? b.productId - a.productId : a.productId - b.productId;
+    } else {
+      return 0;
+    }
   });
 
   // Formaterer innholdet i kortet
@@ -88,7 +96,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
     <Container fluid>
       <Row className="mb-3">
         <Col md={4} lg={3}>
-          <Accordion defaultActiveKey={"0"}>
+          <Accordion defaultActiveKey={"1"}>
             <Accordion.Item eventKey="0">
               <Accordion.Header>Filter</Accordion.Header>
               <AccordionBody>
@@ -124,6 +132,59 @@ const ProductTable: React.FC<ProductTableProps> = ({
             </Accordion.Item>
           </Accordion>
         </Col>
+        <Col md={8} lg={9}>
+          <Accordion defaultActiveKey={"1"}>
+            <Accordion.Item eventKey="0">
+              <Accordion.Header>Sortering</Accordion.Header>
+                <AccordionBody>
+                <div className="btn-group btn-group-toggle sort-buttons" data-toggle="buttons">
+                  <label className={`btn btn-primary ${activeSortMode === "column" ? "active" : ""}`}>
+                    <input
+                      type="radio"
+                      name="options"
+                      id="option1"
+                      checked={activeSortMode === "column"}
+                      onChange={() => toggleSortMode("column")}
+                    /> &nbsp;▲▼ Navn/Gruppe
+
+                  </label>
+                  <label className={`btn btn-primary ${activeSortMode === "id" ? "active" : ""}`}>
+                    <input
+                      type="radio"
+                      name="options"
+                      id="option2"
+                      autoComplete="off"
+                      checked={activeSortMode === "id"}
+                      onChange={() => toggleSortMode("id")}
+                    /> &nbsp;Nyeste/Eldste
+                  </label>
+                </div>
+                {activeSortMode === "id" && (
+                  <Button
+                  
+                    type="button"
+                    variant="outline-primary"
+                    aria-label="Sorter etter nyest/eldst"
+                    onClick={toggleSortById}
+                    className="btn me-2 sort-toggle-button"
+                  >
+                    {sortById === "nyest" ? (
+                      <>
+                        <i className="bi bi-sort-numeric-down"></i>
+                        <span> Sorter etter eldste</span>
+                      </>
+                    ) : (
+                      <>
+                        <i className="bi bi-sort-numeric-up"></i>
+                        <span> Sorter etter nyeste</span>
+                      </>
+                    )}
+                 </Button>
+                )}
+              </AccordionBody>
+            </Accordion.Item>
+          </Accordion>
+        </Col>
       </Row>
       <Row>
         <Col>
@@ -140,7 +201,8 @@ const ProductTable: React.FC<ProductTableProps> = ({
                 <tr>
                   {showId && <th className="align-middle">ID</th>}
                   <th
-                    className="align-middle text-center"
+                    className={`sort-column align-middle text-center 
+                      ${sortColumn === "name" && activeSortMode === "column" ? "sorted-column" : ""}`}
                     onClick={() => handleSort("name")}
                     style={{ cursor: "pointer" }}
                   >
@@ -153,12 +215,13 @@ const ProductTable: React.FC<ProductTableProps> = ({
                   </th>
                   <th className="align-middle text-center">Bilde</th>
                   <th
-                    className="align-middle text-center"
-                    onClick={() => handleSort("name")}
+                    className={`sort-column align-middle text-center 
+                      ${sortColumn === "group" && activeSortMode === "column" ? "sorted-column" : ""}`}
+                    onClick={() => handleSort("group")}
                     style={{ cursor: "pointer" }}
                   >
                     Gruppe{" "}
-                    {sortColumn === "name"
+                    {sortColumn === "group"
                       ? sortDirection === "asc"
                         ? "▲"
                         : "▼"
@@ -192,7 +255,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                 </tr>
               </thead>
               <tbody>
-                {sortedProducts.map((product) => (
+                {finalSortedProducts.map((product) => (
                   <tr key={product.productId}>
                     {showId && (
                       <td className="align-middle">{product.productId}</td>

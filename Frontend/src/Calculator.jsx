@@ -2045,7 +2045,7 @@ const Calculator = () => {
             selectsFragment === "" && <Kategori0 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} />}
           {selectsGroup === "helt eller delvis vegetabilske produkter" &&
             selectsProduct === "kategori 25" &&
-            selectsFragment === "kategori 25 a" && <Kategori25a product={product} onNutritionChange={handleNutritionChange} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
+            selectsFragment === "kategori 25 a" && <Kategori25a product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
             vitaminClaims={vitaminClaims}
             mineralClaims={mineralClaims}
             selectedVitamins={selectedVitamins}
