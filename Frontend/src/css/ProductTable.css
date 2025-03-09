@@ -78,7 +78,7 @@
 }
 
 .sort-buttons .btn:hover {
-  background-color: #007bff;
+  background-color: #06478c;
   color: white;
 }
 
@@ -99,4 +99,7 @@
 .sort-column:hover{
   transition: 0,3s ease;
   background-color: rgb(209, 226, 251) !important;
+}
+.active-sort-column {
+  background-color: #e0f7fa !important; /* Light cyan background */
 }

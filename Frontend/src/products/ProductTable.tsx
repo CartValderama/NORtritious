@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Table, Container, Row, Col, Form, Accordion, AccordionBody, Button} from "react-bootstrap";
+import { Table, Container, Row, Col, Form, Accordion, AccordionBody } from "react-bootstrap";
 import { Product } from "../types/product";
 import { Link } from "react-router-dom";
 import "../css/ProductTable.css";
@@ -25,9 +25,8 @@ const ProductTable: React.FC<ProductTableProps> = ({
   const [showType, setShowType] = useState<boolean>(false);
   const [sortColumn, setSortColumn] = useState<string>("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const [sortById, setSortById] = useState<"nyest" | "eldst">("nyest"); // State for sorting order
   // Switch between sorting by ID and by column
-  const [activeSortMode, setActiveSortMode] = useState<"id" | "column">("column");
+  const [activeSortMode, setActiveSortMode] = useState<"column" | "nyest" |"eldst">("column");
 
   const handleSort = (column: string) => {
     if (sortColumn === column) {
@@ -39,12 +38,14 @@ const ProductTable: React.FC<ProductTableProps> = ({
     setActiveSortMode("column");
   };
 
+  /*
   const toggleSortById = () => {
     setSortById((prevSortById) => (prevSortById === "nyest" ? "eldst" : "nyest"));
     setActiveSortMode("id");
   };
+  */
 
-  const toggleSortMode = (mode: "id" | "column") => {
+  const toggleSortMode = (mode: "column" | "nyest" | "eldst") => {
     setActiveSortMode(mode);
   };
 
@@ -70,11 +71,15 @@ const ProductTable: React.FC<ProductTableProps> = ({
       if (valueA < valueB) return sortDirection === "asc" ? -1 : 1;
       if (valueA > valueB) return sortDirection === "asc" ? 1 : -1;
       return 0;
-    } else {
-      return 0;
-    }
+    } else if (activeSortMode === "nyest") {
+      return b.productId - a.productId;
+    } else if (activeSortMode === "eldst") {
+      return a.productId - b.productId;
+    } else
+    return 0;
   });
 
+  /*
   const finalSortedProducts = sortedProducts.sort((a, b) => {
     if (activeSortMode === "id") {
       return sortById === "nyest" ? b.productId - a.productId : a.productId - b.productId;
@@ -82,6 +87,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
       return 0;
     }
   });
+  */
 
   // Formaterer innholdet i kortet
   const formatContent = (content: string) => {
@@ -137,7 +143,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
             <Accordion.Item eventKey="0">
               <Accordion.Header>Sortering</Accordion.Header>
                 <AccordionBody>
-                <div className="btn-group btn-group-toggle sort-buttons" data-toggle="buttons">
+                <div className=" sort-buttons" data-toggle="buttons">
                   <label className={`btn btn-primary ${activeSortMode === "column" ? "active" : ""}`}>
                     <input
                       type="radio"
@@ -145,42 +151,30 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       id="option1"
                       checked={activeSortMode === "column"}
                       onChange={() => toggleSortMode("column")}
-                    /> &nbsp;▲▼ Navn/Gruppe
+                    /> &nbsp;(A-Å) Navn/Gruppe
 
                   </label>
-                  <label className={`btn btn-primary ${activeSortMode === "id" ? "active" : ""}`}>
+                  <label className={`btn btn-primary ${activeSortMode === "nyest" ? "active" : ""}`}>
                     <input
                       type="radio"
                       name="options"
                       id="option2"
                       autoComplete="off"
-                      checked={activeSortMode === "id"}
-                      onChange={() => toggleSortMode("id")}
-                    /> &nbsp;Nyeste/Eldste
+                      checked={activeSortMode === "nyest"}
+                      onChange={() => toggleSortMode("nyest")}
+                    /> &nbsp; <i className="bi bi-sort-numeric-down"></i> Nyest
+                  </label>
+                  <label className={`btn btn-primary ${activeSortMode === "eldst" ? "active" : ""}`}>
+                    <input
+                      type="radio"
+                      name="options"
+                      id="option3"
+                      autoComplete="off"
+                      checked={activeSortMode === "eldst"}
+                      onChange={() => toggleSortMode("eldst")}
+                    /> &nbsp; <i className="bi bi-sort-numeric-up"></i> Eldst 
                   </label>
                 </div>
-                {activeSortMode === "id" && (
-                  <Button
-                  
-                    type="button"
-                    variant="outline-primary"
-                    aria-label="Sorter etter nyest/eldst"
-                    onClick={toggleSortById}
-                    className="btn me-2 sort-toggle-button"
-                  >
-                    {sortById === "nyest" ? (
-                      <>
-                        <i className="bi bi-sort-numeric-down"></i>
-                        <span> Sorter etter eldste</span>
-                      </>
-                    ) : (
-                      <>
-                        <i className="bi bi-sort-numeric-up"></i>
-                        <span> Sorter etter nyeste</span>
-                      </>
-                    )}
-                 </Button>
-                )}
               </AccordionBody>
             </Accordion.Item>
           </Accordion>
@@ -202,29 +196,31 @@ const ProductTable: React.FC<ProductTableProps> = ({
                   {showId && <th className="align-middle">ID</th>}
                   <th
                     className={`sort-column align-middle text-center 
-                      ${sortColumn === "name" && activeSortMode === "column" ? "sorted-column" : ""}`}
+                      ${sortColumn === "name" && activeSortMode === "column" ? "sorted-column" : ""}
+                      ${activeSortMode === "column" ? "active-sort-column" : ""}`}
                     onClick={() => handleSort("name")}
                     style={{ cursor: "pointer" }}
                   >
                     Navn{" "}
                     {sortColumn === "name"
                       ? sortDirection === "asc"
-                        ? "▲"
-                        : "▼"
+                        ? <small><i>(A-Å) ▲</i></small>
+                        : <small><i>(Å-A) ▼</i></small>
                       : ""}
                   </th>
                   <th className="align-middle text-center">Bilde</th>
                   <th
                     className={`sort-column align-middle text-center 
-                      ${sortColumn === "group" && activeSortMode === "column" ? "sorted-column" : ""}`}
+                      ${sortColumn === "group" && activeSortMode === "column" ? "sorted-column" : ""}
+                      ${activeSortMode === "column" ? "active-sort-column" : ""}`}  
                     onClick={() => handleSort("group")}
                     style={{ cursor: "pointer" }}
                   >
                     Gruppe{" "}
                     {sortColumn === "group"
                       ? sortDirection === "asc"
-                        ? "▲"
-                        : "▼"
+                        ? <small><i>(A-Å) ▲</i></small>
+                        : <small><i>(Å-A) ▼</i></small>
                       : ""}
                   </th>
                   {showType && (
@@ -255,7 +251,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                 </tr>
               </thead>
               <tbody>
-                {finalSortedProducts.map((product) => (
+                {sortedProducts.map((product) => (
                   <tr key={product.productId}>
                     {showId && (
                       <td className="align-middle">{product.productId}</td>
