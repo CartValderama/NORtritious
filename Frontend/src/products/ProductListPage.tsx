@@ -16,6 +16,10 @@ const ProductListPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>(""); // State for search query
   //const [showUnauthorizedError, setShowUnauthorizedError] = useState(false);
   const [visibleProducts, setVisibleProducts] = useState<number>(5); // State for the number of visible products
+  const [sortColumn, setSortColumn] = useState<string>("name");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  // Switch between sorting by ID and by column
+  const [activeSortMode, setActiveSortMode] = useState<"column" | "nyest" |"eldst">("column");
 
   const toggleTableOrGrid = () =>
     setShowTable((prevShowTable) => !prevShowTable);
@@ -71,6 +75,53 @@ const ProductListPage: React.FC = () => {
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.group.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortColumn(column);
+      setSortDirection("asc");
+    }
+    setActiveSortMode("column");
+  };
+
+  /*
+  const toggleSortById = () => {
+    setSortById((prevSortById) => (prevSortById === "nyest" ? "eldst" : "nyest"));
+    setActiveSortMode("id");
+  };
+  */
+
+  const toggleSortMode = (mode: "column" | "nyest" | "eldst") => {
+    setActiveSortMode(mode);
+  };
+
+  // Sorterer produktene
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    // Ensure TypeScript knows `sortColumn` is a valid key of `Product`
+    if (activeSortMode === "column") {
+      const key = sortColumn as keyof Product;
+
+      if (!a[key] || !b[key]) return 0; // Handle missing data
+
+      const valueA =
+        typeof a[key] === "string" ? (a[key] as string).toLowerCase() : a[key];
+      const valueB =
+        typeof b[key] === "string" ? (b[key] as string).toLowerCase() : b[key];
+      
+      if (valueA < valueB) return sortDirection === "asc" ? -1 : 1;
+      if (valueA > valueB) return sortDirection === "asc" ? 1 : -1;
+      return 0;
+    } else if (activeSortMode === "nyest") {
+      return b.productId - a.productId;
+    } else if (activeSortMode === "eldst") {
+      return a.productId - b.productId;
+    } else
+    return 0;
+  });
+
+
 
   const handleProductDeleted = async (productId: number) => {
     const confirmDelete = window.confirm(
@@ -156,15 +207,25 @@ const ProductListPage: React.FC = () => {
         {error && <div className="alert alert-danger">{error}</div>}
         {showTable ? (
           <ProductTable
-            products={filteredProducts.slice(0, visibleProducts)}
+            products={sortedProducts.slice(0, visibleProducts)}
             apiUrl={`${API_URL}`}
             onProductDeleted={handleProductDeleted}
+            sortColumn={sortColumn}
+            sortDirection={sortDirection}
+            activeSortMode={activeSortMode}
+            handleSort={handleSort}
+            toggleSortMode={toggleSortMode}
           />
         ) : (
           <ProductGrid
-            products={filteredProducts.slice(0, visibleProducts)}
+            products={sortedProducts.slice(0, visibleProducts)}
             apiUrl={`${API_URL}`}
             onProductDeleted={handleProductDeleted}
+            sortColumn={sortColumn}
+            sortDirection={sortDirection}
+            activeSortMode={activeSortMode}
+            handleSort={handleSort}
+            toggleSortMode={toggleSortMode}
           />
         )}
         <div className="d-flex justify-content-between mt-3">
