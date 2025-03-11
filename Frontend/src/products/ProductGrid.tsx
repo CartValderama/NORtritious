@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   Col,
@@ -11,7 +11,7 @@ import {
   AccordionBody,
 } from "react-bootstrap";
 import { Product } from "../types/product";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import API_URL from "../apiConfig";
 import ClaimsView from "../shared/ClaimsView";
 import { width } from "@fortawesome/free-solid-svg-icons/fa0";
@@ -19,6 +19,7 @@ import ClaimsLabels from "../components/ClaimsLabels";
 import ProductActions from "../components/ProductActions";
 import { deleteProduct } from "./ProductService";
 import SplitHtml from "../components/SplitHtmlProps";
+import axios from "axios";
 
 interface ProductGridProps {
   products: Product[];
@@ -43,12 +44,53 @@ const ProductGrid: React.FC<ProductGridProps> = ({
   const [showClaims, setShowClaims] = React.useState<boolean>(false);
   const [claimsContent, setClaimsContent] = React.useState<string>("");
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+
+  const [userInfo, setUserInfo] = useState({
+    email: "",
+    name: "",
+    role: "",
+    organizationNumber: "",
+    profilePicture: "",
+  });
 
   const handleShowClaims = (content: string, product: any) => {
     setClaimsContent(content);
     setShowClaims(true);
     setSelectedProduct(product);
   };
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const response = await axios.get(
+          `${API_URL}/api/account/get-user-info`,
+          {
+            withCredentials: true,
+          }
+        );
+        setUserInfo(response.data);
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status === 401) {
+            navigate("/account/login"); // Redirect til login
+          } else {
+            setError(
+              error.response?.data?.message ||
+                "Failed to fetch user information."
+            );
+          }
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserInfo();
+  }, [navigate]);
 
   // Formaterer innholdet i kortet
   const formatContent = (content: string) => {
@@ -170,10 +212,14 @@ const ProductGrid: React.FC<ProductGridProps> = ({
               </Card.Body>
               <Card.Body>
                 <div className="d-flex justify-content-end">
-                  <ProductActions
-                    productId={product.productId}
-                    onDelete={deleteProduct}
-                  />
+                  {userInfo.role !== "Researcher" ? (
+                    <ProductActions
+                      productId={product.productId}
+                      onDelete={deleteProduct}
+                    />
+                  ) : (
+                    ""
+                  )}
                 </div>
               </Card.Body>
             </Card>

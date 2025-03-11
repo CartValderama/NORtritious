@@ -3,10 +3,6 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import API_URL from "../apiConfig";
 import { Product } from "../types/product"; // Importer Product-typen
-import CrudButtons from "../components/CrudButtons";
-import NutritionScoreGroup from "../components/NutritionScoreGroup";
-import { calculateNutriScore } from "../services/CalculateNutriScore";
-import { width } from "@fortawesome/free-solid-svg-icons/fa0";
 import SplitHtml from "../components/SplitHtmlProps";
 import NutritionClaimsUL from "../components/NutritionClaimsUL";
 import ClaimsLabels from "../components/ClaimsLabels";
@@ -19,7 +15,6 @@ const ProductDetails = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [nutriScore, setNutriScore] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -48,13 +43,6 @@ const ProductDetails = () => {
       fetchProduct();
     }
   }, [productId]); // Kjør bare når productId endres
-
-  useEffect(() => {
-    if (product) {
-      const score = calculateNutriScore(product); // Beregn NutriScore når produktet lastes inn
-      setNutriScore(score);
-    }
-  }, [product]); // Kjør når produktet endres
 
   if (loading) return <p>Laster produkt...</p>;
   if (error) return <p>{error}</p>;

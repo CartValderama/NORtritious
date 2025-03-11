@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   Container,
@@ -10,13 +10,15 @@ import {
   Button,
 } from "react-bootstrap";
 import { Product } from "../types/product";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../css/ProductTable.css";
 import API_URL from "../apiConfig";
 import ClaimsView from "../shared/ClaimsView";
 import ProductActions from "../components/ProductActions";
 import { deleteProduct } from "./ProductService";
 import SplitHtml from "../components/SplitHtmlProps";
+import axios from "axios";
+import NoAccess from "../components/NoAccess";
 
 interface ProductTableProps {
   products: Product[];
@@ -45,6 +47,47 @@ const ProductTable: React.FC<ProductTableProps> = ({
   //const [visibleNutrition, setVisibleNutrition] = useState<{[key: number]: boolean;}>({});
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [showType, setShowType] = useState<boolean>(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+
+  const [userInfo, setUserInfo] = useState({
+    email: "",
+    name: "",
+    role: "",
+    organizationNumber: "",
+    profilePicture: "",
+  });
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const response = await axios.get(
+          `${API_URL}/api/account/get-user-info`,
+          {
+            withCredentials: true,
+          }
+        );
+        setUserInfo(response.data);
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status === 401) {
+            navigate("/account/login"); // Redirect til login
+          } else {
+            setError(
+              error.response?.data?.message ||
+                "Failed to fetch user information."
+            );
+          }
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserInfo();
+  }, [navigate]);
 
   const handleShowClaims = (content: string, product: any) => {
     setClaimsContent(content);
@@ -383,11 +426,14 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       </td>
 
                       <td className="align-middle text-center px-2 py-4">
-                        <ProductActions
-                          productId={product.productId}
-                          onDelete={deleteProduct}
-                          sm
-                        />
+                        {userInfo.role !== "Researcher" ? (
+                          <ProductActions
+                            productId={product.productId}
+                            onDelete={deleteProduct}
+                          />
+                        ) : (
+                          <NoAccess />
+                        )}
                       </td>
                     </tr>
                   ))}
