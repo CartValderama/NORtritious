@@ -9,9 +9,11 @@ const NutritionClaimsUL: React.FC<NutritionClaims> = ({ claims }) => {
   const claimsListItems = claims.split(",").map((claim) => claim.trim());
 
   return (
-    <ul>
+    <ul className="list-group mb-4">
       {claimsListItems.map((claim, index) => (
-        <li key={index}>{claim}</li>
+        <li key={index} className="list-group-item">
+          {claim}
+        </li>
       ))}
     </ul>
   );

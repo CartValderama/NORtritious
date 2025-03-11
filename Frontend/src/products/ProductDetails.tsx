@@ -8,10 +8,11 @@ import NutritionScoreGroup from "../components/NutritionScoreGroup";
 import { calculateNutriScore } from "../services/CalculateNutriScore";
 import { width } from "@fortawesome/free-solid-svg-icons/fa0";
 import SplitHtml from "../components/SplitHtmlProps";
-import NutritionClaimsUL from "../components/ListNutritionClaims";
+import NutritionClaimsUL from "../components/NutritionClaimsUL";
 import ClaimsLabels from "../components/ClaimsLabels";
 import ProductActions from "../components/ProductActions";
 import { deleteProduct } from "./ProductService";
+import HealthClaimsUL from "../components/HealthClaimsUL";
 
 const ProductDetails = () => {
   const { productId } = useParams<{ productId: string }>();
@@ -224,11 +225,9 @@ const ProductDetails = () => {
                     <p>
                       <strong>Helsepåstander</strong>
                     </p>
-                    <div
-                      dangerouslySetInnerHTML={{
-                        __html: product.hasEfsaHealth,
-                      }}
-                    ></div>
+                    <div>
+                      <HealthClaimsUL claims={product.hasEfsaHealth} />
+                    </div>
                   </div>
                 )}
               </div>
