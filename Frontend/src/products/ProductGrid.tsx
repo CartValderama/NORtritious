@@ -15,6 +15,9 @@ import { Link } from "react-router-dom";
 import API_URL from "../apiConfig";
 import ClaimsView from "../shared/ClaimsView";
 import { width } from "@fortawesome/free-solid-svg-icons/fa0";
+import ClaimsLabels from "../components/ClaimsLabels";
+import ProductActions from "../components/ProductActions";
+import { deleteProduct } from "./ProductService";
 
 interface ProductGridProps {
   products: Product[];
@@ -151,45 +154,10 @@ const ProductGrid: React.FC<ProductGridProps> = ({
               </Card.Body>
               <Card.Body>
                 <div className="mb-4">
-                  {product.hasEfsaNutrition && (
-                    <OverlayTrigger
-                      trigger="click"
-                      placement="right"
-                      overlay={popover(product)}
-                    >
-                      <img
-                        className="me-2"
-                        src={
-                          product.hasEfsaNutrition
-                            ? `${API_URL}/images/efsaLogoGreen.png`
-                            : ""
-                        }
-                        alt={
-                          product.hasEfsaNutrition
-                            ? "Has EFSA Nutrition"
-                            : "No EFSA Nutrition"
-                        }
-                        style={{
-                          width: "1.5rem",
-                          height: "1.5rem",
-                          cursor: "pointer",
-                        }}
-                      />
-                    </OverlayTrigger>
-                  )}
-                  {product.hasNokkelhullet && (
-                    <img
-                      src={`${API_URL}/images/circle-keyhole-logo.png`}
-                      style={{
-                        width: "1.5rem",
-                        height: "1.5rem",
-                        cursor: "help",
-                      }}
-                      alt="Støtter Nøkkelhullet"
-                      aria-label="Støtter Nøkkelhullet"
-                      title="Støtter Nøkkelhullet"
-                    />
-                  )}
+                  <ClaimsLabels
+                    hasNokkelhullet={product.hasNokkelhullet}
+                    hasEfsaNutrition={product.hasEfsaNutrition}
+                  />
                 </div>
                 <Card.Title>{product.name}</Card.Title>
                 <Card.Text>
@@ -199,22 +167,10 @@ const ProductGrid: React.FC<ProductGridProps> = ({
               </Card.Body>
               <Card.Body>
                 <div className="d-flex justify-content-end">
-                  <ButtonGroup className="mb-2">
-                    <Button
-                      href={`/products/calculatorUpdate/${product.productId}`}
-                      variant="outline-primary"
-                      aria-label="Rediger produkt"
-                    >
-                      <i className="bi bi-pencil-square" aria-hidden="true"></i>
-                    </Button>
-                    <Button
-                      onClick={() => onProductDeleted(product.productId)}
-                      variant="outline-danger"
-                      aria-label="Slett produkt"
-                    >
-                      <i className="bi bi-trash" aria-hidden="true"></i>
-                    </Button>
-                  </ButtonGroup>
+                  <ProductActions
+                    productId={product.productId}
+                    onDelete={deleteProduct}
+                  />
                 </div>
               </Card.Body>
             </Card>

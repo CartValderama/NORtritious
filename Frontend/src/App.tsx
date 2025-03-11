@@ -16,6 +16,7 @@ import "./App.css";
 import ProfilePage from "./account/profile";
 import ProductDetails from "./products/ProductDetails";
 import CalculatorUpdate from "./CalculatorUpdate";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 //    <LoginTest />
 //    <GetProducts />

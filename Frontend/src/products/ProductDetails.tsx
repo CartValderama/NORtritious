@@ -8,6 +8,10 @@ import NutritionScoreGroup from "../components/NutritionScoreGroup";
 import { calculateNutriScore } from "../services/CalculateNutriScore";
 import { width } from "@fortawesome/free-solid-svg-icons/fa0";
 import SplitHtml from "../components/SplitHtmlProps";
+import NutritionClaimsUL from "../components/ListNutritionClaims";
+import ClaimsLabels from "../components/ClaimsLabels";
+import ProductActions from "../components/ProductActions";
+import { deleteProduct } from "./ProductService";
 
 const ProductDetails = () => {
   const { productId } = useParams<{ productId: string }>();
@@ -69,7 +73,10 @@ const ProductDetails = () => {
             <p>Produktlinje 2</p>
           </div>
           <div className="col-4 text-end">
-            <CrudButtons />
+            <ProductActions
+              productId={product.productId}
+              onDelete={deleteProduct}
+            />
           </div>
         </div>
 
@@ -95,27 +102,10 @@ const ProductDetails = () => {
             </div>
             <div className="mt-4">
               <h2>Om produktet</h2>
-              <div className="p-2">
-                {product.hasNokkelhullet && (
-                  <img
-                    src={`${API_URL}/images/circle-keyhole-logo.png`}
-                    height={"30px"}
-                    className="pe-2"
-                    alt="Støtter Nøkkelhullet"
-                    aria-label="Støtter Nøkkelhullet"
-                    title="Støtter Nøkkelhullet"
-                  />
-                )}
-                {product.hasEfsaNutrition !== "" && (
-                  <img
-                    src={`${API_URL}/images/efsaLogoGreen.png`}
-                    height={"30px"}
-                    alt="Har EFSA næringspåstander"
-                    aria-label="Har EFSA næringspåstander"
-                    title="Har EFSA næringspåstander"
-                  />
-                )}
-              </div>
+              <ClaimsLabels
+                hasNokkelhullet={product.hasNokkelhullet}
+                hasEfsaNutrition={product.hasEfsaNutrition}
+              />
               <div className="p-2">
                 <dl className="row">
                   <dt className="col-6">Produsent</dt>
@@ -147,12 +137,17 @@ const ProductDetails = () => {
                 </dl>
               </div>
             </div>
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Temporibus nihil pariatur esse ut neque quos reprehenderit magni
-              harum, excepturi est dolorum quisquam quo reiciendis vel
-              cupiditate repellat tempore. Dolorem, nulla!
-            </p>
+            <hr></hr>
+            <div>
+              <h2>Beskrivelse</h2>
+              <p>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                Temporibus nihil pariatur esse ut neque quos reprehenderit magni
+                harum, excepturi est dolorum quisquam quo reiciendis vel
+                cupiditate repellat tempore. Dolorem, nulla!
+              </p>
+            </div>
+            <hr></hr>
           </div>
 
           {/* Right column */}
@@ -216,20 +211,26 @@ const ProductDetails = () => {
                 </tbody>
               </table>
             </div>
+            <hr></hr>
+            <h2>EFSA Påstander</h2>
             {product.hasEfsaNutrition && (
               <div className="mb-4">
-                <h2>EFSA Næringspåstander</h2>
-                <div
-                  dangerouslySetInnerHTML={{ __html: product.hasEfsaNutrition }}
-                ></div>
-              </div>
-            )}
-            {product.hasEfsaHealth !== "" && (
-              <div className="mb-4">
-                <h2>EFSA Helsepåstander</h2>
-                <div
-                  dangerouslySetInnerHTML={{ __html: product.hasEfsaHealth }}
-                ></div>
+                <p>
+                  <strong>Næringspåstander</strong>
+                </p>
+                <NutritionClaimsUL claims={product.hasEfsaNutrition} />
+                {product.hasEfsaHealth !== "" && (
+                  <div className="mb-4">
+                    <p>
+                      <strong>Helsepåstander</strong>
+                    </p>
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: product.hasEfsaHealth,
+                      }}
+                    ></div>
+                  </div>
+                )}
               </div>
             )}
           </div>

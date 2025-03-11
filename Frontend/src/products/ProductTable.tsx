@@ -14,6 +14,8 @@ import { Link } from "react-router-dom";
 import "../css/ProductTable.css";
 import API_URL from "../apiConfig";
 import ClaimsView from "../shared/ClaimsView";
+import ProductActions from "../components/ProductActions";
+import { deleteProduct } from "./ProductService";
 
 interface ProductTableProps {
   products: Product[];
@@ -378,31 +380,11 @@ const ProductTable: React.FC<ProductTableProps> = ({
                     </td>
 
                     <td className="align-middle text-center">
-                      <div
-                        className="btn-group"
-                        role="group"
-                        aria-label="Produkthandlingsknapper"
-                      >
-                        {/* Navigate to the edit page with product ID */}
-                        <Link
-                          type="button"
-                          to={`/products/calculatorUpdate/${product.productId}`}
-                          className="btn btn-outline-primary btn-sm"
-                          aria-label="Rediger produkt"
-                        >
-                          <i className="bi bi-pencil-square"></i>
-                        </Link>
-
-                        {/* Call onProductDeleted function with product ID */}
-                        <button
-                          type="button"
-                          className="btn btn-outline-danger btn-sm"
-                          aria-label="Slett produkt"
-                          onClick={() => onProductDeleted(product.productId)}
-                        >
-                          <i className="bi bi-trash"></i>
-                        </button>
-                      </div>
+                      <ProductActions
+                        productId={product.productId}
+                        onDelete={deleteProduct}
+                        sm
+                      />
                     </td>
                   </tr>
                 ))}
