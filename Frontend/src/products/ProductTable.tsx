@@ -16,6 +16,7 @@ import API_URL from "../apiConfig";
 import ClaimsView from "../shared/ClaimsView";
 import ProductActions from "../components/ProductActions";
 import { deleteProduct } from "./ProductService";
+import SplitHtml from "../components/SplitHtmlProps";
 
 interface ProductTableProps {
   products: Product[];
@@ -184,20 +185,15 @@ const ProductTable: React.FC<ProductTableProps> = ({
       </Row>
       <Row>
         <Col>
-          <div className="table-responsive">
-            <Table
-              striped
-              bordered
-              hover
-              className="shadow-sm rounded"
-              style={{ backgroundColor: "white" }}
-            >
-              <caption>Produkttabell</caption>
-              <thead className="bg-light">
-                <tr>
-                  {showId && <th className="align-middle">ID</th>}
-                  <th
-                    className={`sort-column align-middle text-center 
+          <div className="card p-3">
+            <div className="table">
+              <Table hover className="rounded">
+                <caption>Produkttabell</caption>
+                <thead className="bg-light">
+                  <tr>
+                    {showId && <th className="align-middle">ID</th>}
+                    <th
+                      className={`sort-column align-middle text-center 
                       ${
                         sortColumn === "name" && activeSortMode === "column"
                           ? "sorted-column"
@@ -206,27 +202,27 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       ${
                         activeSortMode === "column" ? "active-sort-column" : ""
                       }`}
-                    onClick={() => handleSort("name")}
-                    style={{ cursor: "pointer" }}
-                  >
-                    Navn{" "}
-                    {sortColumn === "name" ? (
-                      sortDirection === "asc" ? (
-                        <small>
-                          <i>(A-Å) ▲</i>
-                        </small>
+                      onClick={() => handleSort("name")}
+                      style={{ cursor: "pointer" }}
+                    >
+                      Navn{" "}
+                      {sortColumn === "name" ? (
+                        sortDirection === "asc" ? (
+                          <small>
+                            <i>(A-Å) ▲</i>
+                          </small>
+                        ) : (
+                          <small>
+                            <i>(Å-A) ▼</i>
+                          </small>
+                        )
                       ) : (
-                        <small>
-                          <i>(Å-A) ▼</i>
-                        </small>
-                      )
-                    ) : (
-                      ""
-                    )}
-                  </th>
-                  <th className="align-middle text-center">Bilde</th>
-                  <th
-                    className={`sort-column align-middle text-center 
+                        ""
+                      )}
+                    </th>
+                    <th className="align-middle text-center">Bilde</th>
+                    <th
+                      className={`sort-column align-middle text-center 
                       ${
                         sortColumn === "group" && activeSortMode === "column"
                           ? "sorted-column"
@@ -235,161 +231,169 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       ${
                         activeSortMode === "column" ? "active-sort-column" : ""
                       }`}
-                    onClick={() => handleSort("group")}
-                    style={{ cursor: "pointer" }}
-                  >
-                    Gruppe{" "}
-                    {sortColumn === "group" ? (
-                      sortDirection === "asc" ? (
-                        <small>
-                          <i>(A-Å) ▲</i>
-                        </small>
-                      ) : (
-                        <small>
-                          <i>(Å-A) ▼</i>
-                        </small>
-                      )
-                    ) : (
-                      ""
-                    )}
-                  </th>
-                  {showType && (
-                    <th className="align-middle text-center">Kategori</th>
-                  )}
-                  {showNutrition && (
-                    <th className="align-middle">Næringsmiddel pr. 100 g/ml</th>
-                  )}
-                  <th className="align-middle text-center">
-                    <img
-                      src={`${API_URL}/images/circle-keyhole-logo.png`}
-                      alt="Nøkkelhullet"
-                      className="img-fluid"
-                      style={{ maxHeight: "1.5rem" }} // Adjust size to match text
-                    />
-                    <span></span>
-                  </th>
-                  <th className="align-middle text-center">
-                    <img
-                      src={`${API_URL}/images/efsaLogoGreen.png`}
-                      alt="EFSA Ernæringspåstander"
-                      className="img-fluid"
-                      style={{ maxHeight: "1.5rem" }}
-                    />
-                    <span> EFSA Påstander</span>
-                  </th>
-                  <th className="align-middle text-center">Behandling</th>
-                </tr>
-              </thead>
-              <tbody>
-                {products.map((product) => (
-                  <tr key={product.productId}>
-                    {showId && (
-                      <td className="align-middle">{product.productId}</td>
-                    )}
-                    <td className="align-middle fw-bold">
-                      <Link
-                        to={`/products/details/${product.productId}`}
-                        className="text-decoration-none"
-                      >
-                        {product.name}
-                      </Link>
-                    </td>
-
-                    <td className="align-middle text-center">
-                      <Link
-                        to={`/products/details/${product.productId}`}
-                        className="text-decoration-none"
-                      >
-                        <img
-                          alt={product.name}
-                          className="rounded"
-                          style={{ maxWidth: "120px", maxHeight: "50px" }}
-                          src={
-                            product.imageUrl
-                              ? `${API_URL}${product.imageUrl}`
-                              : `${API_URL}/images/product_images/placeholder.png`
-                          }
-                        />
-                      </Link>
-                    </td>
-
-                    <td className="align-middle">
-                      {formatContent(product.group)}
-                    </td>
-                    {showType && (
-                      <td className="align-middle small">
-                        {formatContent(product.type)}
-                      </td>
-                    )}
-
-                    {showNutrition && (
-                      <td className="align-middle small">
-                        Energi: {product.calories}
-                        <br />
-                        Fett: {product.fat}
-                        <br />
-                        Mettet fett: {product.satFat}
-                        <br />
-                        Karbo: {product.carbs}
-                        <br />
-                        Nat sukker: {product.natSugar}
-                        <br />
-                        Tilsatt sukker: {product.addedSugar}
-                        <br />
-                        Fiber: {product.fiber}
-                        <br />
-                        Protein: {product.protein}
-                        <br />
-                        Salt: {product.salt}
-                      </td>
-                    )}
-                    <td className="align-middle text-center">
-                      {product.hasNokkelhullet ? (
-                        <i className="bi bi-check-circle-fill text-success h4"></i>
-                      ) : (
-                        <></>
-                      )}
-                    </td>
-
-                    <td className="align-middle text-center">
-                      {product.hasEfsaHealth &&
-                      product.hasEfsaHealth.trim() !== "" ? (
-                        <>
-                          <div
-                            className="btn-group"
-                            role="group"
-                            aria-label="EFSA Visningsknapper"
-                          >
-                            <button
-                              type="button"
-                              className="btn btn-outline-success btn-sm"
-                              onClick={() =>
-                                handleShowClaims(product.hasEfsaHealth, product)
-                              }
-                            >
-                              <i className="bi bi-arrows-fullscreen"></i>
-                              <span> Helsepåstander</span>
-                            </button>
-                          </div>
-                          <br />
-                        </>
+                      onClick={() => handleSort("group")}
+                      style={{ cursor: "pointer" }}
+                    >
+                      Gruppe{" "}
+                      {sortColumn === "group" ? (
+                        sortDirection === "asc" ? (
+                          <small>
+                            <i>(A-Å) ▲</i>
+                          </small>
+                        ) : (
+                          <small>
+                            <i>(Å-A) ▼</i>
+                          </small>
+                        )
                       ) : (
                         ""
                       )}
-                      {product.hasEfsaNutrition}
-                    </td>
-
-                    <td className="align-middle text-center">
-                      <ProductActions
-                        productId={product.productId}
-                        onDelete={deleteProduct}
-                        sm
+                    </th>
+                    {showType && (
+                      <th className="align-middle text-center">Kategori</th>
+                    )}
+                    {showNutrition && (
+                      <th className="align-middle">
+                        Næringsmiddel pr. 100 g/ml
+                      </th>
+                    )}
+                    <th className="align-middle text-center">
+                      <img
+                        src={`${API_URL}/images/circle-keyhole-logo.png`}
+                        alt="Nøkkelhullet"
+                        className="img-fluid"
+                        style={{ maxHeight: "1.5rem" }} // Adjust size to match text
                       />
-                    </td>
+                      <span></span>
+                    </th>
+                    <th className="align-middle text-center">
+                      <img
+                        src={`${API_URL}/images/efsaLogoGreen.png`}
+                        alt="EFSA Ernæringspåstander"
+                        className="img-fluid"
+                        style={{ maxHeight: "1.5rem" }}
+                      />
+                      <span> EFSA Påstander</span>
+                    </th>
+                    <th className="align-middle text-center">Behandling</th>
                   </tr>
-                ))}
-              </tbody>
-            </Table>
+                </thead>
+                <tbody>
+                  {products.map((product) => (
+                    <tr key={product.productId}>
+                      {showId && (
+                        <td className="align-middle px-2 py-4">
+                          {product.productId}
+                        </td>
+                      )}
+                      <td className="align-middle fw-bold px-2 py-4">
+                        <Link
+                          to={`/products/details/${product.productId}`}
+                          className="btn btn-link-primary"
+                        >
+                          {product.name}
+                        </Link>
+                      </td>
+
+                      <td className="align-middle text-center px-2 py-4">
+                        <Link
+                          to={`/products/details/${product.productId}`}
+                          className="text-decoration-none"
+                        >
+                          <img
+                            alt={product.name}
+                            className="rounded"
+                            style={{ maxWidth: "120px", maxHeight: "50px" }}
+                            src={
+                              product.imageUrl
+                                ? `${API_URL}${product.imageUrl}`
+                                : `${API_URL}/images/product_images/placeholder.png`
+                            }
+                          />
+                        </Link>
+                      </td>
+
+                      <td className="align-middle px-2 py-4">
+                        <SplitHtml htmlContent={product.group} part="after" />
+                      </td>
+                      {showType && (
+                        <td className="align-middle small px-2 py-4">
+                          <SplitHtml htmlContent={product.type} part="after" />
+                        </td>
+                      )}
+
+                      {showNutrition && (
+                        <td className="align-middle small px-2 py-4">
+                          Energi: {product.calories}
+                          <br />
+                          Fett: {product.fat}
+                          <br />
+                          Mettet fett: {product.satFat}
+                          <br />
+                          Karbo: {product.carbs}
+                          <br />
+                          Nat sukker: {product.natSugar}
+                          <br />
+                          Tilsatt sukker: {product.addedSugar}
+                          <br />
+                          Fiber: {product.fiber}
+                          <br />
+                          Protein: {product.protein}
+                          <br />
+                          Salt: {product.salt}
+                        </td>
+                      )}
+                      <td className="align-middle text-center px-2 py-4">
+                        {product.hasNokkelhullet ? (
+                          <i className="bi bi-check-circle-fill text-success h4"></i>
+                        ) : (
+                          <></>
+                        )}
+                      </td>
+
+                      <td className="align-middle text-center px-2 py-4">
+                        {product.hasEfsaHealth &&
+                        product.hasEfsaHealth.trim() !== "" ? (
+                          <>
+                            <div
+                              className="btn-group"
+                              role="group"
+                              aria-label="EFSA Visningsknapper"
+                            >
+                              <button
+                                type="button"
+                                className="btn btn-outline-success btn-sm"
+                                onClick={() =>
+                                  handleShowClaims(
+                                    product.hasEfsaHealth,
+                                    product
+                                  )
+                                }
+                              >
+                                <i className="bi bi-arrows-fullscreen"></i>
+                                <span> Helsepåstander</span>
+                              </button>
+                            </div>
+                            <br />
+                          </>
+                        ) : (
+                          ""
+                        )}
+                        {product.hasEfsaNutrition}
+                      </td>
+
+                      <td className="align-middle text-center px-2 py-4">
+                        <ProductActions
+                          productId={product.productId}
+                          onDelete={deleteProduct}
+                          sm
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </div>
           </div>
         </Col>
       </Row>
