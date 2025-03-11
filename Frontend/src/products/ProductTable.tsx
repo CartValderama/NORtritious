@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { Table, Container, Row, Col, Form, Accordion, AccordionBody, Button } from "react-bootstrap";
+import {
+  Table,
+  Container,
+  Row,
+  Col,
+  Form,
+  Accordion,
+  AccordionBody,
+  Button,
+} from "react-bootstrap";
 import { Product } from "../types/product";
 import { Link } from "react-router-dom";
 import "../css/ProductTable.css";
@@ -40,7 +49,6 @@ const ProductTable: React.FC<ProductTableProps> = ({
     setSelectedProduct(product);
   };
 
-
   /*
   const finalSortedProducts = sortedProducts.sort((a, b) => {
     if (activeSortMode === "id") {
@@ -70,21 +78,29 @@ const ProductTable: React.FC<ProductTableProps> = ({
               <AccordionBody>
                 <Form>
                   <div className="d-flex flex-column gap-2">
-                    <Form.Check 
+                    <Form.Check
                       type="checkbox"
                       id="showIdCheckbox"
                       label="ID"
                       onChange={() => setShowId(!showId)}
                       className="me-2"
-                      style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.5rem",
+                      }}
                     />
-                    <Form.Check 
-                        type="checkbox"
-                        id="showTypeCheckbox"
-                        label="Type"
-                        onChange={() => setShowType(!showType)}
-                        className="me-2"
-                        style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+                    <Form.Check
+                      type="checkbox"
+                      id="showTypeCheckbox"
+                      label="Type"
+                      onChange={() => setShowType(!showType)}
+                      className="me-2"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.5rem",
+                      }}
                     />
                     <Form.Check
                       type="checkbox"
@@ -92,9 +108,13 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       label="Næringsmiddel"
                       onChange={() => setShowNutrition(!showNutrition)}
                       className="me-2"
-                      style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.5rem",
+                      }}
                     />
-                  </div>  
+                  </div>
                 </Form>
               </AccordionBody>
             </Accordion.Item>
@@ -104,31 +124,31 @@ const ProductTable: React.FC<ProductTableProps> = ({
           <Accordion defaultActiveKey={"1"}>
             <Accordion.Item eventKey="0">
               <Accordion.Header>Sortering</Accordion.Header>
-                <AccordionBody>
+              <AccordionBody>
                 <div className=" sort-buttons" data-toggle="buttons">
                   <Button
                     className="btn btn-primary"
                     onClick={() => handleSort("name")}
                   >
                     Navn
-                    {sortColumn === "name" && sortDirection === "asc" ? (
-                      " (A-Å)"                  
-                    ) : (
-                      " (Å-A)"                  
-                    )}
+                    {sortColumn === "name" && sortDirection === "asc"
+                      ? " (A-Å)"
+                      : " (Å-A)"}
                   </Button>
                   <Button
                     className="btn btn-primary"
                     onClick={() => handleSort("group")}
                   >
                     Gruppe
-                    {sortColumn === "group" && sortDirection === "asc" ? (
-                      " (A-Å)"                  
-                    ) : (
-                      " (Å-A)"
-                    )}
+                    {sortColumn === "group" && sortDirection === "asc"
+                      ? " (A-Å)"
+                      : " (Å-A)"}
                   </Button>
-                  <label className={`btn btn-primary ${activeSortMode === "nyest" ? "active" : ""}`}>
+                  <label
+                    className={`btn btn-primary ${
+                      activeSortMode === "nyest" ? "active" : ""
+                    }`}
+                  >
                     <input
                       type="radio"
                       name="options"
@@ -136,9 +156,14 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       autoComplete="off"
                       checked={activeSortMode === "nyest"}
                       onChange={() => toggleSortMode("nyest")}
-                    /> &nbsp; <i className="bi bi-sort-numeric-down"></i> Nyest
+                    />{" "}
+                    &nbsp; <i className="bi bi-sort-numeric-down"></i> Nyest
                   </label>
-                  <label className={`btn btn-primary ${activeSortMode === "eldst" ? "active" : ""}`}>
+                  <label
+                    className={`btn btn-primary ${
+                      activeSortMode === "eldst" ? "active" : ""
+                    }`}
+                  >
                     <input
                       type="radio"
                       name="options"
@@ -146,7 +171,8 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       autoComplete="off"
                       checked={activeSortMode === "eldst"}
                       onChange={() => toggleSortMode("eldst")}
-                    /> &nbsp; <i className="bi bi-sort-numeric-up"></i> Eldst 
+                    />{" "}
+                    &nbsp; <i className="bi bi-sort-numeric-up"></i> Eldst
                   </label>
                 </div>
               </AccordionBody>
@@ -161,7 +187,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
               striped
               bordered
               hover
-              className="shadow-sm"
+              className="shadow-sm rounded"
               style={{ backgroundColor: "white" }}
             >
               <caption>Produkttabell</caption>
@@ -170,32 +196,60 @@ const ProductTable: React.FC<ProductTableProps> = ({
                   {showId && <th className="align-middle">ID</th>}
                   <th
                     className={`sort-column align-middle text-center 
-                      ${sortColumn === "name" && activeSortMode === "column" ? "sorted-column" : ""}
-                      ${activeSortMode === "column" ? "active-sort-column" : ""}`}
+                      ${
+                        sortColumn === "name" && activeSortMode === "column"
+                          ? "sorted-column"
+                          : ""
+                      }
+                      ${
+                        activeSortMode === "column" ? "active-sort-column" : ""
+                      }`}
                     onClick={() => handleSort("name")}
                     style={{ cursor: "pointer" }}
                   >
                     Navn{" "}
-                    {sortColumn === "name"
-                      ? sortDirection === "asc"
-                        ? <small><i>(A-Å) ▲</i></small>
-                        : <small><i>(Å-A) ▼</i></small>
-                      : ""}
+                    {sortColumn === "name" ? (
+                      sortDirection === "asc" ? (
+                        <small>
+                          <i>(A-Å) ▲</i>
+                        </small>
+                      ) : (
+                        <small>
+                          <i>(Å-A) ▼</i>
+                        </small>
+                      )
+                    ) : (
+                      ""
+                    )}
                   </th>
                   <th className="align-middle text-center">Bilde</th>
                   <th
                     className={`sort-column align-middle text-center 
-                      ${sortColumn === "group" && activeSortMode === "column" ? "sorted-column" : ""}
-                      ${activeSortMode === "column" ? "active-sort-column" : ""}`}  
+                      ${
+                        sortColumn === "group" && activeSortMode === "column"
+                          ? "sorted-column"
+                          : ""
+                      }
+                      ${
+                        activeSortMode === "column" ? "active-sort-column" : ""
+                      }`}
                     onClick={() => handleSort("group")}
                     style={{ cursor: "pointer" }}
                   >
                     Gruppe{" "}
-                    {sortColumn === "group"
-                      ? sortDirection === "asc"
-                        ? <small><i>(A-Å) ▲</i></small>
-                        : <small><i>(Å-A) ▼</i></small>
-                      : ""}
+                    {sortColumn === "group" ? (
+                      sortDirection === "asc" ? (
+                        <small>
+                          <i>(A-Å) ▲</i>
+                        </small>
+                      ) : (
+                        <small>
+                          <i>(Å-A) ▼</i>
+                        </small>
+                      )
+                    ) : (
+                      ""
+                    )}
                   </th>
                   {showType && (
                     <th className="align-middle text-center">Kategori</th>
@@ -210,7 +264,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       className="img-fluid"
                       style={{ maxHeight: "1.5rem" }} // Adjust size to match text
                     />
-                    <span> Nøkkelhull</span>
+                    <span></span>
                   </th>
                   <th className="align-middle text-center">
                     <img
@@ -247,7 +301,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                         <img
                           alt={product.name}
                           className="rounded"
-                          style={{ maxWidth: "120px", maxHeight: "100px" }}
+                          style={{ maxWidth: "120px", maxHeight: "50px" }}
                           src={
                             product.imageUrl
                               ? `${API_URL}${product.imageUrl}`

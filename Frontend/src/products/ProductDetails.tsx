@@ -7,6 +7,7 @@ import CrudButtons from "../components/CrudButtons";
 import NutritionScoreGroup from "../components/NutritionScoreGroup";
 import { calculateNutriScore } from "../services/CalculateNutriScore";
 import { width } from "@fortawesome/free-solid-svg-icons/fa0";
+import SplitHtml from "../components/SplitHtmlProps";
 
 const ProductDetails = () => {
   const { productId } = useParams<{ productId: string }>();
@@ -100,7 +101,7 @@ const ProductDetails = () => {
                     src={`${API_URL}/images/circle-keyhole-logo.png`}
                     height={"30px"}
                     className="pe-2"
-                    alt="Støtter Nøkkelhulle"
+                    alt="Støtter Nøkkelhullet"
                     aria-label="Støtter Nøkkelhullet"
                     title="Støtter Nøkkelhullet"
                   />
@@ -122,6 +123,16 @@ const ProductDetails = () => {
 
                   <dt className="col-6">Merkevare</dt>
                   <dd className="col-6">Ex: Gilde</dd>
+
+                  <dt className="col-6">Matvaregruppe</dt>
+                  <dd className="col-6">
+                    <SplitHtml htmlContent={product.group} part="after" />
+                  </dd>
+
+                  <dt className="col-6">Matvarekategori</dt>
+                  <dd className="col-6">
+                    <SplitHtml htmlContent={product.type} part="after" />
+                  </dd>
 
                   <dt className="col-6">Oppbevaring</dt>
                   <dd className="col-6">
