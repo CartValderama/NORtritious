@@ -18,6 +18,7 @@ import { width } from "@fortawesome/free-solid-svg-icons/fa0";
 import ClaimsLabels from "../components/ClaimsLabels";
 import ProductActions from "../components/ProductActions";
 import { deleteProduct } from "./ProductService";
+import SplitHtml from "../components/SplitHtmlProps";
 
 interface ProductGridProps {
   products: Product[];
@@ -161,8 +162,10 @@ const ProductGrid: React.FC<ProductGridProps> = ({
                 </div>
                 <Card.Title>{product.name}</Card.Title>
                 <Card.Text>
-                  <p dangerouslySetInnerHTML={{ __html: product.group }}></p>
-                  <p dangerouslySetInnerHTML={{ __html: product.type }}></p>
+                  <SplitHtml htmlContent={product.group} part="before" />
+                  <SplitHtml htmlContent={product.group} part="after" />
+                  <SplitHtml htmlContent={product.type} part="before" />
+                  <SplitHtml htmlContent={product.type} part="after" />
                 </Card.Text>
               </Card.Body>
               <Card.Body>
