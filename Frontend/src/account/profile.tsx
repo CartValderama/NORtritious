@@ -153,7 +153,7 @@ const ProfilePage: React.FC = () => {
     formData.append("file", selectedImage);
 
     try {
-      const response = await axios.post(
+      await axios.post(
         `${API_URL}/api/account/upload-profile-picture`,
         formData,
         {

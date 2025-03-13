@@ -24,7 +24,7 @@ const SplitHtml: React.FC<SplitHtmlProps> = ({ htmlContent, part }) => {
     if (afterStrong.trim().length > 0) {
       afterStrong = afterStrong.replace(
         /^(\s*)([a-z])/,
-        (match, spaces, firstLetter) => spaces + firstLetter.toUpperCase()
+        (spaces, firstLetter) => spaces + firstLetter.toUpperCase()
       );
     }
   } else {

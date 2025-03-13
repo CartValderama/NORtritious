@@ -66,7 +66,7 @@ const HealthClaimsAccordion: React.FC<HealthClaimsAccordionProps> = ({
     // Split the body into sentences (simple split by period followed by a space)
     const sentences = body
       .split(/(?<=\.)\s+/)
-      .map((sentence, index) => sentence.trim())
+      .map((sentence) => sentence.trim())
       .filter(Boolean);
 
     return sentences.map((sentence, index) => (

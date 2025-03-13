@@ -4,17 +4,19 @@ import {
   Col,
   Row,
   Button,
-  ButtonGroup,
-  Popover,
-  OverlayTrigger,
+  //ButtonGroup,
+  //Popover,
+  //OverlayTrigger,
   Accordion,
   AccordionBody,
+  Alert,
+  Spinner,
 } from "react-bootstrap";
 import { Product } from "../types/product";
 import { Link, useNavigate } from "react-router-dom";
 import API_URL from "../apiConfig";
 import ClaimsView from "../shared/ClaimsView";
-import { width } from "@fortawesome/free-solid-svg-icons/fa0";
+//import { width } from "@fortawesome/free-solid-svg-icons/fa0";
 import ClaimsLabels from "../components/ClaimsLabels";
 import ProductActions from "../components/ProductActions";
 import { deleteProduct } from "./ProductService";
@@ -34,7 +36,7 @@ interface ProductGridProps {
 
 const ProductGrid: React.FC<ProductGridProps> = ({
   products,
-  onProductDeleted,
+  //onProductDeleted,
   sortColumn,
   sortDirection,
   activeSortMode,
@@ -44,7 +46,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({
   const [showClaims, setShowClaims] = React.useState<boolean>(false);
   const [claimsContent, setClaimsContent] = React.useState<string>("");
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
-  const [message, setMessage] = useState("");
+  //const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -56,12 +58,15 @@ const ProductGrid: React.FC<ProductGridProps> = ({
     organizationNumber: "",
     profilePicture: "",
   });
-
+  setClaimsContent("");
+  setSelectedProduct(null);
+  /*
   const handleShowClaims = (content: string, product: any) => {
     setClaimsContent(content);
     setShowClaims(true);
     setSelectedProduct(product);
   };
+  */
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -92,6 +97,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({
     fetchUserInfo();
   }, [navigate]);
 
+  /*
   // Formaterer innholdet i kortet
   const formatContent = (content: string) => {
     return content.split("\n").map((line, index) => (
@@ -100,6 +106,8 @@ const ProductGrid: React.FC<ProductGridProps> = ({
       <p key={index} dangerouslySetInnerHTML={{ __html: line }} />
     ));
   };
+  */
+ /*
 
   // Popover for ernæringspåstander
   const popover = (product: any) => (
@@ -110,9 +118,24 @@ const ProductGrid: React.FC<ProductGridProps> = ({
       </Popover.Body>
     </Popover>
   );
+  */
 
   return (
     <div>
+    {loading && (
+        <Row className="justify-content-center">
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </Spinner>
+        </Row>
+      )}
+      {error && (
+        <Row className="justify-content-center">
+          <Alert variant="danger">{error}</Alert>
+        </Row>
+      )}
+      {!loading && !error && (
+        <>
       <Col md={8} lg={9}>
         <Accordion defaultActiveKey={"1"}>
           <Accordion.Item eventKey="0">
@@ -233,6 +256,8 @@ const ProductGrid: React.FC<ProductGridProps> = ({
           content={claimsContent}
           product={selectedProduct}
         />
+      )}
+      </>
       )}
     </div>
   );

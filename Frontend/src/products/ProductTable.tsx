@@ -8,6 +8,8 @@ import {
   Accordion,
   AccordionBody,
   Button,
+  Alert,
+  Spinner,
 } from "react-bootstrap";
 import { Product } from "../types/product";
 import { Link, useNavigate } from "react-router-dom";
@@ -33,7 +35,7 @@ interface ProductTableProps {
 
 const ProductTable: React.FC<ProductTableProps> = ({
   products,
-  onProductDeleted,
+  //onProductDeleted,
   sortColumn,
   sortDirection,
   activeSortMode,
@@ -47,7 +49,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
   //const [visibleNutrition, setVisibleNutrition] = useState<{[key: number]: boolean;}>({});
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [showType, setShowType] = useState<boolean>(false);
-  const [message, setMessage] = useState("");
+  //const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -105,6 +107,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
   });
   */
 
+  /*
   // Formaterer innholdet i kortet
   const formatContent = (content: string) => {
     return content.split("\n").map((line, index) => (
@@ -113,9 +116,24 @@ const ProductTable: React.FC<ProductTableProps> = ({
       <p key={index} dangerouslySetInnerHTML={{ __html: line }} />
     ));
   };
+  */
 
   return (
     <Container fluid>
+      {loading && (
+        <Row className="justify-content-center">
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </Spinner>
+        </Row>
+      )}
+      {error && (
+        <Row className="justify-content-center">
+          <Alert variant="danger">{error}</Alert>
+        </Row>
+      )}
+      {!loading && !error && (
+        <>
       <Row className="mb-3">
         <Col md={4} lg={3}>
           <Accordion defaultActiveKey={"1"}>
@@ -450,6 +468,8 @@ const ProductTable: React.FC<ProductTableProps> = ({
           content={claimsContent}
           product={selectedProduct}
         />
+      )}
+      </>
       )}
     </Container>
   );
