@@ -7,8 +7,6 @@ export default defineConfig({
   build: {
     outDir: 'public', // Output dir for build files
   },
-  server: {
-    port: 5173, // Sett porten du ønsker
-  },
+  base: '',
   
-})
+});
