@@ -1,20 +1,18 @@
-# The Docker image that will be used to build your app
-image: dockerImage
-# Functions that should be executed before the build script is run
+image: node:16
+
+cache:
+  paths:
+    - node_modules/
+
 before_script:
-  - cd Frontend
   - npm install
+
 pages:
   script:
-    - cd Frontend
-    - npm run dev
-    - cd ../Backend
-    - dotnet run dev
+    - npm run build
+    - mv public public
   artifacts:
     paths:
-      # The folder that contains the files to be exposed at the Page URL
       - public
-  rules:
-    # This ensures that only pushes to the default branch will trigger
-    # a pages deploy
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+  only:
+    - main
