@@ -2,10 +2,14 @@
 image: dockerImage
 # Functions that should be executed before the build script is run
 before_script:
+  - cd Frontend
   - npm install
 pages:
   script:
+    - cd Frontend
     - npm run dev
+    - cd ../Backend
+    - dotnet run dev
   artifacts:
     paths:
       # The folder that contains the files to be exposed at the Page URL
