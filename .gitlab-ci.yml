@@ -22,17 +22,3 @@ frontend:
   only:
     - main
 
-# Backend build job
-backend:
-  image: mcr.microsoft.com/dotnet/sdk:8.0
-  stage: build
-  script:
-    - cd Backend
-    - dotnet restore
-    - dotnet build --configuration Release
-    - dotnet publish --configuration Release --output publish
-  artifacts:
-    paths:
-      - Backend/publish
-  only:
-    - main
