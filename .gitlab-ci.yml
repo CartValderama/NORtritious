@@ -11,7 +11,7 @@ before_script:
 
 pages:
   script:
-    - npm run dev
+    - npm run build
     - mv public ../public
   artifacts:
     paths:
