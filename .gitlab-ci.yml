@@ -1,20 +1,38 @@
 # .gitlab-ci.yml
-image: node:latest
 
-cache:
-  paths:
-    - node_modules/
+stages:
+  - build
 
-before_script:
-  - cd Frontend
-  - npm install
-
-pages:
+# Frontend build job
+frontend:
+  image: node:latest
+  stage: build
+  cache:
+    paths:
+      - Frontend/node_modules/
+  before_script:
+    - cd Frontend
+    - npm install
   script:
     - npm run build
     - mv public ../public
   artifacts:
     paths:
       - public
+  only:
+    - main
+
+# Backend build job
+backend:
+  image: mcr.microsoft.com/dotnet/sdk:8.0
+  stage: build
+  script:
+    - cd Backend
+    - dotnet restore
+    - dotnet build --configuration Release
+    - dotnet publish --configuration Release --output publish
+  artifacts:
+    paths:
+      - Backend/publish
   only:
     - main
