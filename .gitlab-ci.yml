@@ -1,5 +1,5 @@
 # .gitlab-ci.yml
-image: node:16
+image: node:latest
 
 cache:
   paths:
