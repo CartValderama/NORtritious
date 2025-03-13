@@ -1,3 +1,4 @@
+# .gitlab-ci.yml
 image: node:16
 
 cache:
@@ -5,12 +6,13 @@ cache:
     - node_modules/
 
 before_script:
+  - cd Frontend
   - npm install
 
 pages:
   script:
-    - npm run dev
-    - mv public public
+    - npm run build
+    - mv public ../public
   artifacts:
     paths:
       - public
