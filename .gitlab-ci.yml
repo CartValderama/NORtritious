@@ -4,7 +4,7 @@ stages:
   - build
 
 # Frontend build job
-frontend:
+pages:
   image: node:latest
   stage: build
   cache:
