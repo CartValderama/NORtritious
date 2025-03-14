@@ -7,17 +7,7 @@ stages:
 pages:
   image: node:latest
   stage: build
-  enabled: true
-  # The location where pages are stored (default: shared/pages).
-  # path: shared/pages
-
-  host: localhost
-  access_control: false
-  port: 5047
-  https: true
-  artifacts_server: false
-  external_http: ["localhost:5047"]
-  secret_file: /home/git/gitlab/gitlab-pages-secret
+  
   cache:
     paths:
       - Frontend/node_modules/
