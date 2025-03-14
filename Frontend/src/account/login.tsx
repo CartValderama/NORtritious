@@ -26,7 +26,7 @@ const LoginPage: React.FC = () => {
         });
         setIsLoggedIn(true);
       } catch (error) {
-        //setMessage("Failed to check login status.");
+        setMessage("Failed to check login status.");
       } finally {
         setLoading(false);
       }
