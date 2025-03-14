@@ -185,7 +185,7 @@ const ProductListPage: React.FC = () => {
         className="btn btn-secondary mb-3 me-2"
         style={{ backgroundColor: "darkblue" }}
       >
-        <i className="bi bi-pencil-square"></i> Nytt Produkt
+        <i className="bi bi-pencil-square"></i> Nyttig Produkt
       </Button>
       <Form.Group className="mb-3">
         <InputGroup>
