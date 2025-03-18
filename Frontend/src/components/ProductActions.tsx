@@ -36,7 +36,8 @@ const ProductActions: React.FC<ProductActionsProps> = ({
     <>
       <ButtonGroup className="mb-2">
         <Button
-          href={`/products/calculatorUpdate/${productId}`}
+          as={Link as any}
+          to={`/products/calculatorUpdate/${productId}`}
           variant="outline-primary"
           aria-label="Rediger produkt"
           size={sm ? "sm" : undefined}
