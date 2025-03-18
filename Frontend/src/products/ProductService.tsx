@@ -27,6 +27,9 @@ export const fetchProducts = async () => {
 export const fetchProductById = async (productId: string) => {
   const response = await axios.get(`${API_URL}/api/products/${productId}`, {
     withCredentials: true,
+    headers: {
+      'Content-Type': 'application/json',
+  }
   });
   return handleResponse(response);
 };
@@ -34,6 +37,9 @@ export const fetchProductById = async (productId: string) => {
 export const fetchMyProducts = async () => {
   const response = await axios.get(`${API_URL}/api/products/my-products`, {
     withCredentials: true,
+    headers: {
+      'Content-Type': 'application/json',
+  },
   });
   return handleResponse(response);
 };

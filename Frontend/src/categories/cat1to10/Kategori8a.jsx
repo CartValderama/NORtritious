@@ -25,6 +25,8 @@ import ErrorMessageBox from "../../errorMessages.jsx";
 
 import * as ProductService from "../../products/ProductService";
 
+import HealthClaimInputs from "../../components/HealthClaimInputs"; // import HealthClaimInputs component
+
 // This component is called Kategori1
 const Kategori8a = ({ product, 
   handleNutrientChange, 
@@ -43,7 +45,29 @@ const Kategori8a = ({ product,
   hasSugarsFree, 
   hasLowSatFat,
   meetsReqClaims, 
-  selectedMeetsReqs }) => {
+  selectedMeetsReqs,
+  selectVitamins,
+  selectMinerals,
+  selectOthers,
+  filteredOptions,
+  vitaminInputValues,
+  mineralInputValues,
+  otherInputValues,
+  meetsReqsInputValues,
+  vitaminUnits,
+  mineralUnits,  
+  handleVitaminChange,
+  handleMineralChange,
+  handleOtherChange,
+  handleVitaminInputChange,
+  handleMineralInputChange,
+  handleOtherInputChange,
+  handleMeetsReqsInputChange,
+  handleVitaminUnitChange,
+  handleMineralUnitChange,
+  setSelectedMeetsReqs,
+  openInfoLink,
+  popover }) => {
 
   // State variables for showing results and empty result message
   const [showNokkelhulletResults, setShowNokkelhulletResults] = useState(null);
@@ -981,6 +1005,35 @@ const Kategori8a = ({ product,
           </table>
         </div>
 
+
+        <HealthClaimInputs 
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            selectedOthers={selectedOthers}
+            selectedMeetsReqs={selectedMeetsReqs}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
+
         {/* Button that submits the form and calls the onClick function when clicked */}
         <div className="col-12 button-div">
         <button
@@ -1063,17 +1116,7 @@ const Kategori8a = ({ product,
         sugarsFree={sugarsFree}
         withNoAddedSugars={withNoAddedSugars}>
       </ResultEfsaFulfilled>
-      <ResultEfsaHealthClaims
-        vitaminClaims={vitaminClaims}
-        mineralClaims={mineralClaims}
-        selectedVitamins={selectedVitamins}
-        selectedMinerals={selectedMinerals}
-        otherClaims={otherClaims}
-        selectedOthers={selectedOthers}
-        meetsReqClaims={meetsReqClaims}
-        selectedMeetsReqs={selectedMeetsReqs}
-
-      />
+      
     </div>
   ) : null}
 

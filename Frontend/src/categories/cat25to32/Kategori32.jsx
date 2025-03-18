@@ -19,6 +19,8 @@ import * as ProductService from "../../products/ProductService";
 // ResultEfsaFullfilled og notFullfilled må implementers 
 import {ResultEfsaFulfilled, ResultEfsaHealthClaims, ResultEfsaNotFulfilled} from '../../ResultEfsaClaims.jsx'; // EFSA claims
 
+import HealthClaimInputs from "../../components/HealthClaimInputs"; // import HealthClaimInputs component
+
 const Kategori32 = ({ product, 
   handleNutrientChange, 
   onNutritionChange, 
@@ -35,7 +37,29 @@ const Kategori32 = ({ product,
   hasSugarsFree,
   hasLowSatFat, 
   meetsReqClaims, 
-  selectedMeetsReqs }) => {
+  selectedMeetsReqs,
+  selectVitamins,
+  selectMinerals,
+  selectOthers,
+  filteredOptions,
+  vitaminInputValues,
+  mineralInputValues,
+  otherInputValues,
+  meetsReqsInputValues,
+  vitaminUnits,
+  mineralUnits,  
+  handleVitaminChange,
+  handleMineralChange,
+  handleOtherChange,
+  handleVitaminInputChange,
+  handleMineralInputChange,
+  handleOtherInputChange,
+  handleMeetsReqsInputChange,
+  handleVitaminUnitChange,
+  handleMineralUnitChange,
+  setSelectedMeetsReqs,
+  openInfoLink,
+  popover }) => {
   // State variables for showing results and empty result message
 
   const [showNokkelhulletResults, setShowNokkelhulletResults] = useState(null);
@@ -903,6 +927,34 @@ const Kategori32 = ({ product,
           </table>
         </div>
 
+        <HealthClaimInputs 
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            selectedVitamins={selectedVitamins}
+            selectedMinerals={selectedMinerals}
+            selectedOthers={selectedOthers}
+            selectedMeetsReqs={selectedMeetsReqs}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
+            
         {/* Button that submits the form and calls the onClick function */}
         <div className="col-12 button-div">
           <button
@@ -910,7 +962,7 @@ const Kategori32 = ({ product,
             className="btn btn-primary btn-lg button-search"
             onClick={onClick}
           >
-            Søk
+            Beregn
           </button>
         </div>
       </div>

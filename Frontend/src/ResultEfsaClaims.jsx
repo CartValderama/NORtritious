@@ -280,7 +280,7 @@ function ResultEfsaHealthClaims({ vitaminClaims, mineralClaims, otherClaims, sel
 
   {/* Hvis man ønsker at trekkmenyen ikke overlapper med andre objekter -> fjern styling på Container */}
   return (
-    <div className="health_claims" style={{ display: "flex", flexDirection: "column", maxWidth: "610px", position: 'absolute' }}> {/*style={{ position: 'absolute', maxWidth: '600px'}} >*/}
+    <div className="health_claims" style={{ display: "flex", flexDirection: "column" }}> {/*style={{ position: 'absolute', maxWidth: '600px'}} >*/}
 
     <Container className="claim-description mt-4" >
       <Row>

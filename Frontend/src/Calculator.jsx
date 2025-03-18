@@ -832,7 +832,6 @@ const Calculator = () => {
     try {
       await ProductService.createProduct(updatedProduct);
       alert("Resept er nå lagret for dette produktet!\nDu kan behandle produktet på produkt-siden.");
-      window.location.reload();
     } catch (error) {
       console.error("Error saving product:", error.response ? error.response.data : error.message);
       alert("Noe gikk galt.\nReseptet er ikke lagret.\nSjekk at du er logget inn som matprodusent.");
@@ -849,7 +848,7 @@ const Calculator = () => {
         }
       }
   
-      window.location.reload();
+      //window.location.reload();
     }
   };
   
@@ -951,303 +950,10 @@ const Calculator = () => {
     <div className="vstack gap-3 container">
           
       <div className="row">
-        <div className="col-md-6">
-          <h3>Legg inn næringsinnhold</h3>
-          {/* Add a label for the food name input */}
-          <label htmlFor="matnavn" className="form-label">
-            <strong>Matvarenavn</strong>
-          </label>
 
-          {/* use Bootstrap classes to style the food name input */}
-          <div className="input-group mb-3">
-            <input
-              type="text"
-              className="form-control"
-              aria-describedby="matnavn"
-              name="name"
-              value={product.name}
-              onChange={handleChange}
-              placeholder="Product Name"
-              
-            />
-          </div>
-
-          {/* Display image preview only if an image is selected */}
-          {selectedImage && (
-            <div className="mb-3">
-              <p>Valgt bilde:</p>
-              <img
-                src={URL.createObjectURL(selectedImage)}
-                alt="Preview"
-                className="img-thumbnail"
-                width="150"
-              />
-            </div>
-          )}
-
-          <label htmlFor="image" className="form-label">
-            <strong>Last opp profilbilde</strong>
-          </label>
-          <div className="input-group">
-            <input
-              type="file"
-              className="form-control"
-              id="image"
-              name="image"
-              accept="image/*"
-              onChange={(e) =>
-                setSelectedImage(e.target.files?.[0] || null)
-              }
-            />
-          </div>
-
-          {/* Add a label for the food group select input */}
-          <label htmlFor="matgruppe" className="form-label">
-            <strong>Matvaregruppe</strong>
-          </label>
-
-          {/* Use the react-select component to style the food group select input and provide options */}
-          <CustomSelect
-            placeholder={<div>Velg matvaregruppe</div>}
-            className="form-select-md mb-3"
-            onChange={handlerGroup}
-            options={selectOption}
-          />
-
-          {/* Use conditional rendering to show the food category select input based on the selected food group */}
-          {selectsGroup === "grønnsaker, frukt, bær og nøtter" && (
-            <div>
-              <label htmlFor="mat" className="form-label">
-                <strong>Matkategori</strong>
-              </label>
-
-              {/* Use the react-select component to style the food category select input and provide options for the selected food group */}
-              <CustomSelect
-                placeholder={<div>Velg mat</div>}
-                className="form-select-md mb-3"
-                onChange={handlerProduct}
-                options={selectGrønnsaker}
-              />
-            </div>
-          )}
-
-          {/* Repeat the above conditional rendering for each food group, showing the relevant food category select input based on the selected food group */}
-          {selectsGroup === "mel, gryn og ris" && (
-            <div>
-              <label htmlFor="mat" className="form-label">
-                <strong>Matkategori</strong>
-              </label>
-              <CustomSelect
-                placeholder={<div>Velg mat</div>}
-                className="form-select-md mb-3"
-                onChange={handlerProduct}
-                options={selectMel}
-              />
-            </div>
-          )}
-          {selectsGroup === "grøt, brød og pasta" && (
-            <div>
-              <label htmlFor="mat" className="form-label">
-                <strong>Matkategori</strong>
-              </label>
-              <CustomSelect
-                placeholder={<div>Velg mat</div>}
-                className="form-select-md mb-3"
-                onChange={handlerProduct}
-                options={selectGrøt}
-              />
-            </div>
-          )}
-          {selectsGroup === "melk kategori" && (
-            <div>
-              <label htmlFor="mat" className="form-label">
-                <strong>Matkategori</strong>
-              </label>
-              <CustomSelect
-                placeholder={<div>Velg mat</div>}
-                className="form-select-md mb-3"
-                onChange={handlerProduct}
-                options={selectSyrnede}
-              />
-            </div>
-          )}
-          {selectsGroup === "ost og vegetabilske alternativer" && (
-            <div>
-              <label htmlFor="mat" className="form-label">
-                <strong>Matkategori</strong>
-              </label>
-              <CustomSelect
-                placeholder={<div>Velg mat</div>}
-                className="form-select-md mb-3"
-                onChange={handlerProduct}
-                options={selectOst}
-              />
-            </div>
-          )}
-          {selectsGroup === "matfett og oljer" && (
-            <div>
-              <label htmlFor="mat" className="form-label">
-                <strong>Matkategori</strong>
-              </label>
-              <CustomSelect
-                placeholder={<div>Velg mat</div>}
-                className="form-select-md mb-3"
-                onChange={handlerProduct}
-                options={selectMatfett}
-              />
-            </div>
-          )}
-          {selectsGroup === "fiskerivarer og produkter av fiskerivarer" && (
-            <div>
-              <label htmlFor="mat" className="form-label">
-                <strong>Matkategori</strong>
-              </label>
-              <CustomSelect
-                placeholder={<div>Velg mat</div>}
-                className="form-select-md mb-3"
-                onChange={handlerProduct}
-                options={selectFiskerivarer}
-              />
-            </div>
-          )}
-          {selectsGroup === "kjøtt og produkter som inneholder kjøtt" && (
-            <div>
-              <label htmlFor="mat" className="form-label">
-                <strong>Matkategori</strong>
-              </label>
-              <CustomSelect
-                placeholder={<div>Velg mat</div>}
-                className="form-select-md mb-3"
-                onChange={handlerProduct}
-                options={selectKjøtt}
-              />
-            </div>
-          )}
-          {selectsGroup === "helt eller delvis vegetabilske produkter" && (
-            <div>
-              <label htmlFor="mat" className="form-label">
-                <strong>Matkategori</strong>
-              </label>
-              <CustomSelect
-                placeholder={<div>Velg mat</div>}
-                className="form-select-md mb-3"
-                onChange={handlerProduct}
-                options={selectVegetabliske}
-              />
-            </div>
-          )}
-          {selectsGroup === "ferdigretter" && (
-            <div>
-              <label htmlFor="mat" className="form-label">
-                <strong>Matkategori</strong>
-              </label>
-              <CustomSelect
-                placeholder={<div>Velg mat</div>}
-                className="form-select-md mb-3"
-                onChange={handlerProduct}
-                options={selectFerdig}
-              />
-            </div>
-          )}
-          {selectsGroup === "dressinger og sauser" && (
-            <div>
-              <label htmlFor="mat" className="form-label">
-                <strong>Matkategori</strong>
-              </label>
-              <CustomSelect
-                placeholder={<div>Velg mat</div>}
-                className="form-select-md mb-3"
-                onChange={handlerProduct}
-                options={selectDressinger}
-              />
-            </div>
-          )}
-          {selectsProduct === "kategori 22" && (
-            <div>
-              <label htmlFor="matdivision" className="form-label">
-                <strong>Undermatkategori</strong>
-              </label>
-              <CustomSelect
-                placeholder={<div>Velg undermatkategori</div>}
-                className="form-select-md mb-3"
-                onChange={handlerFragment}
-                options={SelectSub22}
-              />
-            </div>
-          )}
-          {selectsProduct === "kategori 24" && (
-            <div>
-              <label htmlFor="matdivision" className="form-label">
-                <strong>Undermatkategori</strong>
-              </label>
-              <CustomSelect
-                placeholder={<div>Velg undermatkategori</div>}
-                className="form-select-md mb-3"
-                onChange={handlerFragment}
-                options={SelectSub24}
-              />
-            </div>
-          )}
-          {selectsProduct === "kategori 25" && (
-            <div>
-              <label htmlFor="matdivision" className="form-label">
-                <strong>Undermatkategori</strong>
-              </label>
-              <CustomSelect
-                placeholder={<div>Velg undermatkategori</div>}
-                className="form-select-md mb-3"
-                onChange={handlerFragment}
-                options={SelectSub25}
-              />
-            </div>
-          )}
-          {selectsFragment === "kategori 24 a" && (
-            <div>
-              <label htmlFor="matration" className="form-label">
-                <strong>Undermatkategori</strong>
-              </label>
-              <CustomSelect
-                placeholder={<div>Velg undermatkategori</div>}
-                className="form-select-md mb-3"
-                onChange={handlerRation}
-                options={SelectFragment24a}
-              />
-            </div>
-          )}
-          {selectsFragment === "kategori 24 b" && (
-            <div>
-              <label htmlFor="matration" className="form-label">
-                <strong>Undermatkategori</strong>
-              </label>
-              <CustomSelect
-                placeholder={<div>Velg undermatkategori</div>}
-                className="form-select-md mb-3"
-                onChange={handlerRation}
-                options={SelectFragment24b}
-              />
-            </div>
-          )}
-          {selectsFragment === "kategori 24 c" && (
-            <div>
-              <label htmlFor="matration" className="form-label">
-                <strong>Undermatkategori</strong>
-              </label>
-              <CustomSelect
-                placeholder={<div>Velg undermatkategori</div>}
-                className="form-select-md mb-3"
-                onChange={handlerRation}
-                options={SelectFragment24c}
-              />
-            </div>
-          )}
-
-
-
-        </div>
-
-        <div className="col-md-6" style={{ marginTop: '10px' }}>
+      <div className="col-md-6 mb-4" style={{ marginTop: '10px' }}>
           {/* Heading for the column */}
-          <h3>Mulige ernærings- og helsepåstander</h3>
+          <h1>Mulige ernærings- og helsepåstander</h1>
 
           {/* Description of what the user should do */}
           <p>
@@ -1273,6 +979,318 @@ const Calculator = () => {
               />
           */}
           </div>
+
+        <div className="col-md-6 order-md-first">
+          <h2>Legg inn næringsinnhold</h2>
+          {/* Add a label for the food name input */}
+          <label htmlFor="name" className="form-label">
+            Matvarenavn:
+          </label>
+
+          {/* use Bootstrap classes to style the food name input */}
+          <div className="input-group mb-3">
+            <input
+            id="name"
+              type="text"
+              className="form-control"
+              aria-describedby="matnavn"
+              name="name"
+              value={product.name}
+              onChange={handleChange}
+              placeholder="Matvarenavn"
+              
+            />
+          </div>
+
+          {/* Display image preview only if an image is selected */}
+          {selectedImage && (
+            <div className="mb-3">
+              <p>Valgt bilde:</p>
+              <img
+                src={URL.createObjectURL(selectedImage)}
+                alt="Preview"
+                className="img-thumbnail"
+                width="150"
+              />
+            </div>
+          )}
+
+          <label htmlFor="image" className="form-label">
+            Last opp profilbilde:
+          </label>
+          <div className="input-group mb-3">
+            <input
+              type="file"
+              className="form-control"
+              id="image"
+              name="image"
+              accept="image/*"
+              onChange={(e) =>
+                setSelectedImage(e.target.files?.[0] || null)
+              }
+            />
+          </div>
+
+          {/* Add a label for the food group select input */}
+          <label htmlFor="matgruppe" className="form-label">
+            Matvaregruppe:
+          </label>
+
+          {/* Use the react-select component to style the food group select input and provide options */}
+          <CustomSelect
+            placeholder={<div>Velg matvaregruppe</div>}
+            className="form-select-md mb-3"
+            onChange={handlerGroup}
+            options={selectOption}
+          />
+
+          {/* Use conditional rendering to show the food category select input based on the selected food group */}
+          {selectsGroup === "grønnsaker, frukt, bær og nøtter" && (
+            <div>
+              <label htmlFor="mat1" className="form-label">
+                Matkategori:
+              </label>
+
+              {/* Use the react-select component to style the food category select input and provide options for the selected food group */}
+              <CustomSelect
+                placeholder={<div>Velg mat</div>}
+                className="form-select-md mb-3"
+                onChange={handlerProduct}
+                options={selectGrønnsaker}
+                inputId="mat1"
+              />
+            </div>
+          )}
+
+          {/* Repeat the above conditional rendering for each food group, showing the relevant food category select input based on the selected food group */}
+          {selectsGroup === "mel, gryn og ris" && (
+            <div>
+              <label htmlFor="mat2" className="form-label">
+                Matkategori:
+              </label>
+              <CustomSelect
+                placeholder={<div>Velg mat</div>}
+                className="form-select-md mb-3"
+                onChange={handlerProduct}
+                options={selectMel}
+                inputId="mat2"
+              />
+            </div>
+          )}
+          {selectsGroup === "grøt, brød og pasta" && (
+            <div>
+              <label htmlFor="mat3" className="form-label">
+              Matkategori:
+              </label>
+              <CustomSelect
+                placeholder={<div>Velg mat</div>}
+                className="form-select-md mb-3"
+                onChange={handlerProduct}
+                options={selectGrøt}
+                inputId="mat3"
+              />
+            </div>
+          )}
+          {selectsGroup === "melk kategori" && (
+            <div>
+              <label htmlFor="mat4" className="form-label">
+              Matkategori:
+              </label>
+              <CustomSelect
+                placeholder={<div>Velg mat</div>}
+                className="form-select-md mb-3"
+                onChange={handlerProduct}
+                options={selectSyrnede}
+                inputId="mat4"
+              />
+            </div>
+          )}
+          {selectsGroup === "ost og vegetabilske alternativer" && (
+            <div>
+              <label htmlFor="mat5" className="form-label">
+              Matkategori:
+              </label>
+              <CustomSelect
+                placeholder={<div>Velg mat</div>}
+                className="form-select-md mb-3"
+                onChange={handlerProduct}
+                options={selectOst}
+                inputId="mat5"
+              />
+            </div>
+          )}
+          {selectsGroup === "matfett og oljer" && (
+            <div>
+              <label htmlFor="mat6" className="form-label">
+              Matkategori:
+              </label>
+              <CustomSelect
+                placeholder={<div>Velg mat</div>}
+                className="form-select-md mb-3"
+                onChange={handlerProduct}
+                options={selectMatfett}
+                inputId="mat6"
+              />
+            </div>
+          )}
+          {selectsGroup === "fiskerivarer og produkter av fiskerivarer" && (
+            <div>
+              <label htmlFor="mat7" className="form-label">
+              Matkategori:
+              </label>
+              <CustomSelect
+                placeholder={<div>Velg mat</div>}
+                className="form-select-md mb-3"
+                onChange={handlerProduct}
+                options={selectFiskerivarer}
+                inputId="mat7"
+              />
+            </div>
+          )}
+          {selectsGroup === "kjøtt og produkter som inneholder kjøtt" && (
+            <div>
+              <label htmlFor="mat8" className="form-label">
+              Matkategori:
+              </label>
+              <CustomSelect
+                placeholder={<div>Velg mat</div>}
+                className="form-select-md mb-3"
+                onChange={handlerProduct}
+                options={selectKjøtt}
+                inputId="mat8"
+              />
+            </div>
+          )}
+          {selectsGroup === "helt eller delvis vegetabilske produkter" && (
+            <div>
+              <label htmlFor="mat9" className="form-label">
+              Matkategori:
+              </label>
+              <CustomSelect
+                placeholder={<div>Velg mat</div>}
+                className="form-select-md mb-3"
+                onChange={handlerProduct}
+                options={selectVegetabliske}
+                inputId="mat9"
+              />
+            </div>
+          )}
+          {selectsGroup === "ferdigretter" && (
+            <div>
+              <label htmlFor="mat10" className="form-label">
+              Matkategori:
+              </label>
+              <CustomSelect
+                placeholder={<div>Velg mat</div>}
+                className="form-select-md mb-3"
+                onChange={handlerProduct}
+                options={selectFerdig}
+                inputId="mat10"
+              />
+            </div>
+          )}
+          {selectsGroup === "dressinger og sauser" && (
+            <div>
+              <label htmlFor="mat11" className="form-label">
+              Matkategori:
+              </label>
+              <CustomSelect
+                placeholder={<div>Velg mat</div>}
+                className="form-select-md mb-3"
+                onChange={handlerProduct}
+                options={selectDressinger}
+                inputId="mat11"
+              />
+            </div>
+          )}
+          {selectsProduct === "kategori 22" && (
+            <div>
+              <label htmlFor="matdivision" className="form-label">
+                <strong>Undermatkategori</strong>
+              </label>
+              <CustomSelect
+                placeholder={<div>Velg undermatkategori</div>}
+                className="form-select-md mb-3"
+                onChange={handlerFragment}
+                options={SelectSub22}
+                inputId="mat"
+              />
+            </div>
+          )}
+          {selectsProduct === "kategori 24" && (
+            <div>
+              <label htmlFor="matdivision" className="form-label">
+                <strong>Undermatkategori</strong>
+              </label>
+              <CustomSelect
+                placeholder={<div>Velg undermatkategori</div>}
+                className="form-select-md mb-3"
+                onChange={handlerFragment}
+                options={SelectSub24}
+                inputId="mat"
+              />
+            </div>
+          )}
+          {selectsProduct === "kategori 25" && (
+            <div>
+              <label htmlFor="matdivision" className="form-label">
+                <strong>Undermatkategori</strong>
+              </label>
+              <CustomSelect
+                placeholder={<div>Velg undermatkategori</div>}
+                className="form-select-md mb-3"
+                onChange={handlerFragment}
+                options={SelectSub25}
+                inputId="mat"
+              />
+            </div>
+          )}
+          {selectsFragment === "kategori 24 a" && (
+            <div>
+              <label htmlFor="matration" className="form-label">
+                <strong>Undermatkategori</strong>
+              </label>
+              <CustomSelect
+                placeholder={<div>Velg undermatkategori</div>}
+                className="form-select-md mb-3"
+                onChange={handlerRation}
+                options={SelectFragment24a}
+                inputId="mat"
+              />
+            </div>
+          )}
+          {selectsFragment === "kategori 24 b" && (
+            <div>
+              <label htmlFor="matration" className="form-label">
+                <strong>Undermatkategori</strong>
+              </label>
+              <CustomSelect
+                placeholder={<div>Velg undermatkategori</div>}
+                className="form-select-md mb-3"
+                onChange={handlerRation}
+                options={SelectFragment24b}
+                inputId="mat"
+              />
+            </div>
+          )}
+          {selectsFragment === "kategori 24 c" && (
+            <div>
+              <label htmlFor="matration" className="form-label">
+                <strong>Undermatkategori</strong>
+              </label>
+              <CustomSelect
+                placeholder={<div>Velg undermatkategori</div>}
+                className="form-select-md mb-3"
+                onChange={handlerRation}
+                options={SelectFragment24c}
+                inputId="mat"
+              />
+            </div>
+          )}
+
+
+
+        </div>
 
 
         {/* Spacer */}
@@ -1306,6 +1324,28 @@ const Calculator = () => {
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
             selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} 
             /> 
           }
           {/* Display component for Kategori2 if group is selected as grønnsaker, frukt, bær og nøtter and Kategori2 is selected as product */}
@@ -1323,7 +1363,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
 
           {/* Display component for Kategori3 if group is selected as grønnsaker, frukt, bær og nøtter and Kategori3 is selected as product */}
@@ -1342,6 +1404,29 @@ const Calculator = () => {
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
             selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} 
+
             />
           }
 
@@ -1363,7 +1448,29 @@ const Calculator = () => {
             hasSugarsFree={handleSugarsFreeClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {/* Display component for Kategori5 if group is selected as mel, gryn og ris and Kategori5 is selected as product */}
           {selectsGroup === "mel, gryn og ris" &&
@@ -1380,7 +1487,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {/* Display component for Kategori6 if group is selected as mel, gryn og ris and Kategori6 is selected as product */}
           {selectsGroup === "mel, gryn og ris" &&
@@ -1397,7 +1526,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
 
           {/* Display default component if group is selected as grøt, brød og pasta but no product is selected */}
@@ -1419,7 +1570,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {/* Display component for kategori 8a if group is selected as grøt, brød og pasta and product is kategori 8a */}
           {selectsGroup === "grøt, brød og pasta" &&
@@ -1436,7 +1609,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {/* Display component for kategori 8b if group is selected as grøt, brød og pasta and product is kategori 8b */}
           {selectsGroup === "grøt, brød og pasta" &&
@@ -1453,7 +1648,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {/* Display component for kategori 9 if group is selected as grøt, brød og pasta and product is kategori 9 */}
           {selectsGroup === "grøt, brød og pasta" &&
@@ -1470,7 +1687,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {/* Display component for kategori 10 if group is selected as grøt, brød og pasta and product is kategori 10 */}
           {selectsGroup === "grøt, brød og pasta" &&
@@ -1480,13 +1719,36 @@ const Calculator = () => {
             selectedVitamins={selectedVitamins}
             selectedMinerals={selectedMinerals}
             otherClaims={otherClaims}
-            selectedOthers={selectedOthers}            hasHighFibre={handleHighFibreClaims}
+            selectedOthers={selectedOthers}            
+            hasHighFibre={handleHighFibreClaims}
             hasLowSugar={handleLowSugarClaims}
             hasSugarsFree={handleSugarsFreeClaims}
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
             selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} 
             />
           }
 
@@ -1509,7 +1771,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {/* Display component for melk 11b if group is selected as melk kategori and product is melk 11b */}
           {selectsGroup === "melk kategori" &&
@@ -1526,7 +1810,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {/* Display component for melk 12a if group is selected as melk kategori and product is melk 12a */}
           {selectsGroup === "melk kategori" &&
@@ -1543,7 +1849,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {/* Display component for melk 12b if group is selected as melk kategori and product is melk 12b */}
           {selectsGroup === "melk kategori" &&
@@ -1560,7 +1888,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {/* Display component for melk 13a if group is selected as melk kategori and product is melk 13a */}
           {selectsGroup === "melk kategori" &&
@@ -1577,7 +1927,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {/* Display component for melk 13b if group is selected as melk kategori and product is melk 13b */}
           {selectsGroup === "melk kategori" &&
@@ -1594,7 +1966,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {/* Display component for melk 14a if group is selected as melk kategori and product is melk 14a */}
           {selectsGroup === "melk kategori" &&
@@ -1611,7 +2005,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {/* Display component for melk 14b if group is selected as melk kategori and product is melk 14b */}
           {selectsGroup === "melk kategori" &&
@@ -1628,7 +2044,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {/* Display component for melk 15a if group is selected as melk kategori and product is melk 15a */}
           {selectsGroup === "melk kategori" &&
@@ -1645,7 +2083,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {/* Display component for melk 15b if group is selected as melk kategori and product is melk 15b */}
           {selectsGroup === "melk kategori" &&
@@ -1662,7 +2122,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
 
           {/* Repeat the above conditional rendering code that renders a different component based on the user's selection of product category, group, and subcategory.  */}
@@ -1682,7 +2164,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {selectsGroup === "ost og vegetabilske alternativer" &&
             selectsProduct === "kategori 17" && <Kategori17 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
@@ -1698,7 +2202,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {selectsGroup === "ost og vegetabilske alternativer" &&
             selectsProduct === "kategori 18" && <Kategori18 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
@@ -1714,7 +2240,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
 
           {selectsGroup === "matfett og oljer" && selectsProduct === "" && (
@@ -1734,7 +2282,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {selectsGroup === "matfett og oljer" &&
             selectsProduct === "kategori 20" && <Kategori20 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
@@ -1750,7 +2320,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
 
           {selectsGroup === "fiskerivarer og produkter av fiskerivarer" &&
@@ -1769,7 +2361,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {selectsGroup === "fiskerivarer og produkter av fiskerivarer" &&
             selectsProduct === "kategori 22" &&
@@ -1789,7 +2403,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {selectsGroup === "fiskerivarer og produkter av fiskerivarer" &&
             selectsProduct === "kategori 22" &&
@@ -1806,7 +2442,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {selectsGroup === "fiskerivarer og produkter av fiskerivarer" &&
             selectsProduct === "kategori 22" &&
@@ -1823,7 +2481,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {selectsGroup === "fiskerivarer og produkter av fiskerivarer" &&
             selectsProduct === "kategori 22" &&
@@ -1840,7 +2520,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
 
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
@@ -1859,7 +2561,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
 
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
@@ -1877,7 +2601,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
@@ -1899,7 +2645,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
@@ -1917,7 +2685,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
 
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
@@ -1940,7 +2730,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
@@ -1958,7 +2770,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
@@ -1976,7 +2810,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
@@ -1994,7 +2850,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
 
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
@@ -2017,7 +2895,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {selectsGroup === "kjøtt og produkter som inneholder kjøtt" &&
             selectsProduct === "kategori 24" &&
@@ -2035,7 +2935,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
 
           {selectsGroup === "helt eller delvis vegetabilske produkter" &&
@@ -2058,7 +2980,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {selectsGroup === "helt eller delvis vegetabilske produkter" &&
             selectsProduct === "kategori 25" &&
@@ -2075,7 +3019,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
 
           {selectsGroup === "ferdigretter" && selectsProduct === "" && (
@@ -2095,7 +3061,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {selectsGroup === "ferdigretter" &&
             selectsProduct === "kategori 27" && <Kategori27 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
@@ -2111,7 +3099,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {selectsGroup === "ferdigretter" &&
             selectsProduct === "kategori 28" && <Kategori28 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
@@ -2127,7 +3137,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {selectsGroup === "ferdigretter" &&
             selectsProduct === "kategori 29" && <Kategori29 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
@@ -2143,7 +3175,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {selectsGroup === "ferdigretter" &&
             selectsProduct === "kategori 30" && <Kategori30 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
@@ -2159,7 +3213,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
 
           {selectsGroup === "dressinger og sauser" && selectsProduct === "" && (
@@ -2179,7 +3255,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs}/>
+            selectedMeetsReqs={selectedMeetsReqs}
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
           {selectsGroup === "dressinger og sauser" &&
             selectsProduct === "kategori 32" && <Kategori32 product={product} onNutritionChange={handleNutritionChange} onCalculationComplete={handleCalculationComplete} hasNokkelhullet={handleHasNokkelhullet} hasEfsaNutrition={handleEfsaNutrition}
@@ -2195,7 +3293,29 @@ const Calculator = () => {
             hasLowSalt={handleLowSaltClaims}
             hasLowSatFat={handleLowSatFatClaims}
             meetsReqClaims={meetsReqsClaims}
-            selectedMeetsReqs={selectedMeetsReqs} />
+            selectedMeetsReqs={selectedMeetsReqs} 
+            selectVitamins={selectVitamins}
+            selectMinerals={selectMinerals}
+            selectOthers={selectOthers}
+            filteredOptions={filteredOptions}
+            vitaminInputValues={vitaminInputValues}
+            mineralInputValues={mineralInputValues}
+            otherInputValues={otherInputValues}
+            meetsReqsInputValues={meetsReqsInputValues}
+            vitaminUnits={vitaminUnits}
+            mineralUnits={mineralUnits}
+            handleVitaminChange={handleVitaminChange}
+            handleMineralChange={handleMineralChange}
+            handleOtherChange={handleOtherChange}
+            handleVitaminInputChange={handleVitaminInputChange}
+            handleMineralInputChange={handleMineralInputChange}
+            handleOtherInputChange={handleOtherInputChange}
+            handleMeetsReqsInputChange={handleMeetsReqsInputChange}
+            handleVitaminUnitChange={handleVitaminUnitChange}
+            handleMineralUnitChange={handleMineralUnitChange}
+            setSelectedMeetsReqs={setSelectedMeetsReqs}
+            openInfoLink={openInfoLink}
+            popover={popover} />
           }
 
           {/*{isCalculationCompleted && (
@@ -2205,180 +3325,8 @@ const Calculator = () => {
 
 
 
-
         </div>
-
-          {/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/}
-          {/* These are added inputs for Health Claims */}
-          <div className="col-md-6" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-
-          <Container style={{ border: '1px solid #ccc', padding: '10px', borderRadius: '5px', marginTop: '10px', marginBottom: '10px', backgroundColor: '#f9f9f9', maxHeight: '1000px', overflowY: 'auto', overflowX: 'hidden' }}>
-          <h4>
-            <img 
-              alt="EFSA Logo"
-              className=""
-              style={{ width: '35px', height: '35px', float: 'left' }}
-              src={`${API_URL}/images/efsaLogo.png`}
-            />
-            &nbsp;EFSA Helsepåstander &nbsp;
-
-            <OverlayTrigger data-trigger="hover" placement="right" overlay={popover}>
-            <FontAwesomeIcon icon={faCircleInfo} onClick={openInfoLink} style={{ cursor: 'pointer', float: 'right', padding: '5px' }}/>     
-            </OverlayTrigger>
-
-          </h4>
-          <hr/>
-          <Row className="mb-3">
-          <Col xs={12} md={6}>
-            <label htmlFor="vitamins" className="form-label">
-              <strong>Kilde til Vitaminer</strong>
-            </label>
-            <CustomSelect
-              isMulti
-              placeholder={<div>Velg Vitaminer</div>}
-              className="form-select-md"
-              onChange={handleVitaminChange}
-              options={selectVitamins}
-            />
-            {selectedVitamins.map((vitamin) => (
-              <div key={vitamin.value} className="mt-2">
-                <label htmlFor={`vitamin-input-${vitamin.value}`} className="form-label">
-                  Valgfri mengde {vitamin.label} 
-                </label>
-                <div className="input-group">
-                <input
-                  type="text"
-                  className="form-control"
-                  id={`vitamin-input-${vitamin.value}`}
-                  value={vitaminInputValues[vitamin.value] || ''}
-                  onChange={(e) => handleVitaminInputChange(vitamin.value, e.target.value)}
-                  placeholder={`${vitamin.label}`}
-                />
-                <select
-                  className="form-select"
-                  value={vitaminUnits[vitamin.value] || 'mg'}
-                  onChange={(e) => handleVitaminUnitChange(vitamin.value, e.target.value)}
-                  style={{flex: '0 0 25%'}}
-                >
-                  <option value="mg">mg</option>
-                  <option value="µg">µg</option>
-                </select>
-                </div>
-              </div>
-            ))}
-          </Col>
-          <Col xs={12} md={6}>
-            <label htmlFor="minerals" className="form-label">
-              <strong>Kilde til Mineraler</strong>
-            </label>
-            <CustomSelect
-              isMulti
-              placeholder={<div>Velg Mineraler</div>}
-              className="form-select-md"
-              onChange={handleMineralChange}
-              options={selectMinerals}
-            />
-            {selectedMinerals.map((mineral) => (
-              <div key={mineral.value} className="mt-2">
-                <label htmlFor={`mineral-input-${mineral.value}`} className="form-label">
-                  Valgfri mengde {mineral.label}
-                </label>
-                <div className="input-group">
-                <input
-                  type="text"
-                  className="form-control"
-                  id={`mineral-input-${mineral.value}`}
-                  value={mineralInputValues[mineral.value] || ''}
-                  onChange={(e) => handleMineralInputChange(mineral.value, e.target.value)}
-                  placeholder={`${mineral.label}`}
-                />
-                <select
-                  style={{flex: '0 0 25%'}}
-                  className="form-select"
-                  value={mineralUnits[mineral.value] || 'mg'}
-                  onChange={(e) => handleMineralUnitChange(mineral.value, e.target.value)}
-                >
-                  <option value="mg">mg</option>
-                  <option value="µg">µg</option>
-                </select>
-                </div>
-              </div>
-            ))}
-          </Col>
-        </Row>
-        <br/>
-
-        <Row className="mb-3" >
-          <Col>
-            <label htmlFor="others" className="form-label">
-              <strong>Kilde til Annet</strong>
-            </label>
-            <CustomSelect
-              isMulti
-              placeholder={<div>Velg Andre</div>}
-              className="form-select-md"
-              onChange={handleOtherChange}
-              options={selectOthers}
-            />
-            {selectedOthers.map((other) => (
-              <div key={other.value} className="mt-2">
-                <label htmlFor={`other-input-${other.value}`} className="form-label">
-                  Mengde {other.label}
-                </label>
-                <div className="input-group">
-                <input
-                  type="text"
-                  className="form-control"
-                  id={`other-input-${other.value}`}
-                  value={otherInputValues[other.value] || ''}
-                  onChange={(e) => handleOtherInputChange(other.value, e.target.value)}
-                  placeholder={`${other.label}`}
-                />
-                <span className="input-group-text">g</span>
-                
-                </div>
-              </div>
-            ))}
-          </Col>
-        </Row>
-        <br/>
-
-        <Row className="mb-3">
-          <Col>
-            <label htmlFor="reqs" className="form-label">
-              <strong>Møter EFSA Næringskrav</strong>
-            </label>
-            <CustomSelect
-              isMulti
-              placeholder={<div>Velg Muligheter</div>}
-              className="form-select-md"
-              onChange={setSelectedMeetsReqs}
-              options={filteredOptions}
-              value={selectedMeetsReqs}
-            />
-            {selectedMeetsReqs.map((meetsReqs) => (
-              <div key={meetsReqs.value} className="mt-2">
-                <label htmlFor={`meetsReqs-input-${meetsReqs.value}`} className="form-label">
-                  Mengde {meetsReqs.label}
-                </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id={`meetsReqs-input-${meetsReqs.value}`}
-                  value={meetsReqsInputValues[meetsReqs.value] || ''}
-                  onChange={(e) => handleMeetsReqsInputChange(meetsReqs.value, e.target.value)}
-                  placeholder={`${meetsReqs.label} (g)`}
-                />
-              </div>
-            ))}
-          </Col>
-        </Row>
-        </Container>
         </div>
-        <div style={{padding: '200px'}}></div>
-
-
-      </div>
     </div>
     </div>
     </form>

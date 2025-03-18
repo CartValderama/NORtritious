@@ -9,8 +9,6 @@ import {
   //OverlayTrigger,
   Accordion,
   AccordionBody,
-  Alert,
-  Spinner,
 } from "react-bootstrap";
 import { Product } from "../types/product";
 import { Link, useNavigate } from "react-router-dom";
@@ -50,6 +48,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  
 
   const [userInfo, setUserInfo] = useState({
     email: "",
@@ -58,8 +57,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({
     organizationNumber: "",
     profilePicture: "",
   });
-  setClaimsContent("");
-  setSelectedProduct(null);
+
   /*
   const handleShowClaims = (content: string, product: any) => {
     setClaimsContent(content);
@@ -67,6 +65,11 @@ const ProductGrid: React.FC<ProductGridProps> = ({
     setSelectedProduct(product);
   };
   */
+  useEffect(() => {
+    setClaimsContent("");
+    setSelectedProduct(null);
+  }
+  , []);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -107,8 +110,8 @@ const ProductGrid: React.FC<ProductGridProps> = ({
     ));
   };
   */
- /*
 
+  /*
   // Popover for ernæringspåstander
   const popover = (product: any) => (
     <Popover id="popover-basic" style={{ width: "500px", maxHeight: "300px" }}>
@@ -122,20 +125,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({
 
   return (
     <div>
-    {loading && (
-        <Row className="justify-content-center">
-          <Spinner animation="border" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </Spinner>
-        </Row>
-      )}
-      {error && (
-        <Row className="justify-content-center">
-          <Alert variant="danger">{error}</Alert>
-        </Row>
-      )}
-      {!loading && !error && (
-        <>
+    {error && loading}
       <Col md={8} lg={9}>
         <Accordion defaultActiveKey={"1"}>
           <Accordion.Item eventKey="0">
@@ -256,8 +246,6 @@ const ProductGrid: React.FC<ProductGridProps> = ({
           content={claimsContent}
           product={selectedProduct}
         />
-      )}
-      </>
       )}
     </div>
   );

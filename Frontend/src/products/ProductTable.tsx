@@ -8,8 +8,6 @@ import {
   Accordion,
   AccordionBody,
   Button,
-  Alert,
-  Spinner,
 } from "react-bootstrap";
 import { Product } from "../types/product";
 import { Link, useNavigate } from "react-router-dom";
@@ -69,7 +67,10 @@ const ProductTable: React.FC<ProductTableProps> = ({
           `${API_URL}/api/account/get-user-info`,
           {
             withCredentials: true,
+            headers: {
+              'Content-Type': 'application/json',
           }
+        },
         );
         setUserInfo(response.data);
       } catch (error) {
@@ -120,20 +121,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
 
   return (
     <Container fluid>
-      {loading && (
-        <Row className="justify-content-center">
-          <Spinner animation="border" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </Spinner>
-        </Row>
-      )}
-      {error && (
-        <Row className="justify-content-center">
-          <Alert variant="danger">{error}</Alert>
-        </Row>
-      )}
-      {!loading && !error && (
-        <>
+      {error && loading == false}
       <Row className="mb-3">
         <Col md={4} lg={3}>
           <Accordion defaultActiveKey={"1"}>
@@ -247,7 +235,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
       <Row>
         <Col>
           <div className="card p-3">
-            <div className="table">
+            <div className="table-responsive">
               <Table hover className="rounded">
                 <caption>Produkttabell</caption>
                 <thead className="bg-light">
@@ -468,8 +456,6 @@ const ProductTable: React.FC<ProductTableProps> = ({
           content={claimsContent}
           product={selectedProduct}
         />
-      )}
-      </>
       )}
     </Container>
   );

@@ -132,7 +132,7 @@ const ProfilePage: React.FC = () => {
       );
 
       setMessage("Brukerinformasjon oppdatert.");
-      window.location.reload();
+      navigate(0); 
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setError(
@@ -164,7 +164,7 @@ const ProfilePage: React.FC = () => {
         }
       );
       setMessage("Profilbilde ble lastet opp!");
-      window.location.reload();
+      navigate(0);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setError(

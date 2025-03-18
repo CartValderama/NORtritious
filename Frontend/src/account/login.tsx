@@ -23,10 +23,11 @@ const LoginPage: React.FC = () => {
       try {
         await axios.get(`${API_URL}/api/account/get-user-info`, {
           withCredentials: true,
+
         });
         setIsLoggedIn(true);
       } catch (error) {
-        setMessage("Failed to check login status.");
+        //setMessage("Failed to check login status.");
       } finally {
         setLoading(false);
       }

@@ -6,7 +6,7 @@ import { Product } from "../types/product";
 import API_URL from "../apiConfig";
 import * as ProductService from "./ProductService";
 import "../css/ProductTable.css";
-import { NavLink } from 'react-router-dom';
+import { Link } from "react-router-dom";
 //import ErrorPopup from '../shared/ErrorPopup';
 
 const ProductListPage: React.FC = () => {
@@ -181,13 +181,13 @@ const ProductListPage: React.FC = () => {
           </>
         )}
       </Button>
-      <NavLink
+      <Link
         to="/products/calculator"
         className="btn btn-secondary mb-3 me-2"
         style={{ backgroundColor: "darkblue" }}
       >
-        <i className="bi bi-pencil-square"></i> Nyttig Produkt
-      </NavLink>
+        <i className="bi bi-pencil-square"></i> Nytt Produkt
+      </Link>
       <Form.Group className="mb-3">
         <InputGroup>
           <InputGroup.Text>
