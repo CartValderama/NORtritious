@@ -26,7 +26,7 @@ const ProductActions: React.FC<ProductActionsProps> = ({
       if (location.pathname.startsWith("/products/details/")) {
         navigate("/products"); // Redirect to products list if on details page
       } else {
-        navigate(0); // Reload the current page
+        navigate(1); // Reload the current page
       }
     }
     setShowModal(false);
