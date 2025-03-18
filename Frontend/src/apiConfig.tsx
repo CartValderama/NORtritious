@@ -1,3 +1,4 @@
-const API_URL = 'http://localhost:5047';//'https://9883-2a01-799-de3-1300-9003-a242-5537-caad.ngrok-free.app';//import.meta.env.VITE_API_URL;//'https://localhost:7064';
+const API_URL = 'https://fremtidsmat-webapp-bre3fmcafgc6cdgd.northeurope-01.azurewebsites.net';
+//'https://localhost:7064';
 
 export default API_URL;
