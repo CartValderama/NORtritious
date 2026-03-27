@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi;
 using Backend.DAL;
 using Backend.DAL.Seed;
 using Backend.Models;
@@ -12,7 +13,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add Endpoint Explorer
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Bachelor API",
+        Version = "v1"
+    });
+    c.EnableAnnotations();
+});
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
@@ -139,7 +148,10 @@ using (var scope = app.Services.CreateScope())
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Bachelor API V1");
+    });
 }
 else
 {

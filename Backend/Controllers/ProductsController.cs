@@ -275,7 +275,8 @@ namespace Backend.Controllers
         // Handles image upload
         [HttpPost("upload-product-image")]
         [Authorize]
-        public async Task<IActionResult> UploadProductImage([FromForm] IFormFile file)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UploadProductImage(IFormFile file)
         {
             try
             {

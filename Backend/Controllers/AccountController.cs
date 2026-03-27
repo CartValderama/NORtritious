@@ -237,7 +237,8 @@ namespace Backend.Controllers
 
         [HttpPost("upload-profile-picture")]
         [Authorize]
-        public async Task<IActionResult> UploadProfilePicture([FromForm] IFormFile file)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UploadProfilePicture(IFormFile file)
         {
             try
             {
