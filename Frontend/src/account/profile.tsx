@@ -35,7 +35,7 @@ const ProfilePage: React.FC = () => {
           `${API_URL}/api/account/get-user-info`,
           {
             withCredentials: true,
-          }
+          },
         );
         setUserInfo(response.data);
       } catch (error) {
@@ -45,7 +45,7 @@ const ProfilePage: React.FC = () => {
           } else {
             setError(
               error.response?.data?.message ||
-                "Failed to fetch user information."
+                "Failed to fetch user information.",
             );
           }
         }
@@ -66,7 +66,7 @@ const ProfilePage: React.FC = () => {
     try {
       const response = await axios.get(
         `${API_URL}/api/products/my-products`, // Endepunkt for å hente produkter
-        { withCredentials: true }
+        { withCredentials: true },
       );
       setProducts(response.data); // Sett produkter i state
       setError("");
@@ -95,7 +95,7 @@ const ProfilePage: React.FC = () => {
         await axios.post(
           `${API_URL}/api/account/change-password`,
           changePasswordRequest,
-          { withCredentials: true }
+          { withCredentials: true },
         );
         setMessage("Password changed successfully.");
         setOldPassword(""); // Tøm gammelt passord felt
@@ -103,12 +103,12 @@ const ProfilePage: React.FC = () => {
       } catch (error) {
         if (axios.isAxiosError(error)) {
           setError(
-            error.response?.data?.message || "Failed to change password."
+            error.response?.data?.message || "Failed to change password.",
           );
         }
       }
     },
-    [newPassword, oldPassword, userInfo.email] // Inkluder gammelt passord i dependencies
+    [newPassword, oldPassword, userInfo.email], // Inkluder gammelt passord i dependencies
   );
 
   const handleUpdateInfo = async (e: React.FormEvent) => {
@@ -128,15 +128,16 @@ const ProfilePage: React.FC = () => {
       await axios.put(
         `${API_URL}/api/account/update-user-info`,
         updateUserInfoRequest,
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       setMessage("Brukerinformasjon oppdatert.");
-      navigate(0); 
+      navigate(0);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setError(
-          error.response?.data?.message || "Feil ved oppdatering av brukerinfo."
+          error.response?.data?.message ||
+            "Feil ved oppdatering av brukerinfo.",
         );
       }
     }
@@ -161,14 +162,14 @@ const ProfilePage: React.FC = () => {
             "Content-Type": "multipart/form-data",
           },
           withCredentials: true,
-        }
+        },
       );
       setMessage("Profilbilde ble lastet opp!");
       navigate(0);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setError(
-          error.response?.data?.message || "Feil ved opplasting av bilde."
+          error.response?.data?.message || "Feil ved opplasting av bilde.",
         );
       }
     }
@@ -404,7 +405,7 @@ const ProfilePage: React.FC = () => {
                         accept="image/*"
                         onChange={(e) =>
                           setSelectedImage(
-                            e.target.files ? e.target.files[0] : null
+                            e.target.files ? e.target.files[0] : null,
                           )
                         }
                       />
