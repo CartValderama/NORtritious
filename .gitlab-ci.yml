@@ -1,25 +1,32 @@
-# .gitlab-ci.yml
-
 stages:
-  - build
+  - deploy
 
-# Frontend build job
-pages:
-  image: node:latest
-  stage: build
-  
-  cache:
-    paths:
-      - Frontend/node_modules/
+deploy-backend:
+  stage: deploy
+  image: node:20-slim
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || $CI_COMMIT_BRANCH == "cart_branch"
+      changes:
+        - Backend/**/*
   before_script:
-    - cd Frontend
-    - npm install
+    - npm install -g @railway/cli
   script:
-    - npm run build
-    - mv public ../public
-  artifacts:
-    paths:
-      - public
-  only:
-    - main
+    - cd Backend
+    - railway up --service Fremtidsmat --detach
+  environment:
+    name: production
 
+deploy-frontend:
+  stage: deploy
+  image: node:20-slim
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || $CI_COMMIT_BRANCH == "cart_branch"
+      changes:
+        - Frontend/**/*
+  before_script:
+    - npm install -g @railway/cli
+  script:
+    - cd Frontend
+    - railway up --service Frontend --detach
+  environment:
+    name: production

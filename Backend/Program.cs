@@ -11,6 +11,9 @@ using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+
 // Add Endpoint Explorer
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -27,10 +30,12 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend",
         policy =>
         {
-            policy.WithOrigins("http://localhost:5173") // 🔥 Spesifiser frontend-adressen!
+            var allowedOrigins = builder.Configuration["AllowedOrigins"]?.Split(',')
+                ?? new[] { "http://localhost:5173" };
+            policy.WithOrigins(allowedOrigins)
                   .AllowAnyHeader()
                   .AllowAnyMethod()
-                  .AllowCredentials(); // Hvis du bruker cookies/autentisering
+                  .AllowCredentials();
         });
 });
 
@@ -138,29 +143,27 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    var db = services.GetRequiredService<ApplicationDbContext>();
+    db.Database.Migrate();
     await RoleSeeder.SeedRolesAsync(services);
     await UserSeeder.SeedAdminUserAsync(services);
     await UserSeeder.SeedProducerUserAsync(services);
     await UserSeeder.SeedResearcherUserAsync(services);
+    await ProductSeeder.SeedProductsAsync(services);
 }
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Bachelor API V1");
-    });
-}
-else
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Bachelor API V1");
+});
+
+if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
-app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 //app.UseCors("CorsPolicy");
