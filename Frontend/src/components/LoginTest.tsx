@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import API_URL from "../apiConfig";
 //import { Link } from "react-router-dom";
 
 const LoginTest: React.FC = () => {
@@ -9,6 +11,7 @@ const LoginTest: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const navigate = useNavigate();
 
   const handleLogin = async () => {
     setLoading(true);
@@ -16,11 +19,12 @@ const LoginTest: React.FC = () => {
     setMessage(null);
     try {
       const response = await axios.post<{ message: string }>(
-        "http://localhost:5047/api/account/login",
+        "${API_URL}/api/account/login",
         { email, password },
         { withCredentials: true }
       );
       setMessage(response.data.message);
+      navigate("/");
     } catch (err: any) {
       setError(err.response?.data?.message || "Innlogging feilet");
     }
@@ -30,7 +34,7 @@ const LoginTest: React.FC = () => {
   const handleLogout = async () => {
     try {
       await axios.post(
-        "http://localhost:5047/api/account/logout",
+        "${API_URL}/api/account/logout",
         {},
         { withCredentials: true }
       );
@@ -44,7 +48,7 @@ const LoginTest: React.FC = () => {
     try {
       const token = localStorage.getItem("token"); // For eksempel, henter tokenet fra localStorage
       const response = await axios.get<{ message: string }>(
-        "http://localhost:5047/api/account/admin-role-test",
+        "${API_URL}/api/account/admin-role-test",
         {
           headers: {
             Authorization: `Bearer ${token}`, // Sender Bearer-tokenet med forespørselen

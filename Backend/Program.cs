@@ -46,6 +46,13 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IProductsRepository, ProductsRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
+// Add EU Health Claims register client (https://developer.datalake.sante.service.ec.europa.eu)
+builder.Services.AddSingleton<ITranslationService, GoogleTranslateService>();
+builder.Services.AddSingleton<IEuHealthClaimsService, EuHealthClaimsService>();
+
+// Add Calculator
+builder.Services.AddSingleton<CalculatorService>();
+
 // Add IdentityDbContext with SQLite
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -105,9 +112,13 @@ builder.Services.ConfigureApplicationCookie(options =>
     };
 
     // Cookie configuration for session security and expiration
-    options.Cookie.HttpOnly = true;  // Prevent access via JavaScript
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;  // Use only over HTTPS
-    options.Cookie.SameSite = SameSiteMode.None;  // Prevent CSRF attacks
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+        ? CookieSecurePolicy.SameAsRequest
+        : CookieSecurePolicy.Always;
+    options.Cookie.SameSite = builder.Environment.IsDevelopment()
+        ? SameSiteMode.Lax
+        : SameSiteMode.None;
     options.Cookie.Name = "FremtidsmatSession";  // You can rename the cookie if needed
     options.ExpireTimeSpan = TimeSpan.FromDays(14);  // Cookie expiration (e.g., 14 days)
 });

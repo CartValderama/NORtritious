@@ -39,7 +39,13 @@
 }
 
 
-/* Added CSS styling */ 
+/* Added CSS styling */
+
+/* Cap the whole site's width — overrides Bootstrap's responsive container
+   breakpoints, which would otherwise widen past this on large screens. */
+.container {
+  max-width: 1200px !important;
+}
 
 .app-container {
   display: flex;

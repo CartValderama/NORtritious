@@ -1,0 +1,2736 @@
+[
+    {
+        "nutrient": "Reformulated, non-alcoholic, acidic drink",
+        "claims": [
+          {
+            "claim": "Replacing sugar-containing, acidic drinks, such as soft drinks (typically 8-12 g sugars/100 ml), with reformulated drinks contributes to the maintenance of tooth mineralisation.",
+            "conditions": {
+              "requirements": {
+                "fermentable_carbohydrate": "less than 1 g per 100 ml",
+                "calcium_range": "0.3 to 0.8 mol per mol acidulant",
+                "pH_display": "between 3.7-4.0"
+              },
+              "info": "In order to bear the claim, reformulated acidic drinks shall comply with the description of the food subject to the claim."
+            }
+          }
+        ]
+      },
+      {
+        "nutrient": "Non-fermentable carbohydrates",
+        "claims": [
+          {
+            "claim": "Consumption of foods/drinks containing <name of all used non-fermentable carbohydrates> instead of fermentable carbohydrates contributes to the maintenance of tooth mineralisation.",
+            "conditions": {
+              "requirements": {
+                "replacement": "Fermentable carbohydrates should be replaced in foods or drinks by non-fermentable carbohydrates.",
+                "pH_limit": "Consumption of such foods or drinks must not lower plaque pH below 5.7 during and up to 30 minutes after consumption."
+              },
+              "definitions": {
+                "fermentable_carbohydrates": "Carbohydrates or carbohydrate mixtures as consumed in foods or beverages that lower plaque pH below 5.7, as determined in vivo or in situ by plaque pH telemetry tests, by bacterial fermentation during and up to 30 minutes after consumption.",
+                "non_fermentable_carbohydrates": "Carbohydrates or carbohydrate mixtures as consumed in foods or beverages that do not lower plaque pH, as determined in vivo or in situ by plaque pH telemetry tests, below a conservative value of 5.7 by bacterial fermentation during and up to 30 minutes after consumption."
+              }
+            }
+          }
+        ]
+      },
+      {
+        "nutrient": "A combination of artichoke leaf dry extract standardised in caffeoylquinic acids, monacolin K in red yeast rice, sugar-cane derived policosanols, procyanidolic oligomers from French maritime pine bark, garlic dry extract standardised in allicin, d-α-tocopheryl hydrogen succinate, riboflavin and inositol hexanicotinate",
+        "claims": [
+          {
+            "claim": "A combination of artichoke leaf dry extract standardised in caffeoylquinic acids, monacolin K in red yeast rice, sugar-cane derived policosanols, procyanidolic oligomers from French maritime pine bark, garlic dry extract standardised in allicin, d-α-tocopheryl hydrogen succinate, riboflavin and inositol hexanicotinate reduces blood LDL-cholesterol concentrations. High LDL-cholesterol is a risk factor in the development of coronary heart disease.",
+            "conditions": {
+              "requirement": "food_supplement",
+              "dosage_requirements": {
+                "artichoke_leaf_extract": "600 mg with 30-36 mg caffeoylquinic acids",
+                "red_yeast_rice": "500 mg with 2 mg monacolin K",
+                "sugar_cane_policosanols": "10 mg",
+                "pine_bark_extract": "20 mg with 18 mg procyanidolic oligomers",
+                "garlic_dry_extract": "30 mg with 0.25 mg allicin",
+                "tocopherol_equivalents": "30 mg",
+                "riboflavin": "5 mg",
+                "inositol_hexanicotinate": "9 mg"
+              },
+              "consumption_recommendation": "Divided into three daily doses to be consumed with the major meals."
+            }
+          }
+        ]
+      },
+    {
+        "nutrient": "Activated Charcoal",
+        "claims": [
+            {
+                "claim": "Activated charcoal contributes to reducing excessive flatulence after eating.",
+                "conditions": {
+                    "min_amount": 1,
+                    "unit": "g",
+                    "info": "The claim may be used only for food which contains 1 g of activated charcoal per quantified portion. In order to bear the claim, information shall be given to the consumer that the beneficial effect is obtained with 1 g, which should be taken at least 30 minutes before and 1 g shortly after the meal."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Alpha-cyclodextrin",
+        "claims": [
+          {
+                "claim": "Consumption of alpha-cyclodextrin as part of a starch-containing meal contributes to the reduction of the blood glucose rise after that meal.",
+                "conditions": {
+                    "min_amount": 5,
+                    "unit": "g",
+                    "info": "The claim may be used for food which contains at least 5 g of alpha-cyclodextrin per 50 g of starch in a quantified portion as part of the meal. In order to bear the claim, information shall be given to the consumer that the beneficial effect is obtained by consuming the alpha-cyclodextrin as part of the meal."
+            }
+          }
+        ]
+      },
+      {
+        "nutrient": "Alpha-linolenic acid (ALA)",
+        "claims": [
+          {
+                "claim": "ALA contributes to the maintenance of normal blood cholesterol levels.",
+                "conditions": {
+                  "requirement": "source_of_omega_3_acids",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least a source of ALA as referred to in the claim SOURCE OF OMEGA 3 FATTY ACIDS as listed in the Annex to Regulation (EC) No 1924/2006. Information shall be given to the consumer that the beneficial effect is obtained with a daily intake of 2 g of ALA."
+            }
+          }
+        ]
+      },
+      {
+        "nutrient": "Arabinoxylan produced from wheat endosperm",
+        "claims": [
+          {
+                "claim": "Consumption of arabinoxylan as part of a meal contributes to a reduction of the blood glucose rise after that meal.",
+                "conditions": {
+                    "min_amount": 8,
+                    "unit": "g",
+                    "info": "The claim may be used only for food which contains at least 8 g of arabinoxylan (AX)-rich fibre produced from wheat endosperm (at least 60 % AX by weight) per 100 g of available carbohydrates in a quantified portion as part of the meal. In order to bear the claim, information shall be given to the consumer that the beneficial effect is obtained by consuming the arabinoxylan (AX)-rich fibre produced from wheat endosperm as part of the meal."
+            }
+          }
+        ]
+      },
+      {
+        "nutrient": "Barley beta-glucans",
+        "claims": [
+          {
+            "claim": "Barley beta-glucans has been shown to lower/reduce blood cholesterol. High cholesterol is a risk factor in the development of coronary heart disease.",
+            "conditions": {
+              "min_amount": 3,
+              "unit": "g",
+              "info": "Information shall be given to the consumer that the beneficial effect is obtained with a daily intake of 3 g of barley beta-glucan. The claim can be used for foods which provide at least 1 g of barley beta-glucan per quantified portion."
+            }
+          }
+        ]
+      },
+      {
+        "nutrient": "Barley grain fibre",
+        "claims": [
+          {
+            "claim": "Barley grain fibre contributes to an increase in faecal bulk.",
+            "conditions": {
+              "requirement": "high_fibre",
+              "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+              "info": "The claim may be used only for food which is high in that fibre as referred to in the claim HIGH FIBRE as listed in the Annex to Regulation (EC) No 1924/2006."
+            }
+          }
+        ]
+      },
+      {
+        "nutrient": "Beta-glucans",
+        "claims": [
+          {
+            "claim": "Beta-glucans contribute to the maintenance of normal blood cholesterol levels.",
+            "conditions": {
+              "min_amount": 1,
+              "unit": "g",
+              "info": "The claim may be used only for food which contains at least 1 g of beta-glucans from oats, oat bran, barley, barley bran, or from mixtures of these sources per quantified portion. In order to bear the claim, information shall be given to the consumer that the beneficial effect is obtained with a daily intake of 3 g of beta-glucans from oats, oat bran, barley, barley bran, or from mixtures of these beta-glucans."
+            }
+          }
+        ]
+      },
+      {
+        "nutrient": "Beta-glucans from oats and barley",
+        "claims": [
+          {
+            "claim": "Consumption of beta-glucans from oats or barley as part of a meal contributes to the reduction of the blood glucose rise after that meal.",
+            "conditions": {
+              "min_amount": 4,
+              "unit": "g",
+              "info": "The claim may be used only for food which contains at least 4 g of beta-glucans from oats or barley for each 30 g of available carbohydrates in a quantified portion as part of the meal. In order to bear the claim, information shall be given to the consumer that the beneficial effect is obtained by consuming the beta-glucans from oats or barley as part of the meal."
+            }
+          }
+        ]
+      },
+      {
+        "nutrient": "Betaine",
+        "claims": [
+          {
+            "claim": "Betaine contributes to normal homocysteine metabolism.",
+            "conditions": {
+              "min_amount": 500,
+              "unit": "mg",
+              "info": "The claim may be used only for food which contains at least 500 mg of betaine per quantified portion. In order to bear the claim, information shall be given to the consumer that the beneficial effect is obtained with a daily intake of 1.5 g of betaine. In order to bear the claim, information shall be given to the consumer that a daily intake in excess of 4 g may significantly increase blood cholesterol levels."
+            }
+          }
+        ]
+      },
+      {
+        "nutrient": "Biotin",
+        "claims": [
+          {
+            "claim": "Biotin contributes to normal energy-yielding metabolism.",
+            "conditions": {
+              "requirement": "source_of",
+              "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+              "info": "The claim may be used only for food which is at least a source of biotin as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+            }
+          },
+          {
+            "claim": "Biotin contributes to normal functioning of the nervous system.",
+            "conditions": {
+              "requirement": "source_of",
+              "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+              "info": "The claim may be used only for food which is at least a source of biotin as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+            }
+          },
+          {
+            "claim": "Biotin contributes to normal macronutrient metabolism.",
+            "conditions": {
+              "requirement": "source_of",
+              "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+              "info": "The claim may be used only for food which is at least a source of biotin as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+            }
+          },
+          {
+            "claim": "Biotin contributes to normal psychological function.",
+            "conditions": {
+              "requirement": "source_of",
+              "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+              "info": "The claim may be used only for food which is at least a source of biotin as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+            }
+          },
+          {
+            "claim": "Biotin contributes to the maintenance of normal hair.",
+            "conditions": {
+              "requirement": "source_of",
+              "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+              "info": "The claim may be used only for food which is at least a source of biotin as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+            }
+          },
+          {
+            "claim": "Biotin contributes to the maintenance of normal mucous membranes.",
+            "conditions": {
+              "requirement": "source_of",
+              "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+              "info": "The claim may be used only for food which is at least a source of biotin as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+            }
+          },
+          {
+            "claim": "Biotin contributes to the maintenance of normal skin.",
+            "conditions": {
+              "requirement": "source_of",
+              "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+              "info": "The claim may be used only for food which is at least a source of biotin as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+            }
+          }
+        ]
+      },
+      {
+        "nutrient": "Kalsium",
+        "claims": [
+            {
+                "claim": "Kalsium bidrar til å redusere tapet av beinmineral hos postmenopausale kvinner. Lav beinmineraltetthet er en risikofaktor for osteoporoserelaterte beinbrudd",
+                "conditions": {
+                  "min_amount": 400,
+                  "unit": "mg",
+                  "age_restriction": "50+ år",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst inneholder en dose på 400 mg kalsium per porsjonsenhet. Forbrukeren skal informeres om at påstanden er særlig rettet mot kvinner som er 50 år eller eldre, og at den fordelaktige virkningen oppnås ved et daglig inntak på minst 1 200 mg kalsium fra alle kilder.For næringsmidler med tilsatt kalsium kan påstanden bare brukes om dem som har kvinner som er 50 år og eldre, som målgruppe"
+                }
+            },
+            {
+                "claim": "Kalsium er nødvendig for at barns bein skal vokse og utvikles normalt",
+                "conditions": {
+                "requirement": "source_of",
+                "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til kalsium i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Kalsium bidrar til normal blodlevring",
+                "conditions": {
+                "requirement": "source_of",
+                "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til kalsium i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Kalsium bidrar til normal energiomsetning",
+                "conditions": {
+                "requirement": "source_of",
+                "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til kalsium i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Kalsium bidrar til normal muskelfunksjon",
+                "conditions": {
+                "requirement": "source_of",
+                "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til kalsium i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Kalsium bidrar til normal nevrotransmisjon",
+                "conditions": {
+                "requirement": "source_of",
+                "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til kalsium i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Kalsium bidrar til at fordøyelsesenzymer fungerer normalt",
+                "conditions": {
+                "requirement": "source_of",
+                "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til kalsium i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Kalsium spiller en rolle i celledelings- og cellespesialiseringsprosessen",
+                "conditions": {
+                "requirement": "source_of",
+                "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til kalsium i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Kalsium bidrar til å opprettholde normale knokler",
+                "conditions": {
+                "requirement": "source_of",
+                "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til kalsium i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Kalsium bidrar til å opprettholde normale tenner",
+                "conditions": {
+                "requirement": "source_of",
+                "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til kalsium i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            }
+        ]
+      },
+      {
+        "nutrient": "Calcium and vitamin D",
+        "claims": [
+          {
+            "claim": "Calcium and vitamin D help to reduce the loss of bone mineral in post-menopausal women. Low bone mineral density is a risk factor for osteoporotic bone fractures.",
+            "conditions": {
+              "requirement": "food_supplement",
+              "dosage_requirements": {
+                "calcium": "at least 400 mg per daily portion",
+                "vitamin_D": "at least 15 μg per daily portion"
+              },
+              "info": "The claim is specifically intended for women 50 years and older. The beneficial effect is obtained with a daily intake of at least 1,200 mg of calcium and 20 μg of vitamin D from all sources. For food supplements with added calcium and vitamin D, the claim may be used only for those targeting women 50 years and older."
+            }
+          },
+          {
+            "claim": "Calcium and vitamin D are needed for normal growth and development of bone in children.",
+            "conditions": {
+              "requirement": "source_of",
+              "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+              "info": "The claim can be used only for food which is at least a source of calcium and vitamin D as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+            }
+          }
+        ]
+      },
+      {
+        "nutrient": "Carbohydrate solutions",
+        "claims": [
+          {
+            "claim": "Carbohydrate solutions contribute to the improvement of physical performance during a high-intensity and long-lasting physical exercise in trained adults.",
+            "conditions": {
+              "dosage_requirements": {
+                "carbohydrates": "between 30 g and 90 g per hour",
+                "carbohydrate_types": "glucose, sucrose, fructose and/or maltodextrins"
+              },
+              "composition_limits": {
+                "fructose_limit": "should not exceed 1/3 of total carbohydrates",
+                "glucose_limit": "should not exceed 60 g per hour"
+              },
+              "info": "The beneficial effect is obtained only by trained adults performing high-intensity (at least at 65% of the VO2max) and long-lasting (at least 60 min) physical exercise. The claim may be used only for foods intended for trained adults performing high-intensity and long-lasting physical exercise."
+            }
+          }
+        ]
+      },
+      {
+        "nutrient": "Carbohydrate-electrolyte solutions",
+        "claims": [
+          {
+            "claim": "Carbohydrate-electrolyte solutions contribute to the maintenance of endurance performance during prolonged endurance exercise.",
+            "conditions": {
+              "dosage_requirements": {
+                "energy_content": "80-350 kcal/L from carbohydrates",
+                "carbohydrate_energy_source": "at least 75% of energy should be derived from carbohydrates inducing a high glycaemic response (e.g., glucose, glucose polymers, sucrose)"
+              },
+              "composition_limits": {
+                "sodium_content": "between 20 mmol/L (460 mg/L) and 50 mmol/L (1,150 mg/L)",
+                "osmolality": "between 200-330 mOsm/kg water"
+              },
+              "info": "In order to bear the claim, carbohydrate-electrolyte solutions must meet the specified conditions for energy content, sodium levels, and osmolality."
+            }
+          },
+          {
+            "claim": "Carbohydrate-electrolyte solutions enhance the absorption of water during physical exercise.",
+            "conditions": {
+              "dosage_requirements": {
+                "energy_content": "80-350 kcal/L from carbohydrates",
+                "carbohydrate_energy_source": "at least 75% of energy should be derived from carbohydrates inducing a high glycaemic response (e.g., glucose, glucose polymers, sucrose)"
+              },
+              "composition_limits": {
+                "sodium_content": "between 20 mmol/L (460 mg/L) and 50 mmol/L (1,150 mg/L)",
+                "osmolality": "between 200-330 mOsm/kg water"
+              },
+              "info": "In order to bear the claim, carbohydrate-electrolyte solutions must meet the specified conditions for energy content, sodium levels, and osmolality."
+            }
+          }
+        ]
+      },
+      {
+        "nutrient": "Carbohydrates",
+        "claims": [
+          {
+            "claim": "Karbohydrater bidrar til å opprettholde normal hjernefunksjon.",
+            "label": "Hjernefunksjon (M3)",
+            "conditions": {
+              "dosage_requirements": {
+                "total_carbohydrates": "minst 130 g per dag fra alle kilder",
+                "food_carbohydrates": "minst 20 g per mengdeangivelse"
+              },
+              "requirement": ["low_sugars", "with_no_added_sugars"],
+              "reference_regulation": "Vedlegg til forordning (EF) nr. 1924/2006",
+              "info": "For å kunne benytte denne påstanden skal forbrukeren informeres om at den gunstige effekten oppnås ved et daglig inntak på 130 g karbohydrater fra alle kilder. Påstanden kan brukes for matvarer som inneholder minst 20 g karbohydrater som metaboliseres av mennesker, ekskludert polyoler, per mengdeangivelse, og som oppfyller ernæringspåstanden LAVT SUKKERINNHOLD eller UTEN TILSATT SUKKER i henhold til vedlegget til forordning (EF) nr. 1924/2006. Påstanden skal ikke brukes på matvarer som inneholder 100 % sukker."
+              }
+          },
+          {
+            "claim": "Karbohydrater bidrar til å gjenopprette normal muskelfunksjon (sammentrekning) etter svært intensiv og/eller langvarig fysisk aktivitet som fører til muskelutmattelse og tømming av glykogenlagrene i skjelettmuskelen.",
+            "label": "Muskelfunksjon (M6)",
+            "conditions": {
+              "dosage_requirements": {
+                "total_carbohydrates": "4 g per kg kroppsvekt",
+                "consumption_timing": "innen de første 4 timene og senest 6 timer etter trening"
+              },
+              "restrictions": {
+                "allowed": "matvarer beregnet på voksne som utfører svært intensiv og/eller langvarig fysisk aktivitet som fører til muskelutmattelse og tømming av glykogenlagrene"
+              },
+              "info": "Forbrukerne skal opplyses om at den gunstige virkningen oppnås ved inntak av karbohydrater fra alle kilder, med et totalinntak på 4 g per kg kroppsvekt, inntatt i doser som påbegynnes innen 4 timer, og ikke tas senere enn 6 timer, etter høyintensiv og/eller langvarig fysisk aktivitet som fører til muskeltretthet og nedbryting av glykogenlagre i skjelettmuskulatur."
+            }
+          }
+        ]
+      },
+      {
+        "nutrient": "Chewing gum sweetened with 100% xylitol",
+        "claims": [
+          {
+            "claim": "Chewing gum sweetened with 100% xylitol has been shown to reduce dental plaque. High content/level of dental plaque is a risk factor in the development of caries in children.",
+            "conditions": {
+              "dosage_requirements": {
+                "xylitol_content": "100%",
+                "consumption_frequency": "2-3 g at least 3 times per day after meals"
+              },
+              "info": "Information shall be given to the consumer that the beneficial effect is obtained with consumption of 2-3 g of chewing gum sweetened with 100% xylitol at least 3 times per day after meals."
+            }
+          }
+        ]
+      },
+      {
+        "nutrient": "Chitosan",
+        "claims": [
+          {
+            "claim": "Chitosan contributes to the maintenance of normal blood cholesterol levels.",
+            "conditions": {
+              "dosage_requirements": {
+                "chitosan_intake": "3 g per day"
+              },
+              "info": "The claim may be used only for food which provides a daily intake of 3 g of chitosan. In order to bear the claim, information shall be given to the consumer that the beneficial effect is obtained with a daily intake of 3 g of chitosan."
+            }
+          }
+        ]
+      },
+      {
+        "nutrient": "Chloride",
+        "claims": [
+          {
+            "claim": "Chloride contributes to normal digestion by production of hydrochloric acid in the stomach.",
+            "conditions": {
+              "requirement": "source_of",
+              "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+              "restrictions": {
+                "excluded": "chloride from the source sodium chloride"
+              },
+              "info": "The claim may be used only for food which is at least a source of chloride as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+            }
+          }
+        ]
+      },
+      {
+        "nutrient": "Choline",
+        "claims": [
+          {
+            "claim": "Choline contributes to normal homocysteine metabolism.",
+            "conditions": {
+              "dosage_requirements": {
+                "choline_intake": "at least 82.5 mg per 100 g, 100 ml, or per single portion of food"
+              },
+              "info": "The claim may be used only for food which contains at least 82.5 mg of choline per 100 g or 100 ml or per single portion of food."
+            }
+          },
+          {
+            "claim": "Choline contributes to normal lipid metabolism.",
+            "conditions": {
+              "dosage_requirements": {
+                "choline_intake": "at least 82.5 mg per 100 g, 100 ml, or per single portion of food"
+              },
+              "info": "The claim may be used only for food which contains at least 82.5 mg of choline per 100 g or 100 ml or per single portion of food."
+            }
+          },
+          {
+            "claim": "Choline contributes to the maintenance of normal liver function.",
+            "conditions": {
+              "dosage_requirements": {
+                "choline_intake": "at least 82.5 mg per 100 g, 100 ml, or per single portion of food"
+              },
+              "info": "The claim may be used only for food which contains at least 82.5 mg of choline per 100 g or 100 ml or per single portion of food."
+            }
+          }
+        ]
+      },
+      {
+        "nutrient": "Chromium",
+        "claims": [
+          {
+            "claim": "Chromium contributes to normal macronutrient metabolism.",
+            "conditions": {
+              "requirement": "source_of",
+              "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+              "info": "The claim may be used only for food which is at least a source of trivalent chromium as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+            }
+          },
+          {
+            "claim": "Chromium contributes to the maintenance of normal blood glucose levels.",
+            "conditions": {
+              "requirement": "source_of",
+              "reference_regulation": "Annex to Regulation (EC) No 1924/2006",
+              "info": "The claim may be used only for food which is at least a source of trivalent chromium as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+            }
+          }
+        ]
+      },
+      {
+        "nutrient": "Cocoa flavanols",
+        "claims": [
+          {
+            "claim": "Cocoa flavanols help maintain the elasticity of blood vessels, which contributes to normal blood flow.",
+            "conditions": {
+              "dosage_requirements": {
+                "cocoa_flavanols_intake": "200 mg per day"
+              },
+              "restrictions": {
+                "allowed": "cocoa beverages (with cocoa powder) or dark chocolate providing at least 200 mg of cocoa flavanols with a degree of polymerization 1-10"
+              },
+              "info": "Information shall be given to the consumer that the beneficial effect is obtained with a daily intake of 200 mg of cocoa flavanols."
+            }
+          },
+          {
+            "claim": "Cocoa flavanols help maintain the elasticity of blood vessels, which contributes to normal blood flow.",
+            "conditions": {
+              "dosage_requirements": {
+                "cocoa_flavanols_intake": "200 mg per day"
+              },
+              "restrictions": {
+                "allowed": "capsules or tablets containing high-flavanol cocoa extract providing at least 200 mg of cocoa flavanols with a degree of polymerization 1-10"
+              },
+              "info": "Information shall be given to the consumer that the beneficial effect is obtained with a daily intake of 200 mg of cocoa flavanols."
+            }
+          }
+        ]
+      },
+      {
+        "nutrient": "Kobber",
+        "claims": [
+          {
+            "claim": "Kobber bidrar til å opprettholde normalt bindevev",
+            "conditions": {
+              "requirement": "source_of",
+              "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+              "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til kobber i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+            }
+          },
+          {
+            "claim": "Kobber bidrar til normal energiomsetning",
+            "conditions": {
+              "requirement": "source_of",
+              "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+              "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til kobber i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+            }
+          },
+          {
+            "claim": "Kobber bidrar til nervesystemets normale funksjon",
+            "conditions": {
+              "requirement": "source_of",
+              "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+              "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til kobber i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+            }
+          },
+          {
+            "claim": "Kobber bidrar til normal hårpigmentering",
+            "conditions": {
+              "requirement": "source_of",
+              "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+              "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til kobber i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+            }
+          },
+          {
+            "claim": "Kobber bidrar til normal transport av jern i kroppen",
+            "conditions": {
+              "requirement": "source_of",
+              "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+              "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til kobber i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+            }
+          },
+          {
+            "claim": "Kobber bidrar til normal hudpigmentering",
+            "conditions": {
+              "requirement": "source_of",
+              "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+              "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til kobber i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+            }
+          },
+          {
+            "claim": "Kobber bidrar til immunsystemets normale funksjon",
+            "conditions": {
+              "requirement": "source_of",
+              "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+              "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til kobber i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+            }
+          },
+          {
+            "claim": "Kobber bidrar til å beskytte cellene mot oksidativt stress",
+            "conditions": {
+              "requirement": "source_of",
+              "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+              "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til kobber i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+            }
+          }
+        ]
+      },
+      {
+        "nutrient": "Creatine",
+        "claims": [
+          {
+            "claim": "Creatine increases physical performance in successive bursts of short-term, high-intensity exercise.",
+            "conditions": {
+              "dosage_requirements": {
+                "creatine_intake": "3 g per day"
+              },
+              "restrictions": {
+                "allowed": "foods targeting adults performing high-intensity exercise"
+              },
+              "info": "The claim may be used only for food which provides a daily intake of 3 g of creatine."
+            }
+          },
+          {
+            "claim": "Daily creatine consumption can enhance the effect of resistance training on muscle strength in adults over the age of 55.",
+            "conditions": {
+              "dosage_requirements": {
+                "creatine_intake": "3 g per day",
+                "exercise": "regular resistance training at least 3 times per week for several weeks at an intensity of 65-75% of one repetition maximum load"
+              },
+              "restrictions": {
+                "allowed": "foods targeting adults over the age of 55 engaged in resistance training"
+              },
+              "info": "Information shall be provided to the consumer that the claim is targeting adults over the age of 55, who are engaged in regular resistance training."
+            }
+          }
+        ]
+      },
+      {
+        "nutrient": "Docosahexaenoic acid (DHA)",
+        "claims": [
+          {
+            "claim": "DHA contributes to maintenance of normal brain function.",
+            "conditions": {
+              "dosage_requirements": {
+                "DHA_intake": "250 mg per day"
+              },
+              "restrictions": {
+                "allowed": "Food containing at least 40 mg of DHA per 100 g and per 100 kcal"
+              },
+              "info": "The claim may be used only for food which contains at least 40 mg of DHA per 100 g and per 100 kcal."
+            }
+          },
+          {
+            "claim": "DHA contributes to the maintenance of normal vision.",
+            "conditions": {
+              "dosage_requirements": {
+                "DHA_intake": "250 mg per day"
+              },
+              "restrictions": {
+                "allowed": "Food containing at least 40 mg of DHA per 100 g and per 100 kcal"
+              },
+              "info": "The claim may be used only for food which contains at least 40 mg of DHA per 100 g and per 100 kcal."
+            }
+          },
+          {
+            "claim": "DHA contributes to the maintenance of normal blood triglyceride levels.",
+            "conditions": {
+              "dosage_requirements": {
+                "DHA_intake": "2 g per day",
+                "EPA_combination": true
+              },
+              "restrictions": {
+                "allowed": "Food containing DHA in combination with EPA",
+                "not_allowed": "Foods targeting children"
+              },
+              "info": "The claim may be used only for food which provides a daily intake of 2 g of DHA and which contains DHA in combination with eicosapentaenoic acid (EPA)."
+            }
+          },
+          {
+            "claim": "Docosahexaenoic acid (DHA) intake contributes to the normal visual development of infants up to 12 months of age.",
+            "conditions": {
+              "dosage_requirements": {
+                "DHA_intake": "100 mg per day"
+              },
+              "restrictions": {
+                "allowed": "Follow-on formula containing at least 0.3% of total fatty acids as DHA"
+              },
+              "info": "Information shall be given to the consumer that the beneficial effect is obtained with a daily intake of 100 mg of DHA."
+            }
+          },
+          {
+            "claim": "Docosahexaenoic acid (DHA) maternal intake contributes to the normal development of the eye of the foetus and breastfed infants.",
+            "conditions": {
+              "dosage_requirements": {
+                "DHA_intake": "200 mg per day in addition to the recommended 250 mg DHA and EPA for adults"
+              },
+              "restrictions": {
+                "allowed": "Food providing at least 200 mg DHA"
+              },
+              "info": "Information shall be given to pregnant and lactating women that the beneficial effect is obtained with a daily intake of 200 mg of DHA."
+            }
+          },
+          {
+            "claim": "Docosahexaenoic acid (DHA) maternal intake contributes to the normal brain development of the foetus and breastfed infants.",
+            "conditions": {
+              "dosage_requirements": {
+                "DHA_intake": "200 mg per day in addition to the recommended 250 mg DHA and EPA for adults"
+              },
+              "restrictions": {
+                "allowed": "Food providing at least 200 mg DHA"
+              },
+              "info": "Information shall be given to pregnant and lactating women that the beneficial effect is obtained with a daily intake of 200 mg of DHA."
+            }
+          }
+        ]
+      },
+      {
+        "nutrient": "Docosahexaenoic acid and Eicosapentaenoic acid (DHA/EPA)",
+        "claims": [
+          {
+            "claim": "DHA and EPA contribute to the maintenance of normal blood pressure.",
+            "conditions": {
+              "dosage_requirements": {
+                "DHA_EPA_intake": "3 g per day"
+              },
+              "restrictions": {
+                "allowed": "Food providing a daily intake of 3 g of EPA and DHA",
+                "not_allowed": "Foods targeting children"
+              },
+              "info": "The claim may be used only for food which provides a daily intake of 3 g of EPA and DHA."
+            }
+          },
+          {
+            "claim": "DHA and EPA contribute to the maintenance of normal blood triglyceride levels.",
+            "conditions": {
+              "dosage_requirements": {
+                "DHA_EPA_intake": "2 g per day"
+              },
+              "restrictions": {
+                "allowed": "Food providing a daily intake of 2 g of EPA and DHA",
+                "not_allowed": "Foods targeting children"
+              },
+              "info": "The claim may be used only for food which provides a daily intake of 2 g of EPA and DHA."
+            }
+          }
+        ]
+      },
+      {
+        "nutrient": "Dried plums of 'prune' cultivars (Prunus domestica L.)",
+        "claims": [
+          {
+            "claim": "Dried plums/prunes contribute to normal bowel function.",
+            "conditions": {
+              "dosage_requirements": {
+                "prunes_intake": "100 g per day"
+              },
+              "info": "The claim may be used only for food which provides a daily intake of 100 g of dried plums (prunes)."
+            }
+          }
+        ]
+      },
+      {
+        "nutrient": "Eicosapentaenoic acid and docosahexaenoic acid (EPA/DHA)",
+        "claims": [
+            {
+                "claim": "EPA and DHA contribute to the normal function of the heart.",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least a source of EPA and DHA as referred to in the claim 'SOURCE OF OMEGA 3 FATTY ACIDS' as listed in the Annex to Regulation (EC) No 1924/2006. In order to bear the claim information shall be given to the consumer that the beneficial effect is obtained with a daily intake of 250 mg of EPA and DHA."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Fluoride",
+        "claims": [
+            {
+                "claim": "Fluoride contributes to the maintenance of tooth mineralisation.",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least a source of fluoride as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Folate",
+        "claims": [
+            {
+                "claim": "Folate contributes to maternal tissue growth during pregnancy.",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least a source of folate as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Folate contributes to normal amino acid synthesis.",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least a source of folate as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Folate contributes to normal blood formation.",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least a source of folate as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Folate contributes to normal homocysteine metabolism.",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least a source of folate as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Folate contributes to normal psychological function.",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least a source of folate as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Folate contributes to the normal function of the immune system.",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least a source of folate as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Folate contributes to the reduction of tiredness and fatigue.",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least a source of folate as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Folate has a role in the process of cell division.",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least a source of folate as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Folic Acid",
+        "claims": [
+            {
+                "claim": "Supplemental folic acid intake increases maternal folate status. Low maternal folate status is a risk factor in the development of neural tube defects in the developing foetus.",
+                "conditions": {
+                    "min_amount": 400,
+                    "unit": "μg",
+                    "info": "The claim may be used only for food supplements which provide at least 400 μg of folic acid per daily portion. Information shall be provided to the consumer that the target population is women of child-bearing age and the beneficial effect is obtained with a supplemental folic acid daily intake of 400 μg for at least one month before and up to three months after conception."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Foods with a low or reduced content of saturated fatty acids",
+        "claims": [
+            {
+                "claim": "Reducing consumption of saturated fat contributes to the maintenance of normal blood cholesterol levels.",
+                "conditions": {
+                    "requirement": "low_saturated_fat_or_reduced",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least low in saturated fatty acids, as referred to in the claim LOW SATURATED FAT or reduced in saturated fatty acids as referred to in the claim REDUCED [NAME OF NUTRIENT] as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Foods with a low or reduced content of sodium",
+        "claims": [
+            {
+                "claim": "Reducing consumption of sodium contributes to the maintenance of normal blood pressure.",
+                "conditions": {
+                    "requirement": "low_sodium_salt_or_reduced",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least low in sodium/salt as referred to in the claim LOW SODIUM/SALT or reduced in sodium/salt as referred to in the claim REDUCED [NAME OF NUTRIENT] as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Fructose",
+        "claims": [
+            {
+                "claim": "Consumption of foods containing fructose leads to a lower blood glucose rise compared to foods containing sucrose or glucose.",
+                "conditions": {
+                    "requirement": "replace_glucose_sucrose",
+                    "min_reduction": 30,
+                    "unit": "%",
+                    "info": "In order to bear the claim, glucose and/or sucrose should be replaced by fructose in sugar-sweetened foods or drinks so that the reduction in content of glucose and/or sucrose, in these foods or drinks, is at least 30%."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Glucomannan (konjac mannan)",
+        "claims": [
+            {
+                "claim": "Glucomannan in the context of an energy-restricted diet contributes to weight loss.",
+                "conditions": {
+                    "min_amount": 1,
+                    "unit": "g",
+                    "daily_intake": 3,
+                    "intake_frequency": "three doses of 1 g each",
+                    "additional_requirement": "consume with 1-2 glasses of water before meals",
+                    "info": "The claim may be used only for food which contains 1 g of glucomannan per quantified portion. The beneficial effect is obtained with a daily intake of 3 g of glucomannan in three doses of 1 g each, together with 1-2 glasses of water, before meals and in the context of an energy-restricted diet. Warning of choking to be given for people with swallowing difficulties or when ingesting with inadequate fluid intake - advice on taking with plenty of water to ensure substance reaches stomach."
+                }
+            },
+            {
+                "claim": "Glucomannan contributes to the maintenance of normal blood cholesterol levels.",
+                "conditions": {
+                    "min_amount": 4,
+                    "unit": "g",
+                    "info": "The claim may be used only for food which provides a daily intake of 4 g of glucomannan. The beneficial effect is obtained with a daily intake of 4 g of glucomannan. Warning of choking to be given for people with swallowing difficulties or when ingesting with inadequate fluid intake - advice on taking with plenty of water to ensure substance reaches stomach."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Guar Gum",
+        "claims": [
+            {
+                "claim": "Guar gum contributes to the maintenance of normal blood cholesterol levels.",
+                "conditions": {
+                    "min_amount": 10,
+                    "unit": "g",
+                    "info": "The claim may be used only for food which provides a daily intake of 10 g of guar gum. The beneficial effect is obtained with a daily intake of 10 g of guar gum. Warning of choking to be given for people with swallowing difficulties or when ingesting with inadequate fluid intake - advice on taking with plenty of water to ensure substance reaches stomach."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Hydroxypropyl methylcellulose (HPMC)",
+        "claims": [
+            {
+                "claim": "Consumption of Hydroxypropyl methylcellulose with a meal contributes to a reduction in the blood glucose rise after that meal.",
+                "conditions": {
+                    "min_amount": 4,
+                    "unit": "g",
+                    "info": "The claim may be used only for food which contains 4 g of HPMC per quantified portion as part of the meal. The beneficial effect is obtained by consuming 4 g of HPMC as part of the meal. Warning of choking to be given for people with swallowing difficulties or when ingesting with inadequate fluid intake - advice on taking with plenty of water to ensure substance reaches stomach."
+                }
+            },
+            {
+                "claim": "Hydroxypropyl methylcellulose contributes to the maintenance of normal blood cholesterol levels.",
+                "conditions": {
+                    "min_amount": 5,
+                    "unit": "g",
+                    "info": "The claim may be used only for food which provides a daily intake of 5 g of HPMC. The beneficial effect is obtained with a daily intake of 5 g of HPMC. Warning of choking to be given for people with swallowing difficulties or when ingesting with inadequate fluid intake - advice on taking with plenty of water to ensure substance reaches stomach."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Iodine",
+        "claims": [
+            {
+                "claim": "Iodine contributes to normal cognitive function.",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least a source of iodine as referred to in the claim SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S] as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Iodine contributes to normal energy-yielding metabolism.",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least a source of iodine as referred to in the claim SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S] as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Iodine contributes to normal functioning of the nervous system.",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least a source of iodine as referred to in the claim SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S] as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Iodine contributes to the maintenance of normal skin.",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least a source of iodine as referred to in the claim SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S] as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Iodine contributes to the normal production of thyroid hormones and normal thyroid function.",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least a source of iodine as referred to in the claim SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S] as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Iodine contributes to the normal growth of children.",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim can be used only for food which is at least a source of iodine as referred to in the claim SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S] as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Jern",
+        "claims": [
+            {
+                "claim": "Jern bidrar til en normal kognitiv utvikling hos barn",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til jern i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006"
+                }
+            },
+            {
+                "claim": "Jern bidrar til en normal kognitiv funksjon",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til jern i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006"
+                }
+            },
+            {
+                "claim": "Jern bidrar til normal energiomsetning",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til jern i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006"
+                }
+            },
+            {
+                "claim": "Jern bidrar til normal dannelse av røde blodlegemer og hemoglobin",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til jern i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006"
+                }
+            },
+            {
+                "claim": "Jern bidrar til normal transport av oksygen i kroppen",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til jern i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006"
+                }
+            },
+            {
+                "claim": "Jern bidrar til immunsystemets normale funksjon",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til jern i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006"
+                }
+            },
+            {
+                "claim": "Jern bidrar til å redusere tretthet og utmattelse",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til jern i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006"
+                }
+            },
+            {
+                "claim": "Jern spiller en rolle i celledelingsprosessen",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til jern i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006"
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Lactase enzyme",
+        "claims": [
+            {
+                "claim": "Lactase enzyme improves lactose digestion in individuals who have difficulty digesting lactose",
+                "conditions": {
+                    "min_dose": 4500,
+                    "unit": "FCC units",
+                    "info": "The claim may be used only for food supplements, with a minimum dose of 4500 FCC (Food Chemicals Codex) units with instructions to the target population to consume with each lactose-containing meal. Information shall also be given to the target population that tolerance to lactose is variable and they should seek advice as to the role of this substance in their diet."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Lactitol",
+        "claims": [
+            {
+                "claim": "Lactitol contributes to normal bowel function by increasing stool frequency",
+                "conditions": {
+                    "min_dose": 10,
+                    "unit": "g",
+                    "info": "The claim may be used only for food supplements which contain 10 g of lactitol in a single daily quantified portion. In order to bear the claim, information shall be given to the consumer that the beneficial effect is obtained by consuming 10 g of lactitol in one daily dose. The claim shall not be used for foods targeting children."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Lactulose",
+        "claims": [
+            {
+                "claim": "Lactulose contributes to an acceleration of intestinal transit",
+                "conditions": {
+                    "min_dose": 10,
+                    "unit": "g",
+                    "info": "The claim may be used only for food which contains 10 g of lactulose in a single quantified portion. In order to bear the claim, information shall be given to the consumer that the beneficial effect is obtained with a single serving of 10 g of lactulose per day."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Linoleic acid",
+        "claims": [
+            {
+                "claim": "Linoleic acid contributes to the maintenance of normal blood cholesterol levels",
+                "conditions": {
+                    "min_dose": 1.5,
+                    "unit": "g per 100 g and per 100 kcal",
+                    "daily_intake": 10,
+                    "daily_unit": "g",
+                    "info": "The claim may be used only for a food which provides at least 1.5 g of linoleic acid (LA) per 100 g and per 100 kcal. Information shall be given to the consumer that the beneficial effect is obtained with a daily intake of 10 g of LA."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Live yoghurt cultures",
+        "claims": [
+            {
+                "claim": "Live cultures in yoghurt or fermented milk improve lactose digestion of the product in individuals who have difficulty digesting lactose",
+                "conditions": {
+                    "requirement": "Colony Forming Units live starter microorganisms",
+                    "min_amount": "10⁸ CFU per gram",
+                    "microorganisms": ["Lactobacillus delbrueckii subsp. bulgaricus", "Streptococcus thermophilus"],
+                    "info": "In order to bear the claim, Yoghurt or fermented milk should contain at least 10⁸ Colony Forming Units live starter microorganisms (Lactobacillus delbrueckii subsp. bulgaricus and Streptococcus thermophilus) per gram."
+                }
+            }
+        ]
+    },  
+    {
+        "nutrient": "Magnesium",
+        "claims": [
+            {
+                "claim": "Magnesium bidrar til å redusere tretthet og utmattelse",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til magnesium i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Magnesium bidrar til elektrolyttbalansen",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til magnesium i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Magnesium bidrar til normal energiomsetning",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til magnesium i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Magnesium bidrar til nervesystemets normale funksjon",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til magnesium i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Magnesium bidrar til normal muskelfunksjon",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til magnesium i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Magnesium bidrar til normal proteinsyntese",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til magnesium i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Magnesium bidrar til normal psykologisk funksjon",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til magnesium i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Magnesium bidrar til å opprettholde normale knokler",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til magnesium i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Magnesium bidrar til å opprettholde normale tenner",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til magnesium i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Magnesium spiller en rolle i celledelingsprosessen",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til magnesium i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            }
+        ]
+    },  
+    {
+        "nutrient": "Manganese",
+        "claims": [
+            {
+                "claim": "Manganese contributes to normal energy-yielding metabolism",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least a source of manganese as referred to in the claim SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S] as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Manganese contributes to the maintenance of normal bones",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least a source of manganese as referred to in the claim SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S] as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Manganese contributes to the normal formation of connective tissue",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least a source of manganese as referred to in the claim SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S] as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Manganese contributes to the protection of cells from oxidative stress",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least a source of manganese as referred to in the claim SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S] as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Meal replacement for weight control",
+        "claims": [
+            {
+                "claim": "Substituting one daily meal of an energy restricted diet with a meal replacement contributes to the maintenance of weight after weight loss",
+                "conditions": {
+                    "requirement": "specific_composition",
+                    "reference_regulation": "Energy and protein requirements, WHO/FAO/UNU Meeting, WHO Technical Report Series 724",
+                    "info": "In order to bear the claim, a food should comply with the following requirements: 1. Energy content shall not be less than 200 kcal (840 kJ) and shall not exceed 250 kcal (1046 KJ) per meal. 2. Fat content and composition: Energy derived from fat shall not exceed 30% of total available energy. Linoleic acid (in the form of glycerides) shall not be less than 1 g. 3. Protein content and composition: The protein contained in the food shall provide not less than 25% and not more than 50% of the total energy content. The chemical index of protein shall be equal to that set by the WHO in ‘Energy and protein requirements’ (1985, WHO Technical Report Series 724). If the chemical index is lower than 100% of the reference protein, the minimum protein levels shall be correspondingly increased. In any case, the chemical index of the protein shall at least be equal to 80% of that of the reference protein. 4. Vitamins and minerals: The food shall provide at least 30% of the nutrient reference values per meal as laid down in Annex XIII to Regulation (EU) No 1169/2011, except for fluoride, chromium, chloride, and molybdenum. The amount of sodium per meal shall be at least 172.5 mg, and potassium at least 500 mg. Information shall be provided to the consumer on the importance of maintaining an adequate daily fluid intake and that the products are useful only as part of an energy-restricted diet."
+                }
+            },
+            {
+                "claim": "Substituting two daily meals of an energy restricted diet with meal replacements contributes to weight loss",
+                "conditions": {
+                    "requirement": "specific_composition",
+                    "reference_regulation": "Energy and protein requirements, WHO/FAO/UNU Meeting, WHO Technical Report Series 724",
+                    "info": "In order to bear the claim, a food should comply with the following requirements: 1. Energy content shall be between 200 kcal (840 kJ) and 250 kcal (1046 kJ) per meal. 2. Fat content and composition: Energy from fat shall not exceed 30% of total energy content. Linoleic acid (in glycerides) shall be at least 1 g. 3. Protein content and composition: Protein shall provide between 25% and 50% of total energy. The chemical index of protein must meet WHO standards. 4. Vitamins and minerals: The food shall provide at least 30% of the nutrient reference values per meal as per Annex XIII to Regulation (EU) No 1169/2011, except fluoride, chromium, chloride, and molybdenum. Sodium content shall be at least 172.5 mg per meal, and potassium at least 500 mg."
+                }
+            }
+        ]
+    }, 
+    {
+        "nutrient": "Meat or fish",
+        "claims": [
+            {
+                "claim": "Meat or fish contributes to the improvement of iron absorption when eaten with other foods containing iron",
+                "conditions": {
+                    "requirement": "minimum_content",
+                    "min_amount": 50,
+                    "unit": "g",
+                    "info": "The claim may be used only for food which contains at least 50 g of meat or fish per quantified portion. The beneficial effect is obtained by consuming 50 g of meat or fish together with food(s) containing non-haem iron."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Melatonin",
+        "claims": [
+            {
+                "claim": "Melatonin contributes to the alleviation of subjective feelings of jet lag",
+                "conditions": {
+                    "requirement": "minimum_content",
+                    "min_amount": 0.5,
+                    "unit": "mg",
+                    "info": "The claim may be used only for food which contains at least 0.5 mg of melatonin per quantified portion. The beneficial effect is obtained with a minimum intake of 0.5 mg, taken close to bedtime on the first day of travel and on the following few days after arrival at the destination."
+                }
+            },
+            {
+                "claim": "Melatonin contributes to the reduction of time taken to fall asleep",
+                "conditions": {
+                    "requirement": "minimum_content",
+                    "min_amount": 1,
+                    "unit": "mg",
+                    "info": "The claim may be used only for food which contains at least 1 mg of melatonin per quantified portion. The beneficial effect is obtained by consuming 1 mg of melatonin close to bedtime."
+                }
+            }
+        ]
+    }, 
+    {
+        "nutrient": "Molybdenum",
+        "claims": [
+            {
+                "claim": "Molybdenum contributes to normal sulphur amino acid metabolism",
+                "conditions": {
+                    "requirement": "minimum_content",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least a source of molybdenum as referred to in the claim SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Monounsaturated and/or polyunsaturated fatty acids",
+        "claims": [
+            {
+                "claim": "Replacing saturated fats with unsaturated fats in the diet contributes to the maintenance of normal blood cholesterol levels",
+                "conditions": {
+                    "requirement": "high_unsaturated_fat",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is high in unsaturated fatty acids, as referred to in the claim HIGH UNSATURATED FAT."
+                }
+            },
+            {
+                "claim": "Replacing saturated fats with unsaturated fats in the diet has been shown to lower/reduce blood cholesterol. High cholesterol is a risk factor in the development of coronary heart disease",
+                "conditions": {
+                    "requirement": "high_unsaturated_fat",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "restriction": "The claim may only be used on fats and oils."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Native chicory inulin",
+        "claims": [
+            {
+                "claim": "Chicory inulin contributes to normal bowel function by increasing stool frequency",
+                "conditions": {
+                    "requirement": "minimum_content",
+                    "min_amount": 12,
+                    "unit": "g",
+                    "info": "Information shall be provided to the consumer that the beneficial effect is obtained with a daily intake of 12 g of chicory inulin. The claim can be used only for food which provides at least a daily intake of 12 g of native chicory inulin, a non-fractionated mixture of monosaccharides."
+                }
+            }
+        ]
+    }, 
+    {
+        "nutrient": "Niacin",
+        "claims": [
+            {
+              "claim": "Niacin contributes to normal psychological function",
+              "conditions": {
+                  "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "The claim may be used only for food which is at least a source of niacin as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Niacin contributes to normal energy-yielding metabolism",
+              "conditions": {
+                  "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "The claim may be used only for food which is at least a source of niacin as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Niacin contributes to normal functioning of the nervous system",
+              "conditions": {
+                  "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "The claim may be used only for food which is at least a source of niacin as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Niacin contributes to the maintenance of normal mucous membranes",
+              "conditions": {
+                  "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "The claim may be used only for food which is at least a source of niacin as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Niacin contributes to the maintenance of normal skin",
+              "conditions": {
+                  "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "The claim may be used only for food which is at least a source of niacin as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          },
+          {
+              "claim": "Niacin contributes to the reduction of tiredness and fatigue",
+              "conditions": {
+                  "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "The claim may be used only for food which is at least a source of niacin as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          }
+        ]
+    }, 
+    {
+        "nutrient": "Non-digestible carbohydrates",
+        "claims": [
+            {
+                "claim": "Consumption of foods/drinks containing non-digestible carbohydrates instead of sugars induces a lower blood glucose rise after their consumption compared to sugar-containing foods/drinks.",
+                "conditions": {
+                    "requirement": "replacement",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "In order to bear the claim, sugars should be replaced in foods or drinks by non-digestible carbohydrates, which are carbohydrates neither digested nor absorbed in the small intestine, so that foods or drinks contain reduced amounts of sugars by at least the amount referred to in the claim 'REDUCED [NAME OF NUTRIENT]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Oat beta-glucan",
+        "claims": [
+            {
+                "claim": "Oat beta-glucan has been shown to lower/reduce blood cholesterol. High cholesterol is a risk factor in the development of coronary heart disease.",
+                "conditions": {
+                    "requirement": "minimum_intake",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Information shall be given to the consumer that the beneficial effect is obtained with a daily intake of 3 g of oat beta-glucan. The claim can be used for foods which provide at least 1 g of oat beta-glucan per quantified portion."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Oat grain fibre",
+        "claims": [
+            {
+                "claim": "Oat grain fibre contributes to an increase in faecal bulk.",
+                "conditions": {
+                    "requirement": "high_fibre",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is high in that fibre as referred to in the claim 'HIGH FIBRE' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Oleic acid",
+        "claims": [
+            {
+                "claim": "Replacing saturated fats in the diet with unsaturated fats contributes to the maintenance of normal blood cholesterol levels. Oleic acid is an unsaturated fat.",
+                "conditions": {
+                    "requirement": "high_unsaturated_fat",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is high in unsaturated fatty acids, as referred to in the claim 'HIGH UNSATURATED FAT' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Olive oil polyphenols",
+        "claims": [
+            {
+                "claim": "Olive oil polyphenols contribute to the protection of blood lipids from oxidative stress.",
+                "conditions": {
+                    "requirement": "minimum_intake",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for olive oil which contains at least 5 mg of hydroxytyrosol and its derivatives (e.g. oleuropein complex and tyrosol) per 20 g of olive oil. In order to bear the claim, information shall be given to the consumer that the beneficial effect is obtained with a daily intake of 20 g of olive oil."
+                }
+            }
+        ]
+    },
+      {
+        "nutrient": "Pantothenic acid",
+        "claims": [
+            {
+                "claim": "Pantothenic acid contributes to normal energy-yielding metabolism",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least a source of pantothenic acid as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Pantothenic acid contributes to normal mental performance",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least a source of pantothenic acid as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Pantothenic acid contributes to normal synthesis and metabolism of steroid hormones, vitamin D and some neurotransmitters",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least a source of pantothenic acid as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Pantothenic acid contributes to the reduction of tiredness and fatigue",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least a source of pantothenic acid as referred to in the claim 'SOURCE OF [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S]' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Pectins",
+        "claims": [
+            {
+                "claim": "Pectins contribute to the maintenance of normal blood cholesterol levels",
+                "conditions": {
+                    "requirement": "minimum_intake",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which provides a daily intake of 6 g of pectins. In order to bear the claim, information shall be given to the consumer that the beneficial effect is obtained with a daily intake of 6 g of pectins.",
+                    "warning": "Warning of choking to be given for people with swallowing difficulties or when ingesting with inadequate fluid intake - advice on taking with plenty of water to ensure substance reaches stomach."
+                }
+            },
+            {
+                "claim": "Consumption of pectins with a meal contributes to the reduction of the blood glucose rise after that meal",
+                "conditions": {
+                    "requirement": "minimum_intake",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which contains 10 g of pectins per quantified portion. In order to bear the claim, information shall be given to the consumer that the beneficial effect is obtained by consuming 10 g of pectins as part of the meal.",
+                    "warning": "Warning of choking to be given for people with swallowing difficulties or when ingesting with inadequate fluid intake - advice on taking with plenty of water to ensure substance reaches stomach."
+                }
+            }
+        ]
+    },
+    {
+      "nutrient": "Fosfor",
+      "claims": [
+          {
+              "claim": "Fosfor er nødvendig for at barnets benstamme skal vokse og utvikles normalt",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til fosfor i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          },
+          {
+              "claim": "Fosfor bidrar til normal energiomsetning",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til fosfor i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          },
+          {
+              "claim": "Fosfor bidrar til cellemembranenes normale funksjon",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til fosfor i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          },
+          {
+              "claim": "Fosfor bidrar til å opprettholde normale knokler",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til fosfor i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          },
+          {
+              "claim": "Fosfor bidrar til å opprettholde normale tenner",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til fosfor i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          }
+      ]
+    },
+    {
+      "nutrient": "Plant stanol esters",
+      "claims": [
+          {
+              "claim": "Plant stanol esters have been shown to lower/reduce blood cholesterol. High cholesterol is a risk factor in the development of coronary heart disease.",
+              "conditions": {
+                  "requirement": "minimum_intake",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Information to the consumer that the beneficial effect is obtained with a daily intake of 1.5-3 g plant stanols. Reference to the magnitude of the effect may only be made for foods within the following categories: yellow fat spreads, dairy products, mayonnaise, and salad dressings. When referring to the magnitude of the effect, the range '7% to 10%' for foods that provide a daily intake of 1.5-2.4 g plant stanols or the range '10%-12.5%' for foods that provide a daily intake of 2.5-3 g plant stanols and the duration to obtain the effect 'in 2 to 3 weeks' must be communicated to the consumer."
+              }
+          }
+      ]
+  },
+  {
+      "nutrient": "Plant sterols and plant stanols",
+      "claims": [
+          {
+              "claim": "Plant sterols/stanols contribute to the maintenance of normal blood cholesterol levels",
+              "conditions": {
+                  "requirement": "minimum_intake",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "In order to bear the claim information shall be given to the consumer that the beneficial effect is obtained with a daily intake of at least 0.8 g of plant sterols/stanols."
+              }
+          }
+      ]
+  },
+  {
+      "nutrient": "Plant sterols/Plant stanol esters",
+      "claims": [
+          {
+              "claim": "Plant sterols and plant stanol esters have been shown to lower/reduce blood cholesterol. High cholesterol is a risk factor in the development of coronary heart disease.",
+              "conditions": {
+                  "requirement": "minimum_intake",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Information to the consumer that the beneficial effect is obtained with a daily intake of 1.5-3 g plant sterols/stanols. Reference to the magnitude of the effect may only be made for foods within the following categories: yellow fat spreads, dairy products, mayonnaise, and salad dressings. When referring to the magnitude of the effect, the range '7% to 10%' for foods that provide a daily intake of 1.5-2.4 g plant sterols/stanols or the range '10%-12.5%' for foods that provide a daily intake of 2.5-3 g plant sterols/stanols and the duration to obtain the effect 'in 2 to 3 weeks' must be communicated to the consumer."
+              }
+          }
+      ]
+  },
+  {
+      "nutrient": "Plant sterols",
+      "claims": [
+          {
+              "claim": "Plant sterols have been shown to lower/reduce blood cholesterol. High cholesterol is a risk factor in the development of coronary heart disease.",
+              "conditions": {
+                  "requirement": "minimum_intake",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Information to the consumer that the beneficial effect is obtained with a daily intake of 1.5-3 g plant sterols. Reference to the magnitude of the effect may only be made for foods within the following categories: yellow fat spreads, dairy products, mayonnaise, and salad dressings. When referring to the magnitude of the effect, the range '7% to 10%' for foods that provide a daily intake of 1.5-2.4 g plant sterols or the range '10%-12.5%' for foods that provide a daily intake of 2.5-3 g plant sterols and the duration to obtain the effect 'in 2 to 3 weeks' must be communicated to the consumer."
+              }
+          }
+      ]
+  },
+  {
+      "nutrient": "Kalium",
+      "claims": [
+          {
+              "claim": "Kalium bidrar til nervesystemets normale funksjon",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til kalium i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          },
+          {
+              "claim": "Kalium bidrar til normal muskelfunksjon",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til kalium i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          },
+          {
+              "claim": "Kalium bidrar til å opprettholde normalt blodtrykk",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til kalium i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          }
+      ]
+    }, 
+      {
+        "nutrient": "Protein",
+        "claims": [
+            {
+                "claim": "Protein contributes to a growth in muscle mass",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least a source of protein as referred to in the claim 'SOURCE OF PROTEIN' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Protein contributes to the maintenance of muscle mass",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least a source of protein as referred to in the claim 'SOURCE OF PROTEIN' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Protein contributes to the maintenance of normal bones",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is at least a source of protein as referred to in the claim 'SOURCE OF PROTEIN' as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            },
+            {
+                "claim": "Protein is needed for normal growth and development of bone in children.",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim can be used only for food which is at least a source of protein as referred to in the claim 'SOURCE OF PROTEIN' as listed in the Annex to Regulation 1924/2006."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Resistant starch",
+        "claims": [
+            {
+                "claim": "Replacing digestible starches with resistant starch in a meal contributes to a reduction in the blood glucose rise after that meal.",
+                "conditions": {
+                    "requirement": "minimum_content",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food in which digestible starch has been replaced by resistant starch so that the final content of resistant starch is at least 14% of total starch."
+                }
+            }
+        ]
+    },
+      {
+        "nutrient": "Riboflavin (Vitamin B2)",
+        "claims": [
+            {
+                "claim": "Riboflavin bidrar til normal energiomsetning",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til riboflavin i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Riboflavin bidrar til nervesystemets normale funksjon",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til riboflavin i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Riboflavin bidrar til å opprettholde normale slimhinner",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til riboflavin i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Riboflavin bidrar til å opprettholde normale røde blodlegemer",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til riboflavin i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Riboflavin bidrar til å opprettholde normal hud",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til riboflavin i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Riboflavin bidrar til å opprettholde normalt syn",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til riboflavin i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Riboflavin bidrar til normal omsetning av jern",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til riboflavin i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Riboflavin bidrar til å beskytte cellene mot oksidativt stress",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til riboflavin i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Riboflavin bidrar til å redusere tretthet og utmattelse",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til riboflavin i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            }
+        ]
+    },
+    {
+      "nutrient": "Rye Fibre",
+      "claims": [
+          {
+              "claim": "Rye fibre contributes to normal bowel function",
+              "conditions": {
+                  "requirement": "high_fibre",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "The claim may be used only for food which is high in that fibre as referred to in the claim 'HIGH FIBRE' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          }
+      ]
+  },
+  {
+      "nutrient": "Selen",
+      "claims": [
+          {
+              "claim": "Selen bidrar til normal spermatogenese",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til selen i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          },
+          {
+              "claim": "Selen bidrar til å opprettholde normalt hår",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til selen i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          },
+          {
+              "claim": "Selen bidrar til å opprettholde normale negler",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til selen i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          },
+          {
+              "claim": "Selen bidrar til immunsystemets normale funksjon",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til selen i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          },
+          {
+              "claim": "Selen bidrar til skjoldbruskkjertelens normale funksjon",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til selen i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          },
+          {
+              "claim": "Selen bidrar til å beskytte cellene mot oksidativt stress",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til selen i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          }
+      ]
+    },
+    {
+      "nutrient": "Slowly Digestible Starch",
+      "claims": [
+          {
+              "claim": "Consumption of products high in slowly digestible starch (SDS) raises blood glucose concentration less after a meal compared to products low in SDS",
+              "conditions": {
+                  "requirement": "minimum_content",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "The claim may be used only on food where the digestible carbohydrates provide at least 60% of the total energy and where at least 55% of those carbohydrates is digestible starch, of which at least 40% is SDS."
+              }
+          }
+      ]
+  },
+  {
+      "nutrient": "Sugar Beet Fibre",
+      "claims": [
+          {
+              "claim": "Sugar beet fibre contributes to an increase in faecal bulk",
+              "conditions": {
+                  "requirement": "high_fibre",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "The claim may be used only for food which is high in that fibre as referred to in the claim 'HIGH FIBRE' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          }
+      ]
+  },
+  {
+      "nutrient": "Sugar Replacers",
+      "claims": [
+          {
+              "claim": "Consumption of foods/drinks containing sugar replacers instead of sugar contributes to the maintenance of tooth mineralisation. In the case of D-tagatose and isomaltulose, this should read 'other sugars'.",
+              "conditions": {
+                  "requirement": "sugar_replacement",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "In order to bear the claim, sugars should be replaced in foods or drinks (which reduce plaque pH below 5.7) by sugar replacers, i.e. intense sweeteners, xylitol, sorbitol, mannitol, maltitol, lactitol, isomalt, erythritol, D-tagatose, isomaltulose, sucralose or polydextrose, or a combination of them, in amounts such that consumption of such foods or drinks does not lower plaque pH below 5.7 during and up to 30 minutes after consumption."
+              }
+          },
+          {
+              "claim": "Consumption of foods/drinks containing sugar replacers instead of sugar induces a lower blood glucose rise after their consumption compared to sugar-containing foods/drinks. In the case of D-tagatose and isomaltulose, this should read 'other sugars'.",
+              "conditions": {
+                  "requirement": "sugar_replacement",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "In order to bear the claim, sugars should be replaced in foods or drinks by sugar replacers, i.e. intense sweeteners, xylitol, sorbitol, mannitol, maltitol, lactitol, isomalt, erythritol, sucralose or polydextrose, or a combination of them, so that foods or drinks contain reduced amounts of sugars by at least the amount referred to in the claim 'REDUCED [NAME OF NUTRIENT]' as listed in the Annex to Regulation (EC) No 1924/2006. In the case of D-tagatose and isomaltulose, they should replace equivalent amounts of other sugars in the same proportion as that referred to in the claim 'REDUCED [NAME OF NUTRIENT]' as listed in the Annex to Regulation (EC) No 1924/2006."
+              }
+          }
+      ]
+    },
+    {
+      "nutrient": "Sugar-Free Chewing Gum",
+      "claims": [
+          {
+              "claim": "Sugar-free chewing gum contributes to the maintenance of tooth mineralization",
+              "conditions": {
+                  "requirement": "sugars_free",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "The claim may be used only for chewing gum which complies with the conditions of use for the nutrition claim 'SUGARS FREE' as listed in the Annex to Regulation (EC) No 1924/2006. Information shall be given to the consumer that the beneficial effect is obtained with chewing, for at least 20 minutes, after eating or drinking."
+              }
+          },
+          {
+              "claim": "Sugar-free chewing gum contributes to the neutralisation of plaque acids",
+              "conditions": {
+                  "requirement": "sugars_free",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "The claim may be used only for chewing gum which complies with the conditions of use for the nutrition claim 'SUGARS FREE' as listed in the Annex to Regulation (EC) No 1924/2006. Information shall be given to the consumer that the beneficial effect is obtained with chewing, for at least 20 minutes, after eating or drinking."
+              }
+          },
+          {
+              "claim": "Sugar-free chewing gum contributes to the reduction of oral dryness",
+              "conditions": {
+                  "requirement": "sugars_free",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "The claim may be used only for chewing gum which complies with the conditions of use for the nutrition claim 'SUGARS FREE' as listed in the Annex to Regulation (EC) No 1924/2006. Information shall be given to the consumer that the beneficial effect is obtained with use of the chewing gum whenever the mouth feels dry."
+              }
+          },
+          {
+              "claim": "Sugar-free chewing gum helps neutralise plaque acids. Plaque acids are a risk factor in the development of dental caries.",
+              "conditions": {
+                  "requirement": "chewing_gum_usage",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Information shall be given to the consumer that the beneficial effect is obtained with chewing of 2-3 g of sugar-free chewing gum for 20 minutes, at least three times per day after meals."
+              }
+          },
+          {
+              "claim": "Sugar-free chewing gum helps reduce tooth demineralisation. Tooth demineralisation is a risk factor in the development of dental caries.",
+              "conditions": {
+                  "requirement": "chewing_gum_usage",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Information shall be given to the consumer that the beneficial effect is obtained with chewing of 2-3 g of sugar-free chewing gum for 20 minutes, at least three times per day after meals."
+              }
+          }
+      ]
+  },
+  {
+      "nutrient": "Sugar-Free Chewing Gum with Carbamide",
+      "claims": [
+          {
+              "claim": "Sugar-free chewing gum with carbamide neutralises plaque acids more effectively than sugar-free chewing gums without carbamide",
+              "conditions": {
+                  "requirement": "sugars_free",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "The claim may be used only for chewing gum which complies with the conditions of use for the nutrition claim 'SUGARS FREE' as listed in the Annex to Regulation (EC) No 1924/2006. In order to bear the claim each piece of sugar-free chewing gum should contain at least 20 mg carbamide. Information shall be given to the consumer that gum should be chewed for at least 20 minutes after eating or drinking."
+              }
+          }
+      ]
+    },
+    {
+      "nutrient": "Tiamin",
+      "claims": [
+          {
+              "claim": "Tiamin bidrar til normal energiomsetning",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til tiamin i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          },
+          {
+              "claim": "Tiamin bidrar til nervesystemets normale funksjon",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til tiamin i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          },
+          {
+              "claim": "Tiamin bidrar til normal psykologisk funksjon",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til tiamin i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          },
+          {
+              "claim": "Tiamin bidrar til hjertets normale funksjon",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til tiamin i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          }
+      ]
+    },
+    {
+      "nutrient": "Vitamin A",
+      "claims": [
+          {
+              "claim": "Vitamin A bidrar til normal omsetning av jern",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin A i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          },
+          {
+              "claim": "Vitamin A bidrar til å opprettholde normale slimhinner",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin A i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          },
+          {
+              "claim": "Vitamin A bidrar til å opprettholde normal hud",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin A i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          },
+          {
+              "claim": "Vitamin A bidrar til å opprettholde normalt syn",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin A i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          },
+          {
+              "claim": "Vitamin A bidrar til immunsystemets normale funksjon",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin A i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          },
+          {
+              "claim": "Vitamin A spiller en rolle i celledelingsprosessen",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin A i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          }
+      ]
+    },
+    {
+      "nutrient": "Vitamin B12",
+      "claims": [
+          {
+              "claim": "Vitamin B12 bidrar til normal energiomsetning",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin B12 i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          },
+          {
+              "claim": "Vitamin B12 bidrar til nervesystemets normale funksjon",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin B12 i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          },
+          {
+              "claim": "Vitamin B12 bidrar til normal homocysteinomsetning ",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin B12 i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          },
+          {
+              "claim": "Vitamin B12 bidrar til normal psykologisk funksjon",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin B12 i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          },
+          {
+              "claim": "Vitamin B12 bidrar til normal dannelse av røde blodlegemer",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin B12 i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          },
+          {
+              "claim": "Vitamin B12 bidrar til immunsystemets normale funksjon",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin B12 i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          },
+          {
+              "claim": "Vitamin B12 bidrar til å redusere tretthet og utmattelse",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin B12 i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          },
+          {
+              "claim": "Vitamin B12 spiller en rolle i celledelingsprosessen",
+              "conditions": {
+                  "requirement": "source_of",
+                  "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                  "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin B12 i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+              }
+          }
+      ]
+    },
+    {
+        "nutrient": "Vitamin B6",
+        "claims": [
+            {
+                "claim": "Vitamin B6 bidrar til normal cysteinsyntese",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin B6 i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Vitamin B6 bidrar til normal energiomsetning",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin B6 i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Vitamin B6 bidrar til nervesystemets normale funksjon",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin B6 i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Vitamin B6 bidrar til normal homocysteinomsetning",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin B6 i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Vitamin B6 bidrar til normal omsetning av protein og glykogen",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin B6 i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Vitamin B6 bidrar til normal psykologisk funksjon",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin B6 i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Vitamin B6 bidrar til normal dannelse av røde blodlegemer",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin B6 i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Vitamin B6 bidrar til immunsystemets normale funksjon",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin B6 i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Vitamin B6 bidrar til å redusere tretthet og utmattelse",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin B6 i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Vitamin B6 bidrar til å regulere hormonell aktivitet",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin B6 i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Vitamin C",
+        "claims": [
+            {
+                "claim": "Vitamin C bidrar til å opprettholde immunsystemets normale funksjon under og etter intens fysisk trening",
+                "conditions": {
+                    "min_amount": 200,
+                    "unit": "mg",
+                    "info": "Påstanden kan brukes bare om næringsmidler som gir et daglig inntak av 200 mg vitamin C. For at påstanden skal kunne brukes, må forbrukerne opplyses om at den gunstige virkningen oppnås ved daglig inntak av 200 mg i tillegg til det anbefalte daglige inntaket av vitamin C."
+                }       
+            },
+            {
+                "claim": "Vitamin C bidrar til normal kollagendannelse, som har betydning for blodkarenes normale funksjon",
+                "conditions": {
+                "requirement": "source_of",
+                "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin C i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Vitamin C bidrar til normal kollagendannelse, som har betydning for knoklenes normale funksjon",
+                "conditions": {
+                "requirement": "source_of",
+                "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin C i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },  
+            {
+                "claim": "Vitamin C bidrar til normal kollagendannelse, som har betydning for bruskens normale funksjon",
+                "conditions": {
+                "requirement": "source_of",
+                "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin C i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            }, 
+            {
+                "claim": "Vitamin C bidrar til normal kollagendannelse, som har betydning for tannkjøttets normale funksjon",
+                "conditions": {
+                "requirement": "source_of",
+                "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin C i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },   
+            {
+                "claim": "Vitamin C bidrar til normal kollagendannelse, som har betydning for hudens normale funksjon",
+                "conditions": {
+                "requirement": "source_of",
+                "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin C i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },   
+            {
+                "claim": "Vitamin C bidrar til normal kollagendannelse, som har betydning for tennenes normale funksjon",
+                "conditions": {
+                "requirement": "source_of",
+                "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin C i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },   
+            {
+                "claim": "Vitamin C bidrar til normal energiomsetning",
+                "conditions": {
+                "requirement": "source_of",
+                "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin C i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },   
+            {
+                "claim": "Vitamin C bidrar til nervesystemets normale funksjon",
+                "conditions": {
+                "requirement": "source_of",
+                "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin C i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },   
+            {
+                "claim": "Vitamin C bidrar til normal psykologisk funksjon",
+                "conditions": {
+                "requirement": "source_of",
+                "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin C i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },   
+            {
+                "claim": "Vitamin C bidrar til immunsystemets normale funksjon",
+                "conditions": {
+                "requirement": "source_of",
+                "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin C i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },   
+            {
+                "claim": "Vitamin C bidrar til å beskytte cellene mot oksidativt stress",
+                "conditions": {
+                "requirement": "source_of",
+                "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin C i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },   
+            {
+                "claim": "Vitamin C bidrar til å redusere tretthet og utmattelse",
+                "conditions": {
+                "requirement": "source_of",
+                "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin C i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },   
+            {
+                "claim": "Vitamin C bidrar til å gjenoppbygge den reduserte formen av vitamin E",
+                "conditions": {
+                "requirement": "source_of",
+                "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin C i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },   
+            {
+                "claim": "Vitamin C øker opptaket av jern",
+                "conditions": {
+                "requirement": "source_of",
+                "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin C i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Vitamin D",
+        "claims": [
+            {
+                "claim": "Vitamin D bidrar til å reduserer risikoen for å falle, som er forbundet med ustøhet og muskelsvekkelse. Fall er en risikofaktor for beinbrudd blant menn og kvinner som er 60 år eller eldre.",
+                "conditions": {
+                    "min_amount": 15,
+                    "unit": "μg",
+                    "info": "Påstanden kan brukes bare om kosttilskudd som minst inneholder 15 μg vitamin D per daglige dose. Forbrukerne skal opplyses om at den gunstige virkningen oppnås ved et daglig inntak på 20 μg vitamin D fra alle kilder. For kosttilskudd med tilsatt vitamin D kan påstanden bare brukes om dem som har menn og kvinner som er 60 år og eldre, som målgruppe."
+                }
+            },
+            {
+                "claim": "Vitamin D er nødvendig for at barns bein skal vokse og utvikles normalt",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin D i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Vitamin D bidrar til immunsystemets normale funksjon hos barn.",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin D i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Vitamin D bidrar til normalt opptak/utnyttelse av kalsium og fosfor",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin D i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Vitamin D bidrar til normale kalsiumnivåer i blodet",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin D i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Vitamin D bidrar til å opprettholde normale knokler",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin D i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Vitamin D bidrar til å opprettholde normal muskelfunksjon",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin D i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Vitamin D bidrar til å opprettholde normale tenner",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin D i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Vitamin D bidrar til immunsystemets normale funksjon",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin D i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Vitamin D spiller en rolle i celledelingsprosessen",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin D i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Vitamin E",
+        "claims": [
+            {
+                "claim": "Vitamin E bidrar til å beskytte cellene mot oksidativt stress",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin E i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Vitamin K",
+        "claims": [
+            {
+                "claim": "Vitamin K bidrar til normal blodlevring",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin K i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Vitamin K bidrar til å opprettholde normale knokler",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til vitamin K i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Walnuts",
+        "claims": [
+            {
+                "claim": "Walnuts contribute to the improvement of the elasticity of blood vessels.",
+                "conditions": {
+                    "min_amount": 30,
+                    "unit": "g",
+                    "info": "The claim may be used only for food which provides a daily intake of 30 g of walnuts. In order to bear the claim, information shall be given to the consumer that the beneficial effect is obtained with a daily intake of 30 g of walnuts."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Water",
+        "claims": [
+            {
+                "claim": "Water contributes to the maintenance of normal physical and cognitive functions.",
+                "conditions": {
+                    "min_amount": 2.0,
+                    "unit": "L",
+                    "info": "In order to bear the claim, information shall be given to the consumer that in order to obtain the claimed effect, at least 2.0 L of water, from all sources, should be consumed per day. The claim may be used only on water complying with Directives 2009/54/EC and/or 98/83/EC."
+                }
+            },
+            {
+                "claim": "Water contributes to the maintenance of normal regulation of the body's temperature.",
+                "conditions": {
+                    "min_amount": 2.0,
+                    "unit": "L",
+                    "info": "In order to bear the claim, information shall be given to the consumer that in order to obtain the claimed effect, at least 2.0 L of water, from all sources, should be consumed per day. The claim may be used only on water complying with Directives 2009/54/EC and/or 98/83/EC."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Water-Soluble Tomato Concentrate (WSTC) I and II",
+        "claims": [
+            {
+                "claim": "Water-Soluble Tomato Concentrate (WSTC) I and II helps maintain normal platelet aggregation, which contributes to healthy blood flow.",
+                "conditions": {
+                    "min_amount": {
+                        "WSTC I": 3,
+                        "WSTC II": 150
+                    },
+                    "unit": {
+                        "WSTC I": "g",
+                        "WSTC II": "mg"
+                    },
+                    "info": "Information to the consumer that the beneficial effect is obtained with a daily consumption of 3 g WSTC I or 150 mg WSTC II in up to 250 ml of either fruit juices, flavoured drinks or yogurt drinks (unless heavily pasteurised) or with a daily consumption of 3 g WSTC I or 150 mg WSTC II in food supplements when taken with a glass of water or other liquid."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Wheat Bran Fibre",
+        "claims": [
+            {
+                "claim": "Wheat bran fibre contributes to an acceleration of intestinal transit.",
+                "conditions": {
+                    "requirement": "high_fibre",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "min_amount": 10,
+                    "unit": "g",
+                    "info": "The claim may be used only for food which is high in that fibre as referred to in the claim HIGH FIBRE as listed in the Annex to Regulation (EC) No 1924/2006. In order to bear the claim information shall be given to the consumer that the claimed effect is obtained with a daily intake of at least 10 g of wheat bran fibre."
+                }
+            },
+            {
+                "claim": "Wheat bran fibre contributes to an increase in faecal bulk.",
+                "conditions": {
+                    "requirement": "high_fibre",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "The claim may be used only for food which is high in that fibre as referred to in the claim HIGH FIBRE as listed in the Annex to Regulation (EC) No 1924/2006."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Sink",
+        "claims": [
+            {
+                "claim": "Sink bidrar til normal syre-baseomsetning",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til sink i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Sink bidrar til normal karbohydratomsetning",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til sink i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Sink bidrar til normal kognitiv funksjon",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til sink i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Sink bidrar til normal DNA-syntese",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til sink i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Sink bidrar til normal fruktbarhet og reproduksjonsevne",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til sink i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Sink bidrar til normal omsetning av makronæringsstoffer",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til sink i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Sink bidrar til normal omsetning av fettsyrer",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til sink i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Sink bidrar til normal omsetning av vitamin A",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til sink i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Sink bidrar til normal proteinsyntese",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til sink i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Sink bidrar til å opprettholde normale knokler",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til sink i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Sink bidrar til å opprettholde normalt hår",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til sink i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Sink bidrar til å opprettholde normale negler",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til sink i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Sink bidrar til å opprettholde normal hud",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til sink i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Sink bidrar til å opprettholde normale testosteronnivåer i blodet",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til sink i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Sink bidrar til å opprettholde normalt syn",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til sink i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Sink bidrar til immunsystemets normale funksjon",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til sink i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Sink bidrar til å beskytte cellene mot oksidativt stress",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til sink i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            },
+            {
+                "claim": "Sink spiller en rolle i celledelingsprosessen",
+                "conditions": {
+                    "requirement": "source_of",
+                    "reference_regulation": "Vedlegget til forordning (EF) nr. 1924/2006.",
+                    "info": "Påstanden kan brukes bare om næringsmidler som minst er en kilde til sink i henhold til påstanden KILDE TIL [NAVN PÅ VITAMIN] OG/ELLER [NAVN PÅ MINERAL] i vedlegget til forordning (EF) nr. 1924/2006."
+                }
+            }
+        ]
+    },
+    {
+        "nutrient": "Essential Fatty Acids (ALA & LA)",
+        "claims": [
+            {
+                "claim": "Essential fatty acids are needed for normal growth and development of children.",
+                "conditions": {
+                    "min_amount": {
+                        "ALA": 2,
+                        "LA": 10
+                    },
+                    "unit": "g",
+                    "info": "Information to the consumer that the beneficial effect is obtained with a daily intake of 2 g of α-linolenic acid (ALA) and a daily intake of 10 g of linoleic acid (LA)."
+                }
+            }
+        ]
+    }
+]

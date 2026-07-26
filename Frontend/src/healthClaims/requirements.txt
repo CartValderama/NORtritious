@@ -1,5 +1,0 @@
-source_of_omega_3_acids: Alpha-linolenic acid (ALA), 
-high_fibre: Barley grain fibre, 
-source_of: Biotin, Calcium, Calcium and vitamin D, Chloride, Chromium, Copper
-low_sugars: Carbohydrates
-with_no_added_sugars: Carbohydrates

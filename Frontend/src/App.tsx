@@ -1,6 +1,6 @@
 import LoginTest from "./components/LoginTest"; // Hvis den ligger i src/components
 //import GetProducts from "./components/GetProducts";
-import Calculator from "./Calculator";
+import Calculator from "./new_calculator/Calculator";
 import {
   BrowserRouter as Router,
   Route,
@@ -15,7 +15,7 @@ import ProductListPage from "./products/ProductListPage";
 import "./App.css";
 import ProfilePage from "./account/profile";
 import ProductDetails from "./products/ProductDetails";
-import CalculatorUpdate from "./CalculatorUpdate";
+import CalculatorUpdate from "./new_calculator/CalculatorUpdate";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 //    <LoginTest />

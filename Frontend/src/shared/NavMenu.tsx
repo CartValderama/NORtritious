@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Nav, Navbar, Container } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import logo from "../img/logo.jpg";
 import "../css/NavMenu.css";
@@ -10,7 +10,8 @@ const NavMenu: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
   const [profilePicture, setProfilePicture] = useState("");
-  const navigate = useNavigate(); // Bruk useNavigate her
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -30,7 +31,7 @@ const NavMenu: React.FC = () => {
     };
 
     checkLoginStatus();
-  }, []);
+  }, [location.pathname]);
 
   // Handle logout
   const handleLogout = async () => {
@@ -52,13 +53,8 @@ const NavMenu: React.FC = () => {
   return (
     <Navbar bg="light" expand="lg" className="navbar-custom mb3">
       <Container className="d-flex justify-content-between align-items-center">
-        <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
-          <img
-            src={logo}
-            className="img-logo img-fluid"
-            alt="Fremtidsmat logo"
-            style={{ height: "50px" }}
-          />{" "}
+        <Navbar.Brand as={Link} to="/" className="d-flex align-items-center gap-2">
+          <span className="fw-semibold fs-5">NORtritious</span>
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
