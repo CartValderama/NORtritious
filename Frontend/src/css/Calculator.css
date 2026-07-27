@@ -2,6 +2,47 @@
   border-radius: 0 !important;
 }
 
+/* Light-blue "active" button — used for a toggle whose default state is solid
+   btn-primary, switching to this pale-blue tint while active/expanded.
+   !important needed: Bootstrap's own .btn base rule (background-color: var(--bs-btn-bg),
+   defaulting to transparent) loads after this file in the bundle and otherwise wins. */
+.btn-light-primary {
+  background-color: #cfe2ff !important;
+  border-color: #cfe2ff !important;
+  color: #084298 !important;
+}
+.btn-light-primary:hover,
+.btn-light-primary:focus {
+  background-color: #bcd5fc !important;
+  border-color: #bcd5fc !important;
+  color: #084298 !important;
+}
+
+/* Lighter gray than Bootstrap's btn-secondary (#6c757d) — same !important reasoning
+   as .btn-light-primary above. */
+.btn-light-secondary {
+  background-color: #e9ecef !important;
+  border-color: #e9ecef !important;
+  color: #495057 !important;
+}
+.btn-light-secondary:hover,
+.btn-light-secondary:focus {
+  background-color: #dee2e6 !important;
+  border-color: #dee2e6 !important;
+  color: #495057 !important;
+}
+
+/* "Legg til" (Kilde til Annet) — Bootstrap's default disabled opacity (0.65) still
+   reads as a fairly solid blue; fade it further so a disabled state is unmistakable.
+   Bootstrap also sets pointer-events: none on :disabled, which silently suppresses any
+   cursor style — override to auto so "not-allowed" actually shows. The native disabled
+   attribute still blocks clicks either way, so this doesn't reopen the button. */
+.btn-legg-til:disabled {
+  opacity: 0.3 !important;
+  pointer-events: auto !important;
+  cursor: not-allowed !important;
+}
+
 /* Lighter stripe color for the nutrition input table */
 .nutrition-table {
   --bs-table-striped-bg: rgba(0, 0, 0, 0.004);

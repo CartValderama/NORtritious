@@ -1,6 +1,4 @@
-import LoginTest from "./components/LoginTest"; // Hvis den ligger i src/components
-//import GetProducts from "./components/GetProducts";
-import Calculator from "./new_calculator/Calculator";
+import Calculator from "./pages/Calculator";
 import {
   BrowserRouter as Router,
   Route,
@@ -8,18 +6,16 @@ import {
   Navigate,
 } from "react-router-dom";
 import Container from "react-bootstrap/Container";
-import NavMenu from "./shared/NavMenu";
-import HomePage from "./home/HomePage";
-import LoginPage from "./account/login";
-import ProductListPage from "./products/ProductListPage";
+import NavMenu from "./components/NavMenu";
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/login";
+import ProductListPage from "./pages/ProductListPage";
 import "./App.css";
-import ProfilePage from "./account/profile";
-import ProductDetails from "./products/ProductDetails";
-import CalculatorUpdate from "./new_calculator/CalculatorUpdate";
+import ProfilePage from "./pages/profile";
+import ProductDetails from "./pages/ProductDetails";
+import CalculatorUpdate from "./pages/CalculatorUpdate";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-//    <LoginTest />
-//    <GetProducts />
 const App: React.FC = () => {
   return (
     <Router>
@@ -40,7 +36,6 @@ const App: React.FC = () => {
                   path="/products/details/:productId"
                   element={<ProductDetails />}
                 />
-                <Route path="/login" element={<LoginTest />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
                 <Route path="account/login" element={<LoginPage />} />
                 <Route path="account/profile" element={<ProfilePage />} />
