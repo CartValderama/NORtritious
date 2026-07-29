@@ -61,6 +61,8 @@ const NutritionForm = ({
     return <EmptyState message="Velg type matvare for å starte beregningen" />;
   }
 
+  const hasInput = Object.values(nutrition).some((value) => value !== "");
+
   const handleFieldChange = (key, value) => {
     const updated = { ...nutrition, [key]: value };
     setNutrition(updated);
@@ -145,14 +147,16 @@ const NutritionForm = ({
       <div className="bg-white rounded">
         <div className="d-flex align-items-center justify-content-between mb-3">
           <h2 className="mb-0">Næringsinnhold</h2>
-          <button
-            type="button"
-            className="btn btn-primary d-flex align-items-center gap-1"
-            onClick={handleReset}
-          >
-            <i className="bi bi-arrow-counterclockwise" />
-            Nullstill
-          </button>
+          {hasInput && (
+            <button
+              type="button"
+              className="btn btn-primary d-flex align-items-center gap-1"
+              onClick={handleReset}
+            >
+              <i className="bi bi-arrow-counterclockwise" />
+              Nullstill
+            </button>
+          )}
         </div>
         <p className="text-muted small mb-4">
           Fyll inn energi og næringsstoffer per 100 g/ml. Hvilke felt som vises
