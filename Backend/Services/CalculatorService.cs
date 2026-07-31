@@ -79,6 +79,17 @@ namespace Backend.Services
         // checked directly from NutritionInputDTO instead, alongside the Karbohydrater claims.
         private const long ResistantStarchClaimId = 764557;
 
+        // Karbohydrater claims — checked directly from NutritionInputDTO.Carbs (the main
+        // nutrition table's Karbohydrat field) rather than as a manually-entered "Other"
+        // substance, since re-entering the same value there would be redundant.
+        // "Contribute to normal brain function" — quantified portion must contain >=20g
+        // carbohydrates metabolised by humans (excluding polyols).
+        private const long CarbohydrateBrainFunctionClaimId = 836625;
+        // "Recovery of normal muscle function after intensive/prolonged exercise" — condition
+        // is 4g carbohydrates per kg body weight, which this calculator doesn't collect, so it
+        // can't be evaluated automatically.
+        private const long CarbohydrateMuscleRecoveryClaimId = 836661;
+
         // Nøkkelhullet thresholds per category (all values per 100 g/ml)
         // null = no requirement for that nutrient in this category
         private record CategoryThreshold(
@@ -174,15 +185,16 @@ namespace Backend.Services
         {
             var efsaNutritionClaims = CheckEfsaNutritionClaims(request.FoodType, request.EnergyUnit, request.Nutrition);
 
-            var starchHealthClaims = new List<HealthClaimResultDTO>();
+            var autoHealthClaims = new List<HealthClaimResultDTO>();
             var resistantStarchClaim = await CheckResistantStarchHealthClaim(request.Nutrition);
-            if (resistantStarchClaim != null) starchHealthClaims.Add(resistantStarchClaim);
+            if (resistantStarchClaim != null) autoHealthClaims.Add(resistantStarchClaim);
+            autoHealthClaims.AddRange(await CheckCarbohydrateHealthClaims(request.Nutrition, request.PortionSize));
 
             return new CalculatorResponseDTO
             {
                 HasNokkelhullet = CheckNokkelhullet(request.Category, request.Nutrition),
                 EfsaNutritionClaims = efsaNutritionClaims,
-                EfsaHealthClaims = starchHealthClaims,
+                EfsaHealthClaims = autoHealthClaims,
                 IngredientHealthClaims = await CheckHealthClaims(request.Nutrition, request.EnergyUnit, request.PortionSize, request.Vitamins, request.Minerals, request.Others),
             };
         }
@@ -548,6 +560,54 @@ namespace Backend.Services
                 EfsaQuestion = claim.EfsaQuestion,
                 EfsaQuestionUrl = claim.EfsaQuestionUrl,
             };
+        }
+
+        // Both Karbohydrater claims apply as soon as the product has any carbohydrates at all —
+        // gated on Carbs rather than on a user selection like the "Other" substances above.
+        private async Task<List<HealthClaimResultDTO>> CheckCarbohydrateHealthClaims(NutritionInputDTO n, decimal portionSize)
+        {
+            var results = new List<HealthClaimResultDTO>();
+            if (n.Carbs <= 0) return results;
+
+            var brainClaim = await _euHealthClaims.GetByIdAsync(CarbohydrateBrainFunctionClaimId);
+            if (brainClaim != null)
+            {
+                results.Add(new HealthClaimResultDTO
+                {
+                    Nutrient = "Karbohydrater",
+                    Amount = $"{n.Carbs} g",
+                    MeetsRequirement = FormatGramThresholdResult(n.Carbs, portionSize, 20m),
+                    Naeringsmiddel = brainClaim.NutrientSubstFood,
+                    Pastand = brainClaim.Claim,
+                    VilkaarForBruk = brainClaim.ConditionOfUse,
+                    VilkaarOgBegrensninger = brainClaim.RestrictionsOfUse,
+                    LegislationReference = brainClaim.LegislationReference,
+                    SourceUrl = brainClaim.LegislationUrl,
+                    EfsaQuestion = brainClaim.EfsaQuestion,
+                    EfsaQuestionUrl = brainClaim.EfsaQuestionUrl,
+                });
+            }
+
+            var muscleClaim = await _euHealthClaims.GetByIdAsync(CarbohydrateMuscleRecoveryClaimId);
+            if (muscleClaim != null)
+            {
+                results.Add(new HealthClaimResultDTO
+                {
+                    Nutrient = "Karbohydrater",
+                    Amount = $"{n.Carbs} g",
+                    MeetsRequirement = "Kan ikke beregnes automatisk (krever kroppsvekt)",
+                    Naeringsmiddel = muscleClaim.NutrientSubstFood,
+                    Pastand = muscleClaim.Claim,
+                    VilkaarForBruk = muscleClaim.ConditionOfUse,
+                    VilkaarOgBegrensninger = muscleClaim.RestrictionsOfUse,
+                    LegislationReference = muscleClaim.LegislationReference,
+                    SourceUrl = muscleClaim.LegislationUrl,
+                    EfsaQuestion = muscleClaim.EfsaQuestion,
+                    EfsaQuestionUrl = muscleClaim.EfsaQuestionUrl,
+                });
+            }
+
+            return results;
         }
 
         // ── JSON deserialization models ─────────────────────────────────────────

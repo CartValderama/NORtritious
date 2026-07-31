@@ -38,6 +38,9 @@ const EfsaHealthClaimsPanel = ({ kostfiber, onValuesChange }) => {
   const [newSubstance, setNewSubstance] = useState(null);
   const [newSubstanceAmount, setNewSubstanceAmount] = useState("");
   const [substanceError, setSubstanceError] = useState("");
+  // Only shown once the user has actually opened the kilde picker looking for a
+  // fibre source — not by default just because Kostfiber happens to be 0.
+  const [attemptedFiberPick, setAttemptedFiberPick] = useState(false);
 
   const kildeOptionByValue = new Map(KILDE_OPTIONS.map((o) => [o.value, o]));
 
@@ -222,10 +225,9 @@ const EfsaHealthClaimsPanel = ({ kostfiber, onValuesChange }) => {
           <span className="fw-semibold me-2">Kilde til Annet</span>
         </div>
 
-        {!hasFiberSource && (
+        {!hasFiberSource && attemptedFiberPick && (
           <p className="text-muted mb-2" style={{ fontSize: "0.85rem" }}>
-            Kostfiber i næringstabellen er satt til 0 — kun Stivelse kan legges
-            til her.
+            Kostfiber i næringstabellen er satt til 0.
           </p>
         )}
 
@@ -257,6 +259,7 @@ const EfsaHealthClaimsPanel = ({ kostfiber, onValuesChange }) => {
                 setNewSubstance(opt);
                 setSubstanceError("");
               }}
+              onMenuOpen={() => setAttemptedFiberPick(true)}
               isDisabled={kildeOptions.length === 0}
             />
           </div>
