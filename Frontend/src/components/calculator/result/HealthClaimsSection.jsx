@@ -11,8 +11,11 @@ const HealthClaimsSection = ({ result }) => {
     ...(result.efsaHealthClaims || []),
     ...(result.ingredientHealthClaims || []),
   ];
+  // Only claims explicitly verified as met belong under the "this product CAN claim"
+  // heading below — anything else (failed, or unverifiable e.g. missing portion size /
+  // requires body weight) must not be shown as if it qualifies.
   const visibleClaims = allClaims.filter(
-    (c) => c.meetsRequirement !== "Oppfyller ikke gitt krav",
+    (c) => c.meetsRequirement === "Oppfyller gitt krav",
   );
 
   const groups = visibleClaims.reduce((acc, claim) => {
