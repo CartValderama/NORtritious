@@ -1,6 +1,6 @@
 import React from "react";
-import efsaLogo from "../../../assets/img/efsaLogo.png";
-import { translateSubstanceName } from "../../../utils/calculator/nutritionResultHelpers";
+import efsaLogo from "../../../../assets/img/efsaLogo.png";
+import { translateSubstanceName } from "../../../../utils/calculator/nutritionResultHelpers";
 
 // Part 3 — EFSA health claims. Combines carbohydrate claims and ingredient-based claims
 // (vitamins, minerals, other substances). Each qualifying claim gets its own grid card:

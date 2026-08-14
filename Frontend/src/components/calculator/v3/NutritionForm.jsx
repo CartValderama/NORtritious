@@ -1,80 +1,17 @@
 import React, { useState } from "react";
 import Tooltip from "@mui/material/Tooltip";
-import efsaLogo from "../../assets/img/efsaLogo.png";
-import NutritionFieldGrid from "./NutritionFieldGrid";
+import efsaLogo from "../../../assets/img/efsaLogo.png";
+import NutritionFieldColumn from "./NutritionFieldColumn";
+import PanelBox from "./PanelBox";
+import BsAccordionItem from "./BsAccordionItem";
 import {
   NUTRITION_FIELDS,
   EMPTY_NUTRITION,
   ZERO_SUGAR_CATEGORIES,
   isFieldRelevant,
-} from "../../utils/calculator/nutritionFormFields";
-import { getSampleNutrition } from "../../utils/calculator/sampleNutritionGenerator";
-import { calculateNutrition } from "../../services/calculatorService";
-
-// Shown in place of the form until the user has picked both a category and a food type.
-// A static placeholder (not an animated loading skeleton) hinting at the field grid
-// shape that will appear once a category/food type is selected.
-const PLACEHOLDER_FIELD_COUNT = 7;
-
-const EmptyState = ({ message }) => (
-  <div className="d-flex flex-column flex-grow-1">
-    <div
-      className="rounded p-4 flex-grow-1 position-relative"
-      style={{ backgroundColor: "#fafafa" }}
-    >
-      <div
-        className="d-grid gap-2 nutrition-field-grid"
-        style={{ filter: "blur(1px)" }}
-      >
-        {Array.from({ length: PLACEHOLDER_FIELD_COUNT }).map((_, i) => (
-          <div key={i}>
-            <div
-              className="rounded mb-2"
-              style={{
-                height: "14px",
-                width: "55%",
-                backgroundColor: "#e9ecef",
-              }}
-            />
-            <div
-              className="rounded"
-              style={{ height: "38px", backgroundColor: "#e9ecef" }}
-            />
-          </div>
-        ))}
-      </div>
-
-      {/* Message overlay — its own card, centered over the field placeholders */}
-      <div
-        className="position-absolute top-0 start-50 translate-middle-x mt-4 rounded shadow-sm bg-white px-5 py-4 text-center"
-        style={{ maxWidth: "90%" }}
-      >
-        <p className="fw-medium fs-5 text-muted mb-0">{message}</p>
-      </div>
-    </div>
-
-    {/* Skeleton for the "Beregn for helsepåstander" toggle button */}
-    <div
-      className="rounded mt-2 mb-2"
-      style={{
-        height: "3.25rem",
-        backgroundColor: "#fafafa",
-        filter: "blur(1px)",
-      }}
-    />
-
-    {/* Skeleton for the Beregn button */}
-    <div
-      className="rounded"
-      style={{
-        height: "2.6rem",
-        width: "140px",
-        backgroundColor: "#fafafa",
-        filter: "blur(1px)",
-      }}
-    />
-  </div>
-);
+} from "../../../utils/calculator/nutritionFormFields";
+import { getSampleNutrition } from "../../../utils/calculator/sampleNutritionGenerator";
+import { calculateNutrition } from "../../../services/calculatorService";
 
 const NutritionForm = ({
   category,
@@ -112,14 +49,18 @@ const NutritionForm = ({
     onResetAll?.();
   };
 
-  if (!category) {
+  if (!category || !foodType) {
     return (
-      <EmptyState message="Velg en matkategori for å starte beregningen" />
+      <PanelBox className="w-100 flex-grow-1 position-relative">
+        <div className="position-absolute top-50 start-50 translate-middle rounded shadow-sm bg-white px-4 py-3 text-center" style={{ maxWidth: "90%" }}>
+          <p className="text-muted mb-0">
+            {!category
+              ? "Velg en matkategori for å starte beregningen"
+              : "Velg type matvare for å starte beregningen"}
+          </p>
+        </div>
+      </PanelBox>
     );
-  }
-
-  if (!foodType) {
-    return <EmptyState message="Velg type matvare for å starte beregningen" />;
   }
 
   const hasInput = Object.values(nutrition).some((value) => value !== "");
@@ -212,10 +153,10 @@ const NutritionForm = ({
 
   return (
     <div>
-      <div className="rounded p-4" style={{ backgroundColor: "#fafafa" }}>
-        <div className="d-flex align-items-start justify-content-between gap-2 mb-3">
+      <PanelBox>
+        <div className="d-flex align-items-center justify-content-between gap-2 mb-3">
           <div className="d-flex align-items-center gap-2">
-            <h5 className="mb-0">Næringsinnhold (per 100 g/ml)</h5>
+            <h2 className="mb-0 fs-6">Næringsinnhold (100g/ml)</h2>
             <Tooltip
               title='Fyll inn energi og næringsstoffer per 100 g/ml. Åpne "Beregn for helsepåstander" under for helsepåstander.'
               placement="right"
@@ -241,7 +182,7 @@ const NutritionForm = ({
             <i className="bi bi-arrow-counterclockwise" />
           </button>
         </div>
-        <NutritionFieldGrid
+        <NutritionFieldColumn
           category={category}
           nutrition={nutrition}
           energyUnit={energyUnit}
@@ -250,77 +191,103 @@ const NutritionForm = ({
           calculatedNutrition={calculatedNutrition}
           onFieldChange={handleFieldChange}
         />
-      </div>
 
-      {/* Full-width expand toggle for the EFSA Helsepåstander panel */}
-      <button
-        type="button"
-        className={`btn efsa-toggle-btn w-100 mt-2 ${showHealthClaimsPanel ? "" : "mb-2"} py-3 d-flex align-items-center justify-content-center gap-2`}
-        style={{
-          backgroundColor: showHealthClaimsPanel ? "#e9ecef" : "#fafafa",
-          borderColor: showHealthClaimsPanel ? "#e9ecef" : "#fafafa",
-          ...(showHealthClaimsPanel
-            ? { borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }
-            : {}),
-        }}
-        onClick={onShowHealthClaimsPanel}
-      >
-        <img
-          src={efsaLogo}
-          alt="EFSA"
-          style={{ width: "1.6rem", height: "auto" }}
-        />
-        {showHealthClaimsPanel
-          ? "Skjul helsepåstander"
-          : "Beregn for helsepåstander"}
-        <i
-          className={`bi ${showHealthClaimsPanel ? "bi-chevron-up" : "bi-chevron-down"}`}
-        />
-      </button>
-
-      {/* Slot for the EFSA Helsepåstander panel — rendered between the nutrition
-          fields and the Beregn button, so filling it in flows naturally into calculating. */}
-      {children}
-
-      {/* Validation error summary */}
-      {Object.keys(errors).length > 0 && (
-        <div className="alert alert-warning border-0 py-2">
-          Fyll inn alle næringsverdier (0 eller høyere) og velg mattype.
-        </div>
-      )}
-
-      {/* Calculate button */}
-      <div className="d-flex flex-wrap gap-2 mt-3">
-        <button
-          type="button"
-          className="btn btn-primary"
-          style={{ padding: "10px 24px", whiteSpace: "nowrap" }}
-          onClick={handleCalculate}
-          disabled={calculating}
-        >
-          {calculating ? "Beregner…" : "Beregn"}
-        </button>
-        {hasResult && (
-          <button
-            type="button"
-            className="btn btn-outline-secondary"
-            style={{ padding: "10px 24px", whiteSpace: "nowrap" }}
-            onClick={() =>
-              document
-                .getElementById("nutrition-result")
-                ?.scrollIntoView({ behavior: "smooth", block: "start" })
+        {/* Full-width expand toggle for the EFSA Helsepåstander panel — same
+            shared accordion shell as "Hvordan bruke kalkulatoren" (so it gets
+            the same animation and correct corner clipping for free), but
+            React-controlled since the open state also drives the EFSA panel
+            mount and the button's own corner radius. */}
+        <div style={{ marginTop: "2.25rem", marginBottom: "2.25rem" }}>
+          <BsAccordionItem
+            id="efsaAccordion"
+            itemStyle={{ border: "1px solid #dee2e6" }}
+            buttonClassName="efsa-accordion-toggle p-0 d-flex align-items-stretch justify-content-between"
+            buttonStyle={
+              showHealthClaimsPanel
+                ? { borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }
+                : undefined
+            }
+            open={showHealthClaimsPanel}
+            onToggle={onShowHealthClaimsPanel}
+            header={
+              <>
+                <div
+                  className="d-flex align-items-center gap-2 ps-3"
+                  style={{ paddingTop: "0.875rem", paddingBottom: "0.875rem" }}
+                >
+                  <img
+                    src={efsaLogo}
+                    alt="EFSA"
+                    style={{ width: "1.4rem", height: "auto" }}
+                  />
+                  {showHealthClaimsPanel
+                    ? "Skjul helsepåstander"
+                    : "Beregn for helsepåstander"}
+                </div>
+                <span
+                  className="d-flex align-items-center justify-content-center px-3 efsa-accordion-icon-addon"
+                  style={{
+                    paddingTop: "0.875rem",
+                    paddingBottom: "0.875rem",
+                    borderLeft: "1px solid #dee2e6",
+                  }}
+                >
+                  <i
+                    className={`bi ${showHealthClaimsPanel ? "bi-x-lg" : "bi-plus-lg"}`}
+                  />
+                </span>
+              </>
             }
           >
-            Vis resultat
-          </button>
+            {children}
+          </BsAccordionItem>
+        </div>
+
+        {/* Validation error summary */}
+        {Object.keys(errors).length > 0 && (
+          <div className="alert alert-warning border-0 py-2">
+            Fyll inn alle næringsverdier (0 eller høyere) og velg mattype.
+          </div>
         )}
-      </div>
+
+        {/* Calculate button */}
+        <div className="d-flex flex-wrap gap-2 mt-3">
+          <button
+            type="button"
+            className="btn btn-primary"
+            style={{ padding: "10px 24px", whiteSpace: "nowrap" }}
+            onClick={handleCalculate}
+            disabled={calculating}
+          >
+            {calculating ? "Beregner…" : "Beregn"}
+          </button>
+          {hasResult && (
+            <button
+              type="button"
+              className="btn btn-outline-secondary"
+              style={{ padding: "10px 24px", whiteSpace: "nowrap" }}
+              onClick={() =>
+                document
+                  .getElementById("nutrition-result")
+                  ?.scrollIntoView({ behavior: "smooth", block: "start" })
+              }
+            >
+              Vis resultat
+            </button>
+          )}
+        </div>
+      </PanelBox>
 
       {/* Floating sample-data buttons — fixed to the viewport corner instead of
           sitting inline in the form, so they stay reachable regardless of scroll. */}
       <div
         className="d-flex flex-column gap-2"
-        style={{ position: "fixed", bottom: "1.5rem", right: "1.5rem", zIndex: 1030 }}
+        style={{
+          position: "fixed",
+          bottom: "1.5rem",
+          right: "1.5rem",
+          zIndex: 1030,
+        }}
       >
         <button
           type="button"

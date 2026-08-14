@@ -2,6 +2,7 @@ import { CLAIMS_CONFIG, type ClaimConfigEntry } from "./ClaimResult";
 import { EFSA_CLAIM_FIELDS } from "./efsaClaimFields";
 import { OTHER_SUBSTANCE_OPTIONS } from "./otherSubstanceOptions";
 import type { NutritionValues } from "./nutritionFormFields";
+import { evaluateNokkelhulletRequirements } from "./nokkelhulletEvaluation";
 
 // Reverse lookup: backend claim name string (e.g. "Lavt Fettinnhold") -> CLAIMS_CONFIG entry/key.
 export const CLAIMS_BY_NAME: Record<string, ClaimConfigEntry & { key: string }> =
@@ -33,16 +34,23 @@ export const FIELD_LABELS: Record<string, string> = {
   tilsattSalt: "Tilsatt salt",
 };
 
-// Builds "Fett: 7 g/100 g, Salt: 0.3 g/100 g" for the fields a given claim depends on.
+// Builds a natural lead-in sentence ("Produktet inneholder 3 g kostfiber per 100 g")
+// for the fields a given claim depends on, so it reads as one sentence together with
+// the claim's own met/not-met text instead of a bare "Label: value" fragment.
 export const buildClaimStatistic = (
   claimKey: string,
   nutrition: NutritionValues | null | undefined,
 ): string | null => {
   const fields = EFSA_CLAIM_FIELDS[claimKey] || [];
   if (fields.length === 0 || !nutrition) return null;
-  return fields
-    .map((f) => `${FIELD_LABELS[f] || f}: ${Number(nutrition[f]) || 0} g/100 g`)
-    .join(", ");
+  const parts = fields.map(
+    (f) => `${Number(nutrition[f]) || 0} g ${(FIELD_LABELS[f] || f).toLowerCase()}`,
+  );
+  const joined =
+    parts.length > 1
+      ? `${parts.slice(0, -1).join(", ")} og ${parts[parts.length - 1]}`
+      : parts[0];
+  return `Produktet inneholder ${joined} per 100 g`;
 };
 
 // Claims that are liquid-only or solid-only — keyed by CLAIMS_CONFIG key.
@@ -54,15 +62,27 @@ export const SOLID_ONLY_CLAIMS = new Set(["increasedHighFibre", "reducedHighFibr
 interface ResultSummaryInput {
   hasNokkelhullet?: boolean;
   efsaNutritionClaims?: string[];
+  efsaHealthClaims?: { meetsRequirement?: string }[];
+  ingredientHealthClaims?: { meetsRequirement?: string }[];
 }
 
 // Template for the summary line under the "Resultat" heading. {placeholders} are
-// swapped out with the live result data in buildResultSummary below.
+// swapped out with the live result data in buildResultSummary below. Longer/more
+// detailed than a bare pass/fail line: spells out the Nøkkelhullet requirement
+// count (like NokkelhulletSection's own breakdown) and mentions EFSA helsepåstander
+// alongside ernæringspåstander, instead of only the two-sentence summary.
 export const buildResultSummary = (
   result: ResultSummaryInput,
   foodType: string,
+  category: string,
+  nutrition: NutritionValues | null | undefined,
 ): string => {
   const nokkelhulletPassed = result.hasNokkelhullet === true;
+  const requirements = nutrition
+    ? evaluateNokkelhulletRequirements(category, nutrition)
+    : [];
+  const nokkelhulletPassedCount = requirements.filter((r) => r.passed).length;
+
   const efsaTotalCount = Object.entries(CLAIMS_CONFIG).filter(([key]) => {
     if (foodType === "solid" && LIQUID_ONLY_CLAIMS.has(key)) return false;
     if (foodType === "liquid" && SOLID_ONLY_CLAIMS.has(key)) return false;
@@ -70,9 +90,21 @@ export const buildResultSummary = (
   }).length;
   const efsaMetCount = (result.efsaNutritionClaims || []).length;
 
+  const healthClaims = [
+    ...(result.efsaHealthClaims || []),
+    ...(result.ingredientHealthClaims || []),
+  ];
+  const healthClaimsMetCount = healthClaims.filter(
+    (c) => c.meetsRequirement === "Oppfyller gitt krav",
+  ).length;
+
   return (
-    `Nøkkelhullet er ${nokkelhulletPassed ? "oppfylt" : "ikke oppfylt"} for denne kategorien. ` +
-    `${efsaMetCount} av ${efsaTotalCount} mulige EFSA-ernæringspåstander er oppfylt.`
+    `Nøkkelhullet er ${nokkelhulletPassed ? "oppfylt" : "ikke oppfylt"} for denne kategorien` +
+    (requirements.length > 0
+      ? ` (${nokkelhulletPassedCount} av ${requirements.length} krav oppfylt).`
+      : ".") +
+    ` ${efsaMetCount} av ${efsaTotalCount} mulige EFSA-ernæringspåstander er oppfylt, ` +
+    `og ${healthClaimsMetCount} EFSA-helsepåstand${healthClaimsMetCount === 1 ? "" : "er"} kan brukes for produktet.`
   );
 };
 

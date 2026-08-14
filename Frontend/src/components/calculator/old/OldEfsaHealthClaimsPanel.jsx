@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from "react";
-import CustomSelect from "../CustomSelect";
-import { OTHER_SUBSTANCE_OPTIONS } from "../../utils/calculator/otherSubstanceOptions";
-import efsaLogo from "../../assets/img/efsaLogo.png";
+import CustomSelect from "../../CustomSelect";
+import { OTHER_SUBSTANCE_OPTIONS } from "../../../utils/calculator/otherSubstanceOptions";
 
-// Not part of OtherClaimRegistry (backend) — Stivelse is its own dedicated
-// TotalStarch/ResistantStarch field pair, never sent through the `others` list,
-// so it deliberately lives outside OTHER_SUBSTANCE_OPTIONS. `inputType: "starchRatio"`
-// tells the picker to render the two-field total/resistant input instead of the
-// default single "Mengde" field; `requiresKostfiber: false` keeps it out of the
-// Kostfiber gate/budget below.
+// v2-only fork of EfsaHealthClaimsPanel.jsx — identical behaviour, the only
+// difference is the Kilde til Annet amount labels drop the "(g/100g)" suffix
+// (Totalt stivelse / Herav resistent / Mengde). v1 keeps the suffix.
 const STARCH_OPTION = {
   value: "Stivelse",
   label: "Stivelse (resistent)",
@@ -16,61 +12,33 @@ const STARCH_OPTION = {
   inputType: "starchRatio",
 };
 
-// Every selectable "Kilde til Annet" option, fibre or not — new non-fibre kilder
-// (vitamins, minerals, whatever comes next) just get added to OTHER_SUBSTANCE_OPTIONS
-// with requiresKostfiber left false and flow through the default single-field path
-// below without needing any special-casing here.
 const KILDE_OPTIONS = [STARCH_OPTION, ...OTHER_SUBSTANCE_OPTIONS];
 
-// EFSA Helsepåstander panel: Porsjonsstørrelse + the "Kilde til Annet" picker
-// (fibre substances and Stivelse). Fully self-contained — owns its own state and
-// just reports the values NutritionForm's calculation payload needs (totalStarch,
-// resistantStarch, otherSubstances, portionSize) back up via onValuesChange.
-// Calculator.jsx force-remounts this (via a changing `key`) to reset it on Nullstill.
-// It's also unmounted/remounted every time the panel is collapsed/expanded (so the
-// scroll-into-view-on-open effect below keeps firing on each open) — `initialValues`
-// is Calculator.jsx's last-reported copy of this panel's own state, fed back in so a
-// collapse/expand cycle doesn't wipe out what the user already typed.
-const EfsaHealthClaimsPanel = ({ kostfiber, initialValues, onValuesChange }) => {
-  const [hasStarch, setHasStarch] = useState(!!initialValues?.totalStarch);
-  const [totalStarch, setTotalStarch] = useState(initialValues?.totalStarch || "");
-  const [resistantStarch, setResistantStarch] = useState(
-    initialValues?.resistantStarch || "",
-  );
-  const [portionSize, setPortionSize] = useState(initialValues?.portionSize || "");
+const OldEfsaHealthClaimsPanel = ({ kostfiber, onValuesChange }) => {
+  const [hasStarch, setHasStarch] = useState(false);
+  const [totalStarch, setTotalStarch] = useState("");
+  const [resistantStarch, setResistantStarch] = useState("");
+  const [portionSize, setPortionSize] = useState("");
   const [showPortionInfo, setShowPortionInfo] = useState(false);
-  const [showEfsaInfo, setShowEfsaInfo] = useState(false);
-  const [otherSubstances, setOtherSubstances] = useState(
-    initialValues?.otherSubstances || [],
-  );
+  const [otherSubstances, setOtherSubstances] = useState([]);
   const [newSubstance, setNewSubstance] = useState(null);
   const [newSubstanceAmount, setNewSubstanceAmount] = useState("");
   const [substanceError, setSubstanceError] = useState("");
-  // Only shown once the user has actually opened the kilde picker looking for a
-  // fibre source — not by default just because Kostfiber happens to be 0.
   const [attemptedFiberPick, setAttemptedFiberPick] = useState(false);
 
   const kildeOptionByValue = new Map(KILDE_OPTIONS.map((o) => [o.value, o]));
 
   const hasFiberSource = kostfiber > 0;
-  // Only sum kilder that are actually declared as Kostfiber subsets — a future
-  // non-fibre "amount"-type kilde shouldn't count against this budget.
   const usedFiber = otherSubstances
     .filter((s) => kildeOptionByValue.get(s.name)?.requiresKostfiber)
     .reduce((sum, s) => sum + (Number(s.amount) || 0), 0);
   const fiberFullyUsed = hasFiberSource && usedFiber >= kostfiber;
 
-  // "Added" state lives in different places depending on input shape: the
-  // two-field ratio type (Stivelse) tracks itself via hasStarch, everything
-  // else lives in the generic otherSubstances array.
   const isKildeAdded = (opt) =>
     opt.inputType === "starchRatio"
       ? hasStarch
       : otherSubstances.some((s) => s.name === opt.value);
 
-  // Only options flagged requiresKostfiber get gated/removed once Kostfiber is
-  // 0 or its budget is used up — everything else (Stivelse today, whatever
-  // else gets added to Kilde til Annet later) stays selectable.
   const kildeOptions = KILDE_OPTIONS.filter((opt) => {
     if (isKildeAdded(opt)) return false;
     if (opt.requiresKostfiber && (!hasFiberSource || fiberFullyUsed))
@@ -78,8 +46,6 @@ const EfsaHealthClaimsPanel = ({ kostfiber, initialValues, onValuesChange }) => 
     return true;
   });
 
-  // If Kostfiber goes back to 0/empty, any already-picked fibre substances no
-  // longer make sense — clear them so nothing stale gets submitted.
   useEffect(() => {
     if (!hasFiberSource) {
       setOtherSubstances([]);
@@ -89,18 +55,12 @@ const EfsaHealthClaimsPanel = ({ kostfiber, initialValues, onValuesChange }) => 
     }
   }, [hasFiberSource]);
 
-  // Panel is only ever mounted while expanded (parent renders it conditionally),
-  // so scrolling into view on mount is equivalent to scrolling in on expand.
-  // block: "center" instead of "start" so the panel lands in the middle of the
-  // viewport rather than snapped to the very top, which felt like it scrolled too far.
   useEffect(() => {
     document
       .getElementById("efsa-health-panel")
-      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, []);
 
-  // Report the values NutritionForm's calculation payload needs back up to
-  // Calculator.jsx whenever any of them change.
   useEffect(() => {
     onValuesChange({
       totalStarch,
@@ -119,8 +79,6 @@ const EfsaHealthClaimsPanel = ({ kostfiber, initialValues, onValuesChange }) => 
   const handleAddSubstance = () => {
     if (!newSubstance) return;
 
-    // The ratio input shape (Stivelse today) is validated/stored separately
-    // from the generic amount-based kilder and never touches Kostfiber.
     if (newSubstance.inputType === "starchRatio") {
       if (!totalStarch) return;
       setHasStarch(true);
@@ -135,8 +93,6 @@ const EfsaHealthClaimsPanel = ({ kostfiber, initialValues, onValuesChange }) => 
     if (newSubstance.requiresKostfiber) {
       if (fiberFullyUsed) return;
 
-      // A specific fibre source can't exceed total Kostfiber — it's a subset of
-      // it, and neither can the sum of every fibre source added together.
       const otherTotal = otherSubstances
         .filter(
           (s) =>
@@ -175,15 +131,14 @@ const EfsaHealthClaimsPanel = ({ kostfiber, initialValues, onValuesChange }) => 
   return (
     <div
       id="efsa-health-panel"
-      className="px-4 py-4"
+      className="py-3 px-4"
       style={{
         backgroundColor: "#fafafa",
-        borderRadius: "0.375rem",
+        borderRadius: "0.7rem",
         borderTopLeftRadius: 0,
         borderTopRightRadius: 0,
       }}
     >
-      {/* Porsjonsstørrelse — ett felt for hele produktet, brukt av påstander som krever en oppgitt porsjon */}
       <div className="mb-3">
         <div className="d-flex align-items-center gap-2 mb-1 position-relative">
           <label htmlFor="portionSize" className="form-label mb-0">
@@ -242,18 +197,22 @@ const EfsaHealthClaimsPanel = ({ kostfiber, initialValues, onValuesChange }) => 
         )}
 
         {fiberFullyUsed && (
-          <div className="text-warning-emphasis small mb-2">
+          <div className="text-warning small mb-2">
             <i className="bi bi-exclamation-triangle me-1" />
-            All kostfiber ({kostfiber}g) er fordelt. Fjern en kilde for å
-            bytte den ut.
+            All Kostfiber ({kostfiber}g) er allerede fordelt på valgte
+            fiberkilder. Fjern en for å legge til en annen — andre typer kilder
+            kan fortsatt legges til.
           </div>
         )}
 
-        <div className="d-flex flex-wrap align-items-end gap-2">
+        <div className="d-flex flex-nowrap align-items-end gap-2">
           <div style={{ flex: "2 1 200px" }}>
             <label
               className="form-label d-block"
-              style={{ marginBottom: "0.5rem" }}
+              style={{
+                height: "1.2rem",
+                marginBottom: "0.75rem",
+              }}
             >
               Velg kilde
             </label>
@@ -276,9 +235,12 @@ const EfsaHealthClaimsPanel = ({ kostfiber, initialValues, onValuesChange }) => 
                 <label
                   htmlFor="totalStarch"
                   className="form-label d-block"
-                  style={{ marginBottom: "0.5rem" }}
+                  style={{
+                    height: "1.2rem",
+                    marginBottom: "0.75rem",
+                  }}
                 >
-                  Totalt stivelse (g/100g)
+                  Totalt stivelse
                 </label>
                 <input
                   id="totalStarch"
@@ -295,9 +257,12 @@ const EfsaHealthClaimsPanel = ({ kostfiber, initialValues, onValuesChange }) => 
                 <label
                   htmlFor="resistantStarch"
                   className="form-label d-block"
-                  style={{ marginBottom: "0.5rem" }}
+                  style={{
+                    height: "1.2rem",
+                    marginBottom: "0.75rem",
+                  }}
                 >
-                  Herav resistent (g/100g)
+                  Herav resistent
                 </label>
                 <input
                   id="resistantStarch"
@@ -315,9 +280,12 @@ const EfsaHealthClaimsPanel = ({ kostfiber, initialValues, onValuesChange }) => 
             <div style={{ flex: "1 1 150px" }}>
               <label
                 className="form-label d-block"
-                style={{ marginBottom: "0.5rem" }}
+                style={{
+                  height: "1.2rem",
+                  marginBottom: "0.75rem",
+                }}
               >
-                Mengde (g/100g)
+                Mengde
               </label>
               <input
                 type="number"
@@ -383,8 +351,10 @@ const EfsaHealthClaimsPanel = ({ kostfiber, initialValues, onValuesChange }) => 
         {(hasStarch || otherSubstances.length > 0) && (
           <div className="d-flex flex-wrap gap-2 mt-3">
             {hasStarch && (
-              <div className="d-flex align-items-stretch rounded-pill overflow-hidden">
-
+              <div
+                className="d-flex align-items-stretch rounded-pill overflow-hidden"
+                style={{ fontSize: "0.85rem" }}
+              >
                 <span
                   className="d-flex align-items-center px-3 py-1"
                   style={{
@@ -418,6 +388,7 @@ const EfsaHealthClaimsPanel = ({ kostfiber, initialValues, onValuesChange }) => 
                 <div
                   key={s.name}
                   className="d-flex align-items-stretch rounded-pill overflow-hidden"
+                  style={{ fontSize: "0.85rem" }}
                 >
                   <span
                     className="d-flex align-items-center px-3 py-1"
@@ -450,4 +421,4 @@ const EfsaHealthClaimsPanel = ({ kostfiber, initialValues, onValuesChange }) => 
   );
 };
 
-export default EfsaHealthClaimsPanel;
+export default OldEfsaHealthClaimsPanel;

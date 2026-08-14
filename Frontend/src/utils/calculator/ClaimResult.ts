@@ -27,28 +27,28 @@ export const CLAIMS_CONFIG: Record<string, ClaimConfigEntry> = {
     name: 'Høyt Fiberinnhold',
     metText: 'Dette produktet inneholder minst 6 g fiber per 100 g eller minst 3 g fiber per 100 kcal.',
     notMetLines: [
-      'Produktet må inneholde minst 6 g fiber per 100 g eller minst 3 g fiber per 100 kcal. *Husk å benytte kcal som enhet for energi.',
+      'Kravet er minst 6 g fiber per 100 g, eller minst 3 g fiber per 100 kcal (husk å bruke kcal som energienhet).',
     ],
   },
   sourceOfFibre: {
     name: 'Kostfiberkilde',
     metText: 'Dette produktet inneholder minst 3 g kostfiber per 100 g, eller minst 1,5 g kostfiber per 100 kcal.',
     notMetLines: [
-      'For å oppfylle kravet må produktet inneholde minst 3 g kostfiber per 100 g, eller minst 1,5 g kostfiber per 100 kcal.',
+      'Kravet er minst 3 g kostfiber per 100 g, eller minst 1,5 g kostfiber per 100 kcal.',
     ],
   },
   increasedHighFibre: {
     name: 'Økt innhold av høyt kostfiberinnhold',
     metText: 'Dette produktet inneholder minst 7,8 g kostfiber per 100 g, eller minst 3,9 g kostfiber per 100 kcal.',
     notMetLines: [
-      'Produktet må inneholde minst 7,8 g kostfiber per 100 g, eller minst 3,9 g kostfiber per 100 kcal. *Husk å benytte kcal som enhet for energi.',
+      'Kravet er minst 7,8 g kostfiber per 100 g, eller minst 3,9 g kostfiber per 100 kcal (husk å bruke kcal som energienhet).',
     ],
   },
   reducedHighFibre: {
     name: 'Redusert innhold av høyt kostfiberinnhold',
     metText: 'Dette produktet inneholder minst 4,2 g kostfiber per 100 g, eller minst 2,1 g kostfiber per 100 kcal.',
     notMetLines: [
-      'Produktet må inneholde minst 4,2 g kostfiber per 100 g, eller minst 2,1 g kostfiber per 100 kcal. *Husk å benytte kcal som enhet for energi.',
+      'Kravet er minst 4,2 g kostfiber per 100 g, eller minst 2,1 g kostfiber per 100 kcal (husk å bruke kcal som energienhet).',
     ],
   },
   lowSugars: {

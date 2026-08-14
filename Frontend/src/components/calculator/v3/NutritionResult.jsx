@@ -6,7 +6,7 @@ import {
   buildResultSummary,
   getEnergyMismatchWarning,
   getEnergyFormulaWarning,
-} from "../../utils/calculator/nutritionResultHelpers";
+} from "../../../utils/calculator/nutritionResultHelpers";
 
 const NutritionResult = ({
   result,

@@ -1,12 +1,12 @@
 import React from "react";
-import efsaLogoGreen from "../../../assets/img/efsaLogoGreen.png";
-import { CLAIMS_CONFIG } from "../../../utils/calculator/ClaimResult";
+import efsaLogoGreen from "../../../../assets/img/efsaLogoGreen.png";
+import { CLAIMS_CONFIG } from "../../../../utils/calculator/ClaimResult";
 import {
   CLAIMS_BY_NAME,
   buildClaimStatistic,
   LIQUID_ONLY_CLAIMS,
   SOLID_ONLY_CLAIMS,
-} from "../../../utils/calculator/nutritionResultHelpers";
+} from "../../../../utils/calculator/nutritionResultHelpers";
 import StatBox from "./StatBox";
 import SatisfiedAccordion from "./SatisfiedAccordion";
 

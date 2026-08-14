@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
-import CustomSelect from "../CustomSelect";
-import { OTHER_SUBSTANCE_OPTIONS } from "../../utils/calculator/otherSubstanceOptions";
-import efsaLogo from "../../assets/img/efsaLogo.png";
+import CustomSelect from "../../CustomSelect";
+import PanelBox from "./PanelBox";
+import LabeledUnitInput from "./LabeledUnitInput";
+import RemovablePill from "./RemovablePill";
+import { OTHER_SUBSTANCE_OPTIONS } from "../../../utils/calculator/otherSubstanceOptions";
 
 // Not part of OtherClaimRegistry (backend) — Stivelse is its own dedicated
 // TotalStarch/ResistantStarch field pair, never sent through the `others` list,
@@ -31,7 +33,7 @@ const KILDE_OPTIONS = [STARCH_OPTION, ...OTHER_SUBSTANCE_OPTIONS];
 // scroll-into-view-on-open effect below keeps firing on each open) — `initialValues`
 // is Calculator.jsx's last-reported copy of this panel's own state, fed back in so a
 // collapse/expand cycle doesn't wipe out what the user already typed.
-const EfsaHealthClaimsPanel = ({ kostfiber, initialValues, onValuesChange }) => {
+const EfsaHealthClaimsPanel = ({ kostfiber, initialValues, onValuesChange, isOpen }) => {
   const [hasStarch, setHasStarch] = useState(!!initialValues?.totalStarch);
   const [totalStarch, setTotalStarch] = useState(initialValues?.totalStarch || "");
   const [resistantStarch, setResistantStarch] = useState(
@@ -89,15 +91,21 @@ const EfsaHealthClaimsPanel = ({ kostfiber, initialValues, onValuesChange }) => 
     }
   }, [hasFiberSource]);
 
-  // Panel is only ever mounted while expanded (parent renders it conditionally),
-  // so scrolling into view on mount is equivalent to scrolling in on expand.
+  // Panel now stays mounted so the expand/collapse can animate smoothly (grid-rows
+  // transition in NutritionForm.jsx) — scroll on every transition into the open
+  // state instead of on mount. Delayed to match that 0.3s transition so it scrolls
+  // once the panel has actually grown to full height, not while it's still near 0.
   // block: "center" instead of "start" so the panel lands in the middle of the
   // viewport rather than snapped to the very top, which felt like it scrolled too far.
   useEffect(() => {
-    document
-      .getElementById("efsa-health-panel")
-      ?.scrollIntoView({ behavior: "smooth", block: "center" });
-  }, []);
+    if (!isOpen) return;
+    const timeout = setTimeout(() => {
+      document
+        .getElementById("efsa-health-panel")
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 300);
+    return () => clearTimeout(timeout);
+  }, [isOpen]);
 
   // Report the values NutritionForm's calculation payload needs back up to
   // Calculator.jsx whenever any of them change.
@@ -173,89 +181,73 @@ const EfsaHealthClaimsPanel = ({ kostfiber, initialValues, onValuesChange }) => 
   };
 
   return (
-    <div
-      id="efsa-health-panel"
-      className="px-4 py-4"
-      style={{
-        backgroundColor: "#fafafa",
-        borderRadius: "0.375rem",
-        borderTopLeftRadius: 0,
-        borderTopRightRadius: 0,
-      }}
-    >
-      {/* Porsjonsstørrelse — ett felt for hele produktet, brukt av påstander som krever en oppgitt porsjon */}
-      <div className="mb-3">
-        <div className="d-flex align-items-center gap-2 mb-1 position-relative">
-          <label htmlFor="portionSize" className="form-label mb-0">
-            Porsjonsstørrelse av produktet (g/ml)
-          </label>
-          <i
-            className="bi bi-info-circle text-muted"
-            style={{
-              cursor: "default",
-              fontSize: "1rem",
-              flexShrink: 0,
-            }}
-            onMouseEnter={() => setShowPortionInfo(true)}
-            onMouseLeave={() => setShowPortionInfo(false)}
-          />
-          {showPortionInfo && (
-            <div
-              style={{
-                position: "absolute",
-                top: "1.8rem",
-                left: 0,
-                width: "280px",
-                backgroundColor: "#fff",
-                border: "1px solid #bbb",
-                borderRadius: "4px",
-                padding: "0.75rem 1rem",
-                zIndex: 100,
-              }}
-            >
-              Dette feltet er nyttig for påstander som krever en oppgitt
-              porsjonsstørrelse (f.eks. beta-glukaner og blodsukkerrespons). Å
-              la det stå tomt påvirker ikke andre beregninger.
+    <div id="efsa-health-panel">
+      <PanelBox className="rounded-bottom" rounded={false} border={false} bg="#fff">
+        {/* Porsjonsstørrelse — same 4-column grid as the main field list, so it lines
+            up with the rest of the form even though it's the only cell in use here. */}
+        <div className="d-grid gap-3 mb-3 v3-field-grid">
+          <div style={{ position: "relative" }}>
+            <div className="d-flex align-items-center gap-2 mb-2">
+              <label htmlFor="portionSize" className="form-label mb-0 v3-label-indent">
+                Porsjonsstørrelse
+              </label>
+              <i
+                className="bi bi-info-circle text-muted"
+                style={{
+                  cursor: "default",
+                  fontSize: "1rem",
+                  flexShrink: 0,
+                }}
+                onMouseEnter={() => setShowPortionInfo(true)}
+                onMouseLeave={() => setShowPortionInfo(false)}
+              />
+              {showPortionInfo && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "1.8rem",
+                    left: 0,
+                    width: "280px",
+                    backgroundColor: "#fff",
+                    border: "1px solid #bbb",
+                    borderRadius: "4px",
+                    padding: "0.75rem 1rem",
+                    zIndex: 100,
+                  }}
+                >
+                  Dette feltet er nyttig for påstander som krever en oppgitt
+                  porsjonsstørrelse (f.eks. beta-glukaner og
+                  blodsukkerrespons). Å la det stå tomt påvirker ikke andre
+                  beregninger.
+                </div>
+              )}
             </div>
-          )}
-        </div>
-        <input
-          id="portionSize"
-          type="number"
-          min="0"
-          className="form-control"
-          style={{ maxWidth: "140px" }}
-          value={portionSize}
-          onChange={(e) => setPortionSize(e.target.value)}
-          placeholder="f.eks. 100"
-        />
-      </div>
-      <div className="border-top pt-3">
-        <div className="d-flex align-items-center mb-3">
-          <span className="fw-semibold me-2">Kilde til Annet</span>
-        </div>
-
-        {!hasFiberSource && attemptedFiberPick && (
-          <p className="text-muted mb-2" style={{ fontSize: "0.85rem" }}>
-            Kostfiber i næringstabellen er satt til 0.
-          </p>
-        )}
-
-        {fiberFullyUsed && (
-          <div className="text-warning-emphasis small mb-2">
-            <i className="bi bi-exclamation-triangle me-1" />
-            All kostfiber ({kostfiber}g) er fordelt. Fjern en kilde for å
-            bytte den ut.
+            <div className="input-group">
+              <input
+                id="portionSize"
+                type="number"
+                min="0"
+                className="form-control"
+                style={{ minWidth: 0 }}
+                value={portionSize}
+                onChange={(e) => setPortionSize(e.target.value)}
+                placeholder="f.eks. 100"
+              />
+              <span className="input-group-text">g/ml</span>
+            </div>
           </div>
-        )}
+        </div>
 
-        <div className="d-flex flex-wrap align-items-end gap-2">
-          <div style={{ flex: "2 1 200px" }}>
+        {/* Kilde til Annet — repeatable form with inline item creation: pick a kilde,
+            its fields appear, "Legg til" commits it as a pill below and resets the
+            picker back to empty so another one can be added right after. */}
+        <div className="d-grid gap-3 align-items-end mb-3 v3-field-grid">
+          <div style={{ minWidth: 0 }}>
             <label
-              className="form-label d-block"
+              className="form-label d-block v3-label-indent"
               style={{ marginBottom: "0.5rem" }}
             >
-              Velg kilde
+              Velg kilde (g/100g)
             </label>
             <CustomSelect
               options={kildeOptions}
@@ -272,71 +264,43 @@ const EfsaHealthClaimsPanel = ({ kostfiber, initialValues, onValuesChange }) => 
 
           {newSubstance?.inputType === "starchRatio" ? (
             <>
-              <div style={{ flex: "1 1 150px" }}>
-                <label
-                  htmlFor="totalStarch"
-                  className="form-label d-block"
-                  style={{ marginBottom: "0.5rem" }}
-                >
-                  Totalt stivelse (g/100g)
-                </label>
-                <input
-                  id="totalStarch"
-                  type="number"
-                  min="0"
-                  max="100"
-                  className="form-control"
-                  value={totalStarch}
-                  onChange={(e) => setTotalStarch(e.target.value)}
-                  placeholder="f.eks. 50"
-                />
-              </div>
-              <div style={{ flex: "1 1 150px" }}>
-                <label
-                  htmlFor="resistantStarch"
-                  className="form-label d-block"
-                  style={{ marginBottom: "0.5rem" }}
-                >
-                  Herav resistent (g/100g)
-                </label>
-                <input
-                  id="resistantStarch"
-                  type="number"
-                  min="0"
-                  max="100"
-                  className="form-control"
-                  value={resistantStarch}
-                  onChange={(e) => setResistantStarch(e.target.value)}
-                  placeholder="f.eks. 10"
-                />
-              </div>
+              <LabeledUnitInput
+                id="totalStarch"
+                label="Totalt stivelse"
+                unit="g"
+                max="100"
+                placeholder="f.eks. 50"
+                value={totalStarch}
+                onChange={(e) => setTotalStarch(e.target.value)}
+              />
+              <LabeledUnitInput
+                id="resistantStarch"
+                label="Herav resistent"
+                unit="g"
+                max="100"
+                placeholder="f.eks. 10"
+                value={resistantStarch}
+                onChange={(e) => setResistantStarch(e.target.value)}
+              />
             </>
           ) : (
-            <div style={{ flex: "1 1 150px" }}>
-              <label
-                className="form-label d-block"
-                style={{ marginBottom: "0.5rem" }}
-              >
-                Mengde (g/100g)
-              </label>
-              <input
-                type="number"
-                min="0"
-                className="form-control"
-                value={newSubstanceAmount}
-                onChange={(e) => {
-                  setNewSubstanceAmount(e.target.value);
-                  setSubstanceError("");
-                }}
-                placeholder="f.eks. 5"
-                disabled={newSubstance?.requiresKostfiber && fiberFullyUsed}
-              />
-            </div>
+            <LabeledUnitInput
+              label="Mengde"
+              unit="g"
+              placeholder="f.eks. 5"
+              value={newSubstanceAmount}
+              onChange={(e) => {
+                setNewSubstanceAmount(e.target.value);
+                setSubstanceError("");
+              }}
+              disabled={newSubstance?.requiresKostfiber && fiberFullyUsed}
+            />
           )}
 
           <button
             type="button"
-            className="btn btn-primary btn-legg-til flex-shrink-0 d-flex align-items-center gap-1"
+            className="btn btn-outline-primary btn-legg-til d-flex align-items-center justify-content-center gap-2"
+            style={{ whiteSpace: "nowrap" }}
             onClick={handleAddSubstance}
             disabled={
               !newSubstance ||
@@ -345,11 +309,26 @@ const EfsaHealthClaimsPanel = ({ kostfiber, initialValues, onValuesChange }) => 
                 : !newSubstanceAmount ||
                   (newSubstance.requiresKostfiber && fiberFullyUsed))
             }
+            title="Legg til i beregning"
           >
             <i className="bi bi-plus-lg" />
-            Legg til
+            Legg til i beregning
           </button>
         </div>
+
+        {!hasFiberSource && attemptedFiberPick && (
+          <p className="text-muted mb-2" style={{ fontSize: "0.85rem" }}>
+            Kostfiber i næringstabellen er satt til 0.
+          </p>
+        )}
+
+        {fiberFullyUsed && (
+          <div className="text-warning-emphasis small mb-2">
+            <i className="bi bi-exclamation-triangle me-1" />
+            All kostfiber ({kostfiber}g) er fordelt. Fjern en kilde for å
+            bytte den ut.
+          </div>
+        )}
 
         {newSubstance?.inputType === "starchRatio" &&
           Number(resistantStarch) > Number(totalStarch) && (
@@ -363,51 +342,23 @@ const EfsaHealthClaimsPanel = ({ kostfiber, initialValues, onValuesChange }) => 
           <div className="text-danger small mt-2">{substanceError}</div>
         )}
 
-        {newSubstance?.inputType === "starchRatio" && (
-          <p className="mt-1 mb-0 text-muted" style={{ fontSize: "0.8rem" }}>
-            Kun relevant hvis fordøyelig stivelse er erstattet med resistent
-            stivelse. Påstanden krever at resistent stivelse utgjør minst 14 %
-            av total stivelse.
-          </p>
-        )}
-
         {["Beta-glucans", "Barley beta-glucans", "Oat beta-glucan"].includes(
           newSubstance?.value,
         ) && (
           <p className="mt-1 mb-0 text-muted" style={{ fontSize: "0.8rem" }}>
-            Bruker porsjonsstørrelsen øverst i panelet — uten den kan ikke denne
-            påstanden beregnes.
+            Porsjonsstørrelsen øverst i panelet trengs for å beregne
+            fiberinnholdet denne fiberpåstanden er basert på.
           </p>
         )}
 
         {(hasStarch || otherSubstances.length > 0) && (
-          <div className="d-flex flex-wrap gap-2 mt-3">
+          <div className="d-flex flex-wrap gap-2 pt-2">
             {hasStarch && (
-              <div className="d-flex align-items-stretch rounded-pill overflow-hidden">
-
-                <span
-                  className="d-flex align-items-center px-3 py-1"
-                  style={{
-                    backgroundColor: "#f1f1f1",
-                    color: "#333",
-                  }}
-                >
-                  Stivelse — {totalStarch}g totalt, {resistantStarch || 0}g
-                  resistent
-                </span>
-                <button
-                  type="button"
-                  className="d-flex align-items-center justify-content-center border-0 px-2"
-                  style={{
-                    backgroundColor: "#dc3545",
-                    color: "#fff",
-                  }}
-                  onClick={() => handleRemoveSubstance("Stivelse")}
-                  aria-label="Fjern Stivelse"
-                >
-                  <i className="bi bi-x-lg" style={{ fontSize: "0.7rem" }} />
-                </button>
-              </div>
+              <RemovablePill
+                label={`Stivelse: ${totalStarch}g totalt, ${resistantStarch || 0}g resistent`}
+                onRemove={() => handleRemoveSubstance("Stivelse")}
+                ariaLabel="Fjern Stivelse"
+              />
             )}
 
             {otherSubstances.map((s) => {
@@ -415,37 +366,17 @@ const EfsaHealthClaimsPanel = ({ kostfiber, initialValues, onValuesChange }) => 
                 OTHER_SUBSTANCE_OPTIONS.find((o) => o.value === s.name)
                   ?.label || s.name;
               return (
-                <div
+                <RemovablePill
                   key={s.name}
-                  className="d-flex align-items-stretch rounded-pill overflow-hidden"
-                >
-                  <span
-                    className="d-flex align-items-center px-3 py-1"
-                    style={{
-                      backgroundColor: "#f1f1f1",
-                      color: "#333",
-                    }}
-                  >
-                    {label} — {s.amount}g
-                  </span>
-                  <button
-                    type="button"
-                    className="d-flex align-items-center justify-content-center border-0 px-2"
-                    style={{
-                      backgroundColor: "#dc3545",
-                      color: "#fff",
-                    }}
-                    onClick={() => handleRemoveSubstance(s.name)}
-                    aria-label={`Fjern ${label}`}
-                  >
-                    <i className="bi bi-x-lg" style={{ fontSize: "0.7rem" }} />
-                  </button>
-                </div>
+                  label={`${label}: ${s.amount}g`}
+                  onRemove={() => handleRemoveSubstance(s.name)}
+                  ariaLabel={`Fjern ${label}`}
+                />
               );
             })}
           </div>
         )}
-      </div>
+      </PanelBox>
     </div>
   );
 };

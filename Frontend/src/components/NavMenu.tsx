@@ -50,12 +50,16 @@ const NavMenu: React.FC = () => {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link as={Link} to="/" className="nav-link-custom">
-              Hjem
-            </Nav.Link>
-            <Nav.Link as={Link} to="/products" className="nav-link-custom">
-              Produkter
-            </Nav.Link>
+            {location.pathname !== "/products/calculator-v3" && (
+              <>
+                <Nav.Link as={Link} to="/" className="nav-link-custom">
+                  Hjem
+                </Nav.Link>
+                <Nav.Link as={Link} to="/products" className="nav-link-custom">
+                  Produkter
+                </Nav.Link>
+              </>
+            )}
             {/*<Nav.Link as={Link} to="/calculator">Calculator</Nav.Link>*/}
           </Nav>
           <Nav className="ms-auto">

@@ -26,46 +26,43 @@ const NutritionFieldGrid = ({
   calculatedNutrition,
   onFieldChange,
 }) => (
-  <div className="d-flex flex-wrap gap-2">
-    {/* Energy field — unit toggle sits beside the label. Every label below
-        reserves the same height (LABEL_ROW_HEIGHT) so this taller label doesn't
-        push its input out of line with the rest of the fields. */}
-    <div style={{ flex: "1 1 auto" }}>
+  <div className="d-grid gap-2 mt-1 nutrition-field-grid">
+    {/* Energy field — unit toggle sits beside the input as one joined group
+        (input grows, toggle stays compact) instead of in the label. Every label
+        below reserves the same height (LABEL_ROW_HEIGHT) so this label stays
+        aligned with the rest of the fields. */}
+    <div style={{ minWidth: 0 }}>
       <label
-        className="form-label mb-1 d-flex align-items-center gap-2"
+        className="form-label mb-1 fw-medium"
         style={{ whiteSpace: "nowrap", height: LABEL_ROW_HEIGHT }}
       >
-        Energi
-        <div className="btn-group btn-group-sm" role="group">
-          <button
-            type="button"
-            className={`btn ${energyUnit === "energikcal" ? "btn-primary" : "btn-outline-secondary"}`}
-            onClick={() => onEnergyUnitChange("energikcal")}
-          >
-            kcal
-          </button>
-          <button
-            type="button"
-            className={`btn ${energyUnit === "energikj" ? "btn-primary" : "btn-outline-secondary"}`}
-            onClick={() => onEnergyUnitChange("energikj")}
-          >
-            kJ
-          </button>
-        </div>
+        Energi (kcal/kJ)
       </label>
-      <input
-        type="number"
-        min="0"
-        className={`form-control ${errors.energy ? "is-invalid" : ""}`}
-        style={{ width: "100%", maxWidth: "400px" }}
-        placeholder={energyUnit === "energikcal" ? "f.eks. 250" : "f.eks. 1050"}
-        value={
-          energyUnit === "energikcal"
-            ? nutrition.energikcal
-            : nutrition.energikj
-        }
-        onChange={(e) => onFieldChange(energyUnit, e.target.value)}
-      />
+      <div className="input-group" style={{ width: "100%" }}>
+        <input
+          type="number"
+          min="0"
+          className={`form-control ${errors.energy ? "is-invalid" : ""}`}
+          placeholder={
+            energyUnit === "energikcal" ? "f.eks. 250" : "f.eks. 1050"
+          }
+          value={
+            energyUnit === "energikcal"
+              ? nutrition.energikcal
+              : nutrition.energikj
+          }
+          onChange={(e) => onFieldChange(energyUnit, e.target.value)}
+        />
+        <select
+          className="form-select flex-grow-0 flex-shrink-0"
+          style={{ width: "4.5rem" }}
+          value={energyUnit}
+          onChange={(e) => onEnergyUnitChange(e.target.value)}
+        >
+          <option value="energikcal">kcal</option>
+          <option value="energikj">kJ</option>
+        </select>
+      </div>
     </div>
 
     {/* All other nutrition fields — only ones relevant to Nøkkelhullet or EFSA for this category */}
@@ -77,9 +74,9 @@ const NutritionFieldGrid = ({
           calculatedNutrition != null &&
           isFieldFailing(key, category, calculatedNutrition);
         return (
-          <div key={key} style={{ flex: "1 1 auto" }}>
+          <div key={key} style={{ minWidth: 0 }}>
             <label
-              className="form-label mb-1 d-flex align-items-center"
+              className="form-label mb-1 fw-medium d-flex align-items-center"
               style={{ whiteSpace: "nowrap", height: LABEL_ROW_HEIGHT }}
             >
               {label} ({unit})
@@ -121,13 +118,7 @@ const NutritionFieldGrid = ({
               type="number"
               min="0"
               className={`form-control ${errors[key] ? "is-invalid" : ""}`}
-              style={{
-                width: "100%",
-                maxWidth: "400px",
-                ...(nokFail && !errors[key]
-                  ? { borderColor: "#dc3545", borderWidth: "2px" }
-                  : {}),
-              }}
+              style={{ width: "100%" }}
               placeholder={placeholder}
               value={nutrition[key]}
               onChange={(e) => onFieldChange(key, e.target.value)}

@@ -30,12 +30,24 @@ const HomePage = () => {
             matvareprodukt møter krav for Nøkkelhullsmerking, EFSA Næringspåstander og EFSA Helsepåstander.
           </p>
         </div>
-        <div className="button-div col-md-4">
+        <div className="button-div col-md-4 d-flex flex-column gap-2">
           <NavLink
             to="/products/calculator"
             className="btn btn-primary btn-lg button-search"
           >
-            Gå til webkalkulatoren
+            Gå til webkalkulator 1
+          </NavLink>
+          <NavLink
+            to="/products/calculator-v2"
+            className="btn btn-primary btn-lg button-search"
+          >
+            Gå til webkalkulator 2
+          </NavLink>
+          <NavLink
+            to="/products/calculator-v3"
+            className="btn btn-primary btn-lg button-search"
+          >
+            Gå til webkalkulator 3
           </NavLink>
         </div>
       </div>

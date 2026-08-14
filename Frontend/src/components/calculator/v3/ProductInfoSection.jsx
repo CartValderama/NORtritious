@@ -1,19 +1,20 @@
 import React from "react";
-import CustomSelect from "../CustomSelect";
-import { GROUP_OPTIONS } from "../../utils/calculator/categoryOptions";
+import CustomSelect from "../../CustomSelect";
+import PanelBox from "./PanelBox";
+import { GROUP_OPTIONS } from "../../../utils/calculator/categoryOptions";
 
 const FOOD_TYPE_OPTIONS = [
   { value: "solid", label: "Fast form" },
   { value: "liquid", label: "Flytende form" },
 ];
 
-// "Legg inn næringsinnhold" — product name/image plus the matvaregruppe → matkategori
-// → undermatkategori (fragment) → undermatkategori (ration) selector cascade, and the
-// mattype (solid/liquid) selector. Category state itself still lives in Calculator.jsx's
-// single useCalculatorState() call (it's needed elsewhere — e.g. the NutritionForm
-// remount key), so this component just renders the fields against props/setters passed
-// down, plus reports category changes up via onCategoryChange so the parent can clear
-// any stale calculation result.
+// v3 fork of ../ProductInfoSection.jsx — product name/image plus the matvaregruppe →
+// matkategori → undermatkategori (fragment) → undermatkategori (ration) selector
+// cascade, and the mattype (solid/liquid) selector. Category state itself still lives
+// in CalculatorV3.jsx's single useCalculatorState() call (it's needed elsewhere — e.g.
+// the NutritionForm remount key), so this component just renders the fields against
+// props/setters passed down, plus reports category changes up via onCategoryChange so
+// the parent can clear any stale calculation result.
 const ProductInfoSection = ({
   product,
   setProduct,
@@ -34,16 +35,18 @@ const ProductInfoSection = ({
   onResetHealthClaimsPanel,
 }) => (
   <div>
-    <h2 className="mb-3">Legg inn næringsinnhold</h2>
-    <p className="text-muted mb-3" style={{ maxWidth: "800px" }}>
-      Fyll ut produktinformasjonen og næringsverdiene under for å beregne
-      Nøkkelhullet og eventuelle EFSA-påstander.
-    </p>
-
-    {/* Row 1: product name + image */}
-    <div className="row g-2 mb-2">
+    <PanelBox>
+      {/* Header removed for now, and intro paragraph removed — replaced by the calculator
+          explanation at the top of CalculatorV3.jsx instead.
+      <p className="text-muted mb-3" style={{ maxWidth: "800px" }}>
+        Fyll ut produktinformasjonen og næringsverdiene under for å beregne
+        Nøkkelhullet og eventuelle EFSA-påstander.
+      </p>
+      */}
+      {/* Row 1: product name + image */}
+      <div className="row g-3 mb-3">
       <div className="col-12 col-md-6">
-        <label htmlFor="name" className="form-label">
+        <label htmlFor="name" className="form-label v3-label-indent">
           Matvarenavn:
         </label>
         <input
@@ -57,7 +60,7 @@ const ProductInfoSection = ({
         />
       </div>
       <div className="col-12 col-md-6">
-        <label htmlFor="image" className="form-label">
+        <label htmlFor="image" className="form-label v3-label-indent">
           Last opp profilbilde:
         </label>
         <input
@@ -82,9 +85,9 @@ const ProductInfoSection = ({
     </div>
 
     {/* Row 2: selectors */}
-    <div className="row g-2">
+    <div className="row g-3">
       <div className="col-12 col-md">
-        <label className="form-label">Matvaregruppe:</label>
+        <label className="form-label v3-label-indent">Matvaregruppe:</label>
         <CustomSelect
           placeholder={<div>Velg matvaregruppe</div>}
           className="form-select-md"
@@ -102,7 +105,7 @@ const ProductInfoSection = ({
       </div>
 
       <div className="col-12 col-md">
-        <label className="form-label">Matkategori:</label>
+        <label className="form-label v3-label-indent">Matkategori:</label>
         <CustomSelect
           key={selectsGroup}
           placeholder={<div>Velg mat</div>}
@@ -124,7 +127,7 @@ const ProductInfoSection = ({
 
       {fragmentOptions.length > 0 && (
         <div className="col-12 col-md">
-          <label className="form-label">
+          <label className="form-label v3-label-indent">
             <strong>Undermatkategori</strong>
           </label>
           <CustomSelect
@@ -142,7 +145,7 @@ const ProductInfoSection = ({
 
       {rationOptions.length > 0 && (
         <div className="col-12 col-md">
-          <label className="form-label">
+          <label className="form-label v3-label-indent">
             <strong>Undermatkategori</strong>
           </label>
           <CustomSelect
@@ -159,7 +162,7 @@ const ProductInfoSection = ({
       )}
 
       <div className="col-12 col-md">
-        <label htmlFor="foodType" className="form-label">
+        <label htmlFor="foodType" className="form-label v3-label-indent">
           Velg type matvare:
         </label>
         <CustomSelect
@@ -172,7 +175,8 @@ const ProductInfoSection = ({
           <div className="text-danger small mt-1">Velg mattype</div>
         )}
       </div>
-    </div>
+      </div>
+    </PanelBox>
   </div>
 );
 

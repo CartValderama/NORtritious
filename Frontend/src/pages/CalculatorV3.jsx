@@ -1,13 +1,19 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import Breadcrumb from "react-bootstrap/Breadcrumb";
+import BsAccordionItem from "../components/calculator/v3/BsAccordionItem";
 import "../css/Calculator.css";
 import * as ProductService from "../services/productService";
-import ProductButtons from "../components/calculator/ProductButtons";
-import NutritionForm from "../components/calculator/NutritionForm";
-import NutritionResult from "../components/calculator/NutritionResult";
-import EfsaHealthClaimsPanel from "../components/calculator/EfsaHealthClaimsPanel";
-import ProductInfoSection from "../components/calculator/ProductInfoSection";
+import NutritionForm from "../components/calculator/v3/NutritionForm";
+import NutritionResult from "../components/calculator/v3/NutritionResult";
+import EfsaHealthClaimsPanel from "../components/calculator/v3/EfsaHealthClaimsPanel";
+import ProductInfoSection from "../components/calculator/v3/ProductInfoSection";
 import { useCalculatorState } from "../utils/calculator/useCalculatorState";
 
+// v3 — starts as an exact copy of v1 (Calculator.jsx + its component tree, forked
+// into components/calculator/v3/), so it can diverge from v1 independently, same
+// pattern as v2's "old" fork. Reuses the same shared hook/backend logic either way —
+// never duplicate calculation logic itself.
 const EMPTY_EFSA_VALUES = {
   totalStarch: "",
   resistantStarch: "",
@@ -15,7 +21,7 @@ const EMPTY_EFSA_VALUES = {
   portionSize: "",
 };
 
-const Calculator = () => {
+const CalculatorV3 = () => {
   const {
     selectsGroup,
     setSelectGroups,
@@ -34,7 +40,6 @@ const Calculator = () => {
     product,
     setProduct,
     nutrition,
-    isCalculationCompleted,
     handleChange,
     handleNutritionChange,
     handleCalculationComplete,
@@ -121,26 +126,100 @@ const Calculator = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="d-flex flex-column flex-grow-1">
-      <div className="row justify-content-between mb-4">
-        <div className="col-lg-9">
+    <div className="d-flex flex-column flex-grow-1 gap-3">
+      <Breadcrumb className="mb-0">
+        <Breadcrumb.Item linkAs={Link} linkProps={{ to: "/" }}>
+          Hjem
+        </Breadcrumb.Item>
+        <Breadcrumb.Item linkAs={Link} linkProps={{ to: "/products" }}>
+          Produkter
+        </Breadcrumb.Item>
+        <Breadcrumb.Item active>Kalkulator</Breadcrumb.Item>
+      </Breadcrumb>
+
+      <div className="row justify-content-between">
+        <div>
           <h1>Mulige ernærings- og helsepåstander</h1>
+          {/* Removed for now — replaced with a plain explanation of the tool below.
           <p className="mt-2" style={{ maxWidth: "800px" }}>
             Fyll inn ernæringsverdiene og trykk "beregn" for å se resultatet.
             Hold musepekeren over et feilikon for å se hvorfor et krav ikke er
             oppfylt. EFSA-påstander genereres automatisk basert på verdiene og
             eventuelle tilleggsstoffer du legger til.
           </p>
+          */}
+          <p className="mt-3 mb-1" style={{ lineHeight: 1.7 }}>
+            Denne kalkulatoren hjelper deg å sjekke om et matprodukt kan merkes
+            med Nøkkelhullet og hvilke EFSA-godkjente ernærings- og
+            helsepåstander det kan bruke, basert på næringsinnholdet du legger
+            inn.
+          </p>
         </div>
-
-        <ProductButtons
-          showSubmitButton={isCalculationCompleted}
-          onSubmit={handleSubmit}
-        />
       </div>
 
+      {/* ── How to use the calculator ─────────────────────────────────────── */}
+      <BsAccordionItem
+        id="howToUseAccordion"
+        itemClassName="rounded-4"
+        itemStyle={{ backgroundColor: "#fafafa", border: "1px solid #f2f2f2" }}
+        buttonClassName="fs-6 how-to-use-toggle p-4"
+        header={
+          <>
+            <i className="bi bi-question-circle me-2" />
+            Hvordan bruke kalkulatoren
+          </>
+        }
+      >
+        <div className="accordion-body p-4" style={{ backgroundColor: "#fafafa" }}>
+          <ol className="mb-0 ps-0" style={{ listStyle: "none" }}>
+            <li className="d-flex align-items-center gap-2 mb-2">
+              <i
+                className="bi bi-1-circle-fill flex-shrink-0"
+                style={{ color: "#0d6efd", fontSize: "1.25rem" }}
+              />
+              <span>
+                Velg matvaregruppe, matkategori og eventuelle
+                undermatkategorier.
+              </span>
+            </li>
+            <li className="d-flex align-items-center gap-2 mb-2">
+              <i
+                className="bi bi-2-circle-fill flex-shrink-0"
+                style={{ color: "#0d6efd", fontSize: "1.25rem" }}
+              />
+              <span>Velg mattype (fast eller flytende form).</span>
+            </li>
+            <li className="d-flex align-items-center gap-2 mb-2">
+              <i
+                className="bi bi-3-circle-fill flex-shrink-0"
+                style={{ color: "#0d6efd", fontSize: "1.25rem" }}
+              />
+              <span>Fyll inn næringsinnholdet per 100 g/ml.</span>
+            </li>
+            <li className="d-flex align-items-center gap-2 mb-2">
+              <i
+                className="bi bi-4-circle-fill flex-shrink-0"
+                style={{ color: "#0d6efd", fontSize: "1.25rem" }}
+              />
+              <span>
+                Slå på bryteren «Vil du også beregne helsepåstander?» dersom
+                du også vil sjekke EFSA-påstander, og fyll inn
+                tilleggsfeltene som dukker opp.
+              </span>
+            </li>
+            <li className="d-flex align-items-center gap-2">
+              <i
+                className="bi bi-5-circle-fill flex-shrink-0"
+                style={{ color: "#0d6efd", fontSize: "1.25rem" }}
+              />
+              <span>Trykk «Beregn» for å se resultatet.</span>
+            </li>
+          </ol>
+        </div>
+      </BsAccordionItem>
+
       {/* ── Top: product info ─────────────────────────────────────────────── */}
-      <div className="mb-4">
+      <div>
         <ProductInfoSection
           product={product}
           setProduct={setProduct}
@@ -165,9 +244,9 @@ const Calculator = () => {
         />
       </div>
 
-      {/* ── Bottom: nutrition form, then EFSA conditions stacked below ───── */}
-      <div className="row g-4 mb-5 flex-grow-1">
-        <div className="col-12 d-flex flex-column">
+      {/* ── Bottom: form left, results right, stacking on narrow viewports. ─── */}
+      <div className="d-flex flex-wrap flex-grow-1 gap-5">
+        <div className="d-flex flex-column" style={{ flex: "1 1 auto" }}>
           <NutritionForm
             key={`${selectsGroup}|${selectsProduct}|${selectsFragment}|${selectsRation}`}
             category={categoryKey}
@@ -189,29 +268,30 @@ const Calculator = () => {
             portionSize={efsaValues.portionSize}
             onResetAll={handleResetAll}
           >
-            {showHealthClaimsPanel && (
-              <EfsaHealthClaimsPanel
-                key={efsaResetKey}
-                kostfiber={Number(nutrition.kostfiber) || 0}
-                initialValues={efsaValues}
-                onValuesChange={setEfsaValues}
-              />
-            )}
+            <EfsaHealthClaimsPanel
+              key={efsaResetKey}
+              isOpen={showHealthClaimsPanel}
+              kostfiber={Number(nutrition.kostfiber) || 0}
+              initialValues={efsaValues}
+              onValuesChange={setEfsaValues}
+            />
           </NutritionForm>
         </div>
-      </div>
 
-      <div id="nutrition-result">
-        <NutritionResult
-          result={result}
-          category={categoryKey}
-          nutrition={resultNutrition}
-          foodType={foodType}
-          showHealthClaimsPanel={showHealthClaimsPanel}
-        />
+        {categoryKey && foodType && (
+          <div id="nutrition-result" style={{ flex: "1 1 350px", minWidth: 0 }}>
+            <NutritionResult
+              result={result}
+              category={categoryKey}
+              nutrition={resultNutrition}
+              foodType={foodType}
+              showHealthClaimsPanel={showHealthClaimsPanel}
+            />
+          </div>
+        )}
       </div>
-    </form>
+    </div>
   );
 };
 
-export default Calculator;
+export default CalculatorV3;

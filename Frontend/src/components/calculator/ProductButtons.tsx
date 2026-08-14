@@ -22,6 +22,7 @@ const ProductButtons: React.FC<ProductButtonsProps> = ({
             id="lagreProduktDropdown"
             data-bs-toggle="dropdown"
             aria-expanded="false"
+            style={{ padding: "10px 24px", whiteSpace: "nowrap" }}
           >
             <FontAwesomeIcon
               icon={faSave}
@@ -104,6 +105,7 @@ const ProductButtons: React.FC<ProductButtonsProps> = ({
             id="delProduktDropdown"
             data-bs-toggle="dropdown"
             aria-expanded="false"
+            style={{ padding: "10px 24px", whiteSpace: "nowrap" }}
           >
             <FontAwesomeIcon
               icon={faShare}

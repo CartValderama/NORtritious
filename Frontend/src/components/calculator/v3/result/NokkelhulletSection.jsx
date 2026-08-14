@@ -1,6 +1,6 @@
 import React from "react";
-import keyholeLogo from "../../../assets/img/new_resized_image_1.png";
-import { evaluateNokkelhulletRequirements } from "../../../utils/calculator/nokkelhulletEvaluation";
+import keyholeLogo from "../../../../assets/img/new_resized_image_1.png";
+import { evaluateNokkelhulletRequirements } from "../../../../utils/calculator/nokkelhulletEvaluation";
 import StatBox from "./StatBox";
 import SatisfiedAccordion from "./SatisfiedAccordion";
 
