@@ -5,7 +5,6 @@ import {
   Navigate,
   useLocation,
 } from "react-router-dom";
-import Container from "react-bootstrap/Container";
 import NavMenu from "./components/NavMenu";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/login";
