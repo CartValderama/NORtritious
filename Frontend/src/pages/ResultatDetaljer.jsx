@@ -18,9 +18,10 @@ import keyholeLogo from "../assets/img/new_resized_image_1.png";
 import efsaLogoGreen from "../assets/img/efsaLogoGreen.png";
 import efsaLogo from "../assets/img/efsaLogo.png";
 
-const StatBox = ({ passed, title, statLine, children }) => {
-  const color = passed ? "#0f5132" : "#343a40";
-  const bg = passed ? "#f0faf1" : "#fafafa";
+const StatBox = ({ passed, neutral, title, statLine, children }) => {
+  const green = passed && !neutral;
+  const color = green ? "#0f5132" : "#343a40";
+  const bg = green ? "#f0faf1" : "#fafafa";
 
   return (
     <div
@@ -51,7 +52,19 @@ const StatBox = ({ passed, title, statLine, children }) => {
   );
 };
 
-const SatisfiedAccordion = ({ label, items, renderItem, logo }) => {
+const StatusIcon = ({ passed }) => (
+  <span
+    className={`d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0 ${passed ? "bg-success" : "bg-danger"}`}
+    style={{ width: "1.4rem", height: "1.4rem" }}
+  >
+    <i
+      className={`bi ${passed ? "bi-check-lg" : "bi-x-lg"} text-white`}
+      style={{ fontSize: "0.75rem" }}
+    />
+  </span>
+);
+
+const SatisfiedAccordion = ({ label, items, renderItem, logo, passed = true }) => {
   const [expanded, setExpanded] = useState(false);
   if (items.length === 0) return null;
 
@@ -68,11 +81,33 @@ const SatisfiedAccordion = ({ label, items, renderItem, logo }) => {
       <div className="d-flex align-items-center justify-content-between">
         <span className="fw-bold d-flex align-items-center gap-2">
           {logo && (
-            <img
-              src={logo}
-              alt=""
-              style={{ width: "1.5rem", height: "auto" }}
-            />
+            <span
+              className="position-relative d-inline-flex align-items-center justify-content-center flex-shrink-0"
+              style={{ width: "1.5rem", height: "1.5rem" }}
+            >
+              <img src={logo} alt="" style={{ width: "1.5rem", height: "auto" }} />
+              {!passed && (
+                <span
+                  className="position-absolute top-50 start-50 translate-middle rounded-circle"
+                  style={{
+                    width: "1.7rem",
+                    height: "1.7rem",
+                    border: "3px solid #dc3545",
+                    boxSizing: "border-box",
+                  }}
+                >
+                  <span
+                    className="position-absolute top-50 start-50"
+                    style={{
+                      width: "100%",
+                      height: "3px",
+                      backgroundColor: "#dc3545",
+                      transform: "translate(-50%, -50%) rotate(-45deg)",
+                    }}
+                  />
+                </span>
+              )}
+            </span>
           )}
           {label} ({items.length})
         </span>
@@ -85,19 +120,10 @@ const SatisfiedAccordion = ({ label, items, renderItem, logo }) => {
           {items.map((item, i) => (
             <div
               key={i}
-              className="p-3 rounded d-flex align-items-start gap-2"
+              className="p-3 rounded"
               style={{ backgroundColor: "rgba(255,255,255,0.6)" }}
             >
-              <span
-                className="d-inline-flex align-items-center justify-content-center rounded-circle bg-success flex-shrink-0"
-                style={{ width: "1.4rem", height: "1.4rem" }}
-              >
-                <i
-                  className="bi bi-check-lg text-white"
-                  style={{ fontSize: "0.75rem" }}
-                />
-              </span>
-              <div>{renderItem(item)}</div>
+              {renderItem(item, passed)}
             </div>
           ))}
         </div>
@@ -217,6 +243,12 @@ const NokkelhulletDetail = ({ data }) => {
   const failed = hasNokkelhullet === false;
   const failedReqs = requirements.filter((r) => !r.passed);
   const passedReqs = requirements.filter((r) => r.passed);
+  const isMixed = failedReqs.length > 0 && passedReqs.length > 0;
+  const visibleReqs = isMixed
+    ? passedReqs
+    : failedReqs.length > 0
+      ? failedReqs
+      : passedReqs;
   const passedFraction =
     requirements.length > 0
       ? (passedReqs.length / requirements.length) * 100
@@ -277,23 +309,30 @@ const NokkelhulletDetail = ({ data }) => {
           )}
         </div>
 
-        {(failedReqs.length > 0 ? failedReqs : passedReqs).map((req) => (
-          <StatBox key={req.key} passed={req.passed} title={req.nutrient}>
+        {visibleReqs.map((req) => (
+          <StatBox
+            key={req.key}
+            passed={req.passed}
+            neutral={isMixed}
+            title={req.nutrient}
+          >
             {buildRequirementDetail(req)}
           </StatBox>
         ))}
 
-        {failedReqs.length > 0 && (
+        {isMixed && (
           <SatisfiedAccordion
-            label="Krav som er oppfylt"
+            label="Krav som ikke er oppfylt"
             logo={keyholeLogo}
-            items={passedReqs}
-            renderItem={(req) => (
+            items={failedReqs}
+            passed={false}
+            renderItem={(req, passed) => (
               <>
-                <div>
+                <div className="d-flex align-items-center gap-2">
+                  <StatusIcon passed={passed} />
                   <span className="fw-bold">{req.nutrient}</span>
                 </div>
-                <div>{buildRequirementDetail(req)}</div>
+                <div className="mt-2">{buildRequirementDetail(req)}</div>
               </>
             )}
           />
@@ -316,6 +355,12 @@ const EfsaNutritionDetail = ({ data }) => {
 
   const unmetClaims = claims.filter((c) => !c.met);
   const metClaims = claims.filter((c) => c.met);
+  const isMixed = unmetClaims.length > 0 && metClaims.length > 0;
+  const visibleClaims = isMixed
+    ? metClaims
+    : unmetClaims.length > 0
+      ? unmetClaims
+      : metClaims;
   const metCount = metClaims.length;
   const metFraction = claims.length > 0 ? (metCount / claims.length) * 100 : 0;
   const efsaOverallPassed = unmetClaims.length === 0;
@@ -375,31 +420,31 @@ const EfsaNutritionDetail = ({ data }) => {
           )}
         </div>
 
-        {(unmetClaims.length > 0 ? unmetClaims : metClaims).map(
-          ({ name, cfg, met }) => {
-            const statistic = buildClaimStatistic(cfg.key, nutrition);
-            return (
-              <StatBox key={name} passed={met} title={cfg.name}>
-                {statistic ? `${statistic}. ` : ""}
-                {buildClaimDetailText(cfg, met)}
-              </StatBox>
-            );
-          },
-        )}
+        {visibleClaims.map(({ name, cfg, met }) => {
+          const statistic = buildClaimStatistic(cfg.key, nutrition);
+          return (
+            <StatBox key={name} passed={met} neutral={isMixed} title={cfg.name}>
+              {statistic ? `${statistic}. ` : ""}
+              {buildClaimDetailText(cfg, met)}
+            </StatBox>
+          );
+        })}
 
-        {unmetClaims.length > 0 && (
+        {isMixed && (
           <SatisfiedAccordion
-            label="Påstander som er oppfylt"
+            label="Påstander som ikke er oppfylt"
             logo={efsaLogoGreen}
-            items={metClaims}
-            renderItem={({ cfg, met }) => {
+            items={unmetClaims}
+            passed={false}
+            renderItem={({ cfg, met }, passed) => {
               const statistic = buildClaimStatistic(cfg.key, nutrition);
               return (
                 <>
-                  <div>
+                  <div className="d-flex align-items-center gap-2">
+                    <StatusIcon passed={passed} />
                     <span className="fw-bold">{cfg.name}</span>
                   </div>
-                  <div>
+                  <div className="mt-2">
                     {statistic ? `${statistic}. ` : ""}
                     {buildClaimDetailText(cfg, met)}
                   </div>
@@ -489,7 +534,7 @@ const ResultatDetaljer = () => {
     <div style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}>
       <div className="container py-5" style={{ maxWidth: "900px" }}>
         <div className="mb-3">
-          <h1 className="fs-2 fw-bold mb-2">Resultatdetaljer</h1>
+          <h1 className="fs-2 mb-2">Resultatdetaljer</h1>
           <p className="text-muted mb-0">
             Full oversikt over kravene og påstandene fra beregningen du kom fra.
           </p>
