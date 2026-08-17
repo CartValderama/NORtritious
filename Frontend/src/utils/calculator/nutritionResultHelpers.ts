@@ -279,14 +279,33 @@ const claimTone = (passedCount: number, totalCount: number): "pass" | "fail" | "
 export const claimColors = (passedCount: number, totalCount: number): ClaimToneColors =>
   CLAIM_TONE_COLORS[claimTone(passedCount, totalCount)];
 
-// Full success just states the count that's good, a mix (or all failed) breaks
-// it down into oppfylt/ikke oppfylt so both numbers are visible at a glance
-// without opening the accordion.
-export const claimBadgeText = (passedCount: number, totalCount: number): string | null => {
-  if (totalCount === 0) return null;
-  return passedCount === totalCount
-    ? `${totalCount} oppfylt`
-    : `${passedCount} oppfylt, ${totalCount - passedCount} ikke oppfylt`;
+export interface ClaimBadge {
+  text: string;
+  backgroundColor: string;
+  color: string;
+}
+
+// Full success (or full failure) is a single badge in the matching tone; a mix
+// splits into two badges — one green with the passed count, one red with the
+// failed count — so both numbers are visible at a glance without opening the
+// accordion, and without a text label repeating what the color already says.
+export const claimBadges = (passedCount: number, totalCount: number): ClaimBadge[] => {
+  if (totalCount === 0) return [];
+  const pass = CLAIM_TONE_COLORS.pass;
+  const fail = CLAIM_TONE_COLORS.fail;
+
+  if (passedCount === totalCount)
+    return [{ text: `${totalCount}`, backgroundColor: pass.badgeBg, color: pass.badgeColor }];
+  if (passedCount === 0)
+    return [{ text: `${totalCount}`, backgroundColor: fail.badgeBg, color: fail.badgeColor }];
+  return [
+    { text: `${passedCount}`, backgroundColor: pass.badgeBg, color: pass.badgeColor },
+    {
+      text: `${totalCount - passedCount}`,
+      backgroundColor: fail.badgeBg,
+      color: fail.badgeColor,
+    },
+  ];
 };
 
 // Helsepåstander only ever lists claims that qualify (no "failed" list to

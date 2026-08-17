@@ -10,7 +10,7 @@ const ResultAccordionSection = ({
   open,
   onToggle,
   colors,
-  badgeText,
+  badges,
   children,
 }) => {
   useScrollIntoViewOnOpen(id, open);
@@ -38,15 +38,20 @@ const ResultAccordionSection = ({
           style={{ width: "1.75rem", height: "auto", marginRight: "0.75rem" }}
         />
         {title}
-        {badgeText && (
-          <AccordionBadge
-            style={{
-              backgroundColor: colors.badgeBg,
-              color: colors.badgeColor,
-            }}
-          >
-            {badgeText}
-          </AccordionBadge>
+        {badges && badges.length > 0 && (
+          <div className="ms-auto d-flex align-items-center gap-2">
+            {badges.map((badge, index) => (
+              <AccordionBadge
+                key={index}
+                style={{
+                  backgroundColor: badge.backgroundColor,
+                  color: badge.color,
+                }}
+              >
+                {badge.text}
+              </AccordionBadge>
+            ))}
+          </div>
         )}
       </Accordion.Header>
       <Accordion.Body>

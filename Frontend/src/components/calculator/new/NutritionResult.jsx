@@ -20,7 +20,7 @@ import {
   getEnergyMismatchWarning,
   getEnergyFormulaWarning,
   claimColors,
-  claimBadgeText,
+  claimBadges,
   healthClaimsColors,
   getNokkelhulletPercentage,
   getEfsaPercentage,
@@ -221,7 +221,7 @@ const NutritionResult = () => {
             open={nokkelhulletOpen}
             onToggle={() => setNokkelhulletOpen((o) => !o)}
             colors={nokkelhulletColors}
-            badgeText={claimBadgeText(
+            badges={claimBadges(
               stats.nokkelhulletPassedCount,
               stats.nokkelhulletTotalCount,
             )}
@@ -236,7 +236,7 @@ const NutritionResult = () => {
             open={efsaOpen}
             onToggle={() => setEfsaOpen((o) => !o)}
             colors={efsaColors}
-            badgeText={claimBadgeText(stats.efsaMetCount, stats.efsaTotalCount)}
+            badges={claimBadges(stats.efsaMetCount, stats.efsaTotalCount)}
           >
             <EfsaSection
               result={result}
@@ -253,7 +253,13 @@ const NutritionResult = () => {
               open={healthClaimsOpen}
               onToggle={() => setHealthClaimsOpen((o) => !o)}
               colors={healthClaimsColorSet}
-              badgeText={`${stats.healthClaimsMetCount} funnet`}
+              badges={[
+                {
+                  text: `${stats.healthClaimsMetCount} funnet`,
+                  backgroundColor: healthClaimsColorSet.badgeBg,
+                  color: healthClaimsColorSet.badgeColor,
+                },
+              ]}
             >
               <HealthClaimsSection result={result} />
             </ResultAccordionSection>

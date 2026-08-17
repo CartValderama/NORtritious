@@ -12,7 +12,7 @@ const OverviewCard = ({ children }) => (
     className="rounded-2 bg-white d-flex flex-column text-center flex-grow-1"
     style={{
       border: "1px solid rgba(0, 0, 0, 0.06)",
-      boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.04)",
+      boxShadow: "0 1px 2px rgba(0, 0, 0, 0.03)",
       flexBasis: 0,
       minWidth: "200px",
     }}

@@ -285,14 +285,6 @@ const NutritionForm = () => {
                     variant="menuItem"
                     className="px-3 py-2"
                     style={{ textDecoration: "none", whiteSpace: "nowrap" }}
-                    onClick={() => setShowSettingsMenu(false)}
-                  >
-                    Dummy-alternativ
-                  </Button>
-                  <Button
-                    variant="menuItem"
-                    className="px-3 py-2"
-                    style={{ textDecoration: "none", whiteSpace: "nowrap" }}
                     onClick={() => {
                       handleFillSample("pass");
                       setShowSettingsMenu(false);
