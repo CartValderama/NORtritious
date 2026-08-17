@@ -154,7 +154,7 @@ const ProfilePage: React.FC = () => {
 
   return (
     // Main Account profile container
-    <div className="container">
+    <div className="container py-4">
       <h1 className="h1">Konto</h1>
 
       <div className="row">

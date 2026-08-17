@@ -42,7 +42,7 @@ const NavMenu: React.FC = () => {
     }
   };
   return (
-    <Navbar bg="light" expand="lg" className="navbar-custom mb3">
+    <Navbar bg="white" expand="lg" className="navbar-custom mb3">
       <Container className="d-flex justify-content-between align-items-center">
         <Navbar.Brand as={Link} to="/" className="d-flex align-items-center gap-2">
           <span className="fw-semibold fs-5">NORtritious</span>
@@ -50,7 +50,7 @@ const NavMenu: React.FC = () => {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            {location.pathname !== "/products/calculator-v3" && (
+            {location.pathname !== "/products/calculator-new" && (
               <>
                 <Nav.Link as={Link} to="/" className="nav-link-custom">
                   Hjem

@@ -62,15 +62,6 @@ export const createProduct = async (product: any) => {
     */
   return handleResponse(response);
 };
-// Put update item
-export const updateProduct = async (productId: number, product: any) => {
-  const response = await axios.put(
-    `${API_URL}/api/products/${productId}`,
-    product,
-    { withCredentials: true }
-  );
-  return handleResponse(response);
-};
 // Delete item
 export const deleteProduct = async (productId: number): Promise<boolean> => {
   try {
@@ -92,9 +83,9 @@ export const deleteProduct = async (productId: number): Promise<boolean> => {
   }
 };
 
-// Upload a product's image — used from the calculator pages (Calculator.jsx,
-// CalculatorUpdate.jsx) when saving/updating a product, but the endpoint itself is
-// a product operation, so it lives here rather than in calculatorService.
+// Upload a product's image — used from the calculator pages when saving a
+// product, but the endpoint itself is a product operation, so it lives here
+// rather than in calculatorService.
 export const uploadProductImage = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append("file", file);
@@ -116,4 +107,51 @@ export const deleteProductImage = async (imageUrl: string): Promise<void> => {
     data: { imageUrl },
     withCredentials: true,
   });
+};
+
+// Distinguishes which step of saveProductWithImage failed, so callers can
+// show the right message (and know whether the product itself was saved).
+export class ProductSaveError extends Error {
+  stage: "upload" | "save";
+  cause?: unknown;
+
+  constructor(stage: "upload" | "save", cause?: unknown) {
+    super(stage === "upload" ? "Image upload failed" : "Product save failed");
+    this.stage = stage;
+    this.cause = cause;
+  }
+}
+
+// Uploads the image (if given) then creates the product with that image's
+// URL. If create fails after an image was already uploaded, cleans up the
+// orphaned image before rethrowing, so a failed save doesn't leave a
+// dangling upload behind.
+export const saveProductWithImage = async (
+  product: any,
+  image: File | null,
+): Promise<void> => {
+  let imageUrl = "";
+  if (image) {
+    try {
+      imageUrl = await uploadProductImage(image);
+    } catch (error) {
+      throw new ProductSaveError("upload", error);
+    }
+  }
+
+  try {
+    await createProduct({ ...product, imageUrl });
+  } catch (error) {
+    if (imageUrl) {
+      try {
+        await deleteProductImage(imageUrl);
+      } catch (deleteError: any) {
+        console.error(
+          "Failed to delete orphaned image:",
+          deleteError.response?.data || deleteError.message,
+        );
+      }
+    }
+    throw new ProductSaveError("save", error);
+  }
 };

@@ -4,9 +4,11 @@ export interface ClaimConfigEntry {
   notMetLines: string[];
 }
 
-// Scoped to energy + fiber claims for now (mirrors CheckEfsaNutritionClaims in
-// CalculatorService.cs). The other claims (fat, sugar, protein, sodium, light/lite)
-// are recoverable from git history if that scope expands again.
+// Exactly 7 claims in active use (mirrors CheckEfsaNutritionClaims in
+// CalculatorService.cs) — energy, plain fibre (no increased/reduced
+// variants), and sugar. The other claims (fat, protein, sodium, light/lite,
+// plus the fibre variants) are recoverable from git history if that scope
+// expands again.
 export const CLAIMS_CONFIG: Record<string, ClaimConfigEntry> = {
   lowEnergy: {
     name: 'Lavt Energiinnhold',
@@ -18,9 +20,9 @@ export const CLAIMS_CONFIG: Record<string, ClaimConfigEntry> = {
   },
   energyFree: {
     name: 'Energifri',
-    metText: 'Dette produktet inneholder høyst 4 kcal / 17 kJ per 100 ml.',
+    metText: 'Dette produktet inneholder høyst 4 kcal / 17 kJ per 100 g.',
     notMetLines: [
-      'Energinivået må være høyst 4 kcal / 17 kJ per 100 ml. Denne påstanden gjelder bare for næringsmidler i flytende form.',
+      'Energinivået må være høyst 4 kcal / 17 kJ per 100 g.',
     ],
   },
   highFibre: {
@@ -37,26 +39,19 @@ export const CLAIMS_CONFIG: Record<string, ClaimConfigEntry> = {
       'Kravet er minst 3 g kostfiber per 100 g, eller minst 1,5 g kostfiber per 100 kcal.',
     ],
   },
-  increasedHighFibre: {
-    name: 'Økt innhold av høyt kostfiberinnhold',
-    metText: 'Dette produktet inneholder minst 7,8 g kostfiber per 100 g, eller minst 3,9 g kostfiber per 100 kcal.',
-    notMetLines: [
-      'Kravet er minst 7,8 g kostfiber per 100 g, eller minst 3,9 g kostfiber per 100 kcal (husk å bruke kcal som energienhet).',
-    ],
-  },
-  reducedHighFibre: {
-    name: 'Redusert innhold av høyt kostfiberinnhold',
-    metText: 'Dette produktet inneholder minst 4,2 g kostfiber per 100 g, eller minst 2,1 g kostfiber per 100 kcal.',
-    notMetLines: [
-      'Kravet er minst 4,2 g kostfiber per 100 g, eller minst 2,1 g kostfiber per 100 kcal (husk å bruke kcal som energienhet).',
-    ],
-  },
   lowSugars: {
     name: 'Lavt sukkerinnhold',
     metText: 'Dette produktet inneholder høyst 5 g sukkerarter per 100 g (fast form) eller høyst 2,5 g per 100 ml (flytende form).',
     notMetLines: [
       'For faste næringsmidler må sukkerinnholdet være høyst 5 g per 100 g.',
       'For flytende næringsmidler må sukkerinnholdet være høyst 2,5 g per 100 ml.',
+    ],
+  },
+  sugarsFree: {
+    name: 'Sukkerfri',
+    metText: 'Dette produktet inneholder høyst 5 g sukkerarter per 100 g eller 100 ml.',
+    notMetLines: [
+      'Kravet er høyst 5 g sukkerarter per 100 g eller 100 ml.',
     ],
   },
   withNoAddedSugars: {

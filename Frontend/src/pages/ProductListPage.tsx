@@ -150,7 +150,7 @@ const ProductListPage: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="container">
       <h1>Produkter</h1>
       <Button
         variant="outline-primary"
@@ -182,7 +182,7 @@ const ProductListPage: React.FC = () => {
         )}
       </Button>
       <Link
-        to="/products/calculator"
+        to="/products/calculator-old"
         className="btn btn-secondary mb-3 me-2"
         style={{ backgroundColor: "darkblue" }}
       >

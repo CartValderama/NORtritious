@@ -45,7 +45,7 @@ const ProductDetails = () => {
 
   return (
     <>
-      <div className="container">
+      <div className="container py-4">
         <div className="row">
           <p>Breadcrumbs</p>
         </div>

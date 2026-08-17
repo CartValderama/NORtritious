@@ -74,6 +74,30 @@ export function getCategoryKey(
   );
 }
 
+// Backend category key (e.g. "Kategori1", "Melk11a") -> full legal definition
+// label, built once from the dropdown option lists. Used by the reference
+// pages that list every category (not just the one currently selected).
+export function getAllCategoryLabels(): Record<string, string> {
+  const labelsByValue: Record<string, string> = {};
+  for (const options of [
+    ...Object.values(PRODUCT_OPTIONS_BY_GROUP),
+    ...Object.values(FRAGMENT_OPTIONS),
+    ...Object.values(RATION_OPTIONS),
+  ]) {
+    for (const { value, label } of options) {
+      labelsByValue[value] = label;
+    }
+  }
+
+  const labelsByKey: Record<string, string> = {};
+  for (const [value, key] of Object.entries(CATEGORY_KEY_MAP)) {
+    if (labelsByValue[value]) {
+      labelsByKey[key] = labelsByValue[value];
+    }
+  }
+  return labelsByKey;
+}
+
 // ── Group options (level 1) ──────────────────────────────────────────────────
 export const GROUP_OPTIONS: CategoryOption[] = [
   { value: "grønnsaker, frukt, bær og nøtter",                          label: "Grønnsaker, frukt, bær og nøtter" },

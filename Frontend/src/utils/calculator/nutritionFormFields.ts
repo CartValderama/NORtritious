@@ -1,5 +1,6 @@
 import { kategorier, nokkelhulletThresholds } from "./kravNokkelhullet";
 import { EFSA_CLAIM_FIELDS } from "./efsaClaimFields";
+import type { CalculatorRequestPayload } from "../../services/calculatorService";
 
 // Nutrition-table field values, as held by the form (always strings — they come
 // straight from <input> elements) and passed down to the result views afterwards.
@@ -263,3 +264,76 @@ export const getNokkelhulletFailureMessage = (
       return "";
   }
 };
+
+export type NutritionFormErrors = Record<string, boolean>;
+
+// Validates NutritionForm's fields before a calculation is submitted — every
+// relevant field must be filled with a non-negative number, energy must be a
+// positive number, and resistant starch can't exceed total starch. Doesn't
+// include the onFoodTypeErrorChange side effect the caller also needs to
+// fire — that's a prop callback, not part of the pure validation result.
+export const validateNutritionForm = (
+  foodType: string,
+  energyUnit: string,
+  nutrition: NutritionValues,
+  category: string,
+  resistantStarch: string,
+  totalStarch: string,
+): NutritionFormErrors => {
+  const errs: NutritionFormErrors = {};
+  if (!foodType) errs.foodType = true;
+  const energyVal =
+    energyUnit === "energikcal" ? nutrition.energikcal : nutrition.energikj;
+  if (energyVal === "" || Number(energyVal) <= 0) errs.energy = true;
+  NUTRITION_FIELDS.filter(({ key }) => isFieldRelevant(key, category)).forEach(
+    ({ key }) => {
+      if (nutrition[key] === "" || Number(nutrition[key]) < 0) errs[key] = true;
+    },
+  );
+  if (Number(resistantStarch) > Number(totalStarch)) errs.resistantStarch = true;
+  return errs;
+};
+
+// Maps NutritionForm's local form state (all strings, straight from <input>
+// elements) to the numeric payload shape calculateNutrition sends the backend.
+export const buildCalculationPayload = (
+  category: string,
+  foodType: string,
+  energyUnit: string,
+  portionSize: string,
+  nutrition: NutritionValues,
+  totalStarch: string,
+  resistantStarch: string,
+  otherSubstances: { name: string; amount: string | number }[],
+): CalculatorRequestPayload => ({
+  category,
+  foodType,
+  energyUnit,
+  portionSize: Number(portionSize) || 0,
+  nutrition: {
+    energyKcal: Number(nutrition.energikcal) || 0,
+    energyKj: Number(nutrition.energikj) || 0,
+    fat: Number(nutrition.fett),
+    saturatedFat: Number(nutrition.mettede),
+    transFat: Number(nutrition.transfett) || 0,
+    carbs: Number(nutrition.karbohydrat),
+    naturalSugars: ZERO_SUGAR_CATEGORIES.has(category)
+      ? 0
+      : Number(nutrition.naturligSukker),
+    addedSugars: ZERO_SUGAR_CATEGORIES.has(category)
+      ? 0
+      : Number(nutrition.hvoravSukkerarter),
+    fibre: Number(nutrition.kostfiber),
+    protein: Number(nutrition.protein),
+    salt:
+      (Number(nutrition.naturligSalt) || 0) +
+      (Number(nutrition.tilsattSalt) || 0),
+    addedSalt: Number(nutrition.tilsattSalt) || 0,
+    totalStarch: Number(totalStarch) || 0,
+    resistantStarch: Number(resistantStarch) || 0,
+  },
+  others: (otherSubstances || []).map((s) => ({
+    name: s.name,
+    amount: Number(s.amount) || 0,
+  })),
+});

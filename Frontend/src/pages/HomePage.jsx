@@ -20,7 +20,7 @@ const HomePage = () => {
   ];
 
   return (
-    <div className="vstack gap-3 container">
+    <div className="vstack gap-3 container py-4">
 
       <div className="row">
         <h3>Registrer ny matvare</h3>
@@ -32,22 +32,16 @@ const HomePage = () => {
         </div>
         <div className="button-div col-md-4 d-flex flex-column gap-2">
           <NavLink
-            to="/products/calculator"
+            to="/products/calculator-old"
             className="btn btn-primary btn-lg button-search"
           >
-            Gå til webkalkulator 1
+            Gå til webkalkulator (gammel)
           </NavLink>
           <NavLink
-            to="/products/calculator-v2"
+            to="/products/calculator-new"
             className="btn btn-primary btn-lg button-search"
           >
-            Gå til webkalkulator 2
-          </NavLink>
-          <NavLink
-            to="/products/calculator-v3"
-            className="btn btn-primary btn-lg button-search"
-          >
-            Gå til webkalkulator 3
+            Gå til webkalkulator (ny)
           </NavLink>
         </div>
       </div>

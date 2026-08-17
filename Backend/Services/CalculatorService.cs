@@ -223,22 +223,22 @@ namespace Backend.Services
             if (n.EnergyKcal == 0 && n.EnergyKj == 0)
                 return new List<string>();
 
-            // Scoped to energy- and fiber-related claims only for now — the other
-            // predicates below (fat, sugar, protein, sodium, light/lite) are kept
-            // for when that scope expands again, just not surfaced here yet.
+            // Exactly 7 claims in active use — energy, fibre (plain High/Source
+            // only, no increased/reduced variants) and sugar. Everything else
+            // below is kept but disabled for when scope expands again.
             var passing = new List<string>();
 
             if (ClaimLowEnergy(n, foodType, energyUnit))          passing.Add("Lavt Energiinnhold");
-            if (ClaimEnergyFree(foodType, energyUnit, n))         passing.Add("Energifri");
+            if (ClaimEnergyFree(energyUnit, n))                   passing.Add("Energifri");
             if (ClaimHighFibre(foodType, energyUnit, n))          passing.Add("Høyt Fiberinnhold");
             if (ClaimSourceOfFibre(energyUnit, n))                passing.Add("Kostfiberkilde");
-            if (ClaimIncreasedHighFibre(foodType, energyUnit, n)) passing.Add("Økt innhold av høyt kostfiberinnhold");
-            if (ClaimReducedHighFibre(foodType, energyUnit, n))   passing.Add("Redusert innhold av høyt kostfiberinnhold");
             if (ClaimLowSugars(foodType, n.NaturalSugars, n.AddedSugars)) passing.Add("Lavt sukkerinnhold");
             if (ClaimSugarsFree(n.NaturalSugars, n.AddedSugars))          passing.Add("Sukkerfri");
             if (ClaimWithNoAddedSugars(n.Carbs, n.AddedSugars))           passing.Add("Uten tilsatt sukker");
 
             // Uncomment each line below to enable the corresponding claim:
+            // if (ClaimIncreasedHighFibre(foodType, energyUnit, n))            passing.Add("Økt innhold av høyt kostfiberinnhold");
+            // if (ClaimReducedHighFibre(foodType, energyUnit, n))              passing.Add("Redusert innhold av høyt kostfiberinnhold");
             // if (ClaimLowFat(foodType, n.Fat))                                passing.Add("Lavt fettinnhold");
             // if (ClaimFatFree(n.Fat))                                         passing.Add("Fettfri");
             // if (ClaimLowSaturatedFat(foodType, energyUnit, n))               passing.Add("Lavt innhold av mettet fett");
@@ -262,13 +262,13 @@ namespace Backend.Services
             return liquid ? n.EnergyKj <= 80 : n.EnergyKj <= 170;
         }
 
-        // EFSA Annex only defines "energy-free" per 100 ml — there's no solid-food
-        // variant, so this claim never applies to foodType "solid".
-        private static bool ClaimEnergyFree(string foodType, string energyUnit, NutritionInputDTO n)
-        {
-            if (foodType != "liquid") return false;
-            return energyUnit == "energikcal" ? n.EnergyKcal <= 4 : n.EnergyKj <= 17;
-        }
+        // "≤4 kcal (17 kJ) per 100 g" — applies the same way regardless of
+        // foodType (confirmed against the source regulation text; no
+        // solid/liquid split like ClaimLowEnergy has). The table-top-sweetener
+        // sub-clause (≤0.4 kcal per portion, ~6g sucrose) isn't implemented —
+        // this calculator has no "table-top sweetener" product category.
+        private static bool ClaimEnergyFree(string energyUnit, NutritionInputDTO n) =>
+            energyUnit == "energikcal" ? n.EnergyKcal <= 4 : n.EnergyKj <= 17;
 
         private static bool ClaimLowFat(string foodType, decimal fat) =>
             foodType == "solid" ? fat <= 3 : fat <= 1.5m;
@@ -301,8 +301,11 @@ namespace Backend.Services
             return foodType == "solid" ? total <= 5 : total <= 2.5m;
         }
 
+        // NOTE: EU Regulation 1924/2006 Annex actually sets this threshold at
+        // <=0.5g per 100g/100ml — 5g here is a deliberate override per product
+        // owner request, not the legal text. Flag if that was unintentional.
         private static bool ClaimSugarsFree(decimal naturalSugars, decimal addedSugars) =>
-            naturalSugars + addedSugars <= 0.5m;
+            naturalSugars + addedSugars <= 5m;
 
         private static bool ClaimWithNoAddedSugars(decimal carbs, decimal addedSugars) =>
             carbs > 0 && addedSugars == 0;
@@ -544,7 +547,7 @@ namespace Backend.Services
             return new HealthClaimResultDTO
             {
                 Nutrient = "Stivelse",
-                Amount = $"{n.ResistantStarch} g resistent stivelse av {n.TotalStarch} g total stivelse ({pct:0.#} %)",
+                Amount = $"{n.ResistantStarch} g resistent stivelse av {n.TotalStarch} g total stivelse",
                 MeetsRequirement = pct >= 14m ? "Oppfyller gitt krav" : "Oppfyller ikke gitt krav",
                 Naeringsmiddel = claim.NutrientSubstFood,
                 Pastand = claim.Claim,

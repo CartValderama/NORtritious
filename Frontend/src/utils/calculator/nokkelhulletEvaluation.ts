@@ -126,3 +126,18 @@ export const evaluateNokkelhulletRequirements = (
     } ${r.thresholdValue} ${r.unit}.`,
   }));
 };
+
+const comparatorWord = (comparator: string): string =>
+  comparator === "≤" ? "høyst" : "minst";
+const directionLabel = (req: NokkelhulletRequirement): string =>
+  req.comparator === "≤" ? "for høyt" : "for lavt";
+
+// Title says *how* a requirement failed (too high / too low) instead of showing the raw
+// comparator symbol; the actual numbers only appear in the natural-language description.
+export const buildRequirementTitle = (req: NokkelhulletRequirement): string =>
+  req.passed ? req.nutrient : `${req.nutrient} (${directionLabel(req)})`;
+
+export const buildRequirementDetail = (req: NokkelhulletRequirement): string =>
+  `Produktet inneholder ${req.actualValue} ${req.unit}, ${
+    req.passed ? "som oppfyller kravet om" : "men kravet er"
+  } ${comparatorWord(req.comparator)} ${req.thresholdValue} ${req.unit}.`;

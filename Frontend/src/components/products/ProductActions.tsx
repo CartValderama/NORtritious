@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button, ButtonGroup, Modal } from "react-bootstrap";
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 interface ProductActionsProps {
   productId: number;
@@ -35,15 +35,6 @@ const ProductActions: React.FC<ProductActionsProps> = ({
   return (
     <>
       <ButtonGroup className="mb-2">
-        <Button
-          as={Link as any}
-          to={`/products/calculatorUpdate/${productId}`}
-          variant="outline-primary"
-          aria-label="Rediger produkt"
-          size={sm ? "sm" : undefined}
-        >
-          <i className="bi bi-pencil-square" aria-hidden="true"></i>
-        </Button>
         <Button
           onClick={handleDeleteClick}
           variant="outline-danger"

@@ -14,6 +14,7 @@ export const EFSA_CLAIM_FIELDS: Record<string, string[]> = {
   reducedHighFibre: ["kostfiber"],
   // Sugars
   lowSugars: ["naturligSukker", "hvoravSukkerarter"],
+  sugarsFree: ["naturligSukker", "hvoravSukkerarter"],
   withNoAddedSugars: ["hvoravSukkerarter"],
   // Fat
   lowFat: ["fett"],
