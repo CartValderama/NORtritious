@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Backend.Models;
+using Backend.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http.HttpResults;
 
@@ -9,24 +10,39 @@ public class AccountRepository : IAccountRepository
 {
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly ITokenService _tokenService;
     private readonly ApplicationDbContext _db;
     private readonly ILogger<AccountRepository> _logger;
 
-    public AccountRepository(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ApplicationDbContext db, ILogger<AccountRepository> logger)
+    public AccountRepository(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ITokenService tokenService, ApplicationDbContext db, ILogger<AccountRepository> logger)
     {
         _userManager = userManager;
         _signInManager = signInManager;
+        _tokenService = tokenService;
         _db = db;
         _logger = logger;
     }
 
-    public async Task<SignInResult> LoginAsync(string email, string password)
+    // Validates credentials and issues a JWT on success. Uses CheckPasswordSignInAsync
+    // (not PasswordSignInAsync) so no auth cookie is set — the frontend and backend live
+    // on different Railway subdomains, so a cross-site cookie gets silently dropped by
+    // browsers with third-party cookie blocking enabled. A bearer token sidesteps that.
+    public async Task<Backend.Models.LoginResult> LoginAsync(string email, string password)
     {
-        var result = await _signInManager.PasswordSignInAsync(email, password, isPersistent: false, lockoutOnFailure: true);
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user == null)
+        {
+            _logger.LogWarning("Invalid login attempt for user {email}.", email);
+            return new Backend.Models.LoginResult(SignInResult.Failed, null);
+        }
+
+        var result = await _signInManager.CheckPasswordSignInAsync(user, password, lockoutOnFailure: true);
 
         if (result.Succeeded)
         {
             _logger.LogInformation("User {email} successfully signed in.", email);
+            var token = await _tokenService.GenerateTokenAsync(user);
+            return new Backend.Models.LoginResult(result, token);
         }
         else if (result.IsLockedOut)
         {
@@ -41,7 +57,7 @@ public class AccountRepository : IAccountRepository
             _logger.LogWarning("Invalid login attempt for user {email}.", email);
         }
 
-        return result;
+        return new Backend.Models.LoginResult(result, null);
     }
 
     public async Task LogoutAsync()

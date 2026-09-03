@@ -1,5 +1,4 @@
-import axios from "axios";
-import API_URL from "../apiConfig";
+import httpClient from "./httpClient";
 
 const handleResponse = async (response: any) => {
   if (response.status >= 200 && response.status < 300) {
@@ -18,15 +17,12 @@ const handleResponse = async (response: any) => {
 // Get itemlist
 // Not currently used (see fetchMyProducts), but can be used to fetch all products
 export const fetchProducts = async () => {
-  const response = await axios.get(`${API_URL}/api/products`, {
-    withCredentials: true,
-  });
+  const response = await httpClient.get("/api/products");
   return handleResponse(response);
 };
 // Get item by id
 export const fetchProductById = async (productId: string) => {
-  const response = await axios.get(`${API_URL}/api/products/${productId}`, {
-    withCredentials: true,
+  const response = await httpClient.get(`/api/products/${productId}`, {
     headers: {
       'Content-Type': 'application/json',
   }
@@ -35,8 +31,7 @@ export const fetchProductById = async (productId: string) => {
 };
 
 export const fetchMyProducts = async () => {
-  const response = await axios.get(`${API_URL}/api/products/my-products`, {
-    withCredentials: true,
+  const response = await httpClient.get("/api/products/my-products", {
     headers: {
       'Content-Type': 'application/json',
   },
@@ -46,9 +41,7 @@ export const fetchMyProducts = async () => {
 
 // Post create item
 export const createProduct = async (product: any) => {
-  const response = await axios.post(`${API_URL}/api/products`, product, {
-    withCredentials: true,
-  });
+  const response = await httpClient.post("/api/products", product);
 
   if (response.status === 401) {
     const error = new Error("Unauthorized") as any;
@@ -65,12 +58,7 @@ export const createProduct = async (product: any) => {
 // Delete item
 export const deleteProduct = async (productId: number): Promise<boolean> => {
   try {
-    const response = await axios.delete(
-      `${API_URL}/api/products/${productId}`,
-      {
-        withCredentials: true,
-      }
-    );
+    const response = await httpClient.delete(`/api/products/${productId}`);
 
     if (response.status === 204) {
       return true; // Return true if deletion was successful (status 204)
@@ -89,12 +77,11 @@ export const deleteProduct = async (productId: number): Promise<boolean> => {
 export const uploadProductImage = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append("file", file);
-  const response = await axios.post(
-    `${API_URL}/api/products/upload-product-image`,
+  const response = await httpClient.post(
+    "/api/products/upload-product-image",
     formData,
     {
       headers: { "Content-Type": "multipart/form-data" },
-      withCredentials: true,
     },
   );
   return response.data.imageUrl;
@@ -103,9 +90,8 @@ export const uploadProductImage = async (file: File): Promise<string> => {
 // Cleans up an orphaned image (e.g. the product save/update itself failed after
 // the image had already been uploaded).
 export const deleteProductImage = async (imageUrl: string): Promise<void> => {
-  await axios.delete(`${API_URL}/api/products/delete-product-image`, {
+  await httpClient.delete("/api/products/delete-product-image", {
     data: { imageUrl },
-    withCredentials: true,
   });
 };
 

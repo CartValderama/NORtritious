@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using Backend.DAL;
 using Backend.DAL.Seed;
@@ -8,6 +10,7 @@ using Backend.Services;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Serilog;
 using Serilog.Events;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,6 +56,9 @@ builder.Services.AddSingleton<IEuHealthClaimsService, EuHealthClaimsService>();
 // Add Calculator
 builder.Services.AddSingleton<CalculatorService>();
 
+// Add JWT token issuing service
+builder.Services.AddScoped<ITokenService, TokenService>();
+
 // Add IdentityDbContext with SQLite
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -82,45 +88,34 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
-// Configure application cookie behavior to ensure a 401 on unauthorized api calls
-builder.Services.ConfigureApplicationCookie(options =>
+// API auth uses a JWT bearer token instead of the Identity cookie. The frontend and
+// backend live on different Railway subdomains (different registrable "sites" for
+// cookie purposes), so a cross-site auth cookie gets silently dropped by browsers with
+// third-party cookie blocking enabled (Safari ITP by default, Chrome/Edge when the user
+// or an org policy has it on). A bearer token has no such browser-side cookie policy to
+// fight, since the frontend attaches it itself on every request.
+var jwtSection = builder.Configuration.GetSection("Jwt");
+var jwtKey = jwtSection["Key"]
+    ?? throw new InvalidOperationException("Jwt:Key configuration is missing. Set it via appsettings or the Jwt__Key environment variable.");
+
+builder.Services.AddAuthentication(options =>
 {
-    options.Events.OnRedirectToLogin = context =>
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        // Handle unauthenticated requests
-        if (context.Request.Path.StartsWithSegments("/api"))
-        {
-            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            return Task.CompletedTask;
-        }
-
-        context.Response.Redirect(context.RedirectUri);
-        return Task.CompletedTask;
+        ValidateIssuer = true,
+        ValidIssuer = jwtSection["Issuer"],
+        ValidateAudience = true,
+        ValidAudience = jwtSection["Audience"],
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.FromMinutes(2),
     };
-
-    options.Events.OnRedirectToAccessDenied = context =>
-    {
-        // Handle unauthorized requests (authenticated but insufficient permissions)
-        if (context.Request.Path.StartsWithSegments("/api"))
-        {
-            context.Response.StatusCode = StatusCodes.Status403Forbidden;
-            return Task.CompletedTask;
-        }
-
-        context.Response.Redirect(context.RedirectUri);
-        return Task.CompletedTask;
-    };
-
-    // Cookie configuration for session security and expiration
-    options.Cookie.HttpOnly = true;
-    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
-        ? CookieSecurePolicy.SameAsRequest
-        : CookieSecurePolicy.Always;
-    options.Cookie.SameSite = builder.Environment.IsDevelopment()
-        ? SameSiteMode.Lax
-        : SameSiteMode.None;
-    options.Cookie.Name = "FremtidsmatSession";  // You can rename the cookie if needed
-    options.ExpireTimeSpan = TimeSpan.FromDays(14);  // Cookie expiration (e.g., 14 days)
 });
 
 // Add EmailSender

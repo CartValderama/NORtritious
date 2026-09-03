@@ -1,5 +1,4 @@
-import axios from "axios";
-import API_URL from "../apiConfig";
+import httpClient from "./httpClient";
 
 // The exact shape NutritionForm.jsx builds from its local nutrition state —
 // deliberately left loose (not importing NutritionValues) since this is the
@@ -30,10 +29,6 @@ export interface CalculatorRequestPayload {
 }
 
 export const calculateNutrition = async (payload: CalculatorRequestPayload) => {
-  const { data } = await axios.post(
-    `${API_URL}/api/calculator/calculate`,
-    payload,
-    { withCredentials: true },
-  );
+  const { data } = await httpClient.post("/api/calculator/calculate", payload);
   return data;
 };

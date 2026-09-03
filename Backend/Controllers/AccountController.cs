@@ -56,9 +56,9 @@ namespace Backend.Controllers
 
             var result = await _applicationRepository.LoginAsync(request.Email, request.Password);
 
-            if (result.Succeeded)
+            if (result.SignIn.Succeeded)
             {
-                return Ok(new { message = "Login successful" });
+                return Ok(new { message = "Login successful", token = result.Token });
             }
 
             _logger.LogError("[AccountController] Login failed when executing _applicationRepository.LoginAsync()");

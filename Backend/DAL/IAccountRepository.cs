@@ -6,7 +6,7 @@ namespace Backend.DAL;
 
 public interface IAccountRepository
 {
-    Task<SignInResult> LoginAsync(string email, string password);
+    Task<Backend.Models.LoginResult> LoginAsync(string email, string password);
     Task LogoutAsync();
     Task<IdentityResult> RegisterAsync(Backend.Models.RegisterRequest request);
     Task<IdentityResult> ListUsersAsync();

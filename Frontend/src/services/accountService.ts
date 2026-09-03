@@ -1,5 +1,4 @@
-import axios from "axios";
-import API_URL from "../apiConfig";
+import httpClient, { setAuthToken, clearAuthToken } from "./httpClient";
 
 export interface UserInfo {
   email: string;
@@ -10,18 +9,13 @@ export interface UserInfo {
 }
 
 export const getUserInfo = async (): Promise<UserInfo> => {
-  const response = await axios.get(`${API_URL}/api/account/get-user-info`, {
-    withCredentials: true,
-  });
+  const response = await httpClient.get("/api/account/get-user-info");
   return response.data;
 };
 
 export const login = async (email: string, password: string): Promise<void> => {
-  await axios.post(
-    `${API_URL}/api/account/login`,
-    { email, password },
-    { withCredentials: true },
-  );
+  const response = await httpClient.post("/api/account/login", { email, password });
+  setAuthToken(response.data.token);
 };
 
 export interface RegisterRequest {
@@ -33,17 +27,15 @@ export interface RegisterRequest {
 }
 
 export const register = async (request: RegisterRequest): Promise<void> => {
-  await axios.post(`${API_URL}/api/account/register`, request, {
-    withCredentials: true,
-  });
+  await httpClient.post("/api/account/register", request);
 };
 
 export const logout = async (): Promise<void> => {
-  await axios.post(
-    `${API_URL}/api/account/logout`,
-    {},
-    { withCredentials: true },
-  );
+  try {
+    await httpClient.post("/api/account/logout", {});
+  } finally {
+    clearAuthToken();
+  }
 };
 
 export interface ChangePasswordRequest {
@@ -55,9 +47,7 @@ export interface ChangePasswordRequest {
 export const changePassword = async (
   request: ChangePasswordRequest,
 ): Promise<void> => {
-  await axios.post(`${API_URL}/api/account/change-password`, request, {
-    withCredentials: true,
-  });
+  await httpClient.post("/api/account/change-password", request);
 };
 
 export interface UpdateUserInfoRequest {
@@ -70,16 +60,13 @@ export interface UpdateUserInfoRequest {
 export const updateUserInfo = async (
   request: UpdateUserInfoRequest,
 ): Promise<void> => {
-  await axios.put(`${API_URL}/api/account/update-user-info`, request, {
-    withCredentials: true,
-  });
+  await httpClient.put("/api/account/update-user-info", request);
 };
 
 export const uploadProfilePicture = async (file: File): Promise<void> => {
   const formData = new FormData();
   formData.append("file", file);
-  await axios.post(`${API_URL}/api/account/upload-profile-picture`, formData, {
+  await httpClient.post("/api/account/upload-profile-picture", formData, {
     headers: { "Content-Type": "multipart/form-data" },
-    withCredentials: true,
   });
 };
