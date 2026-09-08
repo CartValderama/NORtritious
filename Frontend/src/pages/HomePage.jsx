@@ -32,16 +32,10 @@ const HomePage = () => {
         </div>
         <div className="button-div col-md-4 d-flex flex-column gap-2">
           <NavLink
-            to="/products/calculator-old"
+            to="/products/calculator"
             className="btn btn-primary btn-lg button-search"
           >
-            Gå til webkalkulator (gammel)
-          </NavLink>
-          <NavLink
-            to="/products/calculator-new"
-            className="btn btn-primary btn-lg button-search"
-          >
-            Gå til webkalkulator (ny)
+            Gå til webkalkulator
           </NavLink>
         </div>
       </div>

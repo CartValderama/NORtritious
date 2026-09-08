@@ -12,8 +12,7 @@ import ProductListPage from "./pages/ProductListPage";
 import "./App.css";
 import ProfilePage from "./pages/profile";
 import ProductDetails from "./pages/ProductDetails";
-import CalculatorOld from "./pages/CalculatorOld";
-import CalculatorNew from "./pages/CalculatorNew";
+import Calculator from "./pages/Calculator";
 import ResultatDetaljer from "./pages/ResultatDetaljer";
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -39,12 +38,8 @@ const AppRoutes: React.FC = () => {
           <Route path="/" element={<HomePage />} />
           <Route path="/products" element={<ProductListPage />} />
           <Route
-            path="/products/calculator-old"
-            element={<CalculatorOld />}
-          />
-          <Route
-            path="/products/calculator-new"
-            element={<CalculatorNew />}
+            path="/products/calculator"
+            element={<Calculator />}
           />
           <Route
             path="/products/details/:productId"

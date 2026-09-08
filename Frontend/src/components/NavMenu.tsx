@@ -50,7 +50,7 @@ const NavMenu: React.FC = () => {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            {location.pathname !== "/products/calculator-new" && (
+            {location.pathname !== "/products/calculator" && (
               <>
                 <Nav.Link as={Link} to="/" className="nav-link-custom">
                   Hjem

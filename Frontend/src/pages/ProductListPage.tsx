@@ -182,7 +182,7 @@ const ProductListPage: React.FC = () => {
         )}
       </Button>
       <Link
-        to="/products/calculator-old"
+        to="/products/calculator"
         className="btn btn-secondary mb-3 me-2"
         style={{ backgroundColor: "darkblue" }}
       >
