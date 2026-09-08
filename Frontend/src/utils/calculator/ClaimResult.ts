@@ -4,11 +4,13 @@ export interface ClaimConfigEntry {
   notMetLines: string[];
 }
 
-// Exactly 7 claims in active use (mirrors CheckEfsaNutritionClaims in
+// Exactly 6 claims in active use (mirrors CheckEfsaNutritionClaims in
 // CalculatorService.cs) — energy, plain fibre (no increased/reduced
 // variants), and sugar. The other claims (fat, protein, sodium, light/lite,
 // plus the fibre variants) are recoverable from git history if that scope
-// expands again.
+// expands again. withNoAddedSugars is also disabled — it needs added sugar
+// kept separate from natural sugar, and the calculator only collects total
+// sugar now (single "Sukkerarter" field, client requirement).
 export const CLAIMS_CONFIG: Record<string, ClaimConfigEntry> = {
   lowEnergy: {
     name: 'Lavt Energiinnhold',
@@ -52,13 +54,6 @@ export const CLAIMS_CONFIG: Record<string, ClaimConfigEntry> = {
     metText: 'Dette produktet inneholder høyst 5 g sukkerarter per 100 g eller 100 ml.',
     notMetLines: [
       'Kravet er høyst 5 g sukkerarter per 100 g eller 100 ml.',
-    ],
-  },
-  withNoAddedSugars: {
-    name: 'Uten tilsatt sukker',
-    metText: 'Dette produktet inneholder ingen tilsatte sukkerarter eller andre søtende ingredienser.',
-    notMetLines: [
-      'Produktet må ikke inneholde tilsatte mono- eller disakkarider eller andre næringsmidler brukt for søtningsformål.',
     ],
   },
 };

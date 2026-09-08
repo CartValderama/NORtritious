@@ -36,5 +36,10 @@ namespace Backend.DTO
         // The EFSA scientific opinion the claim is based on, e.g. "2011;9(6):2249"
         public string EfsaQuestion { get; set; } = string.Empty;
         public string EfsaQuestionUrl { get; set; } = string.Empty;
+
+        // Short human-readable title for the opinion behind EfsaQuestionUrl (see
+        // CalculatorService.EfsaOpinionTitles) — falls back to the bare citation
+        // (EfsaQuestion) when no title is mapped for this claim.
+        public string EfsaQuestionTitle { get; set; } = string.Empty;
     }
 }

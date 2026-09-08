@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import {
   translateSubstanceName,
   stripPercentageSuffix,
-  getVisibleHealthClaims,
-} from "../../../utils/calculator/nutritionResultHelpers";
+  getAllHealthClaims,
+} from "../../utils/calculator/nutritionResultHelpers";
 import ClaimGrid from "./ClaimGrid";
+
+const MEETS_REQUIREMENT = "Oppfyller gitt krav";
 
 // Plain click-to-toggle, no accordion styling/border — just hides the
 // condition text behind a click instead of always showing it.
@@ -32,18 +34,20 @@ const VilkaarForBruk = ({ text }) => {
 };
 
 const HealthClaimsSection = ({ result }) => {
-  const visibleClaims = getVisibleHealthClaims(result);
+  const allClaims = getAllHealthClaims(result);
 
   return (
     <ClaimGrid
-      isEmpty={visibleClaims.length === 0}
-      emptyMessage="Ingen EFSA-helsepåstander kan foreløpig utledes fra kildene som er lagt til."
+      isEmpty={allClaims.length === 0}
+      emptyMessage="Ingen kilder er lagt til ennå."
       className="healthclaims-result-grid"
     >
-      {visibleClaims.map((claim, i) => {
-        const isLastInRow = i % 2 === 1 || i === visibleClaims.length - 1;
-        const rows = Math.ceil(visibleClaims.length / 2);
+      {allClaims.map((claim, i) => {
+        const isLastInRow = i % 2 === 1 || i === allClaims.length - 1;
+        const rows = Math.ceil(allClaims.length / 2);
         const isLastRow = i >= (rows - 1) * 2;
+        const passed = claim.meetsRequirement === MEETS_REQUIREMENT;
+        const accentColor = passed ? "#4379d6" : "#b02a37";
 
         return (
           <div
@@ -54,11 +58,11 @@ const HealthClaimsSection = ({ result }) => {
             <div className="d-flex flex-column gap-1">
               <p
                 className="mb-2 fw-bold d-flex align-items-center gap-2"
-                style={{ color: "#4379d6" }}
+                style={{ color: accentColor }}
               >
                 <i
-                  className="bi bi-patch-check-fill"
-                  style={{ color: "#4379d6", fontSize: "1rem" }}
+                  className={`bi ${passed ? "bi-patch-check-fill" : "bi-x-circle-fill"}`}
+                  style={{ color: accentColor, fontSize: "1rem" }}
                 />
                 {translateSubstanceName(claim.nutrient || "Ukjent")}
 
@@ -66,28 +70,33 @@ const HealthClaimsSection = ({ result }) => {
                   {stripPercentageSuffix(claim.amount)}
                 </span>
               </p>
+              {!passed && (
+                <p className="mb-2" style={{ color: accentColor }}>
+                  {claim.meetsRequirement}
+                </p>
+              )}
               <p className="mb-2" style={{ color: "#132745" }}>
                 {claim.pastand}
               </p>
 
-              {claim.vilkaarForBruk && (
-                <VilkaarForBruk text={claim.vilkaarForBruk} />
-              )}
+              {claim.vilkaarForBruk && <VilkaarForBruk text={claim.vilkaarForBruk} />}
             </div>
 
             {(claim.sourceUrl || claim.efsaQuestionUrl) && (
               <div
-                className="mt-4 d-flex flex-column gap-1"
-                style={{ opacity: 0.75, fontSize: "0.85rem" }}
+                className="mt-4"
+                style={{ display: "inline-grid", gap: "0.5rem" }}
               >
                 {claim.sourceUrl && (
                   <a
                     href={claim.sourceUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{ textDecoration: "underline" }}
+                    className={`btn ${passed ? "btn-light-primary" : "btn-light-secondary"} btn-sm text-start d-inline-flex align-items-center gap-2`}
+                    style={{ textDecoration: "none", fontSize: "0.85rem" }}
                   >
-                    {claim.legislationReference || "EU Health Claims Register"}
+                    <i className="bi bi-box-arrow-up-right" style={{ flexShrink: 0 }} />
+                    Les forordningen som godkjenner påstanden
                   </a>
                 )}
                 {claim.efsaQuestionUrl && (
@@ -95,9 +104,11 @@ const HealthClaimsSection = ({ result }) => {
                     href={claim.efsaQuestionUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{ textDecoration: "underline" }}
+                    className={`btn ${passed ? "btn-light-primary" : "btn-light-secondary"} btn-sm text-start d-inline-flex align-items-center gap-2`}
+                    style={{ textDecoration: "none", fontSize: "0.85rem" }}
                   >
-                    EFSA-uttalelse {claim.efsaQuestion}
+                    <i className="bi bi-box-arrow-up-right" style={{ flexShrink: 0 }} />
+                    {claim.efsaQuestionTitle || "Les EFSA-uttalelsen"}
                   </a>
                 )}
               </div>

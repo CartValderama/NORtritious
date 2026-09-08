@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Backend.DTO;
@@ -6,6 +7,12 @@ namespace Backend.Services
 {
     public class CalculatorService
     {
+        // Norway uses a comma as the decimal separator (e.g. "0,5" not "0.5") — every number
+        // shown to the user in a health-claim message or amount display goes through this
+        // instead of raw string interpolation, which defaults to "." regardless of locale.
+        private static readonly CultureInfo NorwegianCulture = CultureInfo.GetCultureInfo("nb-NO");
+        private static string FormatNo(decimal value) => value.ToString(NorwegianCulture);
+
         private readonly List<HealthClaimEntry> _healthClaims;
         private readonly IEuHealthClaimsService _euHealthClaims;
 
@@ -72,6 +79,26 @@ namespace Backend.Services
                 new OtherClaimRule(767513, OtherClaimCheck.HighFibreSource),
             },
             ["Oat grain fibre"]     = new[] { new OtherClaimRule(763813, OtherClaimCheck.HighFibreSource) },
+        };
+
+        // Short link label for the EFSA scientific opinion behind each policy_item_id above (plus
+        // ResistantStarchClaimId) — the EU register API only returns a bare citation like
+        // "2011;9(6):2249", not a title, so the actual title was looked up and verified by hand
+        // for each, then reduced to an invitation to read it ("Les EFSA-uttalelsen om ...") plus
+        // just the claimed effect. The frontend appends the fetched citation (EfsaQuestion, not
+        // hardcoded) after this in parentheses, so the link still names the source it points to.
+        private static readonly Dictionary<long, string> EfsaOpinionTitles = new()
+        {
+            [760097] = "Les EFSA-uttalelsen om beta-glukaner og blodkolesterol",
+            [760137] = "Les EFSA-uttalelsen om beta-glukaner fra havre og bygg",
+            [756273] = "Les EFSA-uttalelsen om betaglukaner fra bygg og blodkolesterol",
+            [757081] = "Les EFSA-uttalelsen om havrebetaglukan og blodkolesterol",
+            [760061] = "Les EFSA-uttalelsen om byggfiber og avføringsvolum",
+            [764917] = "Les EFSA-uttalelsen om rugfiber og tarmfunksjon",
+            [767477] = "Les EFSA-uttalelsen om hvetekli og tarmpassasje",
+            [767513] = "Les EFSA-uttalelsen om hvetekli og avføringsvolum",
+            [763813] = "Les EFSA-uttalelsen om havrefiber og avføringsvolum",
+            [764557] = "Les EFSA-uttalelsen om resistent stivelse og blodsukker",
         };
 
         // Resistant starch (764557) isn't a user-selectable "Other" substance like the ones above —
@@ -207,6 +234,13 @@ namespace Backend.Services
             if (!NokkelhulletThresholds.TryGetValue(category, out var t))
                 return null;
 
+            // NaturalSugars is always 0 from the frontend now (single "Sukkerarter" field,
+            // no natural/added split) — AddedSugars carries the full sugar total. That
+            // makes the MaxTotalSugars check below unaffected (0 + total = total, same as
+            // before), but MaxAddedSugars now compares the full total against what used to
+            // be an added-only cap: stricter than the real rule for categories with no
+            // separate MaxTotalSugars, but the safe direction for a compliance tool — it
+            // can under-claim a naturally-sweet, no-added-sugar product, never over-claim.
             return (!t.MaxFat.HasValue                || n.Fat          <= t.MaxFat.Value)
                 && (!t.MaxSatFat.HasValue             || n.SaturatedFat <= t.MaxSatFat.Value)
                 && (!t.DynamicSatFatFraction.HasValue || n.SaturatedFat <= n.Fat * t.DynamicSatFatFraction.Value)
@@ -223,7 +257,7 @@ namespace Backend.Services
             if (n.EnergyKcal == 0 && n.EnergyKj == 0)
                 return new List<string>();
 
-            // Exactly 7 claims in active use — energy, fibre (plain High/Source
+            // Exactly 6 claims in active use — energy, fibre (plain High/Source
             // only, no increased/reduced variants) and sugar. Everything else
             // below is kept but disabled for when scope expands again.
             var passing = new List<string>();
@@ -234,9 +268,13 @@ namespace Backend.Services
             if (ClaimSourceOfFibre(energyUnit, n))                passing.Add("Kostfiberkilde");
             if (ClaimLowSugars(foodType, n.NaturalSugars, n.AddedSugars)) passing.Add("Lavt sukkerinnhold");
             if (ClaimSugarsFree(n.NaturalSugars, n.AddedSugars))          passing.Add("Sukkerfri");
-            if (ClaimWithNoAddedSugars(n.Carbs, n.AddedSugars))           passing.Add("Uten tilsatt sukker");
 
             // Uncomment each line below to enable the corresponding claim:
+            // Uten tilsatt sukker can't be evaluated: the frontend no longer collects
+            // added sugar separately from natural sugar (single "Sukkerarter" field,
+            // client requirement), so AddedSugars is always the full sugar total here —
+            // never provably zero for a product that actually contains sugar.
+            // if (ClaimWithNoAddedSugars(n.Carbs, n.AddedSugars))              passing.Add("Uten tilsatt sukker");
             // if (ClaimIncreasedHighFibre(foodType, energyUnit, n))            passing.Add("Økt innhold av høyt kostfiberinnhold");
             // if (ClaimReducedHighFibre(foodType, energyUnit, n))              passing.Add("Redusert innhold av høyt kostfiberinnhold");
             // if (ClaimLowFat(foodType, n.Fat))                                passing.Add("Lavt fettinnhold");
@@ -449,7 +487,7 @@ namespace Backend.Services
                     OtherClaimCheck.GramThreshold =>
                         FormatGramThresholdResult(amount, portionSize, rule.MinGrams!.Value),
                     OtherClaimCheck.HighFibreSource =>
-                        MeetsHighFibreThreshold(amount, energyUnit, n) ? "Oppfyller gitt krav" : "Oppfyller ikke gitt krav",
+                        FormatHighFibreSourceResult(amount, energyUnit, n),
                     OtherClaimCheck.BetaGlucanMealRatio =>
                         FormatBetaGlucanMealRatioResult(amount, portionSize, n.Carbs),
                     _ => "Kan ikke beregnes automatisk",
@@ -458,7 +496,7 @@ namespace Backend.Services
                 results.Add(new HealthClaimResultDTO
                 {
                     Nutrient = nutrient,
-                    Amount = amount > 0 ? $"{amount} g" : "ikke oppgitt",
+                    Amount = amount > 0 ? $"{FormatNo(amount)} g" : "ikke oppgitt",
                     MeetsRequirement = meetsReq,
                     Naeringsmiddel = euClaim.NutrientSubstFood,
                     Pastand = euClaim.Claim,
@@ -468,6 +506,7 @@ namespace Backend.Services
                     SourceUrl = euClaim.LegislationUrl,
                     EfsaQuestion = euClaim.EfsaQuestion,
                     EfsaQuestionUrl = euClaim.EfsaQuestionUrl,
+                    EfsaQuestionTitle = EfsaOpinionTitles.GetValueOrDefault(rule.PolicyItemId, euClaim.EfsaQuestion),
                 });
             }
 
@@ -486,14 +525,35 @@ namespace Backend.Services
             return false;
         }
 
+        private static string FormatHighFibreSourceResult(decimal sourceFibreGrams, string energyUnit, NutritionInputDTO n)
+        {
+            if (MeetsHighFibreThreshold(sourceFibreGrams, energyUnit, n)) return "Oppfyller gitt krav";
+
+            if (energyUnit == "energikcal" && n.EnergyKcal > 0)
+            {
+                decimal per100kcal = Math.Round(sourceFibreGrams * 100m / n.EnergyKcal, 2);
+                return $"Oppfyller ikke gitt krav (trenger minst 6 g per 100 g eller 3 g per 100 kcal, " +
+                       $"produktet har {FormatNo(sourceFibreGrams)} g, tilsvarende {FormatNo(per100kcal)} g per 100 kcal)";
+            }
+            if (energyUnit == "energikj" && n.EnergyKj > 0)
+            {
+                decimal per100kj = Math.Round(sourceFibreGrams * 100m / n.EnergyKj, 2);
+                return $"Oppfyller ikke gitt krav (trenger minst 6 g per 100 g eller 0,717 g per 100 kJ, " +
+                       $"produktet har {FormatNo(sourceFibreGrams)} g, tilsvarende {FormatNo(per100kj)} g per 100 kJ)";
+            }
+            return $"Oppfyller ikke gitt krav (trenger minst 6 g per 100 g, produktet har {FormatNo(sourceFibreGrams)} g)";
+        }
+
         // "At least Xg ... per quantified portion" — Mengde (g/100g) must be scaled to the
         // declared portion before comparing against the fixed gram threshold. Comparing the
         // raw per-100g concentration directly would silently assume the portion is 100g.
         private static string FormatGramThresholdResult(decimal amountPer100g, decimal portionSize, decimal minGrams)
         {
             if (portionSize <= 0) return "Kan ikke beregnes automatisk (porsjonsstørrelse mangler)";
-            decimal amountInPortion = amountPer100g * portionSize / 100m;
-            return amountInPortion >= minGrams ? "Oppfyller gitt krav" : "Oppfyller ikke gitt krav";
+            decimal amountInPortion = Math.Round(amountPer100g * portionSize / 100m, 3);
+            return amountInPortion >= minGrams
+                ? "Oppfyller gitt krav"
+                : $"Oppfyller ikke gitt krav (trenger minst {FormatNo(minGrams)} g per porsjon, porsjonen inneholder {FormatNo(amountInPortion)} g)";
         }
 
         // "≥4g beta-glucan per 30g available carbohydrates in a quantified portion" — uses this
@@ -503,8 +563,11 @@ namespace Backend.Services
             if (portionSize <= 0) return "Kan ikke beregnes automatisk (porsjonsstørrelse mangler)";
             decimal carbsPerPortion = carbsPer100g * portionSize / 100m;
             if (carbsPerPortion <= 0) return "Kan ikke beregnes automatisk (ingen karbohydrater oppgitt)";
-            decimal betaGlucanPerPortion = betaGlucanPer100g * portionSize / 100m;
-            return betaGlucanPerPortion / carbsPerPortion >= 4m / 30m ? "Oppfyller gitt krav" : "Oppfyller ikke gitt krav";
+            decimal betaGlucanPerPortion = Math.Round(betaGlucanPer100g * portionSize / 100m, 3);
+            decimal requiredBetaGlucan = Math.Round(carbsPerPortion * 4m / 30m, 3);
+            return betaGlucanPerPortion / carbsPerPortion >= 4m / 30m
+                ? "Oppfyller gitt krav"
+                : $"Oppfyller ikke gitt krav (trenger minst {FormatNo(requiredBetaGlucan)} g beta-glukan per porsjon, porsjonen inneholder {FormatNo(betaGlucanPerPortion)} g)";
         }
 
         private async Task<HealthClaimResultDTO> BuildHealthClaimResult(string nutrient, decimal amount, string unit, bool isOther)
@@ -515,9 +578,11 @@ namespace Backend.Services
                 ? string.Join(" ", entry.Claims.Select(c => c.Claim))
                 : "Ingen påstand funnet for det valgte elementet.";
 
-            string amountDisplay = amount > 0 ? $"{amount} {unit}" : "ikke oppgitt";
+            string amountDisplay = amount > 0 ? $"{FormatNo(amount)} {unit}" : "ikke oppgitt";
             string meetsReq = isOther && OtherMinimumsG.TryGetValue(nutrient, out decimal min)
-                ? (amount >= min ? "Oppfyller gitt krav" : "Oppfyller ikke gitt krav")
+                ? (amount >= min
+                    ? "Oppfyller gitt krav"
+                    : $"Oppfyller ikke gitt krav (trenger minst {FormatNo(min)} {unit}, produktet inneholder {FormatNo(amount)} {unit})")
                 : "Ved å velge dette næringsstoffet er man sikker at mengden oppfyller kravet som er vedlagt til forordning (EF) nr. 1924/2006.";
 
             return new HealthClaimResultDTO
@@ -544,11 +609,15 @@ namespace Backend.Services
 
             decimal pct = n.ResistantStarch / n.TotalStarch * 100m;
 
+            string meetsReq = pct >= 14m
+                ? "Oppfyller gitt krav"
+                : $"Oppfyller ikke gitt krav (trenger minst 14 % resistent stivelse av total stivelse, produktet har {FormatNo(Math.Round(pct, 1))} %)";
+
             return new HealthClaimResultDTO
             {
                 Nutrient = "Stivelse",
-                Amount = $"{n.ResistantStarch} g resistent stivelse av {n.TotalStarch} g total stivelse",
-                MeetsRequirement = pct >= 14m ? "Oppfyller gitt krav" : "Oppfyller ikke gitt krav",
+                Amount = $"{FormatNo(n.ResistantStarch)} g resistent stivelse av {FormatNo(n.TotalStarch)} g total stivelse",
+                MeetsRequirement = meetsReq,
                 Naeringsmiddel = claim.NutrientSubstFood,
                 Pastand = claim.Claim,
                 VilkaarForBruk = claim.ConditionOfUse,
@@ -557,6 +626,7 @@ namespace Backend.Services
                 SourceUrl = claim.LegislationUrl,
                 EfsaQuestion = claim.EfsaQuestion,
                 EfsaQuestionUrl = claim.EfsaQuestionUrl,
+                EfsaQuestionTitle = EfsaOpinionTitles.GetValueOrDefault(ResistantStarchClaimId, claim.EfsaQuestion),
             };
         }
 

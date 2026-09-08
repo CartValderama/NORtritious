@@ -1,20 +1,20 @@
 import React, { useState, useEffect, useRef } from "react";
 import Tooltip from "@mui/material/Tooltip";
-import efsaLogo from "../../../assets/img/efsaLogo.png";
+import efsaLogo from "../../assets/img/efsaLogo.png";
 import NutritionFieldColumn from "./NutritionFieldColumn";
 import EfsaHealthClaimsPanel from "./EfsaHealthClaimsPanel";
-import PanelBox from "../../PanelBox";
-import Accordion from "../../Accordion";
-import Button from "../../Button";
-import WarningAlert from "../../WarningAlert";
+import PanelBox from "../PanelBox";
+import Accordion from "../Accordion";
+import Button from "../Button";
+import WarningAlert from "../WarningAlert";
 import {
   validateNutritionForm,
   buildCalculationPayload,
-} from "../../../utils/calculator/nutritionFormFields";
-import { getSampleNutrition } from "../../../utils/calculator/sampleNutritionGenerator";
-import { calculateNutrition } from "../../../services/calculatorService";
-import { getCategoryKey } from "../../../utils/calculator/categoryOptions";
-import { useCalculatorFormStore } from "../../../stores/calculatorFormStore";
+} from "../../utils/calculator/nutritionFormFields";
+import { getSampleNutrition } from "../../utils/calculator/sampleNutritionGenerator";
+import { calculateNutrition } from "../../services/calculatorService";
+import { getCategoryKey } from "../../utils/calculator/categoryOptions";
+import { useCalculatorFormStore } from "../../stores/calculatorFormStore";
 
 const NutritionForm = () => {
   const {
@@ -213,9 +213,13 @@ const NutritionForm = () => {
           }}
         >
           <div className="d-flex align-items-baseline gap-2">
-            <h2 className="mb-0 fs-5 fw-bold">Næringsinnhold (100g/ml)</h2>
+            <h2 className="mb-0 fs-5 fw-bold">
+              Næringsinnhold (
+              {foodType === "solid" ? "100g" : foodType === "liquid" ? "100ml" : "100g/ml"}
+              )
+            </h2>
             <Tooltip
-              title='Fyll inn energi og næringsstoffer per 100 g/ml. Åpne "Beregn for helsepåstander" under for helsepåstander.'
+              title={`Fyll inn energi og næringsstoffer per ${foodType === "solid" ? "100 g" : foodType === "liquid" ? "100 ml" : "100 g/ml"}. Åpne "Beregn for helsepåstander" under for helsepåstander.`}
               placement="right"
               arrow
             >

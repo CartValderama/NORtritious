@@ -3,7 +3,7 @@ import {
   evaluateNokkelhulletRequirements,
   buildRequirementTitle,
   buildRequirementDetail,
-} from "../../../utils/calculator/nokkelhulletEvaluation";
+} from "../../utils/calculator/nokkelhulletEvaluation";
 import ClaimGrid from "./ClaimGrid";
 
 const NokkelhulletSection = ({ category, nutrition }) => {

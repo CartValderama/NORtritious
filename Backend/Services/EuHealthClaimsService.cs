@@ -90,7 +90,8 @@ namespace Backend.Services
                         RestrictionsOfUse = await _translator.TranslateToNorwegianAsync(restrictionsOfUse, ct),
                         LegislationUrl = raw.LegislationUrl ?? string.Empty,
                         LegislationType = raw.LegislationType ?? string.Empty,
-                        LegislationReference = raw.LegislationReference ?? string.Empty,
+                        LegislationReference = await _translator.TranslateToNorwegianAsync(
+                            raw.LegislationReference ?? string.Empty, ct),
                         EfsaQuestion = raw.EfsaQuestion ?? string.Empty,
                         EfsaQuestionUrl = raw.EfsaQuestionUrl ?? string.Empty,
                     };

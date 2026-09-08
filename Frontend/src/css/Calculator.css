@@ -471,21 +471,6 @@ li {
   filter: brightness(0.95);
 }
 
-/* v2 form/results split — side by side above 980px, stacked full-width below it.
-   min-width: 0 lets each side shrink past its content's natural size instead of
-   forcing the row wider than available space; that same min-width:0 means native
-   flex-wrap never triggers on its own (items can always just keep shrinking), so
-   the stack point below is an explicit breakpoint instead. */
-.old-split-col {
-  flex: 1 1 350px;
-  min-width: 0;
-}
-@media (max-width: 980px) {
-  .old-split-col {
-    flex: 1 1 100%;
-  }
-}
-
 /* Ghost icon-button style, subtle bg on hover instead of underline — used by
    both the Nullstill button and the settings cog beside it. */
 .nullstill-btn {

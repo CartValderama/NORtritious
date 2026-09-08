@@ -1,5 +1,5 @@
 import { nokkelhulletThresholds } from "./kravNokkelhullet";
-import type { NutritionValues } from "./nutritionFormFields";
+import { formatNoNumber, type NutritionValues } from "./nutritionFormFields";
 
 interface RequirementBase {
   key: string;
@@ -28,10 +28,9 @@ export const evaluateNokkelhulletRequirements = (
 
   const fett = Number(nutrition.fett) || 0;
   const mettede = Number(nutrition.mettede) || 0;
-  const naturligSukker = Number(nutrition.naturligSukker) || 0;
-  const hvoravSukkerarter = Number(nutrition.hvoravSukkerarter) || 0;
+  const sukkerarter = Number(nutrition.sukkerarter) || 0;
   const kostfiber = Number(nutrition.kostfiber) || 0;
-  const salt = (Number(nutrition.naturligSalt) || 0) + (Number(nutrition.tilsattSalt) || 0);
+  const salt = Number(nutrition.salt) || 0;
 
   const requirements: RequirementBase[] = [];
 
@@ -64,32 +63,28 @@ export const evaluateNokkelhulletRequirements = (
       actualValue: mettede,
       comparator: "≤",
       thresholdValue: Number((fett * t.dynamicSatFatFraction).toFixed(2)),
-      unit: `g/100 g (${t.dynamicSatFatFraction * 100} % av fett)`,
+      unit: `g/100 g (${formatNoNumber(t.dynamicSatFatFraction * 100)} % av fett)`,
       passed: mettede <= fett * t.dynamicSatFatFraction,
     });
   }
 
-  if (t.maxTotalSugars != null) {
+  // No natural/added split anymore (single field) — one row using whichever
+  // cap is stricter when a category defines both (see isFieldFailing's
+  // comment in nutritionFormFields.ts for why that's the safe direction).
+  if (t.maxTotalSugars != null || t.maxAddedSugars != null) {
+    const threshold = Math.min(
+      ...[t.maxTotalSugars, t.maxAddedSugars].filter(
+        (v): v is number => v != null,
+      ),
+    );
     requirements.push({
-      key: "maxTotalSugars",
-      nutrient: "Sukkerarter (totalt)",
-      actualValue: naturligSukker + hvoravSukkerarter,
+      key: "maxSukkerarter",
+      nutrient: "Sukkerarter",
+      actualValue: sukkerarter,
       comparator: "≤",
-      thresholdValue: t.maxTotalSugars,
+      thresholdValue: threshold,
       unit: "g/100 g",
-      passed: naturligSukker + hvoravSukkerarter <= t.maxTotalSugars,
-    });
-  }
-
-  if (t.maxAddedSugars != null) {
-    requirements.push({
-      key: "maxAddedSugars",
-      nutrient: "Tilsatte sukkerarter",
-      actualValue: hvoravSukkerarter,
-      comparator: "≤",
-      thresholdValue: t.maxAddedSugars,
-      unit: "g/100 g",
-      passed: hvoravSukkerarter <= t.maxAddedSugars,
+      passed: sukkerarter <= threshold,
     });
   }
 
@@ -123,7 +118,7 @@ export const evaluateNokkelhulletRequirements = (
     ...r,
     description: `Kravet er at mengden av ${r.nutrient.toLowerCase()} skal være ${
       comparatorText[r.comparator]
-    } ${r.thresholdValue} ${r.unit}.`,
+    } ${formatNoNumber(r.thresholdValue)} ${r.unit}.`,
   }));
 };
 
@@ -138,6 +133,6 @@ export const buildRequirementTitle = (req: NokkelhulletRequirement): string =>
   req.passed ? req.nutrient : `${req.nutrient} (${directionLabel(req)})`;
 
 export const buildRequirementDetail = (req: NokkelhulletRequirement): string =>
-  `Produktet inneholder ${req.actualValue} ${req.unit}, ${
+  `Produktet inneholder ${formatNoNumber(req.actualValue)} ${req.unit}, ${
     req.passed ? "som oppfyller kravet om" : "men kravet er"
-  } ${comparatorWord(req.comparator)} ${req.thresholdValue} ${req.unit}.`;
+  } ${comparatorWord(req.comparator)} ${formatNoNumber(req.thresholdValue)} ${req.unit}.`;

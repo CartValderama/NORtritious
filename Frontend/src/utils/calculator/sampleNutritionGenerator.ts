@@ -32,24 +32,27 @@ export const getSampleNutrition = (
         ? fett * t.dynamicSatFatFraction * maxFactor
         : Math.min(fett * 0.4, 2);
   const karbohydrat = 20;
+  // No natural/added split anymore — one value checked against whichever cap(s)
+  // the category defines (see isFieldFailing's comment in nutritionFormFields.ts),
+  // so the sample must clear/breach the stricter of the two when both exist.
   // No category threshold: fall back to a value that itself clears (pass) or breaches
   // (fail) the EFSA "lavt sukkerinnhold" claim's fixed 5 g/100 g (solid) / 2.5 g/100 ml
   // (liquid) limit, so the EFSA nutrition claims section isn't left in a mixed state.
-  const sugarBudget =
-    t.maxTotalSugars != null ? t.maxTotalSugars * maxFactor : outcome === "pass" ? 2 : 8;
-  const hvoravSukkerarter =
-    t.maxAddedSugars != null
-      ? Math.min(t.maxAddedSugars * maxFactor, sugarBudget * 0.4)
-      : sugarBudget * 0.3;
-  const naturligSukker = Math.max(sugarBudget - hvoravSukkerarter, 0);
+  const sugarCaps = [t.maxTotalSugars, t.maxAddedSugars].filter(
+    (v): v is number => v != null,
+  );
+  const sukkerarter =
+    sugarCaps.length > 0
+      ? Math.min(...sugarCaps) * maxFactor
+      : outcome === "pass"
+        ? 2
+        : 8;
   // No category threshold: fall back to a value that clears (pass, meets "kostfiberkilde"
   // at 3 g/100 g) or stays under (fail) the lowest EFSA fibre-claim bar.
   const kostfiber =
     t.minFibre != null ? t.minFibre * minFactor : outcome === "pass" ? 3 : 0.5;
   const protein = 8;
   const salt = t.maxSalt != null ? t.maxSalt * maxFactor : 0.5;
-  const naturligSalt = salt * 0.4;
-  const tilsattSalt = salt * 0.3;
   const energikcal = Math.round(
     fett * 9 + karbohydrat * 4 + protein * 4 + kostfiber * 2,
   );
@@ -59,12 +62,10 @@ export const getSampleNutrition = (
     mettede,
     transfett: 0,
     karbohydrat,
-    naturligSukker,
-    hvoravSukkerarter,
+    sukkerarter,
     kostfiber,
     protein,
-    naturligSalt,
-    tilsattSalt,
+    salt,
   };
 
   const sample: NutritionValues = { ...EMPTY_NUTRITION };

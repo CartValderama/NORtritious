@@ -18,12 +18,10 @@ export const NUTRITION_FIELDS: NutritionFieldDef[] = [
   { key: "mettede", label: "Mettede fettsyrer", unit: "g", placeholder: "f.eks. 2" },
   { key: "transfett", label: "Transfett", unit: "g", placeholder: "f.eks. 0" },
   { key: "karbohydrat", label: "Karbohydrat", unit: "g", placeholder: "f.eks. 20" },
-  { key: "naturligSukker", label: "Naturlig sukker", unit: "g", placeholder: "f.eks. 5" },
-  { key: "hvoravSukkerarter", label: "Tilsatt sukker", unit: "g", placeholder: "f.eks. 3" },
+  { key: "sukkerarter", label: "Sukkerarter", unit: "g", placeholder: "f.eks. 8" },
   { key: "kostfiber", label: "Kostfiber", unit: "g", placeholder: "f.eks. 3" },
   { key: "protein", label: "Protein", unit: "g", placeholder: "f.eks. 8" },
-  { key: "naturligSalt", label: "Naturlig salt", unit: "g", placeholder: "f.eks. 0,5" },
-  { key: "tilsattSalt", label: "Tilsatt salt", unit: "g", placeholder: "f.eks. 0,2" },
+  { key: "salt", label: "Salt", unit: "g", placeholder: "f.eks. 0,7" },
 ];
 
 export const EMPTY_NUTRITION: NutritionValues = {
@@ -33,23 +31,19 @@ export const EMPTY_NUTRITION: NutritionValues = {
   mettede: "",
   transfett: "",
   karbohydrat: "",
-  naturligSukker: "",
-  hvoravSukkerarter: "",
+  sukkerarter: "",
   kostfiber: "",
   protein: "",
-  naturligSalt: "",
-  tilsattSalt: "",
+  salt: "",
 };
 
 // Maps each nutrition field key to the kravNokkelhullet property names that cover it.
 const NOKKELHULLET_FIELD_MAP: Record<string, string[]> = {
   fett: ["fett"],
   mettede: ["mettede"],
-  naturligSukker: ["sukkerarter"],
-  hvoravSukkerarter: ["sukkerarter", "tilsattSukkerarter"],
+  sukkerarter: ["sukkerarter", "tilsattSukkerarter"],
   kostfiber: ["kostfiber"],
-  naturligSalt: ["salt"],
-  tilsattSalt: ["salt"],
+  salt: ["salt"],
 };
 
 export const isNokkelhulletField = (key: string, category: string): boolean => {
@@ -102,10 +96,7 @@ const ALWAYS_RELEVANT_FIELDS = ["karbohydrat"];
 // A field is shown if it feeds the Nøkkelhullet check for this category, one of
 // the active EFSA nutrition claims, or the always-on carbohydrate health claim.
 export const isFieldRelevant = (key: string, category: string): boolean => {
-  if (
-    ["naturligSukker", "hvoravSukkerarter"].includes(key) &&
-    ZERO_SUGAR_CATEGORIES.has(category)
-  ) {
+  if (key === "sukkerarter" && ZERO_SUGAR_CATEGORIES.has(category)) {
     return false;
   }
   if (key === "protein" && NO_PROTEIN_CATEGORIES.has(category)) {
@@ -115,7 +106,7 @@ export const isFieldRelevant = (key: string, category: string): boolean => {
     isNokkelhulletField(key, category) ||
     isEfsaRelevantField(key) ||
     ALWAYS_RELEVANT_FIELDS.includes(key) ||
-    ["naturligSukker", "hvoravSukkerarter"].includes(key)
+    key === "sukkerarter"
   );
 };
 
@@ -139,29 +130,20 @@ export const isFieldFailing = (
         (t.dynamicSatFatFraction != null && val > fat * t.dynamicSatFatFraction)
       );
     }
-    case "naturligSukker":
+    // No natural/added split anymore (single field) — checked against both
+    // thresholds where the category defines them, using the one number for
+    // each. Stricter than the real rule for MaxAddedSugars-only categories
+    // (can't prove none of it is added), the safe direction for a compliance
+    // tool: never falsely say a product qualifies.
+    case "sukkerarter":
       return (
-        t.maxTotalSugars != null &&
-        val + (Number(nutrition.hvoravSukkerarter) || 0) > t.maxTotalSugars
-      );
-    case "hvoravSukkerarter":
-      return (
-        (t.maxAddedSugars != null && val > t.maxAddedSugars) ||
-        (t.maxTotalSugars != null &&
-          val + (Number(nutrition.naturligSukker) || 0) > t.maxTotalSugars)
+        (t.maxTotalSugars != null && val > t.maxTotalSugars) ||
+        (t.maxAddedSugars != null && val > t.maxAddedSugars)
       );
     case "kostfiber":
       return t.minFibre != null && val < t.minFibre;
-    case "naturligSalt":
-      return (
-        t.maxSalt != null &&
-        val + (Number(nutrition.tilsattSalt) || 0) > t.maxSalt
-      );
-    case "tilsattSalt":
-      return (
-        t.maxSalt != null &&
-        val + (Number(nutrition.naturligSalt) || 0) > t.maxSalt
-      );
+    case "salt":
+      return t.maxSalt != null && val > t.maxSalt;
     default:
       return false;
   }
@@ -170,12 +152,29 @@ export const isFieldFailing = (
 const NOKKELHULLET_FIELD_LABELS: Record<string, string> = {
   fett: "fett",
   mettede: "mettede fettsyrer",
-  naturligSukker: "sukkerarter",
-  hvoravSukkerarter: "tilsatte sukkerarter",
+  sukkerarter: "sukkerarter",
   kostfiber: "kostfiber",
-  naturligSalt: "salt",
-  tilsattSalt: "salt",
+  salt: "salt",
 };
+
+// Norway uses a comma as the decimal separator (e.g. "0,7" not "0.7") — every number shown
+// to the user goes through this instead of raw interpolation, which always uses ".".
+export const formatNoNumber = (value: number): string =>
+  value.toString().replace(".", ",");
+
+// Nutrition inputs are type="text" (not type="number") specifically so a typed comma isn't
+// silently rejected by the browser — native number inputs only accept "." as the decimal
+// separator in most browser locales regardless of the page's own language. Rejects anything
+// that isn't a plausible in-progress decimal (digits with at most one comma/period) and
+// normalizes the separator to "." so every existing Number(nutrition[key]) call downstream
+// keeps working unchanged.
+export const sanitizeDecimalInput = (raw: string): string | null =>
+  /^\d*[.,]?\d*$/.test(raw) ? raw.replace(",", ".") : null;
+
+// The mirror of sanitizeDecimalInput's normalization, for display: fields are stored with
+// "." (so every Number(nutrition[key]) call keeps working unchanged) but shown to the user
+// with "," — this converts a stored value back for the input's own value prop.
+export const toDisplayDecimal = (value: string): string => value.replace(".", ",");
 
 const buildNokkelhulletMessage = (
   label: string,
@@ -183,7 +182,7 @@ const buildNokkelhulletMessage = (
   value: string | number,
 ): string =>
   `Produktet innfrir ikke Nøkkelhullet på grunn av mengden ${label}. ` +
-  `Mengden på ${label} må være ${comparison} ${value} g/100 g for å møte kravene for Nøkkelhullsmerking.`;
+  `Mengden på ${label} må være ${comparison} ${typeof value === "number" ? formatNoNumber(value) : value} g/100 g for å møte kravene for Nøkkelhullsmerking.`;
 
 // Builds the human-readable reason a field fails Nøkkelhullet, based on the same
 // thresholds isFieldFailing checks against.
@@ -215,34 +214,24 @@ export const getNokkelhulletFailureMessage = (
         return buildNokkelhulletMessage(
           NOKKELHULLET_FIELD_LABELS.mettede,
           "lavere enn eller lik",
-          `${t.dynamicSatFatFraction * 100} % av fett`,
+          `${formatNoNumber(t.dynamicSatFatFraction * 100)} % av fett`,
         );
       }
       return "";
-    case "naturligSukker":
-      return t.maxTotalSugars != null
-        ? buildNokkelhulletMessage(
-            "sukkerarter",
-            "lavere enn eller lik",
-            t.maxTotalSugars,
-          )
-        : "";
-    case "hvoravSukkerarter":
-      if (t.maxAddedSugars != null) {
-        return buildNokkelhulletMessage(
-          NOKKELHULLET_FIELD_LABELS.hvoravSukkerarter,
-          "lavere enn eller lik",
-          t.maxAddedSugars,
-        );
-      }
-      if (t.maxTotalSugars != null) {
-        return buildNokkelhulletMessage(
-          "sukkerarter",
-          "lavere enn eller lik",
-          t.maxTotalSugars,
-        );
-      }
-      return "";
+    // Reports whichever cap is stricter when a category defines both — that's
+    // the actually binding constraint, since staying under it also satisfies
+    // the looser one.
+    case "sukkerarter": {
+      const caps = [t.maxTotalSugars, t.maxAddedSugars].filter(
+        (v): v is number => v != null,
+      );
+      if (caps.length === 0) return "";
+      return buildNokkelhulletMessage(
+        NOKKELHULLET_FIELD_LABELS.sukkerarter,
+        "lavere enn eller lik",
+        Math.min(...caps),
+      );
+    }
     case "kostfiber":
       return t.minFibre != null
         ? buildNokkelhulletMessage(
@@ -251,11 +240,10 @@ export const getNokkelhulletFailureMessage = (
             t.minFibre,
           )
         : "";
-    case "naturligSalt":
-    case "tilsattSalt":
+    case "salt":
       return t.maxSalt != null
         ? buildNokkelhulletMessage(
-            NOKKELHULLET_FIELD_LABELS.naturligSalt,
+            NOKKELHULLET_FIELD_LABELS.salt,
             "lavere enn eller lik",
             t.maxSalt,
           )
@@ -317,18 +305,22 @@ export const buildCalculationPayload = (
     saturatedFat: Number(nutrition.mettede),
     transFat: Number(nutrition.transfett) || 0,
     carbs: Number(nutrition.karbohydrat),
-    naturalSugars: ZERO_SUGAR_CATEGORIES.has(category)
-      ? 0
-      : Number(nutrition.naturligSukker),
+    // No natural/added split anymore (single field, client requirement) — the
+    // full total is sent as addedSugars so both the backend's MaxTotalSugars
+    // check (naturalSugars + addedSugars) and MaxAddedSugars check still work
+    // off it, just stricter than the real rule for MaxAddedSugars-only
+    // categories (see CheckNokkelhullet's comment in CalculatorService.cs).
+    naturalSugars: 0,
     addedSugars: ZERO_SUGAR_CATEGORIES.has(category)
       ? 0
-      : Number(nutrition.hvoravSukkerarter),
+      : Number(nutrition.sukkerarter),
     fibre: Number(nutrition.kostfiber),
     protein: Number(nutrition.protein),
-    salt:
-      (Number(nutrition.naturligSalt) || 0) +
-      (Number(nutrition.tilsattSalt) || 0),
-    addedSalt: Number(nutrition.tilsattSalt) || 0,
+    // addedSalt no longer tracked separately — the backend's "Uten tilsatt
+    // salt" claim that needed it is already disabled (CalculatorService.cs),
+    // so always sending 0 has no effect on any active calculation.
+    salt: Number(nutrition.salt) || 0,
+    addedSalt: 0,
     totalStarch: Number(totalStarch) || 0,
     resistantStarch: Number(resistantStarch) || 0,
   },

@@ -1,5 +1,5 @@
 import React from "react";
-import Accordion from "../../Accordion";
+import Accordion from "../Accordion";
 
 const STEPS = [
   "Velg matvaregruppe, matkategori og eventuelle undermatkategorier.",

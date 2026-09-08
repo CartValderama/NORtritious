@@ -4,7 +4,7 @@ import {
   buildClaimStatistic,
   buildClaimDetailText,
   getApplicableClaims,
-} from "../../../utils/calculator/nutritionResultHelpers";
+} from "../../utils/calculator/nutritionResultHelpers";
 import ClaimGrid from "./ClaimGrid";
 
 const EfsaSection = ({ result, nutrition, foodType }) => {

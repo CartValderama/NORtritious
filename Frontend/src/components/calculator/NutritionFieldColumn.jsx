@@ -1,15 +1,17 @@
 import React from "react";
 import Tooltip from "@mui/material/Tooltip";
-import keyholeLogo from "../../../assets/img/new_resized_image_1.png";
-import banKeyhole from "../../../assets/img/ban_keyhole.png";
-import LabeledUnitInput from "../../LabeledUnitInput";
+import keyholeLogo from "../../assets/img/new_resized_image_1.png";
+import banKeyhole from "../../assets/img/ban_keyhole.png";
+import LabeledUnitInput from "../LabeledUnitInput";
 import {
   NUTRITION_FIELDS,
   isFieldRelevant,
   isNokkelhulletField,
   isFieldFailing,
   getNokkelhulletFailureMessage,
-} from "../../../utils/calculator/nutritionFormFields";
+  sanitizeDecimalInput,
+  toDisplayDecimal,
+} from "../../utils/calculator/nutritionFormFields";
 
 const NutritionFieldColumn = ({
   category,
@@ -33,18 +35,20 @@ const NutritionFieldColumn = ({
         <label className="form-label new-label-indent">Energi</label>
         <div className="input-group">
           <input
-            type="number"
-            min="0"
-            step="any"
+            type="text"
+            inputMode="decimal"
             className={`form-control ${errors.energy ? "is-invalid" : ""}`}
             style={{ minWidth: 0 }}
             placeholder="0"
-            value={
+            value={toDisplayDecimal(
               energyUnit === "energikcal"
                 ? nutrition.energikcal
-                : nutrition.energikj
-            }
-            onChange={(e) => onFieldChange(energyUnit, e.target.value)}
+                : nutrition.energikj,
+            )}
+            onChange={(e) => {
+              const sanitized = sanitizeDecimalInput(e.target.value);
+              if (sanitized !== null) onFieldChange(energyUnit, sanitized);
+            }}
           />
           <select
             className="form-select flex-grow-0 flex-shrink-0"

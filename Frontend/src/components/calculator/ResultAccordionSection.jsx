@@ -1,7 +1,7 @@
 import React from "react";
-import Accordion from "../../Accordion";
-import AccordionBadge from "../../AccordionBadge";
-import { useScrollIntoViewOnOpen } from "../../../hooks/useScrollIntoViewOnOpen";
+import Accordion from "../Accordion";
+import AccordionBadge from "../AccordionBadge";
+import { useScrollIntoViewOnOpen } from "../../hooks/useScrollIntoViewOnOpen";
 
 const ResultAccordionSection = ({
   id,
@@ -38,9 +38,14 @@ const ResultAccordionSection = ({
           style={{ width: "1.75rem", height: "auto", marginRight: "0.75rem" }}
         />
         {title}
-        {badges && badges.length > 0 && (
-          <div className="ms-auto d-flex align-items-center gap-2">
-            {badges.map((badge, index) => (
+        {/* Always rendered (even with no badges) — its ms-auto is what pushes the
+            chevron to the far right; without this wrapper present, the chevron's
+            own margin (Calculator.css's .result-accordion-toggle::after override)
+            has nothing to push against and sits right after the title instead. */}
+        <div className="ms-auto d-flex align-items-center gap-2">
+          {badges &&
+            badges.length > 0 &&
+            badges.map((badge, index) => (
               <AccordionBadge
                 key={index}
                 style={{
@@ -51,8 +56,7 @@ const ResultAccordionSection = ({
                 {badge.text}
               </AccordionBadge>
             ))}
-          </div>
-        )}
+        </div>
       </Accordion.Header>
       <Accordion.Body>
         <div style={{ backgroundColor: "#fff" }}>{children}</div>

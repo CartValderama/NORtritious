@@ -1,18 +1,19 @@
 import React from "react";
 import Tooltip from "@mui/material/Tooltip";
-import CustomSelect from "../../CustomSelect";
-import PanelBox from "../../PanelBox";
-import LabeledUnitInput from "../../LabeledUnitInput";
-import RemovablePill from "../../RemovablePill";
-import Button from "../../Button";
-import WarningAlert from "../../WarningAlert";
+import CustomSelect from "../CustomSelect";
+import PanelBox from "../PanelBox";
+import LabeledUnitInput from "../LabeledUnitInput";
+import RemovablePill from "../RemovablePill";
+import Button from "../Button";
+import WarningAlert from "../WarningAlert";
 import {
   OTHER_SUBSTANCE_OPTIONS,
   substanceRequiresPortionSize,
-} from "../../../utils/calculator/otherSubstanceOptions";
-import { useKildePicker } from "../../../hooks/calculator/useKildePicker";
-import { useCalculatorFormStore } from "../../../stores/calculatorFormStore";
-import { useScrollIntoViewOnOpen } from "../../../hooks/useScrollIntoViewOnOpen";
+} from "../../utils/calculator/otherSubstanceOptions";
+import { useKildePicker } from "../../hooks/calculator/useKildePicker";
+import { sanitizeDecimalInput, toDisplayDecimal } from "../../utils/calculator/nutritionFormFields";
+import { useCalculatorFormStore } from "../../stores/calculatorFormStore";
+import { useScrollIntoViewOnOpen } from "../../hooks/useScrollIntoViewOnOpen";
 
 const EfsaHealthClaimsPanel = () => {
   const isOpen = useCalculatorFormStore((s) => s.showHealthClaimsPanel);
@@ -76,12 +77,15 @@ const EfsaHealthClaimsPanel = () => {
             <div className="input-group">
               <input
                 id="portionSize"
-                type="number"
-                min="0"
+                type="text"
+                inputMode="decimal"
                 className="form-control"
                 style={{ minWidth: 0 }}
-                value={portionSize}
-                onChange={(e) => setEfsaField("portionSize", e.target.value)}
+                value={toDisplayDecimal(portionSize)}
+                onChange={(e) => {
+                  const sanitized = sanitizeDecimalInput(e.target.value);
+                  if (sanitized !== null) setEfsaField("portionSize", sanitized);
+                }}
                 placeholder="f.eks. 100"
               />
               <span className="input-group-text">{portionSizeUnit}</span>
