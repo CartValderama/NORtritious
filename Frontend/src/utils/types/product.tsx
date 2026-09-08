@@ -3,6 +3,8 @@ export interface Product {
     name: string; 
     group: string;
     type: string;
+    categoryKey: string;
+    foodType: string;
     hasEfsaHealth: string; // EFSA Health Claim, will not be boolean
     hasEfsaNutrition: string; // Will not be boolean
     hasNokkelhullet: boolean; // Will not be boolean

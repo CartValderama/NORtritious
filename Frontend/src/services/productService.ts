@@ -55,6 +55,21 @@ export const createProduct = async (product: any) => {
     */
   return handleResponse(response);
 };
+// Put update item
+export const updateProduct = async (productId: number, product: any) => {
+  const response = await httpClient.put(`/api/products/${productId}`, {
+    ...product,
+    productId,
+  });
+
+  if (response.status === 401) {
+    const error = new Error("Unauthorized") as any;
+    error.status = 401;
+    throw error;
+  }
+  return handleResponse(response);
+};
+
 // Delete item
 export const deleteProduct = async (productId: number): Promise<boolean> => {
   try {
@@ -129,6 +144,40 @@ export const saveProductWithImage = async (
     await createProduct({ ...product, imageUrl });
   } catch (error) {
     if (imageUrl) {
+      try {
+        await deleteProductImage(imageUrl);
+      } catch (deleteError: any) {
+        console.error(
+          "Failed to delete orphaned image:",
+          deleteError.response?.data || deleteError.message,
+        );
+      }
+    }
+    throw new ProductSaveError("save", error);
+  }
+};
+
+// Same as saveProductWithImage, but updates an existing product instead of
+// creating a new one. Only uploads a replacement image when one was picked —
+// otherwise keeps the product's existing imageUrl as-is.
+export const updateProductWithImage = async (
+  productId: number,
+  product: any,
+  image: File | null,
+): Promise<void> => {
+  let imageUrl = product.imageUrl || "";
+  if (image) {
+    try {
+      imageUrl = await uploadProductImage(image);
+    } catch (error) {
+      throw new ProductSaveError("upload", error);
+    }
+  }
+
+  try {
+    await updateProduct(productId, { ...product, imageUrl });
+  } catch (error) {
+    if (image && imageUrl) {
       try {
         await deleteProductImage(imageUrl);
       } catch (deleteError: any) {

@@ -74,6 +74,44 @@ export function getCategoryKey(
   );
 }
 
+export interface CategoryPath {
+  group: string;
+  product: string;
+  fragment: string;
+  ration: string;
+}
+
+// Reverse of getCategoryKey — reconstructs the dropdown selections (group/
+// product/fragment/ration values) that produce a given backend category key,
+// so a saved product's category can be restored in the calculator's cascading
+// selects when editing it.
+export function getCategoryPath(categoryKey: string | null | undefined): CategoryPath | null {
+  // Without this guard, a falsy categoryKey (missing/empty) would match the
+  // first *unmapped* option CATEGORY_KEY_MAP[x] returns undefined for too —
+  // e.g. "kategori 24" itself, a non-terminal grouping value never present
+  // in the map — since undefined === undefined.
+  if (!categoryKey) return null;
+
+  for (const [group, products] of Object.entries(PRODUCT_OPTIONS_BY_GROUP)) {
+    for (const { value: product } of products) {
+      if (CATEGORY_KEY_MAP[product] === categoryKey) {
+        return { group, product, fragment: "", ration: "" };
+      }
+      for (const { value: fragment } of FRAGMENT_OPTIONS[product] ?? []) {
+        if (CATEGORY_KEY_MAP[fragment] === categoryKey) {
+          return { group, product, fragment, ration: "" };
+        }
+        for (const { value: ration } of RATION_OPTIONS[fragment] ?? []) {
+          if (CATEGORY_KEY_MAP[ration] === categoryKey) {
+            return { group, product, fragment, ration };
+          }
+        }
+      }
+    }
+  }
+  return null;
+}
+
 // Backend category key (e.g. "Kategori1", "Melk11a") -> full legal definition
 // label, built once from the dropdown option lists. Used by the reference
 // pages that list every category (not just the one currently selected).

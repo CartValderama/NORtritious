@@ -5,6 +5,8 @@ public class ProductDTO
     public string Name { get; set; } = string.Empty;
     public string Group { get; set; } = string.Empty;
     public string Type { get; set; } = string.Empty;
+    public string CategoryKey { get; set; } = string.Empty;
+    public string FoodType { get; set; } = string.Empty;
     public string HasEfsaHealth { get; set; } = string.Empty;
     public string HasEfsaNutrition { get; set; } = string.Empty;
     public bool HasNokkelhullet { get; set; } = false;
@@ -20,4 +22,9 @@ public class ProductDTO
     public decimal Fiber { get; set; }
     public decimal Protein { get; set; }
     public decimal Salt { get; set; }
+
+    public decimal PortionSize { get; set; }
+    public decimal TotalStarch { get; set; }
+    public decimal ResistantStarch { get; set; }
+    public string OtherSubstancesJson { get; set; } = "[]";
 }

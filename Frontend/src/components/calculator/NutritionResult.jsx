@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
-import * as ProductService from "../../../services/productService";
-import PanelBox from "../../PanelBox";
-import Button from "../../Button";
-import WarningAlert from "../../WarningAlert";
-import CircularProgress from "../../CircularProgress";
-import OverviewCard from "../../OverviewCard";
+import * as ProductService from "../../services/productService";
+import PanelBox from "../PanelBox";
+import Button from "../Button";
+import WarningAlert from "../WarningAlert";
+import CircularProgress from "../CircularProgress";
+import OverviewCard from "../OverviewCard";
 import ResultAccordionSection from "./ResultAccordionSection";
 import NokkelhulletSection from "./NokkelhulletSection";
 import EfsaSection from "./EfsaSection";
 import HealthClaimsSection from "./HealthClaimsSection";
-import keyholeLogo from "../../../assets/img/new_resized_image_1.png";
-import efsaLogoGreen from "../../../assets/img/efsaLogoGreen.png";
-import efsaLogo from "../../../assets/img/efsaLogo.png";
+import keyholeLogo from "../../assets/img/new_resized_image_1.png";
+import efsaLogoGreen from "../../assets/img/efsaLogoGreen.png";
+import efsaLogo from "../../assets/img/efsaLogo.png";
 import {
   buildResultStats,
   buildNokkelhulletVerdict,
@@ -22,12 +22,14 @@ import {
   claimColors,
   claimBadges,
   healthClaimsColors,
+  healthClaimsBadges,
   getNokkelhulletPercentage,
   getEfsaPercentage,
   buildProductSubmitPayload,
-} from "../../../utils/calculator/nutritionResultHelpers";
-import { getCategoryKey } from "../../../utils/calculator/categoryOptions";
-import { useCalculatorFormStore } from "../../../stores/calculatorFormStore";
+} from "../../utils/calculator/nutritionResultHelpers";
+import { buildResultPdf } from "../../utils/calculator/buildResultPdf";
+import { getCategoryKey } from "../../utils/calculator/categoryOptions";
+import { useCalculatorFormStore } from "../../stores/calculatorFormStore";
 
 const NutritionResult = () => {
   const {
@@ -43,6 +45,7 @@ const NutritionResult = () => {
     hasNokkelhullet,
     hasEfsaNutrition,
     resetToken,
+    efsaValues,
   } = useCalculatorFormStore((s) => ({
     calculation: s.calculation,
     efsaDisabled: s.efsaDisabled,
@@ -56,6 +59,7 @@ const NutritionResult = () => {
     hasNokkelhullet: s.hasNokkelhullet,
     hasEfsaNutrition: s.hasEfsaNutrition,
     resetToken: s.resetToken,
+    efsaValues: s.efsaValues,
   }));
   const category = getCategoryKey(
     selectsProduct,
@@ -69,6 +73,7 @@ const NutritionResult = () => {
   const [nokkelhulletOpen, setNokkelhulletOpen] = useState(false);
   const [efsaOpen, setEfsaOpen] = useState(false);
   const [healthClaimsOpen, setHealthClaimsOpen] = useState(false);
+  const [showSaveMenu, setShowSaveMenu] = useState(false);
 
   // resetToken bumps on category change/Nullstill/EFSA toggle-off — without
   // watching it, an accordion left open from a previous product would still
@@ -84,6 +89,17 @@ const NutritionResult = () => {
     setEfsaOpen(false);
     setHealthClaimsOpen(false);
   }, [resetToken]);
+
+  useEffect(() => {
+    if (!showSaveMenu) return undefined;
+    const handleClickOutside = (e) => {
+      if (!e.target.closest(".nutrition-save-menu")) {
+        setShowSaveMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showSaveMenu]);
 
   if (!category || !foodType) return null;
 
@@ -106,12 +122,32 @@ const NutritionResult = () => {
   const efsaColors = claimColors(stats.efsaMetCount, stats.efsaTotalCount);
   const healthClaimsColorSet = healthClaimsColors(stats.healthClaimsMetCount);
 
+  const handleSavePdf = () => {
+    const doc = buildResultPdf({
+      productName: product.name,
+      matvaregruppe: selectsGroup,
+      foodType,
+      category,
+      result,
+      nutrition,
+      efsaEnabled,
+    });
+    doc.save(`${product.name || "produkt"}.pdf`);
+    setShowSaveMenu(false);
+  };
+
+  const isEditing = Boolean(product.productId);
+
   const handleSaveProduct = async () => {
+    setShowSaveMenu(false);
     const payload = buildProductSubmitPayload(
       result,
       hasNokkelhullet,
       hasEfsaNutrition,
       nutrition,
+      category,
+      foodType,
+      efsaValues,
     );
     const updatedProduct = {
       ...product,
@@ -120,10 +156,19 @@ const NutritionResult = () => {
     };
 
     try {
-      await ProductService.saveProductWithImage(updatedProduct, selectedImage);
-      alert(
-        "Resept er nå lagret for dette produktet!\nDu kan behandle produktet på produkt-siden.",
-      );
+      if (isEditing) {
+        await ProductService.updateProductWithImage(
+          product.productId,
+          updatedProduct,
+          selectedImage,
+        );
+        alert("Produktet er nå oppdatert!");
+      } else {
+        await ProductService.saveProductWithImage(updatedProduct, selectedImage);
+        alert(
+          "Resept er nå lagret for dette produktet!\nDu kan behandle produktet på produkt-siden.",
+        );
+      }
     } catch (error) {
       const isUploadFailure = error?.stage === "upload";
       console.error(
@@ -157,10 +202,51 @@ const NutritionResult = () => {
               <i className="bi bi-share" />
               Del produkt
             </Button>
-            <Button variant="ghost" size="sm" onClick={handleSaveProduct}>
-              <i className="bi bi-save" />
-              Lagre produkt
-            </Button>
+            <div className="nutrition-save-menu position-relative flex-shrink-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowSaveMenu((v) => !v)}
+                aria-haspopup="true"
+                aria-expanded={showSaveMenu}
+              >
+                <i className="bi bi-save" />
+                {isEditing ? "Oppdater produkt" : "Lagre produkt"}
+              </Button>
+              {showSaveMenu && (
+                <div
+                  className="rounded-2 shadow-sm"
+                  style={{
+                    position: "absolute",
+                    top: "100%",
+                    right: 0,
+                    minWidth: "200px",
+                    backgroundColor: "#fff",
+                    border: "1px solid #dee2e6",
+                    zIndex: 10,
+                  }}
+                >
+                  <Button
+                    variant="menuItem"
+                    className="px-3 py-2"
+                    style={{ textDecoration: "none", whiteSpace: "nowrap" }}
+                    onClick={handleSavePdf}
+                  >
+                    <i className="bi bi-file-earmark-pdf" />
+                    Lagre som PDF
+                  </Button>
+                  <Button
+                    variant="menuItem"
+                    className="px-3 py-2"
+                    style={{ textDecoration: "none", whiteSpace: "nowrap" }}
+                    onClick={handleSaveProduct}
+                  >
+                    <i className="bi bi-person-circle" />
+                    {isEditing ? "Oppdater i profil" : "Lagre til profil"}
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -253,13 +339,17 @@ const NutritionResult = () => {
               open={healthClaimsOpen}
               onToggle={() => setHealthClaimsOpen((o) => !o)}
               colors={healthClaimsColorSet}
-              badges={[
-                {
-                  text: `${stats.healthClaimsMetCount} funnet`,
-                  backgroundColor: healthClaimsColorSet.badgeBg,
-                  color: healthClaimsColorSet.badgeColor,
-                },
-              ]}
+              badges={
+                healthClaimsOpen
+                  ? healthClaimsBadges(
+                      stats.healthClaimsMetCount,
+                      stats.healthClaimsTotalCount,
+                    )
+                  : claimBadges(
+                      stats.healthClaimsMetCount,
+                      stats.healthClaimsTotalCount,
+                    )
+              }
             >
               <HealthClaimsSection result={result} />
             </ResultAccordionSection>

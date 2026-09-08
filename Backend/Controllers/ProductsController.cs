@@ -134,6 +134,8 @@ namespace Backend.Controllers
                     Name = productDTO.Name,
                     Group = productDTO.Group,
                     Type = productDTO.Type,
+                    CategoryKey = productDTO.CategoryKey,
+                    FoodType = productDTO.FoodType,
                     HasEfsaHealth = productDTO.HasEfsaHealth,
                     HasEfsaNutrition = productDTO.HasEfsaNutrition,
                     HasNokkelhullet = productDTO.HasNokkelhullet,
@@ -147,6 +149,10 @@ namespace Backend.Controllers
                     Fiber = productDTO.Fiber,
                     Protein = productDTO.Protein,
                     Salt = productDTO.Salt,
+                    PortionSize = productDTO.PortionSize,
+                    TotalStarch = productDTO.TotalStarch,
+                    ResistantStarch = productDTO.ResistantStarch,
+                    OtherSubstancesJson = productDTO.OtherSubstancesJson,
                     UserId = userId,  // Set the userId for the created product
                     CreatedByUser = user  // Set the User navigation property
                 };
@@ -201,6 +207,8 @@ namespace Backend.Controllers
                 existingProduct.Name = productDTO.Name;
                 existingProduct.Group = productDTO.Group;
                 existingProduct.Type = productDTO.Type;
+                existingProduct.CategoryKey = productDTO.CategoryKey;
+                existingProduct.FoodType = productDTO.FoodType;
                 existingProduct.HasEfsaHealth = productDTO.HasEfsaHealth;
                 existingProduct.HasEfsaNutrition = productDTO.HasEfsaNutrition;
                 existingProduct.HasNokkelhullet = productDTO.HasNokkelhullet;
@@ -214,6 +222,10 @@ namespace Backend.Controllers
                 existingProduct.Fiber = productDTO.Fiber;
                 existingProduct.Protein = productDTO.Protein;
                 existingProduct.Salt = productDTO.Salt;
+                existingProduct.PortionSize = productDTO.PortionSize;
+                existingProduct.TotalStarch = productDTO.TotalStarch;
+                existingProduct.ResistantStarch = productDTO.ResistantStarch;
+                existingProduct.OtherSubstancesJson = productDTO.OtherSubstancesJson;
 
                 // You can call the repository to update the product here
                 var success = await _productsRepository.UpdateProductAsync(existingProduct);

@@ -1,13 +1,14 @@
 import React from "react";
-import LabeledSelect from "../../LabeledSelect";
-import PanelBox from "../../PanelBox";
+import LabeledSelect from "../LabeledSelect";
+import PanelBox from "../PanelBox";
+import API_URL from "../../apiConfig";
 import {
   GROUP_OPTIONS,
   PRODUCT_OPTIONS_BY_GROUP,
   FRAGMENT_OPTIONS,
   RATION_OPTIONS,
-} from "../../../utils/calculator/categoryOptions";
-import { useCalculatorFormStore } from "../../../stores/calculatorFormStore";
+} from "../../utils/calculator/categoryOptions";
+import { useCalculatorFormStore } from "../../stores/calculatorFormStore";
 
 const FOOD_TYPE_OPTIONS = [
   { value: "solid", label: "Fast form" },
@@ -18,7 +19,6 @@ const ProductInfoSection = () => {
   const {
     product,
     setProduct,
-    selectedImage,
     setSelectedImage,
     selectsGroup,
     setSelectGroups,
@@ -26,7 +26,9 @@ const ProductInfoSection = () => {
     setSelectProduct,
     selectsFragment,
     setSelectFragment,
+    selectsRation,
     setSelectRation,
+    foodType,
     foodTypeError,
     setFoodType,
     setCalculation,
@@ -36,7 +38,6 @@ const ProductInfoSection = () => {
   } = useCalculatorFormStore((s) => ({
     product: s.product,
     setProduct: s.setProduct,
-    selectedImage: s.selectedImage,
     setSelectedImage: s.setSelectedImage,
     selectsGroup: s.selectsGroup,
     setSelectGroups: s.setSelectGroups,
@@ -44,7 +45,9 @@ const ProductInfoSection = () => {
     setSelectProduct: s.setSelectProduct,
     selectsFragment: s.selectsFragment,
     setSelectFragment: s.setSelectFragment,
+    selectsRation: s.selectsRation,
     setSelectRation: s.setSelectRation,
+    foodType: s.foodType,
     foodTypeError: s.foodTypeError,
     setFoodType: s.setFoodType,
     setCalculation: s.setCalculation,
@@ -94,16 +97,21 @@ const ProductInfoSection = () => {
               accept="image/*"
               onChange={(e) => setSelectedImage(e.target.files?.[0] || null)}
             />
-            {selectedImage && (
-              <div className="mt-2">
-                <img
-                  src={URL.createObjectURL(selectedImage)}
-                  alt="Preview"
-                  className="img-thumbnail"
-                  width="150"
-                />
-              </div>
-            )}
+            {product.productId > 0 &&
+              product.imageUrl &&
+              product.imageUrl !== "placeholder.png" && (
+                <div className="form-text">
+                  Nåværende bilde:{" "}
+                  <a
+                    href={`${API_URL}${product.imageUrl}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    vis bilde
+                  </a>{" "}
+                  (last opp et nytt for å erstatte)
+                </div>
+              )}
           </div>
         </div>
 
@@ -112,13 +120,24 @@ const ProductInfoSection = () => {
             label="Matvaregruppe"
             placeholder={<div>Velg matvaregruppe</div>}
             className="form-select-md"
+            value={GROUP_OPTIONS.find((o) => o.value === selectsGroup) || null}
             onChange={(e) => {
+              // Only clear the food type and any calculated result when this
+              // actually replaces a prior group selection — not on the first
+              // pick, which matters when editing a product whose category
+              // couldn't be auto-restored (e.g. an older product saved before
+              // categories were persisted): the nutrition values were already
+              // loaded from the product, and picking the group to complete
+              // that recovery shouldn't wipe them back out.
+              const wasPreviouslySelected = Boolean(selectsGroup);
               setSelectGroups(e.value);
               setSelectProduct("");
               setSelectFragment("");
               setSelectRation("");
-              setFoodType("");
-              resetCalculationState();
+              if (wasPreviouslySelected) {
+                setFoodType("");
+                resetCalculationState();
+              }
               setShowHealthClaimsPanel(false);
             }}
             options={GROUP_OPTIONS}
@@ -130,7 +149,9 @@ const ProductInfoSection = () => {
             placeholder={<div>Velg mat</div>}
             className="form-select-md"
             isDisabled={productOptions.length === 0}
+            value={productOptions.find((o) => o.value === selectsProduct) || null}
             onChange={(e) => {
+              const wasPreviouslySelected = Boolean(selectsProduct);
               setSelectProduct(e.value);
               setSelectFragment("");
               setSelectRation("");
@@ -138,7 +159,7 @@ const ProductInfoSection = () => {
                 ...p,
                 type: `<strong>Matkategori:</strong> ${e.label}`,
               }));
-              resetCalculationState();
+              if (wasPreviouslySelected) resetCalculationState();
             }}
             options={productOptions}
           />
@@ -148,10 +169,12 @@ const ProductInfoSection = () => {
               label="Undermatkategori"
               placeholder={<div>Velg undermatkategori</div>}
               className="form-select-md"
+              value={fragmentOptions.find((o) => o.value === selectsFragment) || null}
               onChange={(e) => {
+                const wasPreviouslySelected = Boolean(selectsFragment);
                 setSelectFragment(e.value);
                 setSelectRation("");
-                resetCalculationState();
+                if (wasPreviouslySelected) resetCalculationState();
               }}
               options={fragmentOptions}
             />
@@ -162,10 +185,12 @@ const ProductInfoSection = () => {
               label="Undermatkategori"
               placeholder={<div>Velg undermatkategori</div>}
               className="form-select-md"
+              value={rationOptions.find((o) => o.value === selectsRation) || null}
               onChange={(e) => {
+                const wasPreviouslySelected = Boolean(selectsRation);
                 setSelectRation(e.value);
                 setProduct((p) => ({ ...p, type: e.label }));
-                resetCalculationState();
+                if (wasPreviouslySelected) resetCalculationState();
               }}
               options={rationOptions}
             />
@@ -176,6 +201,7 @@ const ProductInfoSection = () => {
             key={`foodtype-${selectsGroup}`}
             options={FOOD_TYPE_OPTIONS}
             placeholder="Velg mattype"
+            value={FOOD_TYPE_OPTIONS.find((o) => o.value === foodType) || null}
             onChange={(e) => setFoodType(e.value)}
             error={foodTypeError && "Velg mattype"}
           />

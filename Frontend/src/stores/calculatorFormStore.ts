@@ -11,15 +11,13 @@ export interface OtherSubstance {
   amount: string;
 }
 
-// Mirrors the Product shape in useCalculatorState.ts, which CalculatorOld.jsx
-// still uses. Duplicated deliberately rather than shared — CalculatorNew is
-// moving its category-selection state here while CalculatorOld stays on the
-// hook, since CalculatorOld is slated for deletion later anyway.
 export interface Product {
   productId: number;
   name: string;
   group: string;
   type: string;
+  categoryKey: string;
+  foodType: string;
   hasEfsaHealth: boolean | string;
   hasEfsaNutrition: boolean | string[] | null;
   hasNokkelhullet: boolean;
@@ -33,6 +31,10 @@ export interface Product {
   fiber: number | string;
   protein: number | string;
   salt: number | string;
+  portionSize: number | string;
+  totalStarch: number | string;
+  resistantStarch: number | string;
+  otherSubstancesJson: string;
 }
 
 const EMPTY_PRODUCT: Product = {
@@ -40,6 +42,8 @@ const EMPTY_PRODUCT: Product = {
   name: "",
   group: "",
   type: "",
+  categoryKey: "",
+  foodType: "",
   hasEfsaHealth: false,
   hasEfsaNutrition: false,
   hasNokkelhullet: false,
@@ -53,6 +57,10 @@ const EMPTY_PRODUCT: Product = {
   fiber: 0,
   protein: 0,
   salt: 0,
+  portionSize: 0,
+  totalStarch: 0,
+  resistantStarch: 0,
+  otherSubstancesJson: "[]",
 };
 
 export interface EfsaPanelValues {
@@ -86,7 +94,7 @@ interface CalculatorFormState {
   resetNutrition: () => void;
 
   // Same duplication existed for the EFSA "Kilde til Annet" panel values —
-  // CalculatorNew.jsx and EfsaHealthClaimsPanel each held their own copy,
+  // Calculator.jsx and EfsaHealthClaimsPanel each held their own copy,
   // synced one-way via initialValues/onValuesChange. Now the single owner.
   efsaValues: EfsaPanelValues;
   setEfsaValues: (efsaValues: EfsaPanelValues) => void;
@@ -97,7 +105,7 @@ interface CalculatorFormState {
   resetEfsaValues: () => void;
   // Bumped every time resetEfsaValues runs — EfsaHealthClaimsPanel watches
   // this to clear its own local draft/UI state (newSubstance, hasStarch,
-  // etc.), replacing the old key-based force-remount CalculatorNew.jsx used
+  // etc.), replacing the old key-based force-remount Calculator.jsx used
   // to do (efsaResetKey). Folding the bump into resetEfsaValues itself means
   // every caller (Nullstill, disabling EFSA, changing category) gets this
   // for free — previously only Nullstill/disable remembered to bump the key,
@@ -107,7 +115,7 @@ interface CalculatorFormState {
 
   // These four are read by more than one sibling on the "new" calculator page
   // (ProductInfoSection/NutritionForm/NutritionResult), so they can't be
-  // colocated in a single component — they used to live in CalculatorNew.jsx
+  // colocated in a single component — they used to live in Calculator.jsx
   // and get threaded down as props; now every consumer reads/writes here
   // directly and the page itself stays composition-only.
   foodType: string;
@@ -124,17 +132,12 @@ interface CalculatorFormState {
 
   // Read by both NutritionForm (owns the Accordion) and EfsaHealthClaimsPanel
   // (its scroll-into-view-on-open effect) — previously threaded down from
-  // CalculatorNew.jsx under two different prop names (showHealthClaimsPanel /
+  // Calculator.jsx under two different prop names (showHealthClaimsPanel /
   // isOpen) for the same value.
   showHealthClaimsPanel: boolean;
   setShowHealthClaimsPanel: (show: boolean) => void;
   toggleHealthClaimsPanel: () => void;
 
-  // Category-selection cascade + product metadata for CalculatorNew only.
-  // CalculatorOld.jsx keeps its own copy of this via useCalculatorState.ts's
-  // per-instance useState — deliberately not shared here, since a store is a
-  // single tab-wide instance and these two pages must not leak selections
-  // into each other while CalculatorOld still exists.
   selectsGroup: string;
   setSelectGroups: (value: string) => void;
   selectsProduct: string;
@@ -156,6 +159,28 @@ interface CalculatorFormState {
   setHasNokkelhullet: (value: boolean) => void;
   hasEfsaNutrition: string[] | boolean | null;
   setHasEfsaNutrition: (value: string[] | boolean | null) => void;
+
+  // Clears every field a calculator session can accumulate, back to a blank
+  // "new product" draft — used when landing on the calculator without a
+  // productId, so a previous edit session's product identity (in particular
+  // product.productId) can't leak into what should be a fresh create.
+  resetDraft: () => void;
+
+  // Populates the whole draft from a saved product in one atomic update, so
+  // editing a product starts from that product's own data instead of
+  // whatever the previous draft happened to hold.
+  loadProductForEdit: (params: {
+    product: Product;
+    nutrition: NutritionValues;
+    categoryPath: {
+      group: string;
+      product: string;
+      fragment: string;
+      ration: string;
+    } | null;
+    foodType: string;
+    efsaValues: EfsaPanelValues;
+  }) => void;
 }
 
 const calculatorFormStoreBase = createStore<CalculatorFormState>((set) => ({
@@ -216,6 +241,51 @@ const calculatorFormStoreBase = createStore<CalculatorFormState>((set) => ({
   setHasNokkelhullet: (hasNokkelhullet) => set({ hasNokkelhullet }),
   hasEfsaNutrition: null,
   setHasEfsaNutrition: (hasEfsaNutrition) => set({ hasEfsaNutrition }),
+
+  resetDraft: () =>
+    set((state) => ({
+      nutrition: EMPTY_NUTRITION,
+      efsaValues: EMPTY_EFSA_VALUES,
+      resetToken: state.resetToken + 1,
+      foodType: "",
+      foodTypeError: false,
+      calculation: null,
+      efsaDisabled: false,
+      showHealthClaimsPanel: false,
+      selectsGroup: "",
+      selectsProduct: "",
+      selectsFragment: "",
+      selectsRation: "",
+      selectedImage: null,
+      product: EMPTY_PRODUCT,
+      hasNokkelhullet: false,
+      hasEfsaNutrition: null,
+    })),
+
+  loadProductForEdit: ({ product, nutrition, categoryPath, foodType, efsaValues }) =>
+    set((state) => ({
+      nutrition,
+      efsaValues,
+      resetToken: state.resetToken + 1,
+      foodType,
+      foodTypeError: false,
+      calculation: null,
+      efsaDisabled: false,
+      // Auto-open when the product actually has restored panel data, so it's
+      // visible right away instead of looking dropped behind a collapsed
+      // accordion the user has to remember to click open.
+      showHealthClaimsPanel: Boolean(
+        efsaValues.totalStarch || efsaValues.otherSubstances.length > 0,
+      ),
+      selectsGroup: categoryPath?.group ?? "",
+      selectsProduct: categoryPath?.product ?? "",
+      selectsFragment: categoryPath?.fragment ?? "",
+      selectsRation: categoryPath?.ration ?? "",
+      selectedImage: null,
+      product,
+      hasNokkelhullet: product.hasNokkelhullet === true,
+      hasEfsaNutrition: null,
+    })),
 }));
 
 // Wraps useShallow around every call site automatically, so components can

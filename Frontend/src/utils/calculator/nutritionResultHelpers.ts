@@ -1,8 +1,9 @@
 import { CLAIMS_CONFIG, type ClaimConfigEntry } from "./ClaimResult";
 import { EFSA_CLAIM_FIELDS } from "./efsaClaimFields";
 import { OTHER_SUBSTANCE_OPTIONS } from "./otherSubstanceOptions";
-import type { NutritionValues } from "./nutritionFormFields";
+import { formatNoNumber, type NutritionValues } from "./nutritionFormFields";
 import { evaluateNokkelhulletRequirements } from "./nokkelhulletEvaluation";
+import type { EfsaPanelValues } from "../../stores/calculatorFormStore";
 
 // Reverse lookup: backend claim name string (e.g. "Lavt Fettinnhold") -> CLAIMS_CONFIG entry/key.
 export const CLAIMS_BY_NAME: Record<string, ClaimConfigEntry & { key: string }> =
@@ -39,6 +40,7 @@ export interface HealthClaim {
   sourceUrl?: string;
   efsaQuestionUrl?: string;
   efsaQuestion?: string;
+  efsaQuestionTitle?: string;
   legislationReference?: string;
   meetsRequirement?: string;
 }
@@ -59,18 +61,25 @@ export const getVisibleHealthClaims = (
     (c) => c.meetsRequirement === "Oppfyller gitt krav",
   );
 
+// Same combined list as getVisibleHealthClaims, but unfiltered — every substance the user
+// added, whether it met the requirement or not. meetsRequirement carries the reason for a
+// miss (e.g. "trenger minst 6 g per 100 g — produktet har 4 g"), so a failed substance can
+// be shown with why it failed instead of silently disappearing from the results.
+export const getAllHealthClaims = (result: HealthClaimsResult): HealthClaim[] => [
+  ...(result.efsaHealthClaims || []),
+  ...(result.ingredientHealthClaims || []),
+];
+
 // Labels for the nutrition-table fields, used to build the per-claim statistic line.
 export const FIELD_LABELS: Record<string, string> = {
   fett: "Fett",
   mettede: "Mettede fettsyrer",
   transfett: "Transfett",
   karbohydrat: "Karbohydrat",
-  naturligSukker: "Naturlig sukker",
-  hvoravSukkerarter: "Tilsatt sukker",
+  sukkerarter: "Sukkerarter",
   kostfiber: "Kostfiber",
   protein: "Protein",
-  naturligSalt: "Naturlig salt",
-  tilsattSalt: "Tilsatt salt",
+  salt: "Salt",
 };
 
 // Builds a natural lead-in sentence ("Produktet inneholder 3 g kostfiber per 100 g")
@@ -80,16 +89,126 @@ export const buildClaimStatistic = (
   claimKey: string,
   nutrition: NutritionValues | null | undefined,
 ): string | null => {
+  if (!nutrition) return null;
+
+  // Energy claims (lowEnergy/energyFree) aren't in EFSA_CLAIM_FIELDS — energy
+  // isn't a regular nutrition-table field, it's energikcal/energikj on its
+  // own, and only one of the two is ever filled in (whichever unit the form
+  // was set to) — so they need their own branch instead of the generic
+  // field-list lookup below, which would otherwise silently return nothing.
+  if (claimKey === "lowEnergy" || claimKey === "energyFree") {
+    const kcalPart =
+      nutrition.energikcal !== "" ? `${formatNoNumber(Number(nutrition.energikcal) || 0)} kcal` : "";
+    const kjPart =
+      nutrition.energikj !== "" ? `${formatNoNumber(Number(nutrition.energikj) || 0)} kJ` : "";
+    const energy = [kcalPart, kjPart].filter(Boolean).join(" / ");
+    return energy ? `Produktet inneholder ${energy} energi per 100 g` : null;
+  }
+
   const fields = EFSA_CLAIM_FIELDS[claimKey] || [];
-  if (fields.length === 0 || !nutrition) return null;
+  if (fields.length === 0) return null;
   const parts = fields.map(
-    (f) => `${Number(nutrition[f]) || 0} g ${(FIELD_LABELS[f] || f).toLowerCase()}`,
+    (f) => `${formatNoNumber(Number(nutrition[f]) || 0)} g ${(FIELD_LABELS[f] || f).toLowerCase()}`,
   );
   const joined =
     parts.length > 1
       ? `${parts.slice(0, -1).join(", ")} og ${parts[parts.length - 1]}`
       : parts[0];
   return `Produktet inneholder ${joined} per 100 g`;
+};
+
+export interface EfsaClaimDisplay {
+  actualValue: number;
+  actualUnit: string;
+  comparator: "≤" | "≥";
+  thresholdValue: number;
+  thresholdUnit: string;
+}
+
+// Structured actual-vs-threshold numbers for the 6 active EFSA nutrition
+// claims (CheckEfsaNutritionClaims in CalculatorService.cs) — same shape as
+// evaluateNokkelhulletRequirements, for a "Krav / Faktisk / Grense / Status"
+// table instead of a prose sentence. The fibre claims also have an
+// alternative "or ≥X g per 100 kcal" basis in the backend check; that's
+// deliberately dropped here in favour of the single governing per-100g
+// threshold, same simplification evaluateNokkelhulletRequirements already
+// makes when a category defines more than one qualifying basis.
+export const getEfsaClaimDisplay = (
+  claimKey: string,
+  foodType: string,
+  nutrition: NutritionValues,
+): EfsaClaimDisplay | null => {
+  const liquid = foodType === "liquid";
+  const useKj = nutrition.energikj !== "" && nutrition.energikcal === "";
+
+  switch (claimKey) {
+    case "lowEnergy":
+      return useKj
+        ? {
+            actualValue: Number(nutrition.energikj) || 0,
+            actualUnit: "kJ",
+            comparator: "≤",
+            thresholdValue: liquid ? 80 : 170,
+            thresholdUnit: `kJ/100 ${liquid ? "ml" : "g"}`,
+          }
+        : {
+            actualValue: Number(nutrition.energikcal) || 0,
+            actualUnit: "kcal",
+            comparator: "≤",
+            thresholdValue: liquid ? 20 : 40,
+            thresholdUnit: `kcal/100 ${liquid ? "ml" : "g"}`,
+          };
+    case "energyFree":
+      return useKj
+        ? {
+            actualValue: Number(nutrition.energikj) || 0,
+            actualUnit: "kJ",
+            comparator: "≤",
+            thresholdValue: 17,
+            thresholdUnit: "kJ/100 g",
+          }
+        : {
+            actualValue: Number(nutrition.energikcal) || 0,
+            actualUnit: "kcal",
+            comparator: "≤",
+            thresholdValue: 4,
+            thresholdUnit: "kcal/100 g",
+          };
+    case "highFibre":
+      return {
+        actualValue: Number(nutrition.kostfiber) || 0,
+        actualUnit: "g",
+        comparator: "≥",
+        thresholdValue: 6,
+        thresholdUnit: "g/100 g",
+      };
+    case "sourceOfFibre":
+      return {
+        actualValue: Number(nutrition.kostfiber) || 0,
+        actualUnit: "g",
+        comparator: "≥",
+        thresholdValue: 3,
+        thresholdUnit: "g/100 g",
+      };
+    case "lowSugars":
+      return {
+        actualValue: Number(nutrition.sukkerarter) || 0,
+        actualUnit: "g",
+        comparator: "≤",
+        thresholdValue: liquid ? 2.5 : 5,
+        thresholdUnit: `g/100 ${liquid ? "ml" : "g"}`,
+      };
+    case "sugarsFree":
+      return {
+        actualValue: Number(nutrition.sukkerarter) || 0,
+        actualUnit: "g",
+        comparator: "≤",
+        thresholdValue: 5,
+        thresholdUnit: "g/100 g/ml",
+      };
+    default:
+      return null;
+  }
 };
 
 // The claim's own met/not-met explanation text, joined into one string
@@ -146,6 +265,7 @@ export interface ResultStats {
   efsaMetCount: number;
   efsaTotalCount: number;
   healthClaimsMetCount: number;
+  healthClaimsTotalCount: number;
 }
 
 // The three headline numbers behind the "Resultat" summary — shared by the plain-text
@@ -181,6 +301,7 @@ export const buildResultStats = (
     healthClaimsMetCount: healthClaims.filter(
       (c) => c.meetsRequirement === "Oppfyller gitt krav",
     ).length,
+    healthClaimsTotalCount: healthClaims.length,
   };
 };
 
@@ -324,6 +445,29 @@ const HEALTH_CLAIMS_TONE_COLORS: Record<"met" | "none", ClaimToneColors> = {
 export const healthClaimsColors = (metCount: number): ClaimToneColors =>
   HEALTH_CLAIMS_TONE_COLORS[metCount > 0 ? "met" : "none"];
 
+// Same split as claimBadges (met badge + unsatisfied badge when mixed), but the met badge
+// uses Helsepåstander's own blue tone instead of claimBadges' green — this section already
+// reads as blue everywhere else (healthClaimsColors), so its accordion badge should match
+// instead of borrowing Nøkkelhullet/EFSA's pass/fail green.
+export const healthClaimsBadges = (metCount: number, totalCount: number): ClaimBadge[] => {
+  if (totalCount === 0) return [];
+  const met = HEALTH_CLAIMS_TONE_COLORS.met;
+  const fail = CLAIM_TONE_COLORS.fail;
+
+  if (metCount === totalCount)
+    return [{ text: `${totalCount}`, backgroundColor: met.badgeBg, color: met.badgeColor }];
+  if (metCount === 0)
+    return [{ text: `${totalCount}`, backgroundColor: fail.badgeBg, color: fail.badgeColor }];
+  return [
+    { text: `${metCount}`, backgroundColor: met.badgeBg, color: met.badgeColor },
+    {
+      text: `${totalCount - metCount}`,
+      backgroundColor: fail.badgeBg,
+      color: fail.badgeColor,
+    },
+  ];
+};
+
 // Ring percentages for the Nøkkelhullet/EFSA overview cards — pure derivations
 // off the same stats object both cards already read their counts from.
 export const getNokkelhulletPercentage = (stats: ResultStats): number =>
@@ -336,43 +480,72 @@ export const getNokkelhulletPercentage = (stats: ResultStats): number =>
 export const getEfsaPercentage = (stats: ResultStats): number =>
   stats.efsaTotalCount > 0 ? (stats.efsaMetCount / stats.efsaTotalCount) * 100 : 0;
 
-interface SubmitPayloadResult {
-  efsaHealthClaims?: {
-    nutrient?: string;
-    meetsRequirement?: string;
-    pastand?: string;
-  }[];
-}
-
-// The product payload for "Lagre produkt" on the new calculator. Mirrors
-// useCalculatorState.ts's buildSubmitPayload (used by CalculatorOld) —
-// duplicated rather than shared, see calculatorFormStore's Product doc
-// comment for why.
+// The product payload for "Lagre produkt" on the calculator.
 export const buildProductSubmitPayload = (
-  calcResult: SubmitPayloadResult | null | undefined,
+  calcResult: HealthClaimsResult | null | undefined,
   hasNokkelhullet: boolean,
   hasEfsaNutrition: string[] | boolean | null,
   nutrition: NutritionValues,
+  categoryKey: string,
+  foodType: string,
+  efsaValues: EfsaPanelValues,
 ) => {
-  const efsaHealthClaim = calcResult?.efsaHealthClaims?.[0];
+  // Every satisfied claim — both the carbohydrate/fibre-based ones
+  // (efsaHealthClaims) and the ones from substances added in "Kilde til
+  // annet" (ingredientHealthClaims, e.g. vitamins/minerals) — not just the
+  // first efsaHealthClaims entry. Saving only the first one meant a product
+  // with both a satisfied starch claim and satisfied vitamin/mineral claims
+  // only ever showed the starch claim on the product page.
+  const satisfiedHealthClaims = getVisibleHealthClaims(calcResult ?? {});
+  const hasEfsaHealthText = satisfiedHealthClaims
+    .map(
+      (claim) =>
+        `<strong>${claim.nutrient ?? ""} Helsepåstand:</strong>\n${claim.meetsRequirement ?? ""}\n${claim.pastand ?? ""}`,
+    )
+    .join("\n");
+  // Backend's ProductDTO.HasEfsaNutrition is a plain string (comma-separated list,
+  // parsed back apart by NutritionClaimsUL.tsx) — hasEfsaNutrition itself is set
+  // straight from the calculate response's efsaNutritionClaims array
+  // (NutritionForm.jsx), so sending it as-is here is a string[]/boolean/null that
+  // fails JSON model binding into that string property with a 400, silently
+  // breaking every save.
+  const hasEfsaNutritionText = Array.isArray(hasEfsaNutrition)
+    ? hasEfsaNutrition.join(", ")
+    : "";
   return {
     hasNokkelhullet,
-    hasEfsaNutrition,
-    hasEfsaHealth: efsaHealthClaim
-      ? `<strong>${efsaHealthClaim.nutrient} Helsepåstand:</strong>\n${efsaHealthClaim.meetsRequirement}\n${efsaHealthClaim.pastand}`
-      : "",
+    hasEfsaNutrition: hasEfsaNutritionText,
+    categoryKey,
+    foodType,
+    hasEfsaHealth: hasEfsaHealthText,
     calories:
       nutrition.energikcal !== "" ? nutrition.energikcal : nutrition.energikj,
     fat: nutrition.fett,
     satFat: nutrition.mettede,
     carbs: nutrition.karbohydrat,
-    natSugar: nutrition.naturligSukker,
-    addedSugar: nutrition.hvoravSukkerarter,
-    fiber: nutrition.kostfiber,
-    protein: nutrition.protein,
-    salt:
-      (Number(nutrition.naturligSalt) || 0) +
-      (Number(nutrition.tilsattSalt) || 0),
+    // Product.NatSugar/AddedSugar are still two separate saved columns, but the
+    // form no longer collects that split — the full amount goes to natSugar
+    // (not addedSugar) so the saved product's label doesn't assert "all of
+    // this is added sugar" without evidence for it.
+    //
+    // sukkerarter/protein are hidden inputs (blank, never touched) for
+    // categories where they're chemically zero or claims can't apply
+    // (ZERO_SUGAR_CATEGORIES/NO_PROTEIN_CATEGORIES in nutritionFormFields.ts)
+    // — sending "" straight through used to 400 every save for those
+    // categories, since Product.NatSugar/Protein are decimal columns that
+    // can't parse an empty string.
+    natSugar: nutrition.sukkerarter || "0",
+    addedSugar: "0",
+    fiber: nutrition.kostfiber || "0",
+    protein: nutrition.protein || "0",
+    salt: Number(nutrition.salt) || 0,
+    // "Kilde til Annet"/helsepåstander panel inputs — previously not saved at
+    // all, so every edit silently dropped the starch/portion size/added
+    // substances back to blank even though the rest of the form restored.
+    portionSize: efsaValues.portionSize || "0",
+    totalStarch: efsaValues.totalStarch || "0",
+    resistantStarch: efsaValues.resistantStarch || "0",
+    otherSubstancesJson: JSON.stringify(efsaValues.otherSubstances || []),
   };
 };
 
@@ -443,8 +616,8 @@ export const getEnergyFormulaWarning = (
   if (ratio >= 0.5 && ratio <= 1.5) return null;
 
   return (
-    `Du har oppgitt ${entered} ${unit} energi, mens fett er ${fat} g, karbohydrat er ${carbs} g, ` +
-    `protein er ${protein} g og kostfiber er ${fibre} g. ` +
+    `Du har oppgitt ${formatNoNumber(entered)} ${unit} energi, mens fett er ${formatNoNumber(fat)} g, karbohydrat er ${formatNoNumber(carbs)} g, ` +
+    `protein er ${formatNoNumber(protein)} g og kostfiber er ${formatNoNumber(fibre)} g. ` +
     (foodType === "solid"
       ? "Kontroller at disse stemmer med hverandre."
       : "Dette kan være riktig hvis produktet inneholder alkohol, sukkeralkoholer eller organiske syrer, som ikke registreres i denne kalkulatoren. Kontroller likevel at verdiene stemmer med hverandre.")

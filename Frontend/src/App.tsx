@@ -42,6 +42,10 @@ const AppRoutes: React.FC = () => {
             element={<Calculator />}
           />
           <Route
+            path="/products/calculator/:productId"
+            element={<Calculator />}
+          />
+          <Route
             path="/products/details/:productId"
             element={<ProductDetails />}
           />
