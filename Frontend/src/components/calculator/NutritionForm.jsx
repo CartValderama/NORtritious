@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Tooltip from "@mui/material/Tooltip";
 import efsaLogo from "../../assets/img/efsaLogo.png";
 import NutritionFieldColumn from "./NutritionFieldColumn";
+import MatvaretabellenAccordion from "./MatvaretabellenAccordion";
 import EfsaHealthClaimsPanel from "./EfsaHealthClaimsPanel";
 import PanelBox from "../PanelBox";
 import Accordion from "../Accordion";
@@ -313,7 +314,7 @@ const NutritionForm = () => {
         />
 
         {!efsaDisabled && (
-          <div style={{ marginBottom: "2.25rem" }}>
+          <div style={{ marginBottom: "0.75rem" }}>
             <Accordion
               id="efsaAccordion"
               itemClassName="rounded-2"
@@ -367,6 +368,8 @@ const NutritionForm = () => {
             </Accordion>
           </div>
         )}
+
+        <MatvaretabellenAccordion />
 
         {Object.keys(errors).length > 0 && (
           <WarningAlert

@@ -2,6 +2,30 @@
   border-radius: 0 !important;
 }
 
+/* Responsive text scaling for the whole calculator page (Calculator.jsx adds
+   this class to <html> on mount, removes it on unmount) — matches the
+   modal's Bootstrap-RFS-driven shrinking (.fs-4 etc. compile to
+   calc(rem + vw)) but applied once, at the root, instead of per element.
+   rem always resolves against the root font-size regardless of where it's
+   used, so overriding it here — rather than on some local wrapper — is what
+   makes every rem-sized piece of text on the page shrink together: custom
+   CSS in this file, Bootstrap's own fs-* and h1-h6 utilities, inline rem values,
+   all of it, with no need to touch each one individually.
+   calc(13.5px+0.21vw) runs from 16px at 1200px (13.5 + 0.21*12 = 16.02) down
+   to ~14.3px at 375px (13.5 + 0.21*3.75 = 14.29) — about a 10-11% reduction,
+   matching the gentleness of Bootstrap's own RFS curve (e.g. .fs-4's
+   calc(1.275rem + 0.3vw) is a similar ~10% reduction end to end) rather than
+   a much steeper custom one. Pinned to 16px above 1200px so it doesn't keep
+   growing on very wide screens — only shrinks below that breakpoint. */
+html.calculator-responsive-text {
+  font-size: calc(13.5px + 0.21vw) !important;
+}
+@media (min-width: 1200px) {
+  html.calculator-responsive-text {
+    font-size: 16px !important;
+  }
+}
+
 /* Breadcrumb links on the "new" calculator page — black instead of
    Bootstrap's default blue link color. */
 .new-calc-breadcrumb a {
@@ -624,4 +648,337 @@ li {
 }
 .vilkaar-toggle:hover {
   text-decoration: underline !important;
+}
+
+/* Matvaretabellen search modal — fixed box regardless of result count (0 hits,
+   a first page, or several "Vis flere" loads), instead of growing/shrinking
+   with content. Colors match matvaretabellen.no's own light theme (pale mint
+   table header, dark teal text/links) rather than a plain gray Bootstrap
+   table: #054449 teal, #e2f1df pale mint header, #3f5c58 muted teal-gray. */
+/* Bootstrap only widens .modal-lg to 800px starting at its lg breakpoint
+   (992px) — below that it falls back to the base 500px dialog, which felt
+   like it shrank way too early on a laptop-width viewport. Pull that width
+   forward to md (768px) instead, matching the same breakpoint used to hide
+   the Protein/Fett/Karbo columns below. */
+@media (min-width: 768px) {
+  .mvt-modal-dialog.modal-lg {
+    max-width: 800px;
+  }
+}
+.mvt-modal-content {
+  height: 700px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  /* Matches PanelBox's rounded-4 (1rem) instead of Bootstrap's smaller default
+     modal radius, so the dialog reads consistently with the panels behind it. */
+  --bs-modal-border-radius: 1rem;
+}
+.mvt-modal-content .modal-title {
+  color: #054449 !important;
+}
+.mvt-modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.mvt-modal-results {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+/* Table border/rounding lives on the outer frame with overflow: hidden, which
+   reliably clips to a border-radius in every browser. overflow: auto/scroll
+   (needed on the inner element for the actual scrollbar) does NOT reliably
+   clip its own scrollbar to a border-radius — the scrollbar's square corners
+   poke out over the curve. Splitting scrolling (inner) from
+   clipping/border (outer) avoids that.
+   flex: 0 1 auto (not 1 1 auto) on the frame so it hugs the table's actual
+   height instead of always stretching to fill .mvt-modal-results —
+   otherwise, with only a few rows, the bordered/rounded box extends far past
+   the last row into empty space, making the border and corners look
+   disconnected from the content ("clipped"). max-height caps it at the space
+   actually available so it still scrolls once content overflows.
+   0.375rem radius matches the calculator's own plain form-control inputs
+   (Bootstrap's default), not an oversized custom radius. */
+.mvt-modal-table-frame {
+  flex: 0 1 auto;
+  max-height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid #cfe4ca;
+  border-radius: 0.375rem;
+}
+.mvt-modal-table-scroll {
+  max-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #cfe4ca #ffffff;
+}
+.mvt-modal-table-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+.mvt-modal-table-scroll::-webkit-scrollbar-track {
+  background: #ffffff;
+}
+.mvt-modal-table-scroll::-webkit-scrollbar-thumb {
+  background-color: #cfe4ca;
+  border-radius: 4px;
+}
+
+/* Search bar — detached teal-bordered input (icon inside, not a separate
+   input-group box) plus a solid teal "Søk" button, matching
+   matvaretabellen.no's own search bar instead of a plain Bootstrap
+   input-group. Same 0.375rem radius as .mvt-modal-table-frame above, matching
+   the calculator's own plain inputs rather than an oversized custom radius. */
+.mvt-search-input {
+  padding-left: 2.75rem !important;
+  padding-top: 0.65rem !important;
+  padding-bottom: 0.65rem !important;
+  border-color: #cfe4ca !important;
+  border-radius: 0.375rem !important;
+}
+.mvt-search-input:focus {
+  border-color: #054449 !important;
+  box-shadow: 0 0 0 0.2rem rgba(5, 68, 73, 0.15);
+}
+.mvt-search-icon {
+  color: #054449;
+  font-size: 1.1rem;
+  pointer-events: none;
+}
+.mvt-search-btn {
+  background-color: #054449 !important;
+  border-color: #054449 !important;
+  color: #fff !important;
+  border-radius: 0.375rem !important;
+  padding-top: 0.65rem !important;
+  padding-bottom: 0.65rem !important;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  min-width: 8rem;
+  font-weight: 500;
+}
+.mvt-search-btn:hover:not(:disabled) {
+  background-color: #03363a !important;
+  border-color: #03363a !important;
+}
+/* Below md the "Søk" label is hidden (icon-only) — drop the label's min-width
+   too, otherwise the button keeps reserving space for text that isn't there. */
+@media (max-width: 767.98px) {
+  .mvt-search-btn {
+    min-width: auto;
+    padding-left: 0.85rem;
+    padding-right: 0.85rem;
+  }
+}
+
+/* Results table — pale mint header + dark teal text/links, replacing the
+   generic gray table-light header. !important needed throughout: Bootstrap's
+   own --bs-table-bg-driven rules load after this file and otherwise win.
+   Plain table-layout: auto (the browser default — no table-layout override
+   here) so Energi/Protein/Fett/Karbo shrink to exactly fit their own content
+   with no leftover space inside a column, while Matvare takes whatever's
+   left over. Because there's no leftover space *inside* a column, the
+   visual gap between adjacent columns is just their combined left/right
+   padding — constant, even though the columns are each a different
+   (content-fit) width.
+   Note: an earlier table-layout: fixed + width: 1% + white-space: nowrap
+   attempt at this looked right in isolation but actually forced the whole
+   table wider than its container, silently clipping Fett/Karbo off-screen
+   under overflow-x: hidden — nowrap forces overflow instead of wrapping
+   whenever fixed-width columns don't leave enough room, in both fixed and
+   auto layout. Plain auto layout (no nowrap) doesn't have that failure
+   mode: it wraps a value onto a second line in a tight fit instead of
+   forcing the table wider than its box. */
+.mvt-modal-table > :not(caption) > * > * {
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+/* Matvare is the only column meant to absorb whatever's left over — width:
+   100% on just this cell is a standard table-layout: auto trick that tells
+   the browser to hand this column any leftover table width instead of
+   spreading it across every other (already content-fit) column, Energi
+   included. Without it, a capped Matvare (via .mvt-food-name below) reads to
+   the layout algorithm as "already at its max useful width", so leftover
+   space quietly goes to Energi instead — left-aligned, that shows up as
+   blank space trailing the value instead of being usable by Matvare. */
+.mvt-modal-table th:nth-child(2),
+.mvt-modal-table td:nth-child(2) {
+  width: 100%;
+}
+/* Energi/Protein/Fett/Karbo should each stay on one line — nowrap is safe
+   here now that Matvare (not a tiny fixed %) is the column giving up space,
+   unlike the earlier table-layout: fixed + width: 1% combination that
+   actually caused the table to overflow its container. */
+.mvt-modal-table th:nth-child(n + 3),
+.mvt-modal-table td:nth-child(n + 3) {
+  white-space: nowrap;
+}
+/* A single long food name would otherwise stretch the whole column — and
+   every row in it — wider each time one shows up. Cap and truncate the name
+   itself (not the whole <td>, so the MUI Tooltip wrapping it still
+   measures/anchors against the truncated text) — the cell above can still
+   grow to claim leftover space, this just caps how much of it the visible
+   text actually uses before ellipsis-truncating. */
+.mvt-food-name {
+  display: inline-block;
+  max-width: 20rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+/* Below md, Protein/Fett/Karbo are hidden and the modal itself is narrower,
+   so 20rem leaves too little room for Energi — a long name would still push
+   it around as the list grows. Tighter cap keeps the whole row (add-button +
+   Matvare + Energi) stable regardless of what's currently loaded. */
+@media (max-width: 767.98px) {
+  .mvt-food-name {
+    max-width: 12rem;
+  }
+}
+.mvt-modal-table thead th {
+  background-color: #e2f1df !important;
+  color: #054449 !important;
+  border-bottom-color: #cfe4ca !important;
+}
+.mvt-modal-table > tbody > tr > td {
+  color: #3f5c58 !important;
+}
+/* Last row's own border-bottom would stack with .mvt-modal-table-frame's
+   border right below it, making the table's bottom edge look thicker than
+   every other row divider. */
+.mvt-modal-table > tbody > tr:last-child > td {
+  border-bottom-width: 0 !important;
+}
+.mvt-modal-table.table-hover > tbody > tr:hover > * {
+  box-shadow: inset 0 0 0 9999px #f2f8f0 !important;
+}
+
+/* Whole row is the click target for picking a food, not just the small "+"
+   indicator — bigger, more forgiving hit area. */
+.mvt-row-clickable {
+  cursor: pointer;
+}
+
+/* "+" add-button column — narrow and unpadded (the button supplies its own
+   spacing) instead of following the table's normal 1rem cell padding. */
+.mvt-modal-table th.mvt-row-add-col,
+.mvt-modal-table td.mvt-row-add-col {
+  width: 3rem;
+  padding-left: 0.75rem !important;
+  padding-right: 0.25rem !important;
+}
+.mvt-row-add-btn {
+  box-sizing: border-box;
+  width: 1.25rem;
+  height: 1.25rem;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.2rem;
+  border: 1px solid #054449;
+  background: transparent;
+  color: #054449;
+  font-size: 0.65rem;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.mvt-row-add-btn:hover {
+  background-color: #054449;
+  color: #fff;
+}
+/* Toggled-on state (picked for the batch save) — same fill as hover, but
+   persists so a picked row still reads as picked once the mouse moves away. */
+.mvt-row-add-btn-active {
+  background-color: #054449;
+  color: #fff;
+}
+
+/* "Vis flere" as a full-width row inside the table itself (a colSpan cell),
+   not a separate element below the frame — so it scrolls with the results
+   and shares the table's own borders/hover styling. */
+.mvt-modal-table td.mvt-loadmore-cell {
+  padding: 0 !important;
+}
+.mvt-loadmore-row {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: #054449;
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  transition: background-color 0.15s ease;
+}
+.mvt-loadmore-row:hover:not(:disabled) {
+  background-color: #f2f8f0;
+}
+.mvt-loadmore-row:disabled {
+  color: #8fa3a6;
+}
+
+.mvt-modal-content .modal-footer {
+  border-top-color: #cfe4ca;
+}
+
+/* The "add" trigger in the accordion, styled as its own row so it sits
+   inline with the selected-food rows below it rather than reading as a
+   separate button element floating above the list. Dashed border keeps it
+   visually distinct from the solid-bordered food rows it shares a shape with. */
+.mvt-add-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  border: 1px dashed #cfe4ca;
+  background: transparent;
+  color: #054449;
+  font-weight: 500;
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.mvt-add-row:hover {
+  background-color: #f2f8f0;
+  border-color: #054449;
+}
+.mvt-add-row .mvt-row-add-btn {
+  flex-shrink: 0;
+}
+
+/* Selected-food rows in the accordion — same white-box-with-border look as
+   the results overview accordions (ResultAccordionSection.jsx's own
+   collapsed-state border), for consistency with the rest of the page. */
+.mvt-food-item {
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  padding: 1.25rem 1rem;
+}
+
+/* Small inline trash icon inside each selected-food row in the accordion —
+   reset from a plain <button> rather than reusing .mvt-row-add-btn's bordered
+   box look, since here it's sitting inside an already-filled row. */
+.mvt-badge-remove {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  line-height: 1;
+  color: #dc3545;
+  font-size: 1.1rem;
+  opacity: 0.7;
+}
+.mvt-badge-remove:hover {
+  opacity: 1;
 }

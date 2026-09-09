@@ -38,7 +38,8 @@ builder.Services.AddCors(options =>
             policy.WithOrigins(allowedOrigins)
                   .AllowAnyHeader()
                   .AllowAnyMethod()
-                  .AllowCredentials();
+                  .AllowCredentials()
+                  .WithExposedHeaders("X-Total-Count", "X-Page", "X-Page-Size", "X-Has-More");
         });
 });
 
@@ -55,6 +56,9 @@ builder.Services.AddSingleton<IEuHealthClaimsService, EuHealthClaimsService>();
 
 // Add Calculator
 builder.Services.AddSingleton<CalculatorService>();
+
+// Add Matvaretabellen client (https://www.matvaretabellen.no/api/)
+builder.Services.AddSingleton<IMatvaretabellenService, MatvaretabellenService>();
 
 // Add JWT token issuing service
 builder.Services.AddScoped<ITokenService, TokenService>();

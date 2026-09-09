@@ -65,6 +65,19 @@ const Calculator = () => {
     loadProductForEdit: s.loadProductForEdit,
   }));
 
+  // rem is always relative to the root <html> element, not any local
+  // container — so making every rem-sized piece of text on this page
+  // (headings, Bootstrap fs-* utilities, custom CSS, all of it) shrink
+  // together as the viewport narrows means responsively scaling the root
+  // font-size itself, scoped to just this page via this class rather than
+  // globally (see .calculator-responsive-text in Calculator.css).
+  useEffect(() => {
+    document.documentElement.classList.add("calculator-responsive-text");
+    return () => {
+      document.documentElement.classList.remove("calculator-responsive-text");
+    };
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
 
