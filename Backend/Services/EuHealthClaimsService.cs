@@ -15,6 +15,11 @@ namespace Backend.Services
         public string ClaimType { get; set; } = string.Empty;
         public string ClaimStatus { get; set; } = string.Empty;
         public string Claim { get; set; } = string.Empty;
+
+        // The register's own English claim wording, before translation. Kept so a claim whose
+        // Norwegian rendering turns out to be wrong can fall back to the authorised source
+        // text instead of to invented wording.
+        public string ClaimOriginal { get; set; } = string.Empty;
         public string ConditionOfUse { get; set; } = string.Empty;
         public string HealthRelation { get; set; } = string.Empty;
         public string RestrictionsOfUse { get; set; } = string.Empty;
@@ -28,6 +33,12 @@ namespace Backend.Services
     public interface IEuHealthClaimsService
     {
         Task<EuHealthClaimEntry?> GetByIdAsync(long policyItemId, CancellationToken ct = default);
+
+        // Warms the cache for several entries at once. A caller that knows up front which
+        // claims it needs calls this before walking its lists, and its existing GetByIdAsync
+        // calls then complete from memory instead of one round trip at a time. Purely an
+        // optimisation: an id left out still resolves, it just pays for its own fetch.
+        Task PrefetchAsync(IEnumerable<long> policyItemIds, CancellationToken ct = default);
     }
 
     // Fetches individual entries from the EU Health Claims register on demand
@@ -53,12 +64,23 @@ namespace Backend.Services
             _translator = translator;
         }
 
+        public Task PrefetchAsync(IEnumerable<long> policyItemIds, CancellationToken ct = default) =>
+            Task.WhenAll(policyItemIds
+                .Distinct()
+                .Where(id => !_cache.ContainsKey(id))
+                .Select(id => GetByIdAsync(id, ct)));
+
         public async Task<EuHealthClaimEntry?> GetByIdAsync(long policyItemId, CancellationToken ct = default)
         {
             if (_cache.TryGetValue(policyItemId, out var cached))
                 return cached;
 
             EuHealthClaimEntry? entry = null;
+
+            // A null caches only when the register itself answered and had no such row. A
+            // request that threw is left uncached so the next caller retries: caching it would
+            // let one timeout blank that claim for the rest of the process's life.
+            bool answered = false;
             try
             {
                 var url = $"{BaseUrl}?policy_item_id={policyItemId}&format=json&api-version=v2.0";
@@ -69,6 +91,8 @@ namespace Backend.Services
                 var payload = await JsonSerializer.DeserializeAsync<ApiResponse>(stream,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true }, ct);
 
+                answered = true;
+
                 var raw = payload?.Value?.FirstOrDefault();
                 if (raw != null)
                 {
@@ -76,6 +100,17 @@ namespace Backend.Services
                     string conditionOfUse = StripHtml(raw.ConditionOfUse);
                     string healthRelation = StripHtml(raw.HealthRelation);
                     string restrictionsOfUse = StripHtml(raw.RestrictionsOfUse);
+                    string legislationReference = raw.LegislationReference ?? string.Empty;
+
+                    // Five independent translations of five separate fields. Awaiting them one
+                    // after another made a single entry cost five round trips in sequence, and
+                    // a calculation fetches a dozen entries.
+                    var claimNo = _translator.TranslateToNorwegianAsync(claim, ct);
+                    var conditionNo = _translator.TranslateToNorwegianAsync(conditionOfUse, ct);
+                    var relationNo = _translator.TranslateToNorwegianAsync(healthRelation, ct);
+                    var restrictionsNo = _translator.TranslateToNorwegianAsync(restrictionsOfUse, ct);
+                    var legislationNo = _translator.TranslateToNorwegianAsync(legislationReference, ct);
+                    await Task.WhenAll(claimNo, conditionNo, relationNo, restrictionsNo, legislationNo);
 
                     entry = new EuHealthClaimEntry
                     {
@@ -84,14 +119,14 @@ namespace Backend.Services
                         NutrientSubstFood = StripHtml(raw.NutrientSubstFoodNoHtml ?? raw.NutrientSubstFood),
                         ClaimType = raw.ClaimType ?? string.Empty,
                         ClaimStatus = raw.ClaimStatus ?? string.Empty,
-                        Claim = await _translator.TranslateToNorwegianAsync(claim, ct),
-                        ConditionOfUse = await _translator.TranslateToNorwegianAsync(conditionOfUse, ct),
-                        HealthRelation = await _translator.TranslateToNorwegianAsync(healthRelation, ct),
-                        RestrictionsOfUse = await _translator.TranslateToNorwegianAsync(restrictionsOfUse, ct),
+                        Claim = await claimNo,
+                        ClaimOriginal = claim,
+                        ConditionOfUse = await conditionNo,
+                        HealthRelation = await relationNo,
+                        RestrictionsOfUse = await restrictionsNo,
                         LegislationUrl = raw.LegislationUrl ?? string.Empty,
                         LegislationType = raw.LegislationType ?? string.Empty,
-                        LegislationReference = await _translator.TranslateToNorwegianAsync(
-                            raw.LegislationReference ?? string.Empty, ct),
+                        LegislationReference = await legislationNo,
                         EfsaQuestion = raw.EfsaQuestion ?? string.Empty,
                         EfsaQuestionUrl = raw.EfsaQuestionUrl ?? string.Empty,
                     };
@@ -103,10 +138,11 @@ namespace Backend.Services
             }
             catch (Exception ex)
             {
+                answered = false;
                 _logger.LogError(ex, "EuHealthClaims: failed to fetch policy_item_id {Id}", policyItemId);
             }
 
-            _cache[policyItemId] = entry;
+            if (answered) _cache[policyItemId] = entry;
             return entry;
         }
 

@@ -17,6 +17,13 @@ namespace Backend.Services
         private readonly HttpClient _http;
         private readonly ILogger<GoogleTranslateService> _logger;
 
+        // Callers now translate in parallel (a register entry has five translatable fields, and
+        // a calculation pulls a dozen entries at once), so without a ceiling one request could
+        // open sixty connections to an endpoint that is neither official nor rate-limit
+        // documented. Registered as a singleton, so this bounds the whole process, and a
+        // throttled call waits rather than failing — the fallback would silently return English.
+        private readonly SemaphoreSlim _throttle = new(8);
+
         public GoogleTranslateService(ILogger<GoogleTranslateService> logger)
         {
             _http = new HttpClient();
@@ -28,6 +35,7 @@ namespace Backend.Services
         {
             if (string.IsNullOrWhiteSpace(text)) return text;
 
+            await _throttle.WaitAsync(ct);
             try
             {
                 var url = "https://translate.googleapis.com/translate_a/single" +
@@ -51,6 +59,10 @@ namespace Backend.Services
             {
                 _logger.LogWarning(ex, "GoogleTranslate: failed to translate text, falling back to English");
                 return text;
+            }
+            finally
+            {
+                _throttle.Release();
             }
         }
     }
