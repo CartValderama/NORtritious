@@ -3,29 +3,46 @@ import { useEffect } from "react";
 interface ScrollIntoViewOnOpenOptions {
   delay?: number;
   behavior?: ScrollBehavior;
-  block?: ScrollLogicalPosition;
+  offset?: number;
 }
 
-// Scrolls the element with `elementId` into view every time `open` transitions
-// to true (not just on mount) — e.g. an accordion section that should bring
-// itself into the viewport when the user expands it. `delay` should roughly
-// match however long the element's own open/expand transition takes, so it
-// scrolls once the element has actually grown to its full height instead of
-// while still mid-animation.
+// Brings the element with `elementId` to the top of the viewport when `open` transitions to
+// true (not just on mount) — an accordion section showing itself as the user expands it.
+//
+// Two things it deliberately doesn't do:
+//
+// It doesn't centre the element. That was the previous behaviour, and it put long sections in
+// the wrong place: centring is computed from the height the element has at that moment, so a
+// section taller than the viewport gets its middle centred and its heading pushed off the
+// top. The health-claims results are the worst case, running to well over a screen. A top
+// anchor lands the same way whether the section holds two cards or twenty.
+//
+// It doesn't scroll at all when the element's top edge is already on screen. Expanding
+// something you are already looking at shouldn't move the page under you; the only case that
+// needs a scroll is the one where the thing that just opened is somewhere you can't see.
 export function useScrollIntoViewOnOpen(
   elementId: string,
   open: boolean,
   {
     delay = 300,
     behavior = "smooth",
-    block = "center",
+    offset = 16,
   }: ScrollIntoViewOnOpenOptions = {},
 ) {
   useEffect(() => {
     if (!open) return;
     const timeout = setTimeout(() => {
-      document.getElementById(elementId)?.scrollIntoView({ behavior, block });
+      const element = document.getElementById(elementId);
+      if (!element) return;
+
+      const { top } = element.getBoundingClientRect();
+      if (top >= 0 && top < window.innerHeight) return;
+
+      // scrollIntoView honours scroll-margin-top, which is how the element ends up sitting
+      // just below the viewport edge rather than flush against it.
+      element.style.scrollMarginTop = `${offset}px`;
+      element.scrollIntoView({ behavior, block: "start" });
     }, delay);
     return () => clearTimeout(timeout);
-  }, [elementId, open, delay, behavior, block]);
+  }, [elementId, open, delay, behavior, offset]);
 }
