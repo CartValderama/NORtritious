@@ -3,6 +3,8 @@ import Tooltip from "@mui/material/Tooltip";
 import efsaLogo from "../../assets/img/efsaLogo.png";
 import NutritionFieldColumn from "./NutritionFieldColumn";
 import MatvaretabellenAccordion from "./MatvaretabellenAccordion";
+import matvaretabellenLogo from "../../assets/img/matvaretabellenLogo.svg";
+import MatvaretabellenModal from "./MatvaretabellenModal";
 import EfsaHealthClaimsPanel from "./EfsaHealthClaimsPanel";
 import PanelBox from "../PanelBox";
 import Accordion from "../Accordion";
@@ -15,7 +17,9 @@ import {
 import { getSampleNutrition } from "../../utils/calculator/sampleNutritionGenerator";
 import { calculateNutrition } from "../../services/calculatorService";
 import { getCategoryKey } from "../../utils/calculator/categoryOptions";
+import { useCalculatorSchema } from "../../hooks/calculator/useCalculatorSchema";
 import { useCalculatorFormStore } from "../../stores/calculatorFormStore";
+import { IMPORTED_NUTRITION_FIELDS } from "../../utils/calculator/importedFoodTotals";
 
 const NutritionForm = () => {
   const {
@@ -39,6 +43,9 @@ const NutritionForm = () => {
     setShowHealthClaimsPanel,
     toggleHealthClaimsPanel,
     resetToken,
+    importedFoods,
+    setImportedFoods,
+    clearImportedFoods,
   } = useCalculatorFormStore((s) => ({
     selectsProduct: s.selectsProduct,
     selectsFragment: s.selectsFragment,
@@ -60,12 +67,18 @@ const NutritionForm = () => {
     setShowHealthClaimsPanel: s.setShowHealthClaimsPanel,
     toggleHealthClaimsPanel: s.toggleHealthClaimsPanel,
     resetToken: s.resetToken,
+    importedFoods: s.importedFoods,
+    setImportedFoods: s.setImportedFoods,
+    clearImportedFoods: s.clearImportedFoods,
   }));
   const category = getCategoryKey(
     selectsProduct,
     selectsFragment,
     selectsRation,
   );
+  // Which inputs this category needs comes from the backend, not from a local copy of the
+  // rules. Empty until it arrives, so the form shows no fields rather than a guessed set.
+  const schema = useCalculatorSchema(category, foodType);
   const { totalStarch, resistantStarch, otherSubstances, portionSize } =
     efsaValues;
   const kildeCount =
@@ -76,6 +89,16 @@ const NutritionForm = () => {
   const [calculatedNutrition, setCalculatedNutrition] = useState(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
+  // Lives here rather than in the accordion because the accordion isn't rendered until the
+  // first ingredient exists, so it can't be what opens the picker that adds it.
+  const [showMatvaretabellen, setShowMatvaretabellen] = useState(false);
+  // Once a recipe has been used in this session the panel stays put, even after the last
+  // ingredient is removed. Letting it vanish there meant getting back to it cost a trip
+  // through the settings menu, for something the user had just been working in.
+  const [recipeUsed, setRecipeUsed] = useState(false);
+  useEffect(() => {
+    if (importedFoods.length > 0) setRecipeUsed(true);
+  }, [importedFoods.length]);
 
   const handleEfsaDisabledChange = (disabled) => {
     setEfsaDisabled(disabled);
@@ -112,6 +135,9 @@ const NutritionForm = () => {
     setErrors({});
     setCalculating(false);
     setCalculatedNutrition(null);
+    // Nullstill, disabling helsepåstander and changing category are all "start over", so the
+    // recipe panel goes away with everything else rather than lingering as an empty box.
+    setRecipeUsed(false);
   }, [resetToken]);
 
   const handleReset = () => {
@@ -145,8 +171,14 @@ const NutritionForm = () => {
   const hasInput = Object.values(nutrition).some((value) => value !== "");
   const hasResult = calculatedNutrition !== null;
 
+  // While a list of matvarer is what the numbers are made of, those numbers aren't typed
+  // over: a product whose stated nutrition doesn't follow from its own ingredients is
+  // exactly what this tool is supposed to catch. Emptying the list hands the fields back.
+  const lockedFields = importedFoods.length > 0 ? IMPORTED_NUTRITION_FIELDS : [];
+
   const handleFillSample = (outcome) => {
-    const sample = getSampleNutrition(category, outcome);
+    const sample = getSampleNutrition(schema, outcome);
+    clearImportedFoods();
     setNutrition(sample);
     setEnergyUnit("energikcal");
   };
@@ -160,7 +192,7 @@ const NutritionForm = () => {
       foodType,
       energyUnit,
       nutrition,
-      category,
+      schema,
       resistantStarch,
       totalStarch,
     );
@@ -173,20 +205,20 @@ const NutritionForm = () => {
     setCalculating(true);
 
     try {
-      const data = await calculateNutrition(
-        buildCalculationPayload(
-          category,
-          foodType,
-          energyUnit,
-          portionSize,
-          nutrition,
-          totalStarch,
-          resistantStarch,
-          otherSubstances,
-        ),
+      const payload = buildCalculationPayload(
+        category,
+        foodType,
+        energyUnit,
+        portionSize,
+        nutrition,
+        totalStarch,
+        resistantStarch,
+        otherSubstances,
+        schema,
       );
+      const data = await calculateNutrition(payload);
 
-      setCalculation({ data, nutrition });
+      setCalculation({ data, nutrition, payload });
       setCalculatedNutrition(nutrition);
       setHasNokkelhullet(data.hasNokkelhullet === true);
       setHasEfsaNutrition(data.efsaNutritionClaims);
@@ -282,9 +314,32 @@ const NutritionForm = () => {
                       setShowSettingsMenu(false);
                     }}
                   >
+                    {/* The same logos the two accordions carry, so a menu item and the
+                        section it acts on are recognisable as the same thing. */}
+                    <img
+                      src={efsaLogo}
+                      alt=""
+                      style={{ width: "1.1rem", height: "auto", flexShrink: 0 }}
+                    />
                     {efsaDisabled
                       ? "Aktiver helsepåstander"
                       : "Deaktiver helsepåstander"}
+                  </Button>
+                  <Button
+                    variant="menuItem"
+                    className="px-3 py-2"
+                    style={{ textDecoration: "none", whiteSpace: "nowrap" }}
+                    onClick={() => {
+                      setShowMatvaretabellen(true);
+                      setShowSettingsMenu(false);
+                    }}
+                  >
+                    <img
+                      src={matvaretabellenLogo}
+                      alt=""
+                      style={{ width: "1.1rem", height: "auto", flexShrink: 0 }}
+                    />
+                    Hent matvare fra Matvaretabellen
                   </Button>
                   <Button
                     variant="menuItem"
@@ -295,6 +350,7 @@ const NutritionForm = () => {
                       setShowSettingsMenu(false);
                     }}
                   >
+                    <i className="bi bi-magic" style={{ width: "1.1rem" }} />
                     Seed form
                   </Button>
                 </div>
@@ -304,13 +360,14 @@ const NutritionForm = () => {
         </div>
 
         <NutritionFieldColumn
-          category={category}
+          schema={schema}
           nutrition={nutrition}
           energyUnit={energyUnit}
           onEnergyUnitChange={setEnergyUnit}
           errors={errors}
           calculatedNutrition={calculatedNutrition}
           onFieldChange={handleFieldChange}
+          lockedFields={lockedFields}
         />
 
         {!efsaDisabled && (
@@ -363,13 +420,27 @@ const NutritionForm = () => {
                 )}
               </Accordion.Header>
               <Accordion.Body>
-                <EfsaHealthClaimsPanel />
+                <EfsaHealthClaimsPanel schema={schema} />
               </Accordion.Body>
             </Accordion>
           </div>
         )}
 
-        <MatvaretabellenAccordion />
+        {(importedFoods.length > 0 || recipeUsed) && (
+          <MatvaretabellenAccordion
+            onOpenPicker={() => setShowMatvaretabellen(true)}
+          />
+        )}
+
+        <MatvaretabellenModal
+          show={showMatvaretabellen}
+          onHide={() => setShowMatvaretabellen(false)}
+          onSelect={(foods) => {
+            setImportedFoods(foods);
+            setShowMatvaretabellen(false);
+          }}
+          alreadySelected={importedFoods}
+        />
 
         {Object.keys(errors).length > 0 && (
           <WarningAlert
@@ -378,7 +449,12 @@ const NutritionForm = () => {
           />
         )}
 
-        <div className="d-flex flex-wrap gap-2">
+        {/* Owns its own gap from whatever ends up above it, so the spacing holds whether or
+            not the oppskrift accordion is on screen. */}
+        <div
+          className="d-flex flex-wrap gap-2"
+          style={{ marginTop: "2.25rem" }}
+        >
           <Button
             variant="primary"
             size="default"

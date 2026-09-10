@@ -19,5 +19,10 @@ namespace Backend.DTO
         public double Protein { get; set; }
         public double Salt { get; set; }
         public double Starch { get; set; }
+
+        // Feed the helsepåstander panel's kilder rather than the nutrition table: calcium in
+        // mg and vitamin D in µg, the units their claim thresholds are written in.
+        public double Calcium { get; set; }
+        public double VitaminD { get; set; }
     }
 }

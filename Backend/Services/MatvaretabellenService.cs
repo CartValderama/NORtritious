@@ -32,6 +32,13 @@ namespace Backend.Services
         private const string NutSalt = "NaCl";
         private const string NutStarch = "Stivel";
 
+        // The only two kilder in the helsepåstander panel that Matvaretabellen carries. Its
+        // 57 nutrients have no beta-glucan and no breakdown of fibre by type, so the fibre
+        // kilder and resistent stivelse stay hand-entered. Units already match the ones
+        // VitaminMineralDefs states the thresholds in, so nothing is converted.
+        private const string NutCalcium = "Ca";
+        private const string NutVitaminD = "Vit D";
+
         private readonly HttpClient _http;
         private readonly ILogger<MatvaretabellenService> _logger;
         private readonly SemaphoreSlim _loadLock = new(1, 1);
@@ -126,6 +133,8 @@ namespace Backend.Services
                 Protein = Get(NutProtein),
                 Salt = Get(NutSalt),
                 Starch = Get(NutStarch),
+                Calcium = Get(NutCalcium),
+                VitaminD = Get(NutVitaminD),
             };
         }
 

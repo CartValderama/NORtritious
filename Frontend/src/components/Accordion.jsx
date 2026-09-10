@@ -118,13 +118,21 @@ const Header = ({ className = "", style, children }) => {
 };
 
 const Body = ({ children }) => {
-  const { parentId, collapseId, collapseRef } = useAccordionContext("Body");
+  const { parentId, collapseId, collapseRef, open } = useAccordionContext("Body");
+
+  // After mount, Bootstrap's own JS owns the show/collapsing classes on this element, and
+  // rewriting className from React would clobber them mid-animation. So the initial state is
+  // captured once and never recomputed: an accordion that mounts already open renders
+  // expanded, instead of labelling itself "open" above a body that never opened. Needed by
+  // anything that appears in response to an action (the recipe list, which is only rendered
+  // once it has something in it) rather than being toggled by its own header.
+  const initiallyOpen = useRef(open === true).current;
 
   return (
     <div
       ref={collapseRef}
       id={collapseId}
-      className="accordion-collapse collapse"
+      className={`accordion-collapse collapse${initiallyOpen ? " show" : ""}`}
       data-bs-parent={`#${parentId}`}
     >
       {children}

@@ -17,6 +17,9 @@ export interface MatvaretabellenFoodDetail {
   protein: number;
   salt: number;
   starch: number;
+  // For the helsepåstander kilder rather than the nutrition table: mg and µg respectively.
+  calcium: number;
+  vitaminD: number;
 }
 
 export interface MatvaretabellenSearchResult {

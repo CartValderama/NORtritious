@@ -1,3 +1,4 @@
+import type { CalculatorRequestPayload } from "../services/calculatorService";
 import { useStore } from "zustand";
 import { createStore } from "zustand/vanilla";
 import { useShallow } from "zustand/react/shallow";
@@ -5,6 +6,16 @@ import {
   EMPTY_NUTRITION,
   type NutritionValues,
 } from "../utils/calculator/nutritionFormFields";
+import {
+  kilderFromImportedFoods,
+  mergeImportedFoods,
+  nutritionFromImportedFoods,
+  roundTo,
+  totalGramsOf,
+  RECIPE_KILDE_NAMES,
+  type ImportedFood,
+} from "../utils/calculator/importedFoodTotals";
+import type { MatvaretabellenFoodDetail } from "../services/matvaretabellenService";
 
 export interface OtherSubstance {
   name: string;
@@ -81,6 +92,10 @@ const EMPTY_EFSA_VALUES: EfsaPanelValues = {
 export interface Calculation {
   data: any;
   nutrition: NutritionValues;
+  // The inputs this result came from. Kept because the report endpoint recalculates from
+  // them rather than being handed a finished result, which is what stops the document from
+  // stating a verdict the calculator wouldn't reach.
+  payload: CalculatorRequestPayload;
 }
 
 interface CalculatorFormState {
@@ -92,6 +107,36 @@ interface CalculatorFormState {
   setNutrition: (nutrition: NutritionValues) => void;
   setNutritionField: (key: string, value: string) => void;
   resetNutrition: () => void;
+
+  // The recipe. It isn't a reference sitting beside the calculation: it fills the nutrition
+  // table, so every action that changes it recomputes `nutrition` in the same set() rather
+  // than leaving a render where the list and the numbers disagree.
+  //
+  // Emptying the list deliberately leaves the last computed values in the fields instead of
+  // blanking them. Nothing the user can see is destroyed by removing a row, and the fields
+  // unlock at the same moment, so an import can be used as a starting point and then edited
+  // by hand.
+  importedFoods: ImportedFood[];
+  setImportedFoods: (picked: MatvaretabellenFoodDetail[]) => void;
+  removeImportedFood: (foodId: string) => void;
+  setImportedFoodAmount: (foodId: string, amount: string) => void;
+  clearImportedFoods: () => void;
+
+  // "Oppskriften lager én porsjon". The recipe total is a batch, not a serving: the same
+  // product written as 900 g + 100 g or as 90 g + 10 g is identical, so the calculator can't
+  // tell how the batch is divided up. Ticking this is the user saying the batch is one
+  // portion, which is the only way that connection can be made honestly. Off by default,
+  // because assuming it would check per-portion claims against a whole batch and pass claims
+  // that shouldn't pass.
+  usePortionFromRecipe: boolean;
+  setUsePortionFromRecipe: (on: boolean) => void;
+
+  // Bumped when something outside the recipe panel wants it opened and scrolled to — the
+  // "oppskrift" link in the helsepåstander panel's Porsjon fra oppskrift label. A counter
+  // rather than a boolean because the request has to fire again for a panel that is already
+  // open: the useful part is then the scroll, not the opening.
+  recipePanelOpenRequest: number;
+  requestRecipePanelOpen: () => void;
 
   // Same duplication existed for the EFSA "Kilde til Annet" panel values —
   // Calculator.jsx and EfsaHealthClaimsPanel each held their own copy,
@@ -183,12 +228,91 @@ interface CalculatorFormState {
   }) => void;
 }
 
+const portionFromRecipe = (foods: ImportedFood[]): string =>
+  foods.length > 0 ? String(roundTo(totalGramsOf(foods))) : "";
+
+// Everything the ingredient list owns, updated together. Nutrition always follows the list;
+// Porsjonsstørrelse only follows it while the user has said the batch is one portion.
+//
+// An emptied list keeps the last computed nutrition rather than blanking it: the fields
+// unlock at the same moment, so removing the last ingredient hands the numbers over to be
+// edited by hand instead of throwing them away.
+const applyRecipe = (
+  state: CalculatorFormState,
+  importedFoods: ImportedFood[],
+): Partial<CalculatorFormState> => {
+  const patch: Partial<CalculatorFormState> = { importedFoods };
+  if (importedFoods.length > 0) {
+    patch.nutrition = nutritionFromImportedFoods(importedFoods);
+  }
+
+  // Kalsium and vitamin D are kilder rather than nutrition-table fields, but they come from
+  // the same foods and the same weighting, so the recipe fills them too. Any earlier
+  // recipe-derived entry is replaced rather than added to; hand-picked kilder are untouched.
+  const efsaValues: EfsaPanelValues = {
+    ...state.efsaValues,
+    otherSubstances: [
+      ...state.efsaValues.otherSubstances.filter(
+        (s) => !RECIPE_KILDE_NAMES.includes(s.name),
+      ),
+      ...kilderFromImportedFoods(importedFoods),
+    ],
+  };
+  if (state.usePortionFromRecipe) {
+    efsaValues.portionSize = portionFromRecipe(importedFoods);
+  }
+  patch.efsaValues = efsaValues;
+
+  return patch;
+};
+
 const calculatorFormStoreBase = createStore<CalculatorFormState>((set) => ({
   nutrition: EMPTY_NUTRITION,
   setNutrition: (nutrition) => set({ nutrition }),
   setNutritionField: (key, value) =>
     set((state) => ({ nutrition: { ...state.nutrition, [key]: value } })),
-  resetNutrition: () => set({ nutrition: EMPTY_NUTRITION }),
+  resetNutrition: () =>
+    set({
+      nutrition: EMPTY_NUTRITION,
+      importedFoods: [],
+      usePortionFromRecipe: false,
+    }),
+
+  importedFoods: [],
+  setImportedFoods: (picked) =>
+    set((state) => applyRecipe(state, mergeImportedFoods(picked, state.importedFoods))),
+  removeImportedFood: (foodId) =>
+    set((state) =>
+      applyRecipe(state, state.importedFoods.filter((f) => f.foodId !== foodId)),
+    ),
+  setImportedFoodAmount: (foodId, amount) =>
+    set((state) =>
+      applyRecipe(
+        state,
+        state.importedFoods.map((f) => (f.foodId === foodId ? { ...f, amount } : f)),
+      ),
+    ),
+  clearImportedFoods: () =>
+    set((state) => ({ ...applyRecipe(state, []), usePortionFromRecipe: false })),
+
+  recipePanelOpenRequest: 0,
+  requestRecipePanelOpen: () =>
+    set((state) => ({ recipePanelOpenRequest: state.recipePanelOpenRequest + 1 })),
+
+  usePortionFromRecipe: false,
+  setUsePortionFromRecipe: (usePortionFromRecipe) =>
+    set((state) => ({
+      usePortionFromRecipe,
+      efsaValues: {
+        ...state.efsaValues,
+        // Switching off clears the field rather than leaving the recipe's weight behind. A
+        // number the user never typed, sitting in a field they have just taken control of,
+        // reads as their own answer to "how big is one portion" when it was the batch.
+        portionSize: usePortionFromRecipe
+          ? portionFromRecipe(state.importedFoods)
+          : "",
+      },
+    })),
 
   efsaValues: EMPTY_EFSA_VALUES,
   setEfsaValues: (efsaValues) => set({ efsaValues }),
@@ -197,6 +321,8 @@ const calculatorFormStoreBase = createStore<CalculatorFormState>((set) => ({
   resetEfsaValues: () =>
     set((state) => ({
       efsaValues: EMPTY_EFSA_VALUES,
+      // Porsjonsstørrelse is being cleared, so the recipe can't still be its source.
+      usePortionFromRecipe: false,
       resetToken: state.resetToken + 1,
     })),
   resetToken: 0,
@@ -245,6 +371,8 @@ const calculatorFormStoreBase = createStore<CalculatorFormState>((set) => ({
   resetDraft: () =>
     set((state) => ({
       nutrition: EMPTY_NUTRITION,
+      importedFoods: [],
+      usePortionFromRecipe: false,
       efsaValues: EMPTY_EFSA_VALUES,
       resetToken: state.resetToken + 1,
       foodType: "",
@@ -265,6 +393,10 @@ const calculatorFormStoreBase = createStore<CalculatorFormState>((set) => ({
   loadProductForEdit: ({ product, nutrition, categoryPath, foodType, efsaValues }) =>
     set((state) => ({
       nutrition,
+      // A saved product stores its nutrition table, not the foods it was built from, so an
+      // edit session starts with the fields unlocked and no list behind them.
+      importedFoods: [],
+      usePortionFromRecipe: false,
       efsaValues,
       resetToken: state.resetToken + 1,
       foodType,

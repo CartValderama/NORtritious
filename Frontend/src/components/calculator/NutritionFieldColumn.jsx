@@ -14,22 +14,30 @@ import {
 } from "../../utils/calculator/nutritionFormFields";
 
 const NutritionFieldColumn = ({
-  category,
+  schema,
   nutrition,
   energyUnit,
   onEnergyUnitChange,
   errors,
   calculatedNutrition,
   onFieldChange,
+  // Fields currently owned by something other than the keyboard — today, the list of
+  // matvarer imported from Matvaretabellen. Empty in the ordinary case.
+  lockedFields = [],
 }) => {
   const fields = NUTRITION_FIELDS.filter(({ key }) =>
-    isFieldRelevant(key, category),
+    isFieldRelevant(key, schema),
   );
+  const isLocked = (key) => lockedFields.includes(key);
+  const energyLocked = isLocked(energyUnit);
+
+  const locked = lockedFields.length > 0;
 
   return (
+    <>
     <div
       className="d-grid gap-4 new-field-grid"
-      style={{ marginBottom: "2.25rem" }}
+      style={{ marginBottom: locked ? "0.75rem" : "2.25rem" }}
     >
       <div style={{ minWidth: 0 }}>
         <label className="form-label new-label-indent">Energi</label>
@@ -49,6 +57,7 @@ const NutritionFieldColumn = ({
               const sanitized = sanitizeDecimalInput(e.target.value);
               if (sanitized !== null) onFieldChange(energyUnit, sanitized);
             }}
+            disabled={energyLocked}
           />
           <select
             className="form-select flex-grow-0 flex-shrink-0"
@@ -65,15 +74,15 @@ const NutritionFieldColumn = ({
         </div>
       </div>
 
-      {fields.map(({ key, label, unit }) => {
-        const nok = isNokkelhulletField(key, category);
+      {fields.map(({ key, label, unit, info }) => {
+        const nok = isNokkelhulletField(key, schema);
         const nokFail =
           nok &&
           calculatedNutrition != null &&
-          isFieldFailing(key, category, calculatedNutrition);
+          isFieldFailing(key, schema, calculatedNutrition);
         const labelIcon = nokFail ? (
           <Tooltip
-            title={getNokkelhulletFailureMessage(key, category)}
+            title={getNokkelhulletFailureMessage(key, schema)}
             placement="right"
             arrow
           >
@@ -107,18 +116,29 @@ const NutritionFieldColumn = ({
           </Tooltip>
         ) : null;
 
+        const labelInfo = info ? (
+          <Tooltip title={info} placement="right" arrow>
+            <i
+              className="bi bi-info-circle text-muted ms-1"
+              style={{ cursor: "help", fontSize: "0.85rem" }}
+            />
+          </Tooltip>
+        ) : null;
+
         return (
           <LabeledUnitInput
             key={key}
             id={key}
             label={label}
             labelIcon={labelIcon}
+            labelInfo={labelInfo}
             unit={unit}
             step="any"
             placeholder="0"
             value={nutrition[key]}
             onChange={(e) => onFieldChange(key, e.target.value)}
             error={errors[key]}
+            disabled={isLocked(key)}
             invalidStyle={
               nokFail && !errors[key]
                 ? { borderColor: "#dc3545", borderWidth: "2px" }
@@ -128,6 +148,18 @@ const NutritionFieldColumn = ({
         );
       })}
     </div>
+
+    {locked && (
+      <p
+        className="text-muted new-label-indent"
+        style={{ fontSize: "0.8rem", marginBottom: "2.25rem" }}
+      >
+        <i className="bi bi-lock-fill me-1" />
+        Næringsinnholdet regnes ut fra matvarene du har lagt til under. Tøm
+        listen for å fylle inn verdiene selv.
+      </p>
+    )}
+    </>
   );
 };
 
