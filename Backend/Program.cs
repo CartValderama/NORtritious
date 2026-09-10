@@ -56,6 +56,13 @@ builder.Services.AddSingleton<IEuHealthClaimsService, EuHealthClaimsService>();
 
 // Add Calculator
 builder.Services.AddSingleton<CalculatorService>();
+builder.Services.AddSingleton<CalculatorReportService>();
+
+// PDFsharp needs a font it can actually load. The aspnet runtime image ships with none, so
+// the Dockerfile installs DejaVu and this resolver maps whatever family the report asks for
+// onto what is present. Without it, generating a report throws on Linux and works on a
+// developer's Windows machine, which is the worst way to find out.
+PdfSharp.Fonts.GlobalFontSettings.FontResolver = new Backend.Services.ReportFontResolver();
 
 // Add Matvaretabellen client (https://www.matvaretabellen.no/api/)
 builder.Services.AddSingleton<IMatvaretabellenService, MatvaretabellenService>();

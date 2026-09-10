@@ -17,8 +17,6 @@ import {
   buildNokkelhulletVerdict,
   buildEfsaVerdict,
   buildHealthClaimsVerdict,
-  getEnergyMismatchWarning,
-  getEnergyFormulaWarning,
   claimColors,
   claimBadges,
   healthClaimsColors,
@@ -27,8 +25,8 @@ import {
   getEfsaPercentage,
   buildProductSubmitPayload,
 } from "../../utils/calculator/nutritionResultHelpers";
-import { buildResultPdf } from "../../utils/calculator/buildResultPdf";
 import { getCategoryKey } from "../../utils/calculator/categoryOptions";
+import { fetchCalculatorReport } from "../../services/calculatorService";
 import { useCalculatorFormStore } from "../../stores/calculatorFormStore";
 
 const NutritionResult = () => {
@@ -109,9 +107,10 @@ const NutritionResult = () => {
     );
   }
 
-  const energyMismatchWarning = getEnergyMismatchWarning(nutrition, foodType);
-  const energyFormulaWarning = getEnergyFormulaWarning(nutrition, foodType);
-  const stats = buildResultStats(result, foodType, category, nutrition);
+  // Plausibility warnings come from the backend, computed against the same conversion
+  // factors it uses for the saturated-fat claim.
+  const warnings = result.warnings ?? [];
+  const stats = buildResultStats(result);
 
   const nokkelhulletPercentage = getNokkelhulletPercentage(stats);
 
@@ -122,18 +121,27 @@ const NutritionResult = () => {
   const efsaColors = claimColors(stats.efsaMetCount, stats.efsaTotalCount);
   const healthClaimsColorSet = healthClaimsColors(stats.healthClaimsMetCount);
 
-  const handleSavePdf = () => {
-    const doc = buildResultPdf({
-      productName: product.name,
-      matvaregruppe: selectsGroup,
-      foodType,
-      category,
-      result,
-      nutrition,
-      efsaEnabled,
-    });
-    doc.save(`${product.name || "produkt"}.pdf`);
+  const handleSavePdf = async () => {
     setShowSaveMenu(false);
+    try {
+      const blob = await fetchCalculatorReport({
+        ...calculation.payload,
+        productName: product.name,
+        matvaregruppe: selectsGroup,
+        efsaEnabled,
+      });
+      // Object URL rather than a data URL: the report is a few hundred kB and a data URL
+      // would put the whole thing in the DOM.
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${product.name || "produkt"}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error generating report:", error);
+      alert("Kunne ikke lage rapporten. Prøv igjen.");
+    }
   };
 
   const isEditing = Boolean(product.productId);
@@ -254,9 +262,16 @@ const NutritionResult = () => {
           <OverviewCard>
             <OverviewCard.Header logoSrc={keyholeLogo} title="Nøkkelhullet" />
             <OverviewCard.Metric>
+              {/* Nøkkelhullet is all or nothing: a product either qualifies for the mark or
+                  it doesn't, and there is no partial credit to earn. The gradient the ring
+                  uses by default made 75 % look like progress, when it means the product
+                  can't carry the mark. So green only at 100 %, red otherwise. The
+                  ernæringspåstander ring below keeps the gradient, because there each claim
+                  it clears is one it can actually print. */}
               <CircularProgress
                 percentage={nokkelhulletPercentage}
                 strokeWidth={16}
+                color={nokkelhulletPercentage >= 100 ? "#198754" : "#dc3545"}
               />
             </OverviewCard.Metric>
             <OverviewCard.Footer>
@@ -295,7 +310,7 @@ const NutritionResult = () => {
         </div>
 
         <WarningAlert
-          messages={[energyMismatchWarning, energyFormulaWarning]}
+          messages={warnings}
           className="mb-4"
         />
 
@@ -312,7 +327,9 @@ const NutritionResult = () => {
               stats.nokkelhulletTotalCount,
             )}
           >
-            <NokkelhulletSection category={category} nutrition={nutrition} />
+            <NokkelhulletSection
+              requirements={result.nokkelhulletRequirements}
+            />
           </ResultAccordionSection>
 
           <ResultAccordionSection
@@ -324,11 +341,7 @@ const NutritionResult = () => {
             colors={efsaColors}
             badges={claimBadges(stats.efsaMetCount, stats.efsaTotalCount)}
           >
-            <EfsaSection
-              result={result}
-              nutrition={nutrition}
-              foodType={foodType}
-            />
+            <EfsaSection result={result} />
           </ResultAccordionSection>
 
           {efsaEnabled && (
