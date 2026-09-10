@@ -10,6 +10,7 @@ const LabeledUnitInput = ({
   id,
   label,
   labelIcon,
+  labelInfo,
   unit,
   value,
   onChange,
@@ -31,10 +32,11 @@ const LabeledUnitInput = ({
     <div style={{ minWidth: 0 }}>
       <label
         htmlFor={id}
-        className={`form-label new-label-indent${labelIcon ? " d-flex align-items-center" : ""}`}
+        className={`form-label new-label-indent${labelIcon || labelInfo ? " d-flex align-items-center" : ""}`}
       >
         {labelIcon}
         {label}
+        {labelInfo}
       </label>
       <div className="input-group">
         <input

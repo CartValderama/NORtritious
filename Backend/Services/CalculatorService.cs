@@ -1,11 +1,23 @@
 using System.Globalization;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Backend.DTO;
 
 namespace Backend.Services
 {
-    public class CalculatorService
+    // The calculator's entry points and the state every part of it shares.
+    //
+    // The rules themselves are split across partials by regime, because they are
+    // separate bodies of law and were being read past each other in one 1 400-line file:
+    //
+    //   CalculatorService.Nokkelhullet.cs    per-category thresholds (Nokkelhullet forskrift)
+    //   CalculatorService.EfsaNutrition.cs   nutrition claims (Reg. (EC) No 1924/2006 Annex)
+    //   CalculatorService.EfsaHealth.cs      health claims (EU register, fetched by id)
+    //   CalculatorService.Schema.cs          which inputs and claims a category needs
+    //
+    // Static field initialisers run in textual order within one file but in unspecified
+    // order across the parts of a partial class, so a static that is derived from another
+    // static has to be declared in the same file as the one it reads. KildeOptions is the
+    // only one, and it sits with the registries it projects.
+    public partial class CalculatorService
     {
         // Norway uses a comma as the decimal separator (e.g. "0,5" not "0.5") — every number
         // shown to the user in a health-claim message or amount display goes through this
@@ -13,677 +25,171 @@ namespace Backend.Services
         private static readonly CultureInfo NorwegianCulture = CultureInfo.GetCultureInfo("nb-NO");
         private static string FormatNo(decimal value) => value.ToString(NorwegianCulture);
 
-        private readonly List<HealthClaimEntry> _healthClaims;
+        // Openings the frontend keys its neutral "not assessed" card state off, instead of
+        // colouring these like a failure. A condition the calculator can't evaluate is not the
+        // same thing as a condition the product failed, and showing them alike tells someone
+        // their product fell short when nothing of the sort was established.
+        // "Beregnes" is for a missing input, "vurderes" for a condition that isn't arithmetic.
+        private const string CannotComputePrefix = "Kan ikke beregnes automatisk";
+        private const string CannotAssessPrefix = "Kan ikke vurderes automatisk";
+
+        // Every verdict in here is about the product's composition, and only that. Several
+        // claims carry conditions the calculator can't see: a duty to print something on the
+        // label (the beta-glucan and wheat bran "daily intake" sentences), how the food is
+        // eaten (760137's "as part of the meal"), how it was formulated (764557's "digestible
+        // starch has been replaced by"), or what kind of product it is (755405's "only for
+        // food supplements"). None of those are downgraded to a partial verdict. They are
+        // reported in full through VilkaarForBruk on every card, and satisfying them is the
+        // producer's job. The alternative was tried and dropped: flagging them made a
+        // qualifying product look uncertain, and drawing the line consistently would have
+        // caught the resistant starch claim too.
+        private const string MeetsRequirementText = "Oppfyller gitt krav";
+
+        // Every claim in this service comes from the EU Health Claims register through
+        // IEuHealthClaimsService.GetByIdAsync. Data/health_claims.json is deliberately not
+        // read here any more: it was a hand-maintained copy that returned claim text with no
+        // condition of use and no source links, and a name that didn't match it fell through
+        // to "Ingen påstand funnet". A substance with no registered claim is now skipped
+        // rather than answered from a second, unverifiable source.
         private readonly IEuHealthClaimsService _euHealthClaims;
 
-        // Minimum amounts (in g) required per "other" nutrient for the claim to be valid
-        private static readonly Dictionary<string, decimal> OtherMinimumsG = new()
-        {
-            ["Activated Charcoal"] = 1m,
-            ["Alpha-cyclodextrin"] = 5m,
-            ["Arabinoxylan produced from wheat endosperm"] = 8m,
-            ["Beta-glucans"] = 1m,
-            ["Barley beta-glucans"] = 1m,
-            ["Beta-glucans from oats and barley"] = 4m,
-            ["Betaine"] = 0.5m,
-            ["Folic Acid"] = 0.0004m,
-            ["Guar Gum"] = 10m,
-            ["Lactitol"] = 10m,
-            ["Lactulose"] = 10m,
-            ["Native chicory inulin"] = 12m,
-            ["Oat beta-glucan"] = 1m,
-            ["Olive oil polyphenols"] = 0.005m,
-            ["Plant stanol esters"] = 1.5m,
-            ["Plant sterols and plant stanols"] = 0.8m,
-            ["Walnuts"] = 30m,
-            ["Essential Fatty Acids (ALA & LA)"] = 2m,
-            ["Alpha-linolenic acid (ALA)"] = 2m,
-        };
-
-        // How a given "Other" substance claim's condition can actually be checked from the
-        // data this calculator collects.
-        private enum OtherClaimCheck
-        {
-            // amount (g per 100g) >= a fixed minimum, e.g. "at least 1g per quantified portion"
-            GramThreshold,
-            // the substance's own amount must itself pass the HIGH FIBRE threshold
-            // (>=6g/100g or >=3g/100kcal) — condition text: "food which is high in that fibre"
-            HighFibreSource,
-            // beta-glucan grams in the portion >= 4/30 of the carbs grams in the portion
-            // (">=4g beta-glucan per 30g available carbohydrates in a quantified portion") —
-            // uses the product's own portion size.
-            BetaGlucanMealRatio,
-            // condition can't be derived from any field this calculator collects
-            NotComputable,
-        }
-
-        private record OtherClaimRule(long PolicyItemId, OtherClaimCheck Check, decimal? MinGrams = null);
-
-        // Maps a selectable "Other" substance name to every EU-register claim that applies to it.
-        // A substance can have more than one authorised claim (e.g. Beta-glucans has both a
-        // cholesterol claim and a separate post-meal-glucose claim) — all are shown.
-        private static readonly Dictionary<string, OtherClaimRule[]> OtherClaimRegistry = new()
-        {
-            ["Beta-glucans"] = new[]
-            {
-                new OtherClaimRule(760097, OtherClaimCheck.GramThreshold, 1m),
-                new OtherClaimRule(760137, OtherClaimCheck.BetaGlucanMealRatio),
-            },
-            ["Barley beta-glucans"] = new[] { new OtherClaimRule(756273, OtherClaimCheck.GramThreshold, 1m) },
-            ["Oat beta-glucan"]     = new[] { new OtherClaimRule(757081, OtherClaimCheck.GramThreshold, 1m) },
-            ["Barley grain fibre"]  = new[] { new OtherClaimRule(760061, OtherClaimCheck.HighFibreSource) },
-            ["Rye fibre"]           = new[] { new OtherClaimRule(764917, OtherClaimCheck.HighFibreSource) },
-            ["Wheat bran fibre"]    = new[]
-            {
-                new OtherClaimRule(767477, OtherClaimCheck.HighFibreSource),
-                new OtherClaimRule(767513, OtherClaimCheck.HighFibreSource),
-            },
-            ["Oat grain fibre"]     = new[] { new OtherClaimRule(763813, OtherClaimCheck.HighFibreSource) },
-        };
-
-        // Short link label for the EFSA scientific opinion behind each policy_item_id above (plus
-        // ResistantStarchClaimId) — the EU register API only returns a bare citation like
-        // "2011;9(6):2249", not a title, so the actual title was looked up and verified by hand
-        // for each, then reduced to an invitation to read it ("Les EFSA-uttalelsen om ...") plus
-        // just the claimed effect. The frontend appends the fetched citation (EfsaQuestion, not
-        // hardcoded) after this in parentheses, so the link still names the source it points to.
-        private static readonly Dictionary<long, string> EfsaOpinionTitles = new()
-        {
-            [760097] = "Les EFSA-uttalelsen om beta-glukaner og blodkolesterol",
-            [760137] = "Les EFSA-uttalelsen om beta-glukaner fra havre og bygg",
-            [756273] = "Les EFSA-uttalelsen om betaglukaner fra bygg og blodkolesterol",
-            [757081] = "Les EFSA-uttalelsen om havrebetaglukan og blodkolesterol",
-            [760061] = "Les EFSA-uttalelsen om byggfiber og avføringsvolum",
-            [764917] = "Les EFSA-uttalelsen om rugfiber og tarmfunksjon",
-            [767477] = "Les EFSA-uttalelsen om hvetekli og tarmpassasje",
-            [767513] = "Les EFSA-uttalelsen om hvetekli og avføringsvolum",
-            [763813] = "Les EFSA-uttalelsen om havrefiber og avføringsvolum",
-            [764557] = "Les EFSA-uttalelsen om resistent stivelse og blodsukker",
-        };
-
-        // Resistant starch (764557) isn't a user-selectable "Other" substance like the ones above —
-        // its condition needs two dedicated nutrition fields (TotalStarch/ResistantStarch), so it's
-        // checked directly from NutritionInputDTO instead, alongside the Karbohydrater claims.
-        private const long ResistantStarchClaimId = 764557;
-
-        // Karbohydrater claims (836625 "brain function", 836661 "muscle recovery") were
-        // checked directly from NutritionInputDTO.Carbs, but both are dropped:
-        // - Brain function (>=20g carbs per quantified portion + low-sugar/no-added-sugar)
-        //   removed at product owner's request.
-        // - Muscle recovery (4g carbs per kg body weight) is permanently unresolvable — the
-        //   calculator has no body-weight input and never will.
-
-        // Nøkkelhullet thresholds per category (all values per 100 g/ml)
-        // null = no requirement for that nutrient in this category
-        private record CategoryThreshold(
-            decimal? MaxFat = null,
-            decimal? MaxSatFat = null,
-            decimal? DynamicSatFatFraction = null,
-            decimal? MaxTotalSugars = null,  // sukkerarter = NaturalSugars + AddedSugars
-            decimal? MaxAddedSugars = null,
-            decimal? MinFibre = null,
-            decimal? MaxSalt = null
-        );
-
-        // Categories with no numeric thresholds — always pass if inputs are provided
-        private static readonly HashSet<string> AlwaysPassCategories = new() { "Kategori0", "Kategori2", "Kategori21" };
-
-        private static readonly Dictionary<string, CategoryThreshold> NokkelhulletThresholds = new()
-        {
-            // Cat 1–10
-            // Kategori1: tilsatt fett <= 3; satFat <= 20% of tilsatt fett (dynamic); tilsatte sukkerarter <= 1; salt <= 0.5
-            ["Kategori1"]   = new(MaxFat: 3m,    DynamicSatFatFraction: 0.2m,  MaxAddedSugars: 1m,  MaxSalt: 0.5m),
-            ["Kategori3"]   = new(MaxSatFat: 10m),
-            ["Kategori4"]   = new(MinFibre: 6m),
-            ["Kategori5"]   = new(MinFibre: 3m),
-            ["Kategori6"]   = new(MaxFat: 8m,    MaxTotalSugars: 13m,    MaxAddedSugars: 9m,   MinFibre: 6m,  MaxSalt: 1m),
-            ["Kategori7"]   = new(MaxFat: 4m,    MaxTotalSugars: 5m,     MinFibre: 1m,         MaxSalt: 0.3m),
-            ["Kategori8a"]  = new(MaxFat: 7m,    MaxTotalSugars: 5m,     MinFibre: 5m,         MaxSalt: 1m),
-            ["Kategori8b"]  = new(MaxFat: 7m,    MaxTotalSugars: 5m,     MinFibre: 6m,         MaxSalt: 1.2m),
-            ["Kategori9"]   = new(MaxFat: 7m,    MaxTotalSugars: 5m,     MinFibre: 6m,         MaxSalt: 1.3m),
-            ["Kategori10"]  = new(MinFibre: 6m,  MaxSalt: 0.1m),
-
-            // Milk (cat 11–15)
-            ["Melk11a"]     = new(MaxFat: 0.7m),
-            ["Melk11b"]     = new(MaxFat: 1.5m,  DynamicSatFatFraction: 0.33m, MaxTotalSugars: 5m,        MaxSalt: 0.1m),
-            ["Melk12a"]     = new(MaxFat: 1.5m),
-            ["Melk12b"]     = new(MaxFat: 1.5m,  DynamicSatFatFraction: 0.33m, MaxTotalSugars: 5m,        MaxSalt: 0.1m),
-            ["Melk13a"]     = new(MaxFat: 1.5m,  MaxAddedSugars: 4m),
-            ["Melk13b"]     = new(MaxFat: 1.5m,  DynamicSatFatFraction: 0.33m, MaxTotalSugars: 8m,        MaxSalt: 0.1m),
-            ["Melk14a"]     = new(MaxFat: 5m),
-            ["Melk14b"]     = new(MaxFat: 5m,    DynamicSatFatFraction: 0.33m, MaxTotalSugars: 5m,        MaxSalt: 0.3m),
-            ["Melk15a"]     = new(MaxFat: 5m,    MaxTotalSugars: 5m,     MaxSalt: 0.8m),
-            ["Melk15b"]     = new(MaxFat: 5m,    DynamicSatFatFraction: 0.33m, MaxTotalSugars: 5m,        MaxSalt: 0.8m),
-
-            // Cat 16–23 (cheese, fats, fish, meat)
-            ["Kategori16"]  = new(MaxFat: 17m,   MaxSalt: 1.6m),
-            ["Kategori17"]  = new(MaxFat: 17m,   DynamicSatFatFraction: 0.2m,  MaxSalt: 1.5m),
-            ["Kategori18"]  = new(MaxFat: 5m,    MaxAddedSugars: 1m,           MaxSalt: 0.9m),
-            ["Kategori19"]  = new(MaxFat: 80m,   DynamicSatFatFraction: 0.33m),
-            ["Kategori20"]  = new(DynamicSatFatFraction: 0.2m,                 MaxSalt: 1m),
-            // Kategori21 has no numeric thresholds — handled separately (AlwaysPassCategories)
-            ["Kategori22a"] = new(MaxFat: 10m,   MaxTotalSugars: 5m,     MaxSalt: 1.5m),
-            ["Kategori22b"] = new(MaxFat: 10m,   MaxTotalSugars: 5m,     MaxSalt: 2.5m),
-            ["Kategori22c"] = new(MaxFat: 10m,   MaxTotalSugars: 5m,     MaxSalt: 3m),
-            ["Kategori22d"] = new(MaxFat: 10m,   MaxTotalSugars: 5m,     MaxSalt: 3m),
-            ["Kategori23"]  = new(MaxFat: 10m),
-
-            // Cat 24 (meat products)
-            ["Kategori24a1"]= new(MaxFat: 10m,   MaxTotalSugars: 3m,     MaxSalt: 1.0m),
-            ["Kategori24a2"]= new(MaxFat: 10m,   MaxTotalSugars: 3m,     MaxSalt: 0.5m),
-            ["Kategori24b1"]= new(MaxFat: 10m,   MaxAddedSugars: 3m, MaxSalt: 1.7m),
-            ["Kategori24b2"]= new(MaxFat: 10m,   MaxAddedSugars: 3m, MaxSalt: 2.0m),
-            ["Kategori24b3"]= new(MaxFat: 10m,   MaxAddedSugars: 3m, MaxSalt: 2.2m),
-            ["Kategori24b4"]= new(MaxFat: 10m,   MaxTotalSugars: 3m,     MaxAddedSugars: 3m,   MaxSalt: 1.0m),
-            ["Kategori24c1"]= new(MaxFat: 10m,   MaxAddedSugars: 3m, MaxSalt: 2.0m),
-            ["Kategori24c2"]= new(MaxFat: 10m,   MaxAddedSugars: 3m, MaxSalt: 2.5m),
-
-            // Cat 25–32 (vegetable alternatives, ready meals, dressings)
-            ["Kategori25a"] = new(MaxFat: 10m,   MaxSatFat: 3.5m,  MaxAddedSugars: 3m,   MaxSalt: 1.5m),
-            ["Kategori25b"] = new(MaxFat: 10m,   MaxSatFat: 3.5m,  MaxAddedSugars: 3m,   MaxSalt: 1m),
-            ["Kategori26"]  = new(MaxSatFat: 1.8m, MaxAddedSugars: 3m, MaxSalt: 0.8m),
-            ["Kategori27"]  = new(MaxSatFat: 1.5m, MaxAddedSugars: 3m, MaxSalt: 0.8m),
-            ["Kategori28"]  = new(MaxSatFat: 2.0m, MaxAddedSugars: 3m, MaxSalt: 1.0m),
-            ["Kategori29"]  = new(MaxSatFat: 2.0m, MaxAddedSugars: 3m, MaxSalt: 0.9m),
-            ["Kategori30"]  = new(MaxSatFat: 1.5m, MaxAddedSugars: 3m, MaxSalt: 0.8m),
-            ["Kategori31"]  = new(DynamicSatFatFraction: 0.2m,  MaxTotalSugars: 5m,            MaxSalt: 0.8m),
-            ["Kategori32"]  = new(MaxFat: 5m,    DynamicSatFatFraction: 0.33m, MaxTotalSugars: 5m, MaxSalt: 0.8m),
-        };
-
-        public CalculatorService(IWebHostEnvironment env, IEuHealthClaimsService euHealthClaims)
+        public CalculatorService(IEuHealthClaimsService euHealthClaims)
         {
             _euHealthClaims = euHealthClaims;
-            var path = Path.Combine(env.ContentRootPath, "Data", "health_claims.json");
-            var json = File.ReadAllText(path);
-            _healthClaims = JsonSerializer.Deserialize<List<HealthClaimEntry>>(json,
-                new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
-                })
-                ?? new List<HealthClaimEntry>();
         }
 
         public async Task<CalculatorResponseDTO> Calculate(CalculatorRequestDTO request)
         {
-            var efsaNutritionClaims = CheckEfsaNutritionClaims(request.FoodType, request.EnergyUnit, request.Nutrition);
+            // Every register entry this request will need, fetched in one parallel batch. The
+            // builders below still ask for their own claims one at a time, which reads better
+            // and keeps each of them responsible for its own scope; after this line those asks
+            // are served from memory. On a cold cache the difference was 17 s and about one.
+            await _euHealthClaims.PrefetchAsync(CollectClaimIds(request));
 
             var autoHealthClaims = new List<HealthClaimResultDTO>();
             var resistantStarchClaim = await CheckResistantStarchHealthClaim(request.Nutrition);
             if (resistantStarchClaim != null) autoHealthClaims.Add(resistantStarchClaim);
 
+            var nokkelhulletRequirements = BuildNokkelhulletRequirements(request.Category, request.Nutrition);
+
+            // No energy entered means nothing was assessed, so the breakdown is withheld too
+            // rather than shown against a verdict of null.
+            bool assessed = request.Nutrition.EnergyKcal != 0 || request.Nutrition.EnergyKj != 0;
+
+            // The names and the breakdown are two views of one evaluation, so it runs once.
+            // Building the list twice also meant two places could disagree about which claims
+            // were offered.
+            var efsaNutritionClaims = assessed
+                ? BuildEfsaNutritionClaimResults(request.Category, request.FoodType, request.EnergyUnit, request.Nutrition)
+                : new List<EfsaNutritionClaimDTO>();
+
             return new CalculatorResponseDTO
             {
-                HasNokkelhullet = CheckNokkelhullet(request.Category, request.Nutrition),
-                EfsaNutritionClaims = efsaNutritionClaims,
+                HasNokkelhullet = CheckNokkelhullet(request.Category, request.Nutrition, nokkelhulletRequirements),
+                NokkelhulletRequirements = assessed ? nokkelhulletRequirements : new(),
+                EfsaNutritionClaims = efsaNutritionClaims.Where(c => c.Passed).Select(c => c.Label).ToList(),
+                EfsaNutritionClaimResults = efsaNutritionClaims,
                 EfsaHealthClaims = autoHealthClaims,
-                IngredientHealthClaims = await CheckHealthClaims(request.Nutrition, request.EnergyUnit, request.PortionSize, request.Vitamins, request.Minerals, request.Others),
+                Warnings = BuildWarnings(request.Nutrition, request.FoodType),
+                IngredientHealthClaims = await CheckHealthClaims(request.Nutrition, request.FoodType, request.EnergyUnit, request.PortionSize, request.Vitamins, request.Minerals, request.Others),
             };
         }
 
-        // ── Nøkkelhullet ────────────────────────────────────────────────────────
-
-        private bool? CheckNokkelhullet(string category, NutritionInputDTO n)
+        // Which register entries the builders below will ask for. This deliberately mirrors
+        // their traversals rather than driving them: it exists only to warm the cache, so an
+        // id it misses still resolves, at the cost of the round trip this was avoiding.
+        private static IEnumerable<long> CollectClaimIds(CalculatorRequestDTO request)
         {
-            if (n.EnergyKcal == 0 && n.EnergyKj == 0)
-                return null;
+            if (request.Nutrition.TotalStarch > 0)
+                yield return ResistantStarchClaimId;
 
-            if (AlwaysPassCategories.Contains(category))
-                return true;
+            bool hasCalcium = false, hasVitaminD = false;
+            foreach (var input in request.Vitamins.Concat(request.Minerals))
+            {
+                if (!VitaminMineralDefs.ContainsKey(input.Name)) continue;
 
-            if (!NokkelhulletThresholds.TryGetValue(category, out var t))
-                return null;
+                hasCalcium |= string.Equals(input.Name, CalciumName, StringComparison.OrdinalIgnoreCase);
+                hasVitaminD |= string.Equals(input.Name, VitaminDName, StringComparison.OrdinalIgnoreCase);
 
-            // NaturalSugars is always 0 from the frontend now (single "Sukkerarter" field,
-            // no natural/added split) — AddedSugars carries the full sugar total. That
-            // makes the MaxTotalSugars check below unaffected (0 + total = total, same as
-            // before), but MaxAddedSugars now compares the full total against what used to
-            // be an added-only cap: stricter than the real rule for categories with no
-            // separate MaxTotalSugars, but the safe direction for a compliance tool — it
-            // can under-claim a naturally-sweet, no-added-sugar product, never over-claim.
-            return (!t.MaxFat.HasValue                || n.Fat          <= t.MaxFat.Value)
-                && (!t.MaxSatFat.HasValue             || n.SaturatedFat <= t.MaxSatFat.Value)
-                && (!t.DynamicSatFatFraction.HasValue || n.SaturatedFat <= n.Fat * t.DynamicSatFatFraction.Value)
-                && (!t.MaxTotalSugars.HasValue        || (n.NaturalSugars + n.AddedSugars) <= t.MaxTotalSugars.Value)
-                && (!t.MaxAddedSugars.HasValue        || n.AddedSugars  <= t.MaxAddedSugars.Value)
-                && (!t.MinFibre.HasValue              || n.Fibre        >= t.MinFibre.Value)
-                && (!t.MaxSalt.HasValue               || n.Salt         <= t.MaxSalt.Value);
+                foreach (var id in SourceOfClaimIds.GetValueOrDefault(input.Name, Array.Empty<long>()))
+                    yield return id;
+            }
+
+            if (hasCalcium && hasVitaminD)
+                yield return CalciumVitaminDPortionClaimId;
+
+            foreach (var other in request.Others)
+                if (OtherClaimRegistry.TryGetValue(other.Name, out var rules))
+                    foreach (var rule in rules)
+                        yield return rule.PolicyItemId;
         }
 
-        // ── EFSA Nutrition Claims ────────────────────────────────────────────────
+        // ── Plausibility warnings ───────────────────────────────────────────────
+        //
+        // Energy conversion factors from Annex XIV to Regulation (EU) No 1169/2011: the kcal
+        // and kJ each gram of a macronutrient contributes. The same table ClaimLowSaturatedFat
+        // uses for its "10 % of energy" condition.
+        private const decimal KcalPerGramFat = 9m, KcalPerGramCarb = 4m, KcalPerGramProtein = 4m, KcalPerGramFibre = 2m;
+        private const decimal KjPerGramFat = 37m, KjPerGramCarb = 17m, KjPerGramProtein = 17m, KjPerGramFibre = 8m;
 
-        private List<string> CheckEfsaNutritionClaims(string foodType, string energyUnit, NutritionInputDTO n)
+        private static List<string> BuildWarnings(NutritionInputDTO n, string foodType)
         {
-            if (n.EnergyKcal == 0 && n.EnergyKj == 0)
-                return new List<string>();
-
-            // Exactly 6 claims in active use — energy, fibre (plain High/Source
-            // only, no increased/reduced variants) and sugar. Everything else
-            // below is kept but disabled for when scope expands again.
-            var passing = new List<string>();
-
-            if (ClaimLowEnergy(n, foodType, energyUnit))          passing.Add("Lavt Energiinnhold");
-            if (ClaimEnergyFree(energyUnit, n))                   passing.Add("Energifri");
-            if (ClaimHighFibre(foodType, energyUnit, n))          passing.Add("Høyt Fiberinnhold");
-            if (ClaimSourceOfFibre(energyUnit, n))                passing.Add("Kostfiberkilde");
-            if (ClaimLowSugars(foodType, n.NaturalSugars, n.AddedSugars)) passing.Add("Lavt sukkerinnhold");
-            if (ClaimSugarsFree(n.NaturalSugars, n.AddedSugars))          passing.Add("Sukkerfri");
-
-            // Uncomment each line below to enable the corresponding claim:
-            // Uten tilsatt sukker can't be evaluated: the frontend no longer collects
-            // added sugar separately from natural sugar (single "Sukkerarter" field,
-            // client requirement), so AddedSugars is always the full sugar total here —
-            // never provably zero for a product that actually contains sugar.
-            // if (ClaimWithNoAddedSugars(n.Carbs, n.AddedSugars))              passing.Add("Uten tilsatt sukker");
-            // if (ClaimIncreasedHighFibre(foodType, energyUnit, n))            passing.Add("Økt innhold av høyt kostfiberinnhold");
-            // if (ClaimReducedHighFibre(foodType, energyUnit, n))              passing.Add("Redusert innhold av høyt kostfiberinnhold");
-            // if (ClaimLowFat(foodType, n.Fat))                                passing.Add("Lavt fettinnhold");
-            // if (ClaimFatFree(n.Fat))                                         passing.Add("Fettfri");
-            // if (ClaimLowSaturatedFat(foodType, energyUnit, n))               passing.Add("Lavt innhold av mettet fett");
-            // if (ClaimSaturatedFatFree(n.SaturatedFat, n.TransFat))           passing.Add("Fri for mettet fett");
-            // if (ClaimSourceOfProtein(energyUnit, n))                         passing.Add("Proteinkilde");
-            // if (ClaimHighProtein(energyUnit, n))                             passing.Add("Høyt proteininnhold");
-            // if (ClaimLowSodium(n.Salt))                                      passing.Add("Lavt saltinnhold");
-            // if (ClaimVeryLowSodium(n.Salt))                                  passing.Add("Svært lavt saltinnhold");
-            // if (ClaimSodiumFree(n.Salt))                                     passing.Add("Saltfri");
-            // if (ClaimNoAddedSodium(n.Salt, n.AddedSalt))                     passing.Add("Uten tilsatt salt");
-            // if (ClaimLightLite(n))                                           passing.Add("Lett/Lite");
-
-            return passing;
-        }
-
-        private static bool ClaimLowEnergy(NutritionInputDTO n, string foodType, string energyUnit)
-        {
+            var warnings = new List<string>();
             bool liquid = foodType == "liquid";
-            if (energyUnit == "energikcal")
-                return liquid ? n.EnergyKcal <= 20 : n.EnergyKcal <= 40;
-            return liquid ? n.EnergyKj <= 80 : n.EnergyKj <= 170;
-        }
+            bool hasEnergy = n.EnergyKcal > 0 || n.EnergyKj > 0;
+            bool allMacrosZero = n.Fat == 0 && n.Carbs == 0 && n.Protein == 0 && n.Fibre == 0;
 
-        // "≤4 kcal (17 kJ) per 100 g" — applies the same way regardless of
-        // foodType (confirmed against the source regulation text; no
-        // solid/liquid split like ClaimLowEnergy has). The table-top-sweetener
-        // sub-clause (≤0.4 kcal per portion, ~6g sucrose) isn't implemented —
-        // this calculator has no "table-top sweetener" product category.
-        private static bool ClaimEnergyFree(string energyUnit, NutritionInputDTO n) =>
-            energyUnit == "energikcal" ? n.EnergyKcal <= 4 : n.EnergyKj <= 17;
-
-        private static bool ClaimLowFat(string foodType, decimal fat) =>
-            foodType == "solid" ? fat <= 3 : fat <= 1.5m;
-
-        private static bool ClaimFatFree(decimal fat) => fat <= 0.5m;
-
-        private static bool ClaimLowSaturatedFat(string foodType, string energyUnit, NutritionInputDTO n)
-        {
-            // The gram threshold applies to saturated fat alone, but the "no more than 10% of
-            // energy" condition is defined on the sum of saturated AND trans fatty acids.
-            decimal satPlusTransFat = n.SaturatedFat + n.TransFat;
-            decimal satPlusTransFatEnergy = energyUnit == "energikcal"
-                ? satPlusTransFat * 9
-                : satPlusTransFat * 38;
-
-            decimal tenPctEnergy = energyUnit == "energikcal"
-                ? n.EnergyKcal * 0.9m
-                : n.EnergyKj * 0.9m;
-
-            return foodType == "solid"
-                ? n.SaturatedFat <= 1.5m && satPlusTransFatEnergy <= tenPctEnergy
-                : n.SaturatedFat <= 0.75m && satPlusTransFatEnergy <= tenPctEnergy;
-        }
-
-        private static bool ClaimSaturatedFatFree(decimal satFat, decimal transFat) => satFat + transFat <= 0.1m;
-
-        private static bool ClaimLowSugars(string foodType, decimal naturalSugars, decimal addedSugars)
-        {
-            decimal total = naturalSugars + addedSugars;
-            return foodType == "solid" ? total <= 5 : total <= 2.5m;
-        }
-
-        // NOTE: EU Regulation 1924/2006 Annex actually sets this threshold at
-        // <=0.5g per 100g/100ml — 5g here is a deliberate override per product
-        // owner request, not the legal text. Flag if that was unintentional.
-        private static bool ClaimSugarsFree(decimal naturalSugars, decimal addedSugars) =>
-            naturalSugars + addedSugars <= 5m;
-
-        private static bool ClaimWithNoAddedSugars(decimal carbs, decimal addedSugars) =>
-            carbs > 0 && addedSugars == 0;
-
-        private static bool ClaimHighFibre(string foodType, string energyUnit, NutritionInputDTO n)
-        {
-            // ≥6g per 100g (absolute threshold, no energy condition)
-            if (n.Fibre >= 6m) return true;
-            // ≥3g per 100 kcal
-            if (energyUnit == "energikcal" && n.EnergyKcal > 0)
-                return n.Fibre * 100m / n.EnergyKcal >= 3m;
-            // ≥3g per 418.4 kJ (same threshold in kJ units)
-            if (energyUnit == "energikj" && n.EnergyKj > 0)
-                return n.Fibre * 100m / n.EnergyKj >= 0.717m;
-            return false;
-        }
-
-        private static bool ClaimSourceOfProtein(string energyUnit, NutritionInputDTO n)
-        {
-            if (energyUnit == "energikcal" && n.EnergyKcal > 0)
-                return n.Protein * 4m / n.EnergyKcal >= 0.12m;
-            if (energyUnit == "energikj" && n.EnergyKj > 0)
-                return n.Protein * 17m / n.EnergyKj >= 0.12m;
-            return false;
-        }
-
-        private static bool ClaimReducedFat(decimal fat) => fat <= 2.1m;
-
-        private static bool ClaimReducedSaturatedFat(decimal satFat) => satFat <= 1.05m;
-
-        private static bool ClaimReducedSalt(decimal salt) => salt <= 0.09m;
-
-        private static bool ClaimHighProtein(string energyUnit, NutritionInputDTO n)
-        {
-            if (energyUnit == "energikcal" && n.EnergyKcal > 0)
-                return n.Protein * 4m / n.EnergyKcal >= 0.20m;
-            if (energyUnit == "energikj" && n.EnergyKj > 0)
-                return n.Protein * 17m / n.EnergyKj >= 0.20m;
-            return false;
-        }
-
-        private static bool ClaimLowSodium(decimal salt) => salt <= 0.12m;
-
-        private static bool ClaimVeryLowSodium(decimal salt) => salt <= 0.04m;
-
-        private static bool ClaimSodiumFree(decimal salt) => salt <= 0.005m;
-
-        private static bool ClaimNoAddedSodium(decimal salt, decimal addedSalt) =>
-            addedSalt == 0 && salt <= 0.12m;
-
-        private static bool ClaimSourceOfFibre(string energyUnit, NutritionInputDTO n)
-        {
-            if (n.Fibre >= 3m) return true;
-            if (energyUnit == "energikcal" && n.EnergyKcal > 0)
-                return n.Fibre * 100m / n.EnergyKcal >= 1.5m;
-            if (energyUnit == "energikj" && n.EnergyKj > 0)
-                return n.Fibre * 100m / n.EnergyKj >= 0.36m;
-            return false;
-        }
-
-        private static bool ClaimLightLite(NutritionInputDTO n) =>
-            ClaimReducedFat(n.Fat) || ClaimReducedSaturatedFat(n.SaturatedFat) || ClaimReducedSalt(n.Salt);
-
-        private static bool ClaimIncreasedLowFat(string foodType, decimal fat) =>
-            foodType == "solid" ? fat <= 3.9m : fat <= 1.95m;
-
-        private static bool ClaimIncreasedHighFibre(string foodType, string energyUnit, NutritionInputDTO n)
-        {
-            if (foodType != "solid") return false;
-            // ≥7.8g per 100g (absolute) OR ≥3.9g per 100 kcal
-            if (n.Fibre >= 7.8m) return true;
-            if (energyUnit == "energikcal" && n.EnergyKcal > 0)
-                return n.Fibre * 100m / n.EnergyKcal >= 3.9m;
-            return false;
-        }
-
-        private static bool ClaimReducedHighFibre(string foodType, string energyUnit, NutritionInputDTO n)
-        {
-            if (foodType != "solid") return false;
-            // ≥4.2g per 100g (absolute) OR ≥2.1g per 100 kcal
-            if (n.Fibre >= 4.2m) return true;
-            if (energyUnit == "energikcal" && n.EnergyKcal > 0)
-                return n.Fibre * 100m / n.EnergyKcal >= 2.1m;
-            return false;
-        }
-
-        private static bool ClaimIncreasedLowSatFat(string foodType, decimal satFat) =>
-            foodType == "solid" ? satFat <= 1.95m : satFat <= 0.975m;
-
-        // ── EFSA Health Claims ───────────────────────────────────────────────────
-
-        private async Task<List<HealthClaimResultDTO>> CheckHealthClaims(
-            NutritionInputDTO n,
-            string energyUnit,
-            decimal portionSize,
-            List<HealthClaimInputDTO> vitamins,
-            List<HealthClaimInputDTO> minerals,
-            List<OtherClaimInputDTO> others)
-        {
-            var results = new List<HealthClaimResultDTO>();
-
-            foreach (var v in vitamins)
+            // Energy has to come from somewhere. All four macros at zero with energy entered
+            // is impossible for a solid and unusual for a liquid.
+            if (hasEnergy && allMacrosZero)
             {
-                decimal amountMg = v.Unit == "µg" ? v.Amount / 1000 : v.Amount;
-                results.Add(await BuildHealthClaimResult(v.Name, amountMg, "mg", isOther: false));
+                warnings.Add(liquid
+                    ? "Du har oppgitt energi, men fett, karbohydrat, protein og kostfiber er alle satt til 0. "
+                    + "Dette kan være riktig hvis produktet inneholder alkohol, sukkeralkoholer eller organiske "
+                    + "syrer, som ikke registreres i denne kalkulatoren. Kontroller likevel at verdiene er riktige."
+                    : "Du har oppgitt energi, men fett, karbohydrat, protein og kostfiber er alle satt til 0. "
+                    + "Dette er normalt ikke mulig for et fast produkt, siden energi kommer fra disse "
+                    + "næringsstoffene. Kontroller verdiene.");
+                return warnings;
             }
 
-            foreach (var m in minerals)
+            // The general case: entered energy should be roughly what the macros add up to.
+            decimal entered, expected;
+            string unit;
+            if (n.EnergyKcal > 0)
             {
-                decimal amountMg = m.Unit == "µg" ? m.Amount / 1000 : m.Amount;
-                results.Add(await BuildHealthClaimResult(m.Name, amountMg, "mg", isOther: false));
+                entered = n.EnergyKcal;
+                expected = n.Fat * KcalPerGramFat + n.Carbs * KcalPerGramCarb
+                         + n.Protein * KcalPerGramProtein + n.Fibre * KcalPerGramFibre;
+                unit = "kcal";
             }
-
-            foreach (var o in others)
+            else if (n.EnergyKj > 0)
             {
-                if (OtherClaimRegistry.TryGetValue(o.Name, out var rules))
-                    results.AddRange(await BuildEuOtherClaimResults(o.Name, o.Amount, portionSize, n, energyUnit, rules));
-                else
-                    results.Add(await BuildHealthClaimResult(o.Name, o.Amount, "g", isOther: true));
+                entered = n.EnergyKj;
+                expected = n.Fat * KjPerGramFat + n.Carbs * KjPerGramCarb
+                         + n.Protein * KjPerGramProtein + n.Fibre * KjPerGramFibre;
+                unit = "kJ";
             }
+            else return warnings;
 
-            return results;
-        }
+            if (expected <= 0) return warnings;
 
-        // Substances with a known EU Health Claims register entry (OtherClaimRegistry) — each
-        // rule is checked against the data this calculator actually collects, rather than the
-        // generic "amount >= fixed minimum" fallback used for everything else.
-        private async Task<List<HealthClaimResultDTO>> BuildEuOtherClaimResults(
-            string nutrient, decimal amount, decimal portionSize, NutritionInputDTO n, string energyUnit,
-            OtherClaimRule[] rules)
-        {
-            var results = new List<HealthClaimResultDTO>();
+            // Half to one and a half times the expected value, generous enough for label
+            // rounding and for substances this calculator doesn't track.
+            decimal ratio = entered / expected;
+            if (ratio >= 0.5m && ratio <= 1.5m) return warnings;
 
-            foreach (var rule in rules)
-            {
-                var euClaim = await _euHealthClaims.GetByIdAsync(rule.PolicyItemId);
-                if (euClaim == null) continue;
+            warnings.Add(
+                $"Du har oppgitt {FormatNo(entered)} {unit} energi, mens fett er {FormatNo(n.Fat)} g, "
+                + $"karbohydrat er {FormatNo(n.Carbs)} g, protein er {FormatNo(n.Protein)} g og kostfiber "
+                + $"er {FormatNo(n.Fibre)} g. "
+                + (liquid
+                    ? "Dette kan være riktig hvis produktet inneholder alkohol, sukkeralkoholer eller organiske "
+                    + "syrer, som ikke registreres i denne kalkulatoren. Kontroller likevel at verdiene stemmer "
+                    + "med hverandre."
+                    : "Kontroller at disse stemmer med hverandre."));
 
-                string meetsReq = rule.Check switch
-                {
-                    OtherClaimCheck.GramThreshold =>
-                        FormatGramThresholdResult(amount, portionSize, rule.MinGrams!.Value),
-                    OtherClaimCheck.HighFibreSource =>
-                        FormatHighFibreSourceResult(amount, energyUnit, n),
-                    OtherClaimCheck.BetaGlucanMealRatio =>
-                        FormatBetaGlucanMealRatioResult(amount, portionSize, n.Carbs),
-                    _ => "Kan ikke beregnes automatisk",
-                };
-
-                results.Add(new HealthClaimResultDTO
-                {
-                    Nutrient = nutrient,
-                    Amount = amount > 0 ? $"{FormatNo(amount)} g" : "ikke oppgitt",
-                    MeetsRequirement = meetsReq,
-                    Naeringsmiddel = euClaim.NutrientSubstFood,
-                    Pastand = euClaim.Claim,
-                    VilkaarForBruk = euClaim.ConditionOfUse,
-                    VilkaarOgBegrensninger = euClaim.RestrictionsOfUse,
-                    LegislationReference = euClaim.LegislationReference,
-                    SourceUrl = euClaim.LegislationUrl,
-                    EfsaQuestion = euClaim.EfsaQuestion,
-                    EfsaQuestionUrl = euClaim.EfsaQuestionUrl,
-                    EfsaQuestionTitle = EfsaOpinionTitles.GetValueOrDefault(rule.PolicyItemId, euClaim.EfsaQuestion),
-                });
-            }
-
-            return results;
-        }
-
-        // "Food which is high in that fibre" — the specific substance's own amount (not total
-        // dietary fibre) must pass the same threshold as the HIGH FIBRE nutrition claim.
-        private static bool MeetsHighFibreThreshold(decimal sourceFibreGrams, string energyUnit, NutritionInputDTO n)
-        {
-            if (sourceFibreGrams >= 6m) return true;
-            if (energyUnit == "energikcal" && n.EnergyKcal > 0)
-                return sourceFibreGrams * 100m / n.EnergyKcal >= 3m;
-            if (energyUnit == "energikj" && n.EnergyKj > 0)
-                return sourceFibreGrams * 100m / n.EnergyKj >= 0.717m;
-            return false;
-        }
-
-        private static string FormatHighFibreSourceResult(decimal sourceFibreGrams, string energyUnit, NutritionInputDTO n)
-        {
-            if (MeetsHighFibreThreshold(sourceFibreGrams, energyUnit, n)) return "Oppfyller gitt krav";
-
-            if (energyUnit == "energikcal" && n.EnergyKcal > 0)
-            {
-                decimal per100kcal = Math.Round(sourceFibreGrams * 100m / n.EnergyKcal, 2);
-                return $"Oppfyller ikke gitt krav (trenger minst 6 g per 100 g eller 3 g per 100 kcal, " +
-                       $"produktet har {FormatNo(sourceFibreGrams)} g, tilsvarende {FormatNo(per100kcal)} g per 100 kcal)";
-            }
-            if (energyUnit == "energikj" && n.EnergyKj > 0)
-            {
-                decimal per100kj = Math.Round(sourceFibreGrams * 100m / n.EnergyKj, 2);
-                return $"Oppfyller ikke gitt krav (trenger minst 6 g per 100 g eller 0,717 g per 100 kJ, " +
-                       $"produktet har {FormatNo(sourceFibreGrams)} g, tilsvarende {FormatNo(per100kj)} g per 100 kJ)";
-            }
-            return $"Oppfyller ikke gitt krav (trenger minst 6 g per 100 g, produktet har {FormatNo(sourceFibreGrams)} g)";
-        }
-
-        // "At least Xg ... per quantified portion" — Mengde (g/100g) must be scaled to the
-        // declared portion before comparing against the fixed gram threshold. Comparing the
-        // raw per-100g concentration directly would silently assume the portion is 100g.
-        private static string FormatGramThresholdResult(decimal amountPer100g, decimal portionSize, decimal minGrams)
-        {
-            if (portionSize <= 0) return "Kan ikke beregnes automatisk (porsjonsstørrelse mangler)";
-            decimal amountInPortion = Math.Round(amountPer100g * portionSize / 100m, 3);
-            return amountInPortion >= minGrams
-                ? "Oppfyller gitt krav"
-                : $"Oppfyller ikke gitt krav (trenger minst {FormatNo(minGrams)} g per porsjon, porsjonen inneholder {FormatNo(amountInPortion)} g)";
-        }
-
-        // "≥4g beta-glucan per 30g available carbohydrates in a quantified portion" — uses this
-        // entry's own portion size, not a product-wide serving size.
-        private static string FormatBetaGlucanMealRatioResult(decimal betaGlucanPer100g, decimal portionSize, decimal carbsPer100g)
-        {
-            if (portionSize <= 0) return "Kan ikke beregnes automatisk (porsjonsstørrelse mangler)";
-            decimal carbsPerPortion = carbsPer100g * portionSize / 100m;
-            if (carbsPerPortion <= 0) return "Kan ikke beregnes automatisk (ingen karbohydrater oppgitt)";
-            decimal betaGlucanPerPortion = Math.Round(betaGlucanPer100g * portionSize / 100m, 3);
-            decimal requiredBetaGlucan = Math.Round(carbsPerPortion * 4m / 30m, 3);
-            return betaGlucanPerPortion / carbsPerPortion >= 4m / 30m
-                ? "Oppfyller gitt krav"
-                : $"Oppfyller ikke gitt krav (trenger minst {FormatNo(requiredBetaGlucan)} g beta-glukan per porsjon, porsjonen inneholder {FormatNo(betaGlucanPerPortion)} g)";
-        }
-
-        private async Task<HealthClaimResultDTO> BuildHealthClaimResult(string nutrient, decimal amount, string unit, bool isOther)
-        {
-            var entry = _healthClaims.FirstOrDefault(h =>
-                string.Equals(h.Nutrient, nutrient, StringComparison.OrdinalIgnoreCase));
-            string fallbackText = entry != null
-                ? string.Join(" ", entry.Claims.Select(c => c.Claim))
-                : "Ingen påstand funnet for det valgte elementet.";
-
-            string amountDisplay = amount > 0 ? $"{FormatNo(amount)} {unit}" : "ikke oppgitt";
-            string meetsReq = isOther && OtherMinimumsG.TryGetValue(nutrient, out decimal min)
-                ? (amount >= min
-                    ? "Oppfyller gitt krav"
-                    : $"Oppfyller ikke gitt krav (trenger minst {FormatNo(min)} {unit}, produktet inneholder {FormatNo(amount)} {unit})")
-                : "Ved å velge dette næringsstoffet er man sikker at mengden oppfyller kravet som er vedlagt til forordning (EF) nr. 1924/2006.";
-
-            return new HealthClaimResultDTO
-            {
-                Nutrient = nutrient,
-                Amount = amountDisplay,
-                MeetsRequirement = meetsReq,
-                Naeringsmiddel = string.Empty,
-                Pastand = fallbackText,
-                VilkaarForBruk = string.Empty,
-                VilkaarOgBegrensninger = string.Empty,
-                SourceUrl = string.Empty,
-            };
-        }
-
-        // "Resistant starch replacing digestible starch ... reduction in blood glucose rise" —
-        // requires resistant starch to be at least 14% of the product's total starch.
-        private async Task<HealthClaimResultDTO?> CheckResistantStarchHealthClaim(NutritionInputDTO n)
-        {
-            if (n.TotalStarch <= 0) return null;
-
-            var claim = await _euHealthClaims.GetByIdAsync(ResistantStarchClaimId);
-            if (claim == null) return null;
-
-            decimal pct = n.ResistantStarch / n.TotalStarch * 100m;
-
-            string meetsReq = pct >= 14m
-                ? "Oppfyller gitt krav"
-                : $"Oppfyller ikke gitt krav (trenger minst 14 % resistent stivelse av total stivelse, produktet har {FormatNo(Math.Round(pct, 1))} %)";
-
-            return new HealthClaimResultDTO
-            {
-                Nutrient = "Stivelse",
-                Amount = $"{FormatNo(n.ResistantStarch)} g resistent stivelse av {FormatNo(n.TotalStarch)} g total stivelse",
-                MeetsRequirement = meetsReq,
-                Naeringsmiddel = claim.NutrientSubstFood,
-                Pastand = claim.Claim,
-                VilkaarForBruk = claim.ConditionOfUse,
-                VilkaarOgBegrensninger = claim.RestrictionsOfUse,
-                LegislationReference = claim.LegislationReference,
-                SourceUrl = claim.LegislationUrl,
-                EfsaQuestion = claim.EfsaQuestion,
-                EfsaQuestionUrl = claim.EfsaQuestionUrl,
-                EfsaQuestionTitle = EfsaOpinionTitles.GetValueOrDefault(ResistantStarchClaimId, claim.EfsaQuestion),
-            };
-        }
-
-        // ── JSON deserialization models ─────────────────────────────────────────
-
-        private class HealthClaimEntry
-        {
-            public string Nutrient { get; set; } = string.Empty;
-            public List<ClaimEntry> Claims { get; set; } = new();
-        }
-
-        private class ClaimEntry
-        {
-            public string Claim { get; set; } = string.Empty;
-            public string Label { get; set; } = string.Empty;
-            public ClaimConditions? Conditions { get; set; }
-        }
-
-        private class ClaimConditions
-        {
-            public Dictionary<string, JsonElement>? DosageRequirements { get; set; }
-            [JsonConverter(typeof(SingleOrListConverter))]
-            public List<string>? Requirement { get; set; }
-            public string? Info { get; set; }
-            public string? ReferenceRegulation { get; set; }
-            public ClaimRestrictions? Restrictions { get; set; }
-        }
-
-        private class ClaimRestrictions
-        {
-            public string? Allowed { get; set; }
-        }
-
-        // Handles health_claims.json where "requirement" is sometimes a string, sometimes an array.
-        private class SingleOrListConverter : JsonConverter<List<string>?>
-        {
-            public override List<string>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-            {
-                if (reader.TokenType == JsonTokenType.String)
-                    return new List<string> { reader.GetString()! };
-                if (reader.TokenType == JsonTokenType.StartArray)
-                {
-                    var list = new List<string>();
-                    while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
-                        list.Add(reader.GetString()!);
-                    return list;
-                }
-                return null;
-            }
-
-            public override void Write(Utf8JsonWriter writer, List<string>? value, JsonSerializerOptions options)
-            {
-                if (value == null) { writer.WriteNullValue(); return; }
-                writer.WriteStartArray();
-                foreach (var s in value) writer.WriteStringValue(s);
-                writer.WriteEndArray();
-            }
+            return warnings;
         }
     }
 }

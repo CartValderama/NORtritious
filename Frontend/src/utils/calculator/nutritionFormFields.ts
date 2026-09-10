@@ -1,6 +1,7 @@
-import { kategorier, nokkelhulletThresholds } from "./kravNokkelhullet";
-import { EFSA_CLAIM_FIELDS } from "./efsaClaimFields";
-import type { CalculatorRequestPayload } from "../../services/calculatorService";
+import type {
+  CalculatorRequestPayload,
+  CalculatorSchema,
+} from "../../services/calculatorService";
 
 // Nutrition-table field values, as held by the form (always strings — they come
 // straight from <input> elements) and passed down to the result views afterwards.
@@ -11,6 +12,7 @@ interface NutritionFieldDef {
   label: string;
   unit: string;
   placeholder: string;
+  info?: string;
 }
 
 export const NUTRITION_FIELDS: NutritionFieldDef[] = [
@@ -18,7 +20,15 @@ export const NUTRITION_FIELDS: NutritionFieldDef[] = [
   { key: "mettede", label: "Mettede fettsyrer", unit: "g", placeholder: "f.eks. 2" },
   { key: "transfett", label: "Transfett", unit: "g", placeholder: "f.eks. 0" },
   { key: "karbohydrat", label: "Karbohydrat", unit: "g", placeholder: "f.eks. 20" },
-  { key: "sukkerarter", label: "Sukkerarter", unit: "g", placeholder: "f.eks. 8" },
+  {
+    key: "sukkerarter",
+    label: "Sukkerarter",
+    unit: "g",
+    placeholder: "f.eks. 8",
+    // Mattilsynet's wording: the nutrition declaration doesn't separate the two,
+    // so the field has to say outright that it covers both.
+    info: "Sukkerarter er alle mono- og disakkarider i produktet, unntatt polyoler, slik det oppgis i næringsdeklarasjonen. Tallet omfatter både naturlig forekommende og tilsatte sukkerarter.",
+  },
   { key: "kostfiber", label: "Kostfiber", unit: "g", placeholder: "f.eks. 3" },
   { key: "protein", label: "Protein", unit: "g", placeholder: "f.eks. 8" },
   { key: "salt", label: "Salt", unit: "g", placeholder: "f.eks. 0,7" },
@@ -37,85 +47,29 @@ export const EMPTY_NUTRITION: NutritionValues = {
   salt: "",
 };
 
-// Maps each nutrition field key to the kravNokkelhullet property names that cover it.
-const NOKKELHULLET_FIELD_MAP: Record<string, string[]> = {
-  fett: ["fett"],
-  mettede: ["mettede"],
-  sukkerarter: ["sukkerarter", "tilsattSukkerarter"],
-  kostfiber: ["kostfiber"],
-  salt: ["salt"],
-};
+// Which fields to show, which of them Nøkkelhullet governs, and whether one is currently
+// over or under its limit: all three used to be worked out here from local copies of the
+// rules. They come from the schema now, so the form asks the same source that will judge the
+// result. See CalculatorService.BuildSchema.
 
-export const isNokkelhulletField = (key: string, category: string): boolean => {
-  const reqs = kategorier[category];
-  if (!reqs) return false;
-  const reqKeys = NOKKELHULLET_FIELD_MAP[key];
-  if (!reqKeys) return false;
-  return reqKeys.some((k) => reqs[k] != null);
-};
+// The optional chaining is deliberate. Every caller is a .jsx component, which TypeScript
+// doesn't check, so a wrong argument here reaches runtime: passing the category string
+// instead of the schema took the whole form down with "Cannot read properties of undefined".
+// Treating a malformed schema as "no fields" degrades to an empty form instead.
+export const isNokkelhulletField = (key: string, schema: CalculatorSchema): boolean =>
+  schema?.nokkelhulletFields?.includes(key) ?? false;
 
-// Whether `key` is needed for at least one (currently active) EFSA claim.
-// EFSA claims apply to every category now, so this no longer depends on category.
-const isEfsaRelevantField = (key: string): boolean =>
-  Object.values(EFSA_CLAIM_FIELDS).some((fields) => fields.includes(key));
+export const isFieldRelevant = (key: string, schema: CalculatorSchema): boolean =>
+  schema?.fields?.includes(key) ?? false;
 
-// Categories where sugar content is always 0 — no MaxTotalSugars or MaxAddedSugars
-// threshold exists, so sugar inputs are hidden and auto-sent as 0.
-export const ZERO_SUGAR_CATEGORIES = new Set([
-  "Kategori0",
-  "Kategori2",
-  "Kategori3",
-  "Kategori4",
-  "Kategori5",
-  "Kategori10",
-  "Kategori16",
-  "Kategori17",
-  "Kategori19",
-  "Kategori20",
-  "Kategori21",
-  "Kategori23",
-  "Melk11a",
-  "Melk12a",
-  "Melk14a",
-]);
-
-// Categories where protein is negligible and EFSA protein claims can never apply:
-// pure oils/fats (zero protein) and oil-based dressings (near-zero protein).
-// Raw fruits/berries (Kategori2) are also excluded — too low to reach the 12% threshold.
-const NO_PROTEIN_CATEGORIES = new Set([
-  "Kategori2", // frukt og bær (uforedlet)
-  "Kategori19", // matfett og matfettblandinger
-  "Kategori20", // matoljer og flytende matfett
-  "Kategori31", // dressinger av olje og eddik
-]);
-
-// Karbohydrat must always be shown. Sugar is always shown unless
-// the category is in ZERO_SUGAR_CATEGORIES.
-const ALWAYS_RELEVANT_FIELDS = ["karbohydrat"];
-
-// A field is shown if it feeds the Nøkkelhullet check for this category, one of
-// the active EFSA nutrition claims, or the always-on carbohydrate health claim.
-export const isFieldRelevant = (key: string, category: string): boolean => {
-  if (key === "sukkerarter" && ZERO_SUGAR_CATEGORIES.has(category)) {
-    return false;
-  }
-  if (key === "protein" && NO_PROTEIN_CATEGORIES.has(category)) {
-    return false;
-  }
-  return (
-    isNokkelhulletField(key, category) ||
-    isEfsaRelevantField(key) ||
-    ALWAYS_RELEVANT_FIELDS.includes(key) ||
-    key === "sukkerarter"
-  );
-};
-
+// Live feedback while typing, before any calculation has run, so it needs the limits rather
+// than a verdict. They arrive on the schema, from the same table the backend judges against.
 export const isFieldFailing = (
   key: string,
-  category: string,
+  schema: CalculatorSchema,
   nutrition: NutritionValues,
 ): boolean => {
-  const t = nokkelhulletThresholds[category];
+  const t = schema?.thresholds;
   if (!t) return false;
   const val = Number(nutrition[key]);
   if (nutrition[key] === "" || isNaN(val)) return false;
@@ -130,11 +84,9 @@ export const isFieldFailing = (
         (t.dynamicSatFatFraction != null && val > fat * t.dynamicSatFatFraction)
       );
     }
-    // No natural/added split anymore (single field) — checked against both
-    // thresholds where the category defines them, using the one number for
-    // each. Stricter than the real rule for MaxAddedSugars-only categories
-    // (can't prove none of it is added), the safe direction for a compliance
-    // tool: never falsely say a product qualifies.
+    // One field for total sugars, checked against both caps where a category defines them.
+    // Stricter than the rule for added-sugar-only categories, which is the safe direction:
+    // it can refuse a claim, never grant one falsely.
     case "sukkerarter":
       return (
         (t.maxTotalSugars != null && val > t.maxTotalSugars) ||
@@ -188,9 +140,9 @@ const buildNokkelhulletMessage = (
 // thresholds isFieldFailing checks against.
 export const getNokkelhulletFailureMessage = (
   key: string,
-  category: string,
+  schema: CalculatorSchema,
 ): string => {
-  const t = nokkelhulletThresholds[category];
+  const t = schema?.thresholds;
   if (!t) return "";
 
   switch (key) {
@@ -264,7 +216,7 @@ export const validateNutritionForm = (
   foodType: string,
   energyUnit: string,
   nutrition: NutritionValues,
-  category: string,
+  schema: CalculatorSchema,
   resistantStarch: string,
   totalStarch: string,
 ): NutritionFormErrors => {
@@ -273,7 +225,7 @@ export const validateNutritionForm = (
   const energyVal =
     energyUnit === "energikcal" ? nutrition.energikcal : nutrition.energikj;
   if (energyVal === "" || Number(energyVal) <= 0) errs.energy = true;
-  NUTRITION_FIELDS.filter(({ key }) => isFieldRelevant(key, category)).forEach(
+  NUTRITION_FIELDS.filter(({ key }) => isFieldRelevant(key, schema)).forEach(
     ({ key }) => {
       if (nutrition[key] === "" || Number(nutrition[key]) < 0) errs[key] = true;
     },
@@ -281,6 +233,20 @@ export const validateNutritionForm = (
   if (Number(resistantStarch) > Number(totalStarch)) errs.resistantStarch = true;
   return errs;
 };
+
+// The picked kilder of one kind, in the shape the request's vitamins/minerals lists take.
+// The unit comes from the option table rather than the form, since that's what the picker
+// showed the user next to the amount they typed.
+const buildVitaminMineralPayload = (
+  otherSubstances: { name: string; amount: string | number }[],
+  kind: "vitamin" | "mineral",
+  schema: CalculatorSchema,
+): { name: string; amount: number; unit: string }[] =>
+  (otherSubstances || []).flatMap((s) => {
+    const option = (schema?.kilder ?? []).find((k) => k.value === s.name);
+    if (!option || option.kind !== kind) return [];
+    return [{ name: s.name, amount: Number(s.amount) || 0, unit: option.unit }];
+  });
 
 // Maps NutritionForm's local form state (all strings, straight from <input>
 // elements) to the numeric payload shape calculateNutrition sends the backend.
@@ -293,6 +259,7 @@ export const buildCalculationPayload = (
   totalStarch: string,
   resistantStarch: string,
   otherSubstances: { name: string; amount: string | number }[],
+  schema: CalculatorSchema,
 ): CalculatorRequestPayload => ({
   category,
   foodType,
@@ -311,9 +278,7 @@ export const buildCalculationPayload = (
     // off it, just stricter than the real rule for MaxAddedSugars-only
     // categories (see CheckNokkelhullet's comment in CalculatorService.cs).
     naturalSugars: 0,
-    addedSugars: ZERO_SUGAR_CATEGORIES.has(category)
-      ? 0
-      : Number(nutrition.sukkerarter),
+    addedSugars: Number(nutrition.sukkerarter) || 0,
     fibre: Number(nutrition.kostfiber),
     protein: Number(nutrition.protein),
     // addedSalt no longer tracked separately — the backend's "Uten tilsatt
@@ -324,8 +289,17 @@ export const buildCalculationPayload = (
     totalStarch: Number(totalStarch) || 0,
     resistantStarch: Number(resistantStarch) || 0,
   },
-  others: (otherSubstances || []).map((s) => ({
-    name: s.name,
-    amount: Number(s.amount) || 0,
-  })),
+  // One picker feeds three request lists: the vitamins and minerals are routed by the
+  // option table, everything left over is an "other" substance and stays in grams.
+  vitamins: buildVitaminMineralPayload(otherSubstances, "vitamin", schema),
+  minerals: buildVitaminMineralPayload(otherSubstances, "mineral", schema),
+  others: (otherSubstances || [])
+    .filter((s) => {
+      const option = (schema?.kilder ?? []).find((k) => k.value === s.name);
+      return !option || option.kind === "other";
+    })
+    .map((s) => ({
+      name: s.name,
+      amount: Number(s.amount) || 0,
+    })),
 });

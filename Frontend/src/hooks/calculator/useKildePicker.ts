@@ -1,22 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 import { useCalculatorFormStore } from "../../stores/calculatorFormStore";
 import {
-  KILDE_OPTION_BY_VALUE,
+  kildeByValue,
   calculateUsedFiber,
   validateFiberAddition,
   getSelectableKildeOptions,
-  type StarchOption,
+  type KildeOption,
 } from "../../utils/calculator/kildeOptions";
-import type { OtherSubstanceOption } from "../../utils/calculator/otherSubstanceOptions";
-
-type KildeOption = StarchOption | OtherSubstanceOption;
+import type { CalculatorSchema } from "../../services/calculatorService";
 
 // All local "draft" state, effects and handlers behind the EFSA
 // Helsepåstander panel's "Kilde til Annet" picker — reads/writes
 // calculatorFormStore itself, so EfsaHealthClaimsPanel.jsx just calls this
 // and gets back what it needs to render instead of owning 3 effects, 5
 // pieces of state and 2 handlers directly.
-export function useKildePicker() {
+export function useKildePicker(schema: CalculatorSchema) {
   const { efsaValues, setEfsaField, setEfsaValues, nutrition, resetToken } =
     useCalculatorFormStore((s) => ({
       efsaValues: s.efsaValues,
@@ -25,6 +23,7 @@ export function useKildePicker() {
       nutrition: s.nutrition,
       resetToken: s.resetToken,
     }));
+  const byValue = kildeByValue(schema);
   const kostfiber = Number(nutrition.kostfiber) || 0;
   const { totalStarch, resistantStarch, otherSubstances, portionSize } =
     efsaValues;
@@ -62,10 +61,11 @@ export function useKildePicker() {
   }, [resetToken]);
 
   const hasFiberSource = kostfiber > 0;
-  const usedFiber = calculateUsedFiber(otherSubstances);
+  const usedFiber = calculateUsedFiber(otherSubstances, byValue);
   const fiberFullyUsed = hasFiberSource && usedFiber >= kostfiber;
 
   const kildeOptions = getSelectableKildeOptions(
+    schema,
     otherSubstances,
     hasStarch,
     hasFiberSource,
@@ -73,10 +73,16 @@ export function useKildePicker() {
   );
 
   // If Kostfiber goes back to 0/empty, any already-picked fibre substances no
-  // longer make sense — clear them so nothing stale gets submitted.
+  // longer make sense, so clear them before anything stale gets submitted. Only the
+  // fibre-gated ones: a vitamin or mineral has nothing to do with Kostfiber and
+  // must survive, or entering calcium and then zeroing the fibre field would
+  // silently drop it.
   useEffect(() => {
     if (!hasFiberSource) {
-      setEfsaField("otherSubstances", []);
+      setEfsaField(
+        "otherSubstances",
+        otherSubstances.filter((s) => !byValue.get(s.name)?.requiresKostfiber),
+      );
       setNewSubstance(null);
       setNewSubstanceAmount("");
       setSubstanceError("");
@@ -115,6 +121,7 @@ export function useKildePicker() {
     if (newSubstance.requiresKostfiber) {
       const fiberError = validateFiberAddition(
         otherSubstances,
+        byValue,
         newSubstance.value,
         amount,
         kostfiber,
@@ -135,7 +142,7 @@ export function useKildePicker() {
   };
 
   const handleRemoveSubstance = (name: string) => {
-    const opt = KILDE_OPTION_BY_VALUE.get(name);
+    const opt = byValue.get(name);
     if (opt && "inputType" in opt && opt.inputType === "starchRatio") {
       setStarchCommitted(false);
       setEfsaValues({ ...efsaValues, totalStarch: "", resistantStarch: "" });
@@ -149,6 +156,7 @@ export function useKildePicker() {
   };
 
   return {
+    byValue,
     totalStarch,
     resistantStarch,
     otherSubstances,

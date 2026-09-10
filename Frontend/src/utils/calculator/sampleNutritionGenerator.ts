@@ -1,4 +1,4 @@
-import { nokkelhulletThresholds } from "./kravNokkelhullet";
+import type { CalculatorSchema } from "../../services/calculatorService";
 import {
   EMPTY_NUTRITION,
   isFieldRelevant,
@@ -14,10 +14,10 @@ import {
 // no Nøkkelhullet requirements at all. Energy is always computed to match via the EU's
 // fixed conversion factors, so neither variant ever trips the energy mismatch/formula warning.
 export const getSampleNutrition = (
-  category: string,
+  schema: CalculatorSchema,
   outcome: "pass" | "fail" = "pass",
 ): NutritionValues => {
-  const t = nokkelhulletThresholds[category] || {};
+  const t = schema?.thresholds || {};
   const round1 = (n: number) => Math.round(n * 10) / 10;
   // For a max-type threshold (fett, mettede, sukker, salt): <1 stays under, >1 breaches it.
   const maxFactor = outcome === "pass" ? 0.6 : 1.5;
@@ -70,7 +70,7 @@ export const getSampleNutrition = (
 
   const sample: NutritionValues = { ...EMPTY_NUTRITION };
   Object.entries(values).forEach(([key, value]) => {
-    if (isFieldRelevant(key, category)) sample[key] = String(round1(value));
+    if (isFieldRelevant(key, schema)) sample[key] = String(round1(value));
   });
   sample.energikcal = String(energikcal);
   sample.energikj = String(Math.round(energikcal * 4.184));

@@ -1,12 +1,20 @@
 import React, { useState } from "react";
 import {
-  translateSubstanceName,
   stripPercentageSuffix,
   getAllHealthClaims,
+  getClaimStatus,
 } from "../../utils/calculator/nutritionResultHelpers";
 import ClaimGrid from "./ClaimGrid";
 
-const MEETS_REQUIREMENT = "Oppfyller gitt krav";
+// Three states, not two. "Undetermined" is for conditions the calculator deliberately
+// doesn't judge (missing input, or a requirement that isn't about composition) — showing
+// those in the same red as a genuine miss would claim the product fell short when it was
+// never assessed.
+const CLAIM_STYLES = {
+  met: { color: "#4379d6", icon: "bi-patch-check-fill", button: "btn-light-primary" },
+  notMet: { color: "#b02a37", icon: "bi-x-circle-fill", button: "btn-light-secondary" },
+  undetermined: { color: "#6c757d", icon: "bi-dash-circle-fill", button: "btn-light-secondary" },
+};
 
 // Plain click-to-toggle, no accordion styling/border — just hides the
 // condition text behind a click instead of always showing it.
@@ -46,8 +54,10 @@ const HealthClaimsSection = ({ result }) => {
         const isLastInRow = i % 2 === 1 || i === allClaims.length - 1;
         const rows = Math.ceil(allClaims.length / 2);
         const isLastRow = i >= (rows - 1) * 2;
-        const passed = claim.meetsRequirement === MEETS_REQUIREMENT;
-        const accentColor = passed ? "#4379d6" : "#b02a37";
+        const status = getClaimStatus(claim.meetsRequirement);
+        const style = CLAIM_STYLES[status];
+        const passed = status === "met";
+        const accentColor = style.color;
 
         return (
           <div
@@ -61,10 +71,10 @@ const HealthClaimsSection = ({ result }) => {
                 style={{ color: accentColor }}
               >
                 <i
-                  className={`bi ${passed ? "bi-patch-check-fill" : "bi-x-circle-fill"}`}
+                  className={`bi ${style.icon}`}
                   style={{ color: accentColor, fontSize: "1rem" }}
                 />
-                {translateSubstanceName(claim.nutrient || "Ukjent")}
+                {claim.nutrient || "Ukjent"}
 
                 <span className="text-muted small text-lowercase fw-normal ">
                   {stripPercentageSuffix(claim.amount)}
@@ -92,7 +102,7 @@ const HealthClaimsSection = ({ result }) => {
                     href={claim.sourceUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`btn ${passed ? "btn-light-primary" : "btn-light-secondary"} btn-sm text-start d-inline-flex align-items-center gap-2`}
+                    className={`btn ${style.button} btn-sm text-start d-inline-flex align-items-center gap-2`}
                     style={{ textDecoration: "none", fontSize: "0.85rem" }}
                   >
                     <i className="bi bi-box-arrow-up-right" style={{ flexShrink: 0 }} />
@@ -104,7 +114,7 @@ const HealthClaimsSection = ({ result }) => {
                     href={claim.efsaQuestionUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`btn ${passed ? "btn-light-primary" : "btn-light-secondary"} btn-sm text-start d-inline-flex align-items-center gap-2`}
+                    className={`btn ${style.button} btn-sm text-start d-inline-flex align-items-center gap-2`}
                     style={{ textDecoration: "none", fontSize: "0.85rem" }}
                   >
                     <i className="bi bi-box-arrow-up-right" style={{ flexShrink: 0 }} />

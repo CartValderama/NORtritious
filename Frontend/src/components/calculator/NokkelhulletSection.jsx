@@ -1,13 +1,12 @@
 import React from "react";
-import {
-  evaluateNokkelhulletRequirements,
-  buildRequirementTitle,
-  buildRequirementDetail,
-} from "../../utils/calculator/nokkelhulletEvaluation";
+import { buildRequirementTitle } from "../../utils/calculator/nokkelhulletDisplay";
 import ClaimGrid from "./ClaimGrid";
 
-const NokkelhulletSection = ({ category, nutrition }) => {
-  const requirements = evaluateNokkelhulletRequirements(category, nutrition);
+// The breakdown comes from the response rather than being recomputed here. The backend
+// derives HasNokkelhullet from the same list, so what's shown and what was decided can't
+// disagree. buildRequirementTitle/Detail stay: they turn a requirement into Norwegian prose,
+// which is presentation, not assessment.
+const NokkelhulletSection = ({ requirements = [] }) => {
 
   return (
     <ClaimGrid
@@ -46,7 +45,7 @@ const NokkelhulletSection = ({ category, nutrition }) => {
               className="mb-0"
               style={{ color: req.passed ? "#062814" : "#3b0c0f" }}
             >
-              {buildRequirementDetail(req)}
+              {req.note ? `${req.explanation} ${req.note}` : req.explanation}
             </p>
           </div>
         );

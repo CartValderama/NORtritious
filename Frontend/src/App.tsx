@@ -3,7 +3,6 @@ import {
   Route,
   Routes,
   Navigate,
-  useLocation,
 } from "react-router-dom";
 import NavMenu from "./components/NavMenu";
 import HomePage from "./pages/HomePage";
@@ -13,23 +12,9 @@ import "./App.css";
 import ProfilePage from "./pages/profile";
 import ProductDetails from "./pages/ProductDetails";
 import Calculator from "./pages/Calculator";
-import ResultatDetaljer from "./pages/ResultatDetaljer";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-// /resultat-detaljer/:token is a standalone page — no NavMenu/app-container
-// chrome, since it's not part of the app's normal navigable surface (opened
-// directly in a new tab from the old calculator, not linked from anywhere).
 const AppRoutes: React.FC = () => {
-  const location = useLocation();
-
-  if (location.pathname.startsWith("/resultat-detaljer/")) {
-    return (
-      <Routes>
-        <Route path="/resultat-detaljer/:token" element={<ResultatDetaljer />} />
-      </Routes>
-    );
-  }
-
   return (
     <div className="app-container">
       <NavMenu />
