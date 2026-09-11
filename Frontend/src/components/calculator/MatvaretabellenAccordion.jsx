@@ -239,8 +239,11 @@ const MatvaretabellenAccordion = ({ onOpenPicker }) => {
                 sensibly with nothing in it: an empty grid and a "Totalt: 0 g" would look
                 like something had gone wrong rather than like a list waiting to be filled. */}
             {importedFoods.length > 0 && (
-              <div className="d-flex justify-content-end">
-                <span className="text-muted" style={{ fontSize: "0.85rem" }}>
+              <div className="d-flex justify-content-start">
+                <span
+                  className="text-muted new-label-indent"
+                  style={{ fontSize: "0.85rem" }}
+                >
                   Totalt: {formatNoNumber(roundTo(total))} g
                 </span>
               </div>
