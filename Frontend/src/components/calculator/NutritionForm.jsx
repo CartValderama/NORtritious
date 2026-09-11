@@ -19,6 +19,7 @@ import { calculateNutrition } from "../../services/calculatorService";
 import { getCategoryKey } from "../../utils/calculator/categoryOptions";
 import { useCalculatorSchema } from "../../hooks/calculator/useCalculatorSchema";
 import { useCalculatorFormStore } from "../../stores/calculatorFormStore";
+import { useKostradeneStore } from "../../stores/kostradeneStore";
 import { IMPORTED_NUTRITION_FIELDS } from "../../utils/calculator/importedFoodTotals";
 
 const NutritionForm = () => {
@@ -71,6 +72,7 @@ const NutritionForm = () => {
     setImportedFoods: s.setImportedFoods,
     clearImportedFoods: s.clearImportedFoods,
   }));
+  const openKostradene = useKostradeneStore((s) => s.openKostradene);
   const category = getCategoryKey(
     selectsProduct,
     selectsFragment,
@@ -337,6 +339,21 @@ const NutritionForm = () => {
                       className="menu-item-icon"
                     />
                     Hent matvare fra Matvaretabellen
+                  </Button>
+                  <Button
+                    variant="menuItem"
+                    className="px-3 py-2"
+                    style={{ textDecoration: "none", whiteSpace: "nowrap" }}
+                    onClick={() => {
+                      openKostradene();
+                      setShowSettingsMenu(false);
+                    }}
+                  >
+                    <i
+                      className="bi bi-clipboard2-heart"
+                      style={{ width: "1.1rem" }}
+                    />
+                    Se kostholdsråd
                   </Button>
                   <Button
                     variant="menuItem"

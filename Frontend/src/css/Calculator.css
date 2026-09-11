@@ -1094,3 +1094,67 @@ li {
 .mvt-badge-remove:hover {
   opacity: 1;
 }
+
+/* Kostholdsråd dialog. Borrows the Matvaretabellen dialog's *shape* (a fixed
+   dialog height with one scrolling region inside it) but none of its colour:
+   the teal and mint there are matvaretabellen.no's own palette, and this
+   content isn't theirs. It uses the calculator page's greys instead, the same
+   #dee2e6 that .calculator .table and the panel dividers already use.
+
+   The whole body scrolls rather than a table inside a fixed frame: this one is
+   a document, not a result list under a search box that has to stay put. */
+.kostrad-modal-content {
+  height: 700px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  /* Matches PanelBox's rounded-4 rather than Bootstrap's smaller modal radius,
+     so the dialog reads consistently with the panels behind it. */
+  --bs-modal-border-radius: 1rem;
+}
+.kostrad-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #dee2e6 #ffffff;
+}
+.kostrad-body::-webkit-scrollbar {
+  width: 8px;
+}
+.kostrad-body::-webkit-scrollbar-track {
+  background: #ffffff;
+}
+.kostrad-body::-webkit-scrollbar-thumb {
+  background-color: #dee2e6;
+  border-radius: 4px;
+}
+
+/* Border and rounding on the wrapper, not the table, so the corners clip
+   cleanly. 0.375rem to match the calculator's own form-control inputs. */
+.kostrad-table-frame {
+  overflow: hidden;
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+}
+.kostrad-table > :not(caption) > * > * {
+  padding: 1rem !important;
+}
+.kostrad-table thead th {
+  background-color: #f8f9fa !important;
+  border-bottom-color: #dee2e6 !important;
+}
+.kostrad-table tbody th {
+  background-color: transparent;
+}
+/* Anbefaling absorbs the leftover width so Matvaregruppe stays as narrow as its
+   longest group name, instead of the two columns splitting the table evenly. */
+.kostrad-table th:nth-child(2),
+.kostrad-table td:nth-child(2) {
+  width: 100%;
+}
+/* The last row's own border would stack with the frame's, making the bottom
+   edge read as thicker than every other row divider. */
+.kostrad-table > tbody > tr:last-child > * {
+  border-bottom-width: 0 !important;
+}

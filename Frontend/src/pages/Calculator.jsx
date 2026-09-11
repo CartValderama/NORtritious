@@ -6,6 +6,7 @@ import NutritionForm from "../components/calculator/NutritionForm";
 import NutritionResult from "../components/calculator/NutritionResult";
 import ProductInfoSection from "../components/calculator/ProductInfoSection";
 import CalculatorInstructions from "../components/calculator/CalculatorInstructions";
+import KostradeneModal from "../components/calculator/KostradeneModal";
 import WarningAlert from "../components/WarningAlert";
 import { fetchProductById } from "../services/productService";
 import { getCategoryPath } from "../utils/calculator/categoryOptions";
@@ -169,6 +170,12 @@ const Calculator = () => {
             </div>
           </>
         )}
+
+        {/* Rendered once, here, rather than beside each of the two things that open it (the
+            settings menu inside the form, the "kostrådene" link in the instructions above).
+            It is the same dialog either way, and the form doesn't exist until a category is
+            chosen while the instructions are there from the start. */}
+        <KostradeneModal />
       </div>
     </div>
   );
