@@ -37,7 +37,7 @@ const MatvaretabellenAccordion = ({ onOpenPicker }) => {
   }));
 
   // Brings itself into view when it expands, the same way the helsepåstander panel does.
-  useScrollIntoViewOnOpen("oppskrift-panel", open);
+  useScrollIntoViewOnOpen("oppskrift-panel", open, { block: "center" });
 
   // Somewhere else asked for this panel. Bootstrap's JS owns the collapse, and the only thing
   // it reacts to is a click on the header, so that is what this does rather than setting

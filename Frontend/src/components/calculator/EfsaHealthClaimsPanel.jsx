@@ -59,7 +59,7 @@ const EfsaHealthClaimsPanel = ({ schema }) => {
     byValue,
   } = useKildePicker(schema);
 
-  useScrollIntoViewOnOpen("efsa-health-panel", isOpen);
+  useScrollIntoViewOnOpen("efsa-health-panel", isOpen, { block: "center" });
 
   return (
     <div id="efsa-health-panel">
