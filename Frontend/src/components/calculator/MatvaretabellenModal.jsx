@@ -277,16 +277,24 @@ const MatvaretabellenModal = ({
         <span className="text-muted small me-auto">
           {picked.length > 0 ? `${picked.length} valgt` : "Ingen valgt"}
         </span>
-        <Button variant="ghost" size="sm" onClick={onHide}>
-          Avbryt
-        </Button>
-        <button
-          type="button"
-          className="btn mvt-search-btn"
-          onClick={handleSave}
-        >
-          Lagre
-        </button>
+        <div className="mvt-modal-actions">
+          <Button
+            variant="ghost"
+            className="mvt-modal-action"
+            onClick={onHide}
+          >
+            <i className="bi bi-x-lg" />
+            Avbryt
+          </Button>
+          <button
+            type="button"
+            className="btn mvt-search-btn mvt-modal-action d-flex align-items-center gap-2"
+            onClick={handleSave}
+          >
+            <i className="bi bi-check-lg" />
+            Lagre
+          </button>
+        </div>
       </Modal.Footer>
     </Modal>
   );

@@ -996,8 +996,25 @@ li {
   color: #8fa3a6;
 }
 
-.mvt-modal-content .modal-footer {
-  border-top-color: #cfe4ca;
+/* Footer actions. Both buttons get the same width so the pair reads as one
+   group rather than a small link parked beside a wide solid button, and the gap
+   comes from a flex wrapper around just the two of them: Bootstrap's own footer
+   spacing is a margin on every child, which includes the count text held left
+   by me-auto. Sizing is listed after .mvt-search-btn so it wins on source
+   order for the min-width and padding that rule also sets.
+
+   The footer border is left at Bootstrap's default so it matches the header's.
+   It used to be overridden to the mint #cfe4ca, which made the bottom edge of
+   the dialog a different colour from the top edge of it. */
+.mvt-modal-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+.mvt-modal-action {
+  min-width: 9rem;
+  justify-content: center;
+  padding: 0.65rem 1.25rem !important;
+  font-weight: 500;
 }
 
 /* Ingredient rows, two per line. A recipe runs long enough that one row per
