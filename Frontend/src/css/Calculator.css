@@ -1031,6 +1031,24 @@ li {
   min-width: 5.5rem;
 }
 
+/* Brand logos used as menu icons. The settings menu sits beside the save menu,
+   whose items are plain Bootstrap icons in the text colour, and two colour logos
+   in among them pulled the eye to the wrong items. Greyscaled rather than
+   swapped for generic icons so each row still names the thing it acts on. */
+.menu-item-icon {
+  width: 1.1rem;
+  height: auto;
+  flex-shrink: 0;
+  /* Greyscale alone leaves a mid-grey: it preserves luminance, and both source
+     marks are mid-tone to begin with (measured 90 and 108 against the 36 a
+     Bootstrap icon renders at in the body colour). Contrast separates the tones
+     and brightness brings the whole thing down onto that weight. Tuned against
+     both logos: the EFSA one has a range of tones, the Matvaretabellen one is a
+     single flat colour that contrast alone barely moves. No opacity, which was
+     lifting the darks back off black. */
+  filter: grayscale(1) contrast(1.5) brightness(0.4);
+}
+
 /* A word inside a label that navigates somewhere, styled as text rather than as
    a control: it sits mid-sentence, so button chrome would break the line it is
    part of. Still a real <button>, so it keeps keyboard focus and activation. */

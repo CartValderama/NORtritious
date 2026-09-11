@@ -315,12 +315,9 @@ const NutritionForm = () => {
                     }}
                   >
                     {/* The same logos the two accordions carry, so a menu item and the
-                        section it acts on are recognisable as the same thing. */}
-                    <img
-                      src={efsaLogo}
-                      alt=""
-                      style={{ width: "1.1rem", height: "auto", flexShrink: 0 }}
-                    />
+                        section it acts on are recognisable as the same thing. Greyscaled by
+                        .menu-item-icon to sit alongside the plain icons in the save menu. */}
+                    <img src={efsaLogo} alt="" className="menu-item-icon" />
                     {efsaDisabled
                       ? "Aktiver helsepåstander"
                       : "Deaktiver helsepåstander"}
@@ -337,7 +334,7 @@ const NutritionForm = () => {
                     <img
                       src={matvaretabellenLogo}
                       alt=""
-                      style={{ width: "1.1rem", height: "auto", flexShrink: 0 }}
+                      className="menu-item-icon"
                     />
                     Hent matvare fra Matvaretabellen
                   </Button>
