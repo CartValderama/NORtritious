@@ -247,3 +247,100 @@ export const RATION_OPTIONS: Record<string, CategoryOption[]> = {
     { value: "kategori 24 c 1", label: "- for øvrige produkter." },
   ],
 };
+
+// ── Fullkorn requirements per category ──────────────────────────────────────
+// Fifteen categories carry a fullkorn requirement. Twelve state their own
+// figure; 26, 27 and 30 are mixed dishes that state none, because the korn part
+// has to meet whatever group that korn belongs to (pasta in a ferdigrett is
+// judged by gruppe 10, bread by gruppe 8 a), so there is no single number to
+// quote for those three.
+//
+// Keyed on the level-2 value. For 24 and 25 the requirement holds across every
+// sub-level beneath them, so the level-2 key covers 24 a/b/c and 25 a/b too.
+//
+// `basis` is not decoration: 4, 28 and 29 measure the share against the korn
+// part's dry matter while 5 through 10 measure it against the whole product's,
+// so the same percentage means two different things and the number alone would
+// be ambiguous.
+//
+// Simple version: one line per category. The conditional branches (gluten-free
+// thresholds, 8 b)'s rye share, the rule that deducts vegetables from the
+// denominator) are deliberately not here yet.
+export interface FullkornRequirement {
+  /** How the category is written in the regulation, e.g. "8. a)". */
+  name: string;
+  /** Null for the three mixed-dish categories that defer to another group. */
+  percent: number | null;
+  /**
+   * What the percentage is measured against. Empty where the regulation names
+   * no basis, as 24 and 25 do: they write only "korn (100 % fullkorn)".
+   */
+  basis: string;
+  /**
+   * True where the product need not contain korn at all, and the requirement
+   * binds only the korn that is there. Separate from `percent === null`, which
+   * asks a different question: does this category state its own figure, or
+   * point at another group. All three deferring categories are conditional,
+   * but 24, 25, 28 and 29 are conditional while still naming their own figure.
+   */
+  conditional: boolean;
+}
+
+export const FULLKORN_REQUIREMENTS: Record<string, FullkornRequirement> = {
+  // Korn is the product: mel, ris, grøt, brød, pasta. There is no such thing as
+  // one of these without it, so the requirement binds unconditionally.
+  "kategori 4":  { name: "4",      percent: 100, basis: "korndelens tørrstoffinnhold", conditional: false },
+  "kategori 5":  { name: "5",      percent: 100, basis: "produktets tørrstoffinnhold", conditional: false },
+  "kategori 6":  { name: "6",      percent: 55,  basis: "produktets tørrstoffinnhold", conditional: false },
+  "kategori 7":  { name: "7",      percent: 55,  basis: "produktets tørrstoffinnhold", conditional: false },
+  "kategori 8a": { name: "8. a)",  percent: 30,  basis: "produktets tørrstoffinnhold", conditional: false },
+  "kategori 8b": { name: "8. b)",  percent: 35,  basis: "produktets tørrstoffinnhold", conditional: false },
+  "kategori 9":  { name: "9",      percent: 50,  basis: "produktets tørrstoffinnhold", conditional: false },
+  "kategori 10": { name: "10",     percent: 50,  basis: "produktets tørrstoffinnhold", conditional: false },
+  // Korn is one alternative among several making up the required 50 %, so a
+  // product built from meat or vegetables alone meets these without any. The
+  // regulation names no basis here, only "korn (100 % fullkorn)".
+  "kategori 24": { name: "24",     percent: 100, basis: "", conditional: true },
+  "kategori 25": { name: "25",     percent: 100, basis: "", conditional: true },
+  // "Inneholder produktet en korndel, skal denne ...": a pizza or a wrap can be
+  // made without one.
+  "kategori 28": { name: "28",     percent: 30,  basis: "korndelens tørrstoffinnhold", conditional: true },
+  "kategori 29": { name: "29",     percent: 30,  basis: "korndelens tørrstoffinnhold", conditional: true },
+  // Conditional and deferring both: the mixed dishes.
+  "kategori 26": { name: "26",     percent: null, basis: "", conditional: true },
+  "kategori 27": { name: "27",     percent: null, basis: "", conditional: true },
+  "kategori 30": { name: "30",     percent: null, basis: "", conditional: true },
+};
+
+// What the notice says, and what the checkbox asks the user to confirm. Built
+// here rather than in the components so all three shapes stay next to the data
+// that decides which one applies, and so the notice and the confirmation can
+// never word the same requirement two different ways.
+export const fullkornMessageFor = (
+  categoryValue: string,
+): { name: string; text: string; confirmation: string } | null => {
+  const req = FULLKORN_REQUIREMENTS[categoryValue];
+  if (!req) return null;
+  const deferred = req.percent === null;
+  // "minst 100 %" is not a sentence the regulation ever writes, and it reads as
+  // a mistake. The four categories at 100 % state it as a flat figure. The
+  // basis is left off where the regulation names none.
+  const figure = `${req.percent === 100 ? "" : "minst "}${req.percent} % fullkorn${
+    req.basis ? ` av ${req.basis}` : ""
+  }`;
+  const text = deferred
+    ? "Korndelen i produktet må oppfylle fullkornskravet i den gruppen korndelen hører til."
+    : req.conditional
+      ? `Inneholder produktet en korndel, må den inneholde ${figure}.`
+      : `Kategorien krever ${figure}.`;
+  // A conditional requirement asked as a flat "produktet oppfyller
+  // fullkornskravet" would have the user affirm something about an ingredient
+  // the product need not contain at all, so those are worded the way the
+  // regulation words them, around a korndel that may or may not be there.
+  const confirmation = deferred
+    ? "Jeg bekrefter at en eventuell korndel i produktet oppfyller fullkornskravet i sin gruppe."
+    : req.conditional
+      ? `Jeg bekrefter at en eventuell korndel i produktet oppfyller fullkornskravet for kategori ${req.name}.`
+      : `Jeg bekrefter at produktet oppfyller fullkornskravet for kategori ${req.name}.`;
+  return { name: req.name, text, confirmation };
+};
