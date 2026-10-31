@@ -180,10 +180,19 @@ const ProductInfoSection = () => {
             />
           )}
 
+          {/* Level 4, which only category 24 reaches. Labelled differently from the
+              level above because it is not the same question asked again: it picks a
+              variant inside the sub-category, and the regulation sets its own
+              threshold per variant. 24 a) allows 1,0 g salt for "øvrige produkter"
+              but 0,5 g for stikksaltede. The level-3 value is a grouping with no
+              thresholds of its own, so nothing can be checked until this is answered.
+              Its options read as sentence fragments ("- for pølser likevel") that
+              only make sense hanging off the level-3 label, which is the other reason
+              two selects both saying "Undermatkategori" read as a duplicate. */}
           {rationOptions.length > 0 && (
             <LabeledSelect
-              label="Undermatkategori"
-              placeholder={<div>Velg undermatkategori</div>}
+              label="Presisering"
+              placeholder={<div>Velg presisering</div>}
               className="form-select-md"
               value={rationOptions.find((o) => o.value === selectsRation) || null}
               onChange={(e) => {
