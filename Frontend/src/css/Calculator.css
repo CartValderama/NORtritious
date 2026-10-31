@@ -1188,6 +1188,21 @@ li {
 .Toastify__toast-container {
   --toastify-toast-width: 420px;
 }
+/* Right edge aligned with the scroll-to-top button's, so the two read as one
+   column in the corner whether or not the button is there. */
+.Toastify__toast-container--bottom-right {
+  --toastify-toast-right: 1.5rem;
+  transition: bottom 0.2s ease;
+}
+/* Added only while that button is on screen. It is fixed at 1.5rem from each
+   edge and 3rem square, so its top edge sits 4.5rem up: 1.5 + 3 + 0.75rem of
+   gap, less the 1rem bottom margin the library puts on every toast, which
+   already contributes to that gap. Overriding the library's own variable
+   rather than `bottom` leaves its below-480px rules, which pin the container
+   to the bottom edge, intact. */
+.Toastify__toast-container--bottom-right.toast-above-scroll-top {
+  --toastify-toast-bottom: 4.25rem;
+}
 /* Two classes, not one: the library's own `.Toastify__toast-theme--light`
    declares the background and text colour, and its stylesheet lands after this
    one, so a single-class selector loses the tie and the toast stays white. */

@@ -23,6 +23,7 @@ import {
 import { useCalculatorSchema } from "../../hooks/calculator/useCalculatorSchema";
 import { useCalculatorFormStore } from "../../stores/calculatorFormStore";
 import { useKostradeneStore } from "../../stores/kostradeneStore";
+import { useScrollTopButtonStore } from "../../stores/scrollTopButtonStore";
 import { IMPORTED_NUTRITION_FIELDS } from "../../utils/calculator/importedFoodTotals";
 
 const NutritionForm = () => {
@@ -92,7 +93,10 @@ const NutritionForm = () => {
   const [errors, setErrors] = useState({});
   const [calculating, setCalculating] = useState(false);
   const [calculatedNutrition, setCalculatedNutrition] = useState(null);
-  const [showScrollTop, setShowScrollTop] = useState(false);
+  // In a store rather than local state because the toast container, rendered at the app
+  // level, has to know: both sit in the same fixed corner.
+  const showScrollTop = useScrollTopButtonStore((s) => s.visible);
+  const setShowScrollTop = useScrollTopButtonStore((s) => s.setVisible);
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
   // Lives here rather than in the accordion because the accordion isn't rendered until the
   // first ingredient exists, so it can't be what opens the picker that adds it.
@@ -129,8 +133,13 @@ const NutritionForm = () => {
   useEffect(() => {
     const handleScroll = () => setShowScrollTop(window.scrollY > 300);
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      // Leaving the calculator takes the button with it, so clear the flag rather than
+      // leaving a notice on some other page lifted over a corner with nothing in it.
+      setShowScrollTop(false);
+    };
+  }, [setShowScrollTop]);
 
   useEffect(() => {
     if (!showSettingsMenu) return undefined;

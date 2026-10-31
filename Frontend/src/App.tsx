@@ -13,10 +13,13 @@ import ProfilePage from "./pages/profile";
 import ProductDetails from "./pages/ProductDetails";
 import Calculator from "./pages/Calculator";
 import { ToastContainer } from "react-toastify";
+import { useScrollTopButtonStore } from "./stores/scrollTopButtonStore";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-toastify/dist/ReactToastify.css";
 
 const AppRoutes: React.FC = () => {
+  const scrollTopVisible = useScrollTopButtonStore((s) => s.visible);
+
   return (
     <div className="app-container">
       <NavMenu />
@@ -48,6 +51,7 @@ const AppRoutes: React.FC = () => {
           takes one away. */}
       <ToastContainer
         position="bottom-right"
+        className={scrollTopVisible ? "toast-above-scroll-top" : undefined}
         autoClose={false}
         closeOnClick={false}
         draggable={false}
