@@ -12,7 +12,9 @@ import "./App.css";
 import ProfilePage from "./pages/profile";
 import ProductDetails from "./pages/ProductDetails";
 import Calculator from "./pages/Calculator";
+import { ToastContainer } from "react-toastify";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "react-toastify/dist/ReactToastify.css";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -39,6 +41,19 @@ const AppRoutes: React.FC = () => {
           <Route path="account/profile" element={<ProfilePage />} />
         </Routes>
       </main>
+      {/* Mounted once for the whole app so anything can raise a notice without
+          threading show/onClose props down to it. Nothing auto-closes and a
+          click on the body does not dismiss: these carry requirements the user
+          has to act on, so only the close button (or the code that raised it)
+          takes one away. */}
+      <ToastContainer
+        position="bottom-right"
+        autoClose={false}
+        closeOnClick={false}
+        draggable={false}
+        hideProgressBar
+        newestOnTop
+      />
     </div>
   );
 };

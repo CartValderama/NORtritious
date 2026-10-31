@@ -1,4 +1,5 @@
 import React from "react";
+import { toast } from "react-toastify";
 import LabeledSelect from "../LabeledSelect";
 import PanelBox from "../PanelBox";
 import API_URL from "../../apiConfig";
@@ -7,8 +8,59 @@ import {
   PRODUCT_OPTIONS_BY_GROUP,
   FRAGMENT_OPTIONS,
   RATION_OPTIONS,
+  fullkornMessageFor,
 } from "../../utils/calculator/categoryOptions";
 import { useCalculatorFormStore } from "../../stores/calculatorFormStore";
+
+// One stable id for the fullkorn notice, so picking a second korn category
+// rewrites the one on screen instead of stacking another on top of it.
+const FULLKORN_TOAST_ID = "fullkorn-krav";
+
+// The notice itself. The calculator has no fullkorn input and cannot check any
+// of this, so it states the requirement and leaves the verifying to the user,
+// worded to avoid reading as a pass.
+const showFullkornNotice = (categoryValue) => {
+  const notice = fullkornMessageFor(categoryValue);
+  if (!notice) {
+    // Picked something with no korn requirement, so any notice still up is
+    // about a category the user has left.
+    toast.dismiss(FULLKORN_TOAST_ID);
+    return;
+  }
+  // One wrapper, not a fragment: the toast itself is the flex row (v11 has no
+  // inner body element once you render your own content), so a fragment would
+  // make the heading and the paragraph two columns beside the close button.
+  //
+  // The icon sits on the heading line, so it reads as part of what the notice
+  // calls itself rather than as a column running down the side of the text.
+  // It is Bootstrap's rather than the library's own typed one, so this carries
+  // the same triangle as every other warning on the page.
+  const body = (
+    <div className="warning-toast-content">
+      <strong className="warning-toast-heading">
+        <i className="bi bi-exclamation-triangle-fill" />
+        Krav til fullkorn, kategori {notice.name}
+      </strong>
+      <div className="mt-1">
+        {notice.text}{" "}
+        <span className="warning-toast-note">
+          Kalkulatoren kontrollerer ikke fullkorninnhold, så dette må du
+          bekrefte selv.
+        </span>
+      </div>
+    </div>
+  );
+  // toast() with an existing id is a no-op rather than a replace, so an active
+  // notice has to be updated explicitly.
+  if (toast.isActive(FULLKORN_TOAST_ID)) {
+    toast.update(FULLKORN_TOAST_ID, { render: body });
+  } else {
+    toast.warn(body, {
+      toastId: FULLKORN_TOAST_ID,
+      className: "warning-toast",
+    });
+  }
+};
 
 const FOOD_TYPE_OPTIONS = [
   { value: "solid", label: "Fast form" },
@@ -134,6 +186,7 @@ const ProductInfoSection = () => {
               setSelectProduct("");
               setSelectFragment("");
               setSelectRation("");
+              toast.dismiss(FULLKORN_TOAST_ID);
               if (wasPreviouslySelected) {
                 setFoodType("");
                 resetCalculationState();
@@ -153,6 +206,11 @@ const ProductInfoSection = () => {
             onChange={(e) => {
               const wasPreviouslySelected = Boolean(selectsProduct);
               setSelectProduct(e.value);
+              // Re-shown even when the same category is picked again, since the
+              // notice auto-dismisses and the user may well be coming back to
+              // re-read it. The 24 and 25 requirements hold for every sub-level
+              // below them, so firing on this level covers those too.
+              showFullkornNotice(e.value);
               setSelectFragment("");
               setSelectRation("");
               setProduct((p) => ({

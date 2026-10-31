@@ -1175,3 +1175,69 @@ li {
 .kostrad-table > tbody > tr:last-child > * {
   border-bottom-width: 0 !important;
 }
+
+/* Corner notice. react-toastify ships its own dark-on-tinted look per type;
+   this puts it on Bootstrap's alert-warning palette instead, the same one the
+   inline WarningAlert uses, so a notice in the corner and a warning in the
+   form read as the same kind of thing rather than as a library's default. */
+/* Wider than the library's 320px default. The notice is a two-part sentence
+   plus a caveat, which wrapped to five short lines in the default width and
+   read as a column of fragments. Set on the container, since that is what the
+   library sizes; the toast itself just fills it. Its own media query takes the
+   container full width below 480px, so this only applies on wider screens. */
+.Toastify__toast-container {
+  --toastify-toast-width: 420px;
+}
+/* Two classes, not one: the library's own `.Toastify__toast-theme--light`
+   declares the background and text colour, and its stylesheet lands after this
+   one, so a single-class selector loses the tie and the toast stays white. */
+.Toastify__toast.warning-toast {
+  background: #fff3cd;
+  color: #664d03;
+  border: 1px solid #ffe69c;
+  /* The amber edge is what carries at a glance, from the corner of the eye and
+     well before the text is read. */
+  border-left: 4px solid #ffc107;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  /* No font-size of its own. The library declares none either, so the notice
+     inherits the page's, and reads at the same size as the form it is about. */
+  font-family: inherit;
+  line-height: 1.5;
+  padding: 0.85rem 1rem;
+}
+/* The library's own icon column, hidden in favour of the Bootstrap triangle
+   rendered in the content: its typed SVG is a different drawing from the one
+   the rest of the page warns with. */
+.warning-toast .Toastify__toast-icon {
+  display: none;
+}
+/* The heading line: triangle, then what the notice is about. Flex only to keep
+   the icon's optical centre on the text's, which a plain inline icon sits a
+   shade below. */
+.warning-toast-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.warning-toast-heading > i {
+  flex-shrink: 0;
+  font-size: 1rem;
+}
+/* The toast element is itself the flex row holding icon, content, close button
+   and progress bar; v11 has no inner body wrapper once you render your own
+   content. So the text gets one wrapper of its own and takes the leftover
+   width, instead of each paragraph becoming its own squeezed column. */
+.warning-toast-content {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+/* Set back rather than greyed: #6c757d on amber reads as muddy, and the point
+   is only that this sentence is the aside, not the requirement. */
+.warning-toast-note {
+  opacity: 0.8;
+}
+.warning-toast .Toastify__close-button {
+  color: #664d03;
+  opacity: 0.7;
+}
