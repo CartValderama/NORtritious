@@ -16,7 +16,10 @@ import {
 } from "../../utils/calculator/nutritionFormFields";
 import { getSampleNutrition } from "../../utils/calculator/sampleNutritionGenerator";
 import { calculateNutrition } from "../../services/calculatorService";
-import { getCategoryKey } from "../../utils/calculator/categoryOptions";
+import {
+  getCategoryKey,
+  fullkornMessageFor,
+} from "../../utils/calculator/categoryOptions";
 import { useCalculatorSchema } from "../../hooks/calculator/useCalculatorSchema";
 import { useCalculatorFormStore } from "../../stores/calculatorFormStore";
 import { useKostradeneStore } from "../../stores/kostradeneStore";
@@ -98,6 +101,19 @@ const NutritionForm = () => {
   // ingredient is removed. Letting it vanish there meant getting back to it cost a trip
   // through the settings menu, for something the user had just been working in.
   const [recipeUsed, setRecipeUsed] = useState(false);
+  // The korn requirement for the chosen category, or null when it has none.
+  // Keyed on the level-2 value, the same place the notice comes from, so the
+  // two can never disagree about whether a category has a requirement.
+  const fullkorn = fullkornMessageFor(selectsProduct);
+  const [fullkornConfirmed, setFullkornConfirmed] = useState(false);
+  const [fullkornError, setFullkornError] = useState(false);
+  // A tick confirms one category's requirement. Carrying it over to the next
+  // category would record the user as having confirmed something they never
+  // read, and the figures differ between categories, so it has to clear.
+  useEffect(() => {
+    setFullkornConfirmed(false);
+    setFullkornError(false);
+  }, [selectsProduct, resetToken]);
   useEffect(() => {
     if (importedFoods.length > 0) setRecipeUsed(true);
   }, [importedFoods.length]);
@@ -199,7 +215,11 @@ const NutritionForm = () => {
       totalStarch,
     );
     setFoodTypeError(!foodType);
-    if (Object.keys(errs).length > 0) {
+    // Checked alongside the field validation rather than before it, so one press
+    // of Beregn surfaces everything that is wrong instead of one thing at a time.
+    const missingFullkorn = Boolean(fullkorn) && !fullkornConfirmed;
+    setFullkornError(missingFullkorn);
+    if (Object.keys(errs).length > 0 || missingFullkorn) {
       setErrors(errs);
       return;
     }
@@ -455,6 +475,39 @@ const NutritionForm = () => {
           }}
           alreadySelected={importedFoods}
         />
+
+        {/* Sits directly above Beregn rather than inside either accordion: it gates
+            that button, and both accordions can be collapsed or absent, which would
+            hide the one thing standing between the user and a result they cannot
+            get. Only rendered for categories that carry a korn requirement. */}
+        {fullkorn && (
+          <div
+            className={`fullkorn-check${fullkornError ? " fullkorn-check-error" : ""}`}
+          >
+            <div className="form-check mb-0">
+              <input
+                className="form-check-input"
+                type="checkbox"
+                id="fullkornConfirm"
+                checked={fullkornConfirmed}
+                onChange={(e) => {
+                  setFullkornConfirmed(e.target.checked);
+                  if (e.target.checked) setFullkornError(false);
+                }}
+              />
+              <label className="form-check-label" htmlFor="fullkornConfirm">
+                {fullkorn.confirmation}
+              </label>
+            </div>
+          </div>
+        )}
+
+        {fullkornError && (
+          <WarningAlert
+            messages="Bekreft fullkornskravet før du beregner."
+            className="py-2 mt-3"
+          />
+        )}
 
         {Object.keys(errors).length > 0 && (
           <WarningAlert

@@ -1241,3 +1241,40 @@ li {
   color: #664d03;
   opacity: 0.7;
 }
+
+/* Fullkorn confirmation, the gate on Beregn. Given its own margin, but no frame
+   of its own: the question is a single line, so a box around it would only add
+   another edge directly under the accordion above it. */
+.fullkorn-check {
+  margin-top: 2.25rem;
+}
+/* Red only after a press of Beregn, never on first render: an untouched
+   checkbox is not yet a mistake. Marks the box itself, there being no border
+   left to colour, and the warning below carries the wording. */
+.fullkorn-check-error .form-check-input {
+  border-color: #dc3545;
+}
+/* Flex rather than Bootstrap's indent-and-pull-back arrangement. There the
+   label flows immediately after the input's margin box, so the two always sit
+   flush and widening the indent just moves the pair sideways. A flex row with
+   a gap puts actual space between them, and keeps the box aligned to the first
+   line of a label that wraps to three. The three-class selector is needed
+   because Bootstrap's own `.form-check .form-check-input` matches two and
+   would otherwise win on source order. */
+.fullkorn-check .form-check {
+  display: flex;
+  gap: 0.65rem;
+  padding-left: 0;
+}
+.fullkorn-check .form-check .form-check-input {
+  margin: 0.3rem 0 0 0;
+  flex-shrink: 0;
+}
+.fullkorn-check .form-check-input:checked {
+  background-color: #212529;
+  border-color: #212529;
+}
+.fullkorn-check .form-check-label {
+  cursor: pointer;
+  line-height: 1.5;
+}
