@@ -154,10 +154,21 @@ namespace Backend.DTO
         // CalculatorService.MetabolisableCarbs.
         public decimal? Polyols { get; set; }
 
-        // Used for the "resistant starch" EFSA health claim, which requires resistant
-        // starch to be at least 14% of total starch — not derivable from Carbs alone.
+        // The starch breakdown, collected through the Stivelse kilde rather than the
+        // nutrition table, and read by two health claims: 764557 wants resistant starch at
+        // 14 % of the total, 755877 wants slowly digestible starch at 40 % of the digestible
+        // part. None of it is derivable from Carbs.
+        //
+        // A zero total means "not declared" rather than "none present", and both claims
+        // withhold on it rather than failing the product.
         public decimal TotalStarch { get; set; }
         public decimal ResistantStarch { get; set; }
+
+        // Nullable where its two siblings are not, and the difference carries meaning. A zero
+        // is a real answer: a product can hold starch of which none is slowly digestible, and
+        // that fails 755877's 40 % rather than withholding it. A blank says the producer did
+        // not measure it, which withholds the claim instead.
+        public decimal? SlowlyDigestibleStarch { get; set; }
     }
 
     public class HealthClaimInputDTO

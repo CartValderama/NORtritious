@@ -348,6 +348,7 @@ export const buildCalculationPayload = (
   nutrition: NutritionValues,
   totalStarch: string,
   resistantStarch: string,
+  slowlyDigestibleStarch: string,
   otherSubstances: { name: string; amount: string | number }[],
   schema: CalculatorSchema,
   // One object rather than two more positional booleans at the end of a ten-argument list,
@@ -397,6 +398,7 @@ export const buildCalculationPayload = (
     docosahexaenoicAcid: optionalNumber(nutrition.dokosaheksaensyre),
     totalStarch: Number(totalStarch) || 0,
     resistantStarch: Number(resistantStarch) || 0,
+    slowlyDigestibleStarch: optionalNumber(slowlyDigestibleStarch),
   },
   // One picker feeds three request lists: the vitamins and minerals are routed by the
   // option table, and everything left over is an "other" substance.

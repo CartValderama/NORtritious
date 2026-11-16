@@ -5,9 +5,14 @@ import {
   calculateUsedFiber,
   validateFiberAddition,
   getSelectableKildeOptions,
+  kildeUnit,
+  kildePlaceholder,
   type KildeOption,
 } from "../../utils/calculator/kildeOptions";
-import type { CalculatorSchema } from "../../services/calculatorService";
+import type {
+  CalculatorSchema,
+  KildeField,
+} from "../../services/calculatorService";
 
 // All local "draft" state, effects and handlers behind the EFSA
 // Helsepåstander panel's "Kilde til Annet" picker — reads/writes
@@ -90,27 +95,42 @@ export function useKildePicker(schema: CalculatorSchema) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasFiberSource]);
 
-  // The ratio input shape (Stivelse today) is validated/stored separately
-  // from the generic amount-based kilder and never touches Kostfiber — this
-  // is the one flag the component needs to branch on, computed once instead
-  // of re-derived at every call site.
-  const isStarchRatio =
-    !!newSubstance && "inputType" in newSubstance && newSubstance.inputType === "starchRatio";
+  // A kilde that carries no amount of its own: its boxes write straight into the
+  // nutrition figures, so it is stored and validated differently from the amount-based
+  // kilder and never touches Kostfiber. Read off the served kind rather than off the name,
+  // which is what lets the panel render any kilde's boxes without knowing what it is.
+  const isNutritionKilde = newSubstance?.kind === "nutrition";
+
+  // The boxes to draw for the current pick: whatever the backend described, or the ordinary
+  // single "Mengde" one for the kilde that described none, which is all but three of them.
+  const kildeFields: KildeField[] =
+    newSubstance?.fields && newSubstance.fields.length > 0
+      ? newSubstance.fields
+      : [
+          {
+            target: "amount",
+            label: "Mengde",
+            unit: kildeUnit(newSubstance),
+            placeholder: kildePlaceholder(newSubstance),
+          },
+        ];
 
   // Single source of truth for "is there enough filled in to add this kilde
   // right now" — used for both the Legg til button's disabled state and as
   // handleAddSubstance's own guard, so the two can't drift apart.
   const canAddSubstance =
     !!newSubstance &&
-    (isStarchRatio
-      ? !!totalStarch
+    (isNutritionKilde
+      ? // the first box is the figure the others are fractions of, and none of them means
+        // anything without it
+        !!efsaValues[kildeFields[0].target as keyof typeof efsaValues]
       : !!newSubstanceAmount &&
         !(newSubstance.requiresKostfiber && fiberFullyUsed));
 
   const handleAddSubstance = () => {
     if (!canAddSubstance || !newSubstance) return;
 
-    if (isStarchRatio) {
+    if (isNutritionKilde) {
       setStarchCommitted(true);
       setSubstanceError("");
       setNewSubstance(null);
@@ -143,9 +163,16 @@ export function useKildePicker(schema: CalculatorSchema) {
 
   const handleRemoveSubstance = (name: string) => {
     const opt = byValue.get(name);
-    if (opt && "inputType" in opt && opt.inputType === "starchRatio") {
+    if (opt?.kind === "nutrition") {
       setStarchCommitted(false);
-      setEfsaValues({ ...efsaValues, totalStarch: "", resistantStarch: "" });
+      // Every box it owns, not the two that existed when this was written: a figure left
+      // behind by a removed kilde is one the next calculation would still read.
+      // Indexed by a served name, so the keys are strings rather than a union the
+      // compiler can line up with the store's shape. A field naming something the store
+      // does not hold writes a key nothing reads, which is inert.
+      const cleared: Record<string, unknown> = { ...efsaValues };
+      for (const f of opt.fields ?? []) cleared[f.target] = "";
+      setEfsaValues(cleared as unknown as typeof efsaValues);
       return;
     }
     setEfsaField(
@@ -157,6 +184,8 @@ export function useKildePicker(schema: CalculatorSchema) {
 
   return {
     byValue,
+    efsaValues,
+    kildeFields,
     totalStarch,
     resistantStarch,
     otherSubstances,
@@ -175,7 +204,7 @@ export function useKildePicker(schema: CalculatorSchema) {
     hasFiberSource,
     fiberFullyUsed,
     kildeOptions,
-    isStarchRatio,
+    isNutritionKilde,
     canAddSubstance,
     handleAddSubstance,
     handleRemoveSubstance,

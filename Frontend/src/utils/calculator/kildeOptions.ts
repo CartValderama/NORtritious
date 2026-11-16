@@ -1,44 +1,18 @@
 import type { CalculatorSchema, KildeOption as ServedKilde } from "../../services/calculatorService";
 
-export interface StarchOption {
-  value: string;
-  label: string;
-  unit: string;
-  kind: "other";
-  requiresKostfiber: false;
-  requiresPortionSize: false;
-  inputType: "starchRatio";
-}
-
 export interface AddedSubstance {
   name: string;
   amount: string | number;
 }
 
-export type KildeOption = ServedKilde | StarchOption;
+export type KildeOption = ServedKilde;
 
-// The only kilde not served by the schema. Stivelse isn't in OtherClaimRegistry: it has its
-// own TotalStarch/ResistantStarch field pair on the request rather than going through the
-// `others` list, so the backend has no registry entry to describe it. `inputType:
-// "starchRatio"` tells the picker to render that two-field input instead of the single
-// "Mengde" one.
-export const STARCH_OPTION: StarchOption = {
-  value: "Stivelse",
-  label: "Stivelse (resistent)",
-  unit: "g",
-  kind: "other",
-  requiresKostfiber: false,
-  requiresPortionSize: false,
-  inputType: "starchRatio",
-};
-
-// Everything selectable in the picker. Which substances exist, their units and whether each
-// needs a portion size are properties of the claim registries, so they arrive on the schema
-// rather than being kept in step by hand here.
-export const kildeOptionsFrom = (schema: CalculatorSchema): KildeOption[] => [
-  STARCH_OPTION,
-  ...(schema?.kilder ?? []),
-];
+// Everything selectable in the picker, all of it served. Stivelse used to be declared here,
+// because it is not a substance in the claim registry and so had nothing to describe it; the
+// backend now describes it like any other kilde, including the boxes it needs, so the
+// browser no longer holds an option of its own.
+export const kildeOptionsFrom = (schema: CalculatorSchema): KildeOption[] =>
+  schema?.kilder ?? [];
 
 export const kildeByValue = (schema: CalculatorSchema): Map<string, KildeOption> =>
   new Map(kildeOptionsFrom(schema).map((o) => [o.value, o]));
@@ -68,16 +42,17 @@ export const calculateUsedFiber = (
     .filter((s) => byValue.get(s.name)?.requiresKostfiber)
     .reduce((sum, s) => sum + (Number(s.amount) || 0), 0);
 
-// "Added" state lives in different places depending on input shape: the two-field ratio type
-// (Stivelse) tracks itself via hasStarch, everything else lives in the generic
-// otherSubstances array. `"inputType" in opt` narrows the union without the served options
-// needing to declare the field.
+// "Added" state lives in different places depending on what the kilde is. One that carries
+// no amount of its own writes straight into the nutrition figures, so there is no entry in
+// otherSubstances to look for and it tracks itself via hasStarch; everything else lives in
+// that array. Keyed on the served kind rather than on a name, so a second nutrition kilde
+// would not need this line changed.
 const isKildeAdded = (
   opt: KildeOption,
   otherSubstances: AddedSubstance[],
   hasStarch: boolean,
 ): boolean =>
-  "inputType" in opt && opt.inputType === "starchRatio"
+  opt.kind === "nutrition"
     ? hasStarch
     : otherSubstances.some((s) => s.name === opt.value);
 

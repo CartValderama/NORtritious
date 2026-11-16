@@ -60,6 +60,18 @@ namespace Backend.Services
             // is rather than converted to 13,333 so the figure in the code stays the figure
             // in the register.
             CarbsRatioThreshold,
+            // amount per portion >= a share of the starch in that portion: "at least 5 g of
+            // alpha-cyclodextrin per 50 g of starch in a quantified portion". MinAmount is
+            // the grams per 100 g of starch, so the register's 5-per-50 is written here as
+            // 10. The portion cancels out of the ratio, both sides scaling by it, but is
+            // still required because a quantified portion is what the condition asks for.
+            //
+            // The same shape as CarbsRatioThreshold against a different figure, and the
+            // figure is the one the Stivelse kilde collects rather than a second copy of it.
+            StarchRatioThreshold,
+            // amount per gram, the basis the register states a bacteria count on and the only
+            // check here read neither per 100 g nor per portion.
+            PerGramThreshold,
             // No condition on the food to check, so the card reports the claim and its
             // conditions and reaches no verdict. The verdict line is CannotComputePrefix,
             // which the frontend and the report already treat as a third state beside met and
@@ -95,7 +107,11 @@ namespace Backend.Services
         // substance's own property now. IsFibre is what ties a kilde to the Kostfiber figure
         // in the nutrition table: a fibre source cannot exceed the total fibre declared, and
         // charcoal or meat has nothing to do with that total.
-        private record OtherSubstance(OtherClaimRule[] Rules, string Unit = "g", bool IsFibre = true);
+        // Fields is null for all but the two substances whose claims need a figure beyond
+        // the substance's own amount, which get the ordinary single "Mengde" box.
+        private record OtherSubstance(
+            OtherClaimRule[] Rules, string Unit = "g", bool IsFibre = true,
+            KildeFieldDTO[]? Fields = null);
 
         // Maps a selectable "Other" substance name to every EU-register claim that applies to it.
         // A substance can have more than one authorised claim (e.g. Beta-glucans has both a
@@ -321,6 +337,44 @@ namespace Backend.Services
             //
             // "only for olive oil" is a condition about what the product is, reported
             // through Vilkår for bruk like 755661's "fats and oils".
+            // "At least 5 g of alpha-cyclodextrin per 50 g of starch in a quantified
+            // portion", so this row needs the product's total starch as well as its own
+            // amount. It asks for the same field Stivelse fills rather than a copy of it, so
+            // a product declaring both cannot give two different answers for its starch.
+            ["Alpha-cyclodextrin"] =
+                                     new(new[] { new OtherClaimRule(830129, OtherClaimCheck.StarchRatioThreshold, 10m) },
+                                         IsFibre: false,
+                                         Fields: new[]
+                                         {
+                                             new KildeFieldDTO { Target = "amount", Label = "Mengde",
+                                                                 Unit = "g", Placeholder = "f.eks. 5" },
+                                             new KildeFieldDTO { Target = "totalStarch",
+                                                                 Label = "Totalt stivelse i produktet",
+                                                                 Unit = "g", Placeholder = "f.eks. 50" },
+                                         }),
+
+            // "Yoghurt or fermented milk should contain at least 10^8 Colony Forming Units
+            // live starter microorganisms per gram", which is a condition on the food.
+            //
+            // Counted in millions rather than as 100000000. It is the same number written so
+            // that a producer can type it without losing an order of magnitude to a missed
+            // zero, and an order of magnitude is the whole of what this claim asks for.
+            //
+            // Two parts of the condition are reported through Vilkår for bruk rather than
+            // checked: that the organisms are Lactobacillus delbrueckii subsp. bulgaricus and
+            // Streptococcus thermophilus, and that the product is yoghurt or fermented milk.
+            // Nothing on this form identifies an organism, and no matkategori says "yoghurt".
+            ["Live yoghurt cultures"] =
+                                     new(new[] { new OtherClaimRule(762729, OtherClaimCheck.PerGramThreshold, 100m) },
+                                         Unit: "mill. CFU/g", IsFibre: false,
+                                         Fields: new[]
+                                         {
+                                             new KildeFieldDTO { Target = "amount",
+                                                                 Label = "Levende kulturer",
+                                                                 Unit = "mill. CFU per gram",
+                                                                 Placeholder = "f.eks. 100" },
+                                         }),
+
             ["Olive oil polyphenols"] =
                                      new(new[] { new OtherClaimRule(763885, OtherClaimCheck.PerHundredThreshold, 25m) },
                                          Unit: "mg", IsFibre: false),
@@ -490,6 +544,8 @@ namespace Backend.Services
                 ["Plant sterols and plant stanols"] = "Plantesteroler og plantestanoler",
                 ["Water-Soluble Tomato Concentrate (WSTC) I and II"] =
                     "Vannløselig tomatkonsentrat (WSTC I og II)",
+                ["Alpha-cyclodextrin"] = "Alfa-syklodekstrin",
+                ["Live yoghurt cultures"] = "Levende yoghurtkulturer",
                 ["Choline"] = "Kolin",
                 ["Betaine"] = "Betain",
                 ["Melatonin"] = "Melatonin",
@@ -517,6 +573,7 @@ namespace Backend.Services
             OtherClaimCheck.DailyIntakeThreshold => true,
             OtherClaimCheck.BetaGlucanMealRatio => true,
             OtherClaimCheck.CarbsRatioThreshold => true,
+            OtherClaimCheck.StarchRatioThreshold => true,
             _ => false,
         };
 
@@ -591,6 +648,9 @@ namespace Backend.Services
             [837853] = "Les EFSA-uttalelsen om kalsium og tap av beinmineral",
             [757477] = "Les EFSA-uttalelsen om vannløselig tomatkonsentrat og blodplater",
             [757821] = "Les EFSA-uttalelsen om essensielle fettsyrer og vekst hos barn",
+            [755877] = "Les EFSA-uttalelsen om langsomt fordøyelig stivelse og blodsukker",
+            [830129] = "Les EFSA-uttalelsen om alfa-syklodekstrin og blodsukker etter måltid",
+            [762729] = "Les EFSA-uttalelsen om yoghurtkulturer og fordøyelse av laktose",
             [763885] = "Les EFSA-uttalelsen om polyfenoler i olivenolje og blodfettene",
             [761973] = "Les EFSA-uttalelsen om glukomannan og blodkolesterol",
             [762125] = "Les EFSA-uttalelsen om HPMC og blodkolesterol",
@@ -612,6 +672,67 @@ namespace Backend.Services
             [760025] = "Les EFSA-uttalelsen om arabinoksylan og blodsukker etter måltid",
             [836625] = "Les EFSA-uttalelsen om karbohydrater og hjernefunksjon",
         };
+
+        // "Food where the digestible carbohydrates provide at least 60 % of the total energy
+        // and where at least 55 % of those carbohydrates is digestible starch, of which at
+        // least 40 % is SDS." Three conditions on one product, all of them ratios.
+        //
+        // Two of the three were answerable before this claim existed. Digestible carbohydrate
+        // is read as MetabolisableCarbs, the Carbs less polyols that 836625 already uses: the
+        // declared figure excludes fibre, and polyols are the part of what remains that is not
+        // digested in the ordinary sense. Digestible starch is the total less the resistant
+        // part, which is what resistant means. Only the SDS figure is new, and it is collected
+        // on the Stivelse kilde beside the two that were already there.
+        //
+        // 4 kcal per gram of carbohydrate, from Annex XIV to Regulation (EU) No 1169/2011.
+        private const long SlowlyDigestibleStarchClaimId = 755877;
+        private const decimal SdsDigestibleCarbEnergyShare = 60m;
+        private const decimal SdsDigestibleStarchShareOfCarbs = 55m;
+        private const decimal SdsShareOfDigestibleStarch = 40m;
+
+        private async Task<HealthClaimResultDTO?> CheckSlowlyDigestibleStarchHealthClaim(
+            NutritionInputDTO n, string energyUnit)
+        {
+            // Withheld, not failed, when the figures were not given. A blank SDS is a producer
+            // who did not measure it, which is not a statement about the product.
+            if (n.SlowlyDigestibleStarch is not decimal sds) return null;
+            if (n.TotalStarch <= 0) return null;
+
+            decimal kcal = EnergyAsKcal(energyUnit, n);
+            if (kcal <= 0) return null;
+
+            var claim = await _euHealthClaims.GetByIdAsync(SlowlyDigestibleStarchClaimId);
+            if (claim == null) return null;
+
+            decimal carbs = MetabolisableCarbs(n);
+            decimal digestibleStarch = Math.Max(0m, n.TotalStarch - n.ResistantStarch);
+
+            decimal carbEnergyShare = carbs * KcalPerGramCarb * 100m / kcal;
+            decimal starchShare = carbs > 0 ? digestibleStarch * 100m / carbs : 0m;
+            decimal sdsShare = digestibleStarch > 0 ? sds * 100m / digestibleStarch : 0m;
+
+            // Every condition that failed rather than the first, because a producer reading
+            // this wants to know how far off the product is, not one reason at a time.
+            var missing = new List<string>();
+            if (carbEnergyShare < SdsDigestibleCarbEnergyShare)
+                missing.Add($"fordøyelige karbohydrater gir {FormatNo(Math.Round(carbEnergyShare, 1))} % av " +
+                            $"energien, kravet er {FormatNo(SdsDigestibleCarbEnergyShare)} %");
+            if (starchShare < SdsDigestibleStarchShareOfCarbs)
+                missing.Add($"fordøyelig stivelse utgjør {FormatNo(Math.Round(starchShare, 1))} % av " +
+                            $"karbohydratene, kravet er {FormatNo(SdsDigestibleStarchShareOfCarbs)} %");
+            if (sdsShare < SdsShareOfDigestibleStarch)
+                missing.Add($"langsomt fordøyelig stivelse utgjør {FormatNo(Math.Round(sdsShare, 1))} % av den " +
+                            $"fordøyelige stivelsen, kravet er {FormatNo(SdsShareOfDigestibleStarch)} %");
+
+            return BuildEuClaimResult(
+                "Stivelse",
+                $"{FormatNo(sds)} g langsomt fordøyelig stivelse av {FormatNo(digestibleStarch)} g fordøyelig stivelse",
+                missing.Count == 0
+                    ? MeetsRequirementText
+                    : $"Oppfyller ikke gitt krav ({string.Join("; ", missing)})",
+                SlowlyDigestibleStarchClaimId,
+                claim);
+        }
 
         // Resistant starch (764557) isn't a user-selectable "Other" substance like the ones above —
         // its condition needs two dedicated nutrition fields (TotalStarch/ResistantStarch), so it's
@@ -636,6 +757,32 @@ namespace Backend.Services
         // about recovery from intensive exercise. That is the complaint that had 836625
         // removed the first time.
 
+        // Kilder that collect nutrition figures rather than an amount of themselves.
+        //
+        // Stivelse is the only one and is not a substance at all: it carries no amount in the
+        // others list, and the two claims it feeds are read straight off the nutrition input
+        // like the rest of the table. It lived in the frontend as a hardcoded option for
+        // exactly as long as it was the only thing of its kind. Its boxes are described here
+        // now, so the panel renders them without knowing what Stivelse is.
+        private record NutritionKilde(string Label, KildeFieldDTO[] Fields);
+
+        private static readonly Dictionary<string, NutritionKilde> NutritionKilder = new()
+        {
+            ["Stivelse"] = new("Stivelse (resistent)", new[]
+            {
+                new KildeFieldDTO { Target = "totalStarch", Label = "Totalt stivelse",
+                                    Unit = "g", Placeholder = "f.eks. 50" },
+                new KildeFieldDTO { Target = "resistantStarch", Label = "Herav resistent",
+                                    Unit = "g", Placeholder = "f.eks. 10" },
+                // New, and optional in a way the two above are not: leaving it blank withholds
+                // 755877 and leaves 764557 untouched, so a product that only ever wanted the
+                // resistant starch claim is unaffected by this box existing.
+                new KildeFieldDTO { Target = "slowlyDigestibleStarch",
+                                    Label = "Herav langsomt fordøyelig",
+                                    Unit = "g", Placeholder = "f.eks. 20" },
+            }),
+        };
+
         // The kilde picker's options. Neither the category nor the food type changes them, so
         // they're built once at startup rather than per request. Nothing mutates the list or
         // the options in it; they are serialised onto the schema response as they are.
@@ -650,9 +797,22 @@ namespace Backend.Services
                 Label = NutrientLabel(entry.Key),
                 Unit = entry.Value.Unit,
                 Kind = "other",
+                Fields = entry.Value.Fields?.ToList(),
                 RequiresKostfiber = entry.Value.IsFibre,
                 RequiresPortionSize = entry.Value.Rules.Any(r => NeedsPortionSize(r.Check)),
             })
+            .Concat(NutritionKilder.Select(entry => new KildeOptionDTO
+            {
+                Value = entry.Key,
+                Label = entry.Value.Label,
+                Unit = "g",
+                Kind = "nutrition",
+                Fields = entry.Value.Fields.ToList(),
+                RequiresKostfiber = false,
+                // Neither claim reading these figures is per portion: both are ratios within
+                // the starch itself.
+                RequiresPortionSize = false,
+            }))
             .Concat(VitaminMineralDefs.Select(entry => new KildeOptionDTO
             {
                 Value = entry.Key,
@@ -768,6 +928,11 @@ namespace Backend.Services
                     OtherClaimCheck.CarbsRatioThreshold =>
                         FormatCarbsRatioThresholdResult(
                             amount, portionSize, rule.MinAmount!.Value, n.Carbs, unit),
+                    OtherClaimCheck.StarchRatioThreshold =>
+                        FormatStarchRatioThresholdResult(
+                            amount, portionSize, rule.MinAmount!.Value, n.TotalStarch, unit),
+                    OtherClaimCheck.PerGramThreshold =>
+                        FormatPerGramThresholdResult(amount, rule.MinAmount!.Value, unit),
                     OtherClaimCheck.HighFibreSource =>
                         FormatHighFibreSourceResult(amount, energyUnit, n),
                     OtherClaimCheck.BetaGlucanMealRatio =>
@@ -789,6 +954,11 @@ namespace Backend.Services
                     // other claim's amount already restates.
                     OtherClaimCheck.DailyIntakeThreshold =>
                         FormatDailyIntakeAmount(amount, portionSize, unit, foodType),
+
+                    // The unit already names the basis, so restating it would read
+                    // "100 mill. CFU/g per 100 g".
+                    OtherClaimCheck.PerGramThreshold =>
+                        amount > 0 ? $"{FormatNo(amount)} {unit}" : "ikke oppgitt",
 
                     _ => FormatPerHundredAmount(amount, unit, foodType),
                 };
@@ -991,6 +1161,37 @@ namespace Backend.Services
                 ? MeetsRequirementText
                 : $"Oppfyller ikke gitt krav (trenger minst {FormatNo(CalciumPortionMinMg)} mg per porsjon, " +
                   $"porsjonen inneholder {FormatNo(inPortion)} mg)";
+        }
+
+        // The alpha-cyclodextrin ratio. Both sides of it scale by the portion, so the portion
+        // cancels and the comparison is made on the per-100 figures; it is still required,
+        // because the condition asks for a quantified portion and a product with no declared
+        // serving has not stated one.
+        private static string FormatStarchRatioThresholdResult(
+            decimal amountPer100, decimal portionSize, decimal minPer100Starch,
+            decimal totalStarchPer100, string unit)
+        {
+            if (portionSize <= 0) return $"{CannotComputePrefix} (porsjonsstørrelse mangler)";
+            if (totalStarchPer100 <= 0)
+                return $"{CannotComputePrefix} (stivelse i produktet er ikke oppgitt)";
+
+            decimal required = Math.Round(minPer100Starch * totalStarchPer100 / 100m, 3);
+            return amountPer100 >= required
+                ? MeetsRequirementText
+                : $"Oppfyller ikke gitt krav (trenger minst {FormatNo(required)} {unit} mot " +
+                  $"{FormatNo(totalStarchPer100)} g stivelse, produktet har {FormatNo(amountPer100)} {unit})";
+        }
+
+        // The one figure read per gram rather than per 100 g or per portion, so the number
+        // typed in is already the one being compared and there is no basis to restate.
+        private static string FormatPerGramThresholdResult(
+            decimal amountPerGram, decimal minimum, string unit)
+        {
+            if (amountPerGram <= 0) return $"{CannotComputePrefix} (mengde er ikke oppgitt)";
+            return amountPerGram >= minimum
+                ? MeetsRequirementText
+                : $"Oppfyller ikke gitt krav (trenger minst {FormatNo(minimum)} {unit}, " +
+                  $"produktet har {FormatNo(amountPerGram)} {unit})";
         }
 
         // "Food which is high in that fibre" — the specific substance's own amount (not total

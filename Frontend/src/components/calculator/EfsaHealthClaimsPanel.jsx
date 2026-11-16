@@ -33,7 +33,9 @@ const EfsaHealthClaimsPanel = ({ schema }) => {
     hasFiberSource,
     fiberFullyUsed,
     kildeOptions,
-    isStarchRatio,
+    efsaValues,
+    kildeFields,
+    isNutritionKilde,
     canAddSubstance,
     handleAddSubstance,
     handleRemoveSubstance,
@@ -93,42 +95,37 @@ const EfsaHealthClaimsPanel = ({ schema }) => {
             />
           </div>
 
-          {isStarchRatio ? (
-            <>
+          {/* One box per field the backend described for this kilde, which for all but
+              three of them is the single "Mengde" the hook supplies as the default. The
+              panel no longer knows that Stivelse takes two numbers, or that
+              alfa-syklodekstrin wants the product's total starch beside its own amount. */}
+          {kildeFields.map((f) =>
+            f.target === "amount" ? (
               <LabeledUnitInput
-                id="totalStarch"
-                label="Totalt stivelse"
-                unit="g"
-                max="100"
-                placeholder="f.eks. 50"
-                value={totalStarch}
-                onChange={(e) => setEfsaField("totalStarch", e.target.value)}
+                key={f.target}
+                id="substanceAmount"
+                label={f.label}
+                unit={f.unit}
+                placeholder={f.placeholder}
+                value={newSubstanceAmount}
+                onChange={(e) => {
+                  setNewSubstanceAmount(e.target.value);
+                  setSubstanceError("");
+                }}
+                disabled={newSubstance?.requiresKostfiber && fiberFullyUsed}
               />
+            ) : (
               <LabeledUnitInput
-                id="resistantStarch"
-                label="Herav resistent"
-                unit="g"
+                key={f.target}
+                id={f.target}
+                label={f.label}
+                unit={f.unit}
                 max="100"
-                placeholder="f.eks. 10"
-                value={resistantStarch}
-                onChange={(e) =>
-                  setEfsaField("resistantStarch", e.target.value)
-                }
+                placeholder={f.placeholder}
+                value={efsaValues[f.target] ?? ""}
+                onChange={(e) => setEfsaField(f.target, e.target.value)}
               />
-            </>
-          ) : (
-            <LabeledUnitInput
-              id="substanceAmount"
-              label="Mengde"
-              unit={kildeUnit(newSubstance)}
-              placeholder={kildePlaceholder(newSubstance)}
-              value={newSubstanceAmount}
-              onChange={(e) => {
-                setNewSubstanceAmount(e.target.value);
-                setSubstanceError("");
-              }}
-              disabled={newSubstance?.requiresKostfiber && fiberFullyUsed}
-            />
+            ),
           )}
 
           <Button
@@ -165,11 +162,27 @@ const EfsaHealthClaimsPanel = ({ schema }) => {
           />
         )}
 
-        {isStarchRatio &&
-          Number(resistantStarch) > Number(totalStarch) && (
+        {/* Each starch figure is a fraction of the one above it: resistant is part of the
+            total, and slowly digestible is part of what is left once the resistant part is
+            taken out, since resistant starch is by definition the part that is not
+            digested. Checked here as well as in the verdict because a number that cannot be
+            true is worth saying before Beregn rather than after. */}
+        {isNutritionKilde && Number(resistantStarch) > Number(totalStarch) && (
+          <div className="text-danger small mt-3">
+            Resistent stivelse ({resistantStarch}g) kan ikke overstige totalt
+            stivelsesinnhold ({totalStarch}g).
+          </div>
+        )}
+
+        {isNutritionKilde &&
+          Number(efsaValues.slowlyDigestibleStarch) >
+            Number(totalStarch) - Number(resistantStarch) && (
             <div className="text-danger small mt-3">
-              Resistent stivelse ({resistantStarch}g) kan ikke overstige totalt
-              stivelsesinnhold ({totalStarch}g).
+              Langsomt fordøyelig stivelse (
+              {efsaValues.slowlyDigestibleStarch}g) kan ikke overstige den
+              fordøyelige stivelsen (
+              {Number(totalStarch) - Number(resistantStarch)}g), altså totalt
+              stivelse minus resistent stivelse.
             </div>
           )}
 
@@ -189,7 +202,11 @@ const EfsaHealthClaimsPanel = ({ schema }) => {
           <div className="d-flex flex-wrap gap-2 pt-2 mt-3">
             {hasStarch && (
               <RemovablePill
-                label={`Stivelse: ${totalStarch}g totalt, ${resistantStarch || 0}g resistent`}
+                label={`Stivelse: ${totalStarch}g totalt, ${resistantStarch || 0}g resistent${
+                  efsaValues.slowlyDigestibleStarch
+                    ? `, ${efsaValues.slowlyDigestibleStarch}g langsomt fordøyelig`
+                    : ""
+                }`}
                 onRemove={() => handleRemoveSubstance("Stivelse")}
                 ariaLabel="Fjern Stivelse"
               />

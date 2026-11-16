@@ -45,6 +45,7 @@ export interface Product {
   portionSize: number | string;
   totalStarch: number | string;
   resistantStarch: number | string;
+  slowlyDigestibleStarch: number | string;
   otherSubstancesJson: string;
 }
 
@@ -71,12 +72,14 @@ const EMPTY_PRODUCT: Product = {
   portionSize: 0,
   totalStarch: 0,
   resistantStarch: 0,
+  slowlyDigestibleStarch: 0,
   otherSubstancesJson: "[]",
 };
 
 export interface EfsaPanelValues {
   totalStarch: string;
   resistantStarch: string;
+  slowlyDigestibleStarch: string;
   otherSubstances: OtherSubstance[];
   portionSize: string;
 }
@@ -84,6 +87,7 @@ export interface EfsaPanelValues {
 const EMPTY_EFSA_VALUES: EfsaPanelValues = {
   totalStarch: "",
   resistantStarch: "",
+  slowlyDigestibleStarch: "",
   otherSubstances: [],
   portionSize: "",
 };

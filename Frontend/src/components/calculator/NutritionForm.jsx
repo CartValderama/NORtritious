@@ -94,8 +94,13 @@ const NutritionForm = () => {
   // Which inputs this category needs comes from the backend, not from a local copy of the
   // rules. Empty until it arrives, so the form shows no fields rather than a guessed set.
   const schema = useCalculatorSchema(category, foodType);
-  const { totalStarch, resistantStarch, otherSubstances, portionSize } =
-    efsaValues;
+  const {
+    totalStarch,
+    resistantStarch,
+    slowlyDigestibleStarch,
+    otherSubstances,
+    portionSize,
+  } = efsaValues;
   const kildeCount =
     (efsaValues.totalStarch ? 1 : 0) + efsaValues.otherSubstances.length;
   const [energyUnit, setEnergyUnit] = useState("energikcal");
@@ -245,6 +250,7 @@ const NutritionForm = () => {
         nutrition,
         totalStarch,
         resistantStarch,
+        slowlyDigestibleStarch,
         otherSubstances,
         schema,
         {

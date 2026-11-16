@@ -74,6 +74,10 @@ namespace Backend.Services
             var resistantStarchClaim = await CheckResistantStarchHealthClaim(request.Nutrition);
             if (resistantStarchClaim != null) autoHealthClaims.Add(resistantStarchClaim);
 
+            var sdsClaim = await CheckSlowlyDigestibleStarchHealthClaim(
+                request.Nutrition, request.EnergyUnit);
+            if (sdsClaim != null) autoHealthClaims.Add(sdsClaim);
+
             // Automatic for the same reason resistant starch is: these read the nutrition
             // table rather than anything picked in "Velg kilde", so there is nothing for the
             // user to add first. See NutritionGatedClaims.
@@ -134,7 +138,11 @@ namespace Backend.Services
         private static IEnumerable<long> CollectClaimIds(CalculatorRequestDTO request)
         {
             if (request.Nutrition.TotalStarch > 0)
+            {
                 yield return ResistantStarchClaimId;
+                if (request.Nutrition.SlowlyDigestibleStarch is not null)
+                    yield return SlowlyDigestibleStarchClaimId;
+            }
 
             var basis = new ProductBasis(request.ProductType, request.PortionSize);
             var declared = new ProductDeclarations(

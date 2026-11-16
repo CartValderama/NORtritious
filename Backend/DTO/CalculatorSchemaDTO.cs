@@ -38,6 +38,21 @@ namespace Backend.DTO
         public List<KildeOptionDTO> Kilder { get; set; } = new();
     }
 
+    // One input box a kilde needs. A kilde with no fields gets the ordinary single "Mengde"
+    // box bound to its own amount, which is all but three of them.
+    //
+    // Target is where the number goes on the request: "amount" for the kilde's own figure in
+    // the others list, otherwise the name of a nutrition field. That is how alpha-cyclodextrin
+    // asks for the product's total starch and gets the same figure Stivelse collects, rather
+    // than a second copy of it that could disagree.
+    public class KildeFieldDTO
+    {
+        public string Target { get; set; } = "amount";
+        public string Label { get; set; } = string.Empty;
+        public string Unit { get; set; } = "g";
+        public string Placeholder { get; set; } = string.Empty;
+    }
+
     public class KildeOptionDTO
     {
         // The name sent back on the request. Matches the registry key, which is the English
@@ -53,6 +68,11 @@ namespace Backend.DTO
 
         // "vitamin", "mineral" or "other", which decides the request list the entry goes into.
         public string Kind { get; set; } = "other";
+
+        // The boxes the picker shows for this kilde, or null for the ordinary single
+        // "Mengde" one. Served rather than decided in the browser, because which figures a
+        // claim needs is a property of the claim.
+        public List<KildeFieldDTO>? Fields { get; set; }
 
         // True where the substance is a subset of Kostfiber, so the picker can gate it on
         // the Kostfiber field and check the running total against it.

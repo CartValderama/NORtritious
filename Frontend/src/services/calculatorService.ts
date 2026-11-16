@@ -53,6 +53,9 @@ export interface CalculatorRequestPayload {
     addedSalt: number;
     totalStarch: number;
     resistantStarch: number;
+    // Null where the producer did not measure it, which withholds 755877 rather than failing
+    // the product on a figure nobody gave. A zero is a real answer and fails it.
+    slowlyDigestibleStarch: number | null;
   };
   // Vitamins and minerals carry a unit because theirs aren't grams (calcium is mg,
   // vitamin D is µg). The two lists are separate only because the backend DTO has them
@@ -69,11 +72,30 @@ export const calculateNutrition = async (payload: CalculatorRequestPayload) => {
 
 // What the form needs to know about a category before anything is entered. The rules live in
 // the backend, so the form asks rather than keeping its own copy of them.
+// One input box a kilde needs. `target` is where the number goes on the request: "amount"
+// for the kilde's own figure in the others list, otherwise the name of a nutrition field.
+// That is how alpha-cyclodextrin asks for the product's total starch and fills the same field
+// Stivelse fills, instead of a second copy that could disagree with it.
+export interface KildeField {
+  target: string;
+  label: string;
+  unit: string;
+  placeholder: string;
+}
+
 export interface KildeOption {
   value: string;
   label: string;
   unit: string;
-  kind: "vitamin" | "mineral" | "other";
+  // "nutrition" is a kilde that carries no amount of its own and exists to collect nutrition
+  // figures: Stivelse, whose claims are read off the nutrition input like the rest of the
+  // table. It used to be a hardcoded option in the browser for as long as it was the only
+  // one of its kind.
+  kind: "vitamin" | "mineral" | "other" | "nutrition";
+  // The boxes to render, or absent for the ordinary single "Mengde" one. Which figures a
+  // claim needs is a property of the claim, so it arrives from the backend rather than being
+  // decided here by name.
+  fields?: KildeField[] | null;
   requiresKostfiber: boolean;
   requiresPortionSize: boolean;
 }
