@@ -757,6 +757,51 @@ namespace Backend.Services
         // about recovery from intensive exercise. That is the complaint that had 836625
         // removed the first time.
 
+        // The rest of the authorised claims, and why each one is not here.
+        //
+        // Every claim the register authorises falls into one of six groups: served here,
+        // carrying the SOURCE OF cross-reference the client's scope excludes, food
+        // supplements only, chewing gum only, needing a reference product to compare
+        // against, or one of the ten below. The ten had no reason recorded anywhere, which
+        // is the only reason this note exists: a scope with ten silent omissions in it
+        // cannot be defended, and an omission nobody wrote down is indistinguishable from
+        // one nobody noticed.
+        //
+        // Reformulation claims. Each one asks what the product used to contain, or what it
+        // contains instead of something else, which is a second product's figures:
+        //   831181  fructose, "glucose and/or sucrose should be replaced by fructose ...
+        //           the reduction ... is at least 30 %"
+        //   757117  reformulated acidic drinks, "shall comply with the description of the
+        //           food subject to the claim", and that description is itself a comparison
+        //           against the soft drink being replaced
+        //   765181  sugar replacers, and 836553 non-fermentable carbohydrates. Both are
+        //           replacement claims, and both end in a condition on plaque pH 30 minutes
+        //           after consumption, which is a measurement on a person and not a figure
+        //           on a label.
+        //
+        // Not a food:
+        //   837317  cocoa flavanols, "can be used only for capsules or tablets containing
+        //           high-flavanol cocoa extract". The calculator is for food, and the
+        //           supplement exclusion is the same one that keeps the five Art.13(5)
+        //           supplement claims out. Note this is not the cocoa claim that is served:
+        //           835181 is the beverage one, and it is live.
+        //
+        // Conditions the calculator has no input for, and no sensible place to ask:
+        //   760781, 760817  carbohydrate-electrolyte solutions. Energy per litre, the share
+        //           of it from high-glycaemic carbohydrates, sodium in mmol/L and an
+        //           osmolality range. Four figures, none of them on a nutrition label.
+        //   839621  carbohydrate solutions, 30 g to 90 g of carbohydrates per hour
+        //           "according to the instructions of use", with sub-conditions on the
+        //           fructose and glucose shares. The basis is a rate of consumption the
+        //           producer sets, not a property of the food.
+        //   763277, 763321  meal replacement for weight control. A multi-part specification
+        //           per meal, including a table of vitamins and minerals in quantities the
+        //           calculator collects as kilder rather than as a declaration.
+        //
+        // These are decisions, not findings. Each could be served if the inputs were added,
+        // and the reconciliation in the scratchpad reads the ids out of this comment, so a
+        // claim removed from this note shows up as unaccounted for until it is served.
+
         // Kilder that collect nutrition figures rather than an amount of themselves.
         //
         // Stivelse is the only one and is not a substance at all: it carries no amount in the
