@@ -135,8 +135,21 @@ namespace Backend.Services
             // 4 g per day for the cholesterol one.
             ["Chitosan"]           = new(new[] { new OtherClaimRule(760853, OtherClaimCheck.DailyIntakeThreshold, 3m) },
                                          IsFibre: false),
-            ["Creatine"]           = new(new[] { new OtherClaimRule(761413, OtherClaimCheck.DailyIntakeThreshold, 3m) },
-                                         IsFibre: false),
+            // Two claims at the same 3 g a day, so one row carries both. What 838613 adds is
+            // a target population and a training protocol: adults over 55 in regular
+            // resistance training, three times a week at 65-75 % of a one-repetition maximum.
+            // Those are duties for the label, reported through Vilkår for bruk the way
+            // 755661's "only fats and oils" is, and none of them is a figure about the food.
+            //
+            // Its condition text in the register is full of typos ("tarteting", "engagted",
+            // "bneficial", "at leat", "maximum loead") and prints verbatim like every other
+            // register sentence. Rewriting it here would mean putting wording on a label that
+            // is not the authorised wording.
+            ["Creatine"]           = new(new[]
+            {
+                new OtherClaimRule(761413, OtherClaimCheck.DailyIntakeThreshold, 3m),
+                new OtherClaimRule(838613, OtherClaimCheck.DailyIntakeThreshold, 3m),
+            }, IsFibre: false),
             ["Dried plums"]        = new(new[] { new OtherClaimRule(834173, OtherClaimCheck.DailyIntakeThreshold, 100m) },
                                          IsFibre: false),
             ["Guar gum"]           = new(new[] { new OtherClaimRule(762053, OtherClaimCheck.DailyIntakeThreshold, 10m) }),
@@ -150,6 +163,36 @@ namespace Backend.Services
                                          Unit: "mg", IsFibre: false),
             ["Cocoa flavanols"]    = new(new[] { new OtherClaimRule(835181, OtherClaimCheck.DailyIntakeThreshold, 200m) },
                                          Unit: "mg", IsFibre: false),
+
+            // ── Plant sterols and stanols ────────────────────────────────────
+            //
+            // Four authorised claims under four register substance names, kept as four rows
+            // because the names are not interchangeable. 757605 is about sterols, 757729 about
+            // stanol esters, and the other two about either one. A single combined row reading
+            // the sum would grant 757605 to a product holding 1 g of sterols beside 1 g of
+            // stanols, and 1 g of sterols is not the 1,5 g that claim asks for.
+            //
+            // So a sterol product picks Plantesteroler for its own claim and the two
+            // either-or rows for the rest. That is what a barley product already does with
+            // Beta-glucans and Barley beta-glucans, which overlap the same way.
+            //
+            // All four state a daily intake rather than a figure per 100 g, so they read
+            // against the declared portion like the rest of this section. Three of them say
+            // "1,5-3 g" and are read at the floor, as every range here is: a product with 4 g
+            // has not failed to provide 1,5 g. The "7 % to 10 % in 2 to 3 weeks" sentence in
+            // those three governs how the size of the effect may be described on the label,
+            // which is a labelling duty and not a condition on the food.
+            ["Plant sterols"]      = new(new[] { new OtherClaimRule(757605, OtherClaimCheck.DailyIntakeThreshold, 1.5m) },
+                                         IsFibre: false),
+            ["Plant stanol esters"] =
+                                     new(new[] { new OtherClaimRule(757729, OtherClaimCheck.DailyIntakeThreshold, 1.5m) },
+                                         IsFibre: false),
+            ["Plant sterols/Plant stanol esters"] =
+                                     new(new[] { new OtherClaimRule(757557, OtherClaimCheck.DailyIntakeThreshold, 1.5m) },
+                                         IsFibre: false),
+            ["Plant sterols and plant stanols"] =
+                                     new(new[] { new OtherClaimRule(764289, OtherClaimCheck.DailyIntakeThreshold, 0.8m) },
+                                         IsFibre: false),
 
             // ── Claims on a substance the form did not collect before ────────
             //
@@ -290,6 +333,23 @@ namespace Backend.Services
         private const decimal CalciumVitaminDMinCalciumMg = 400m;
         private const decimal CalciumVitaminDMinVitaminDUg = 15m;
 
+        // The same effect claimed on calcium alone: "food which provides at least 400 mg of
+        // calcium per quantified portion". Same figure as the calcium half above and the same
+        // target population, so the only difference in what has to be checked is that vitamin
+        // D does not come into it.
+        //
+        // Worth noting which of the two is about food. 755405 reads "only for food
+        // supplements" and is served anyway, by the product owner's decision, with that
+        // restriction left to the reader through Vilkår for bruk. This one says "only for
+        // food", so it is the one that fits a calculator for food, and it is added beside
+        // 755405 rather than in place of it: both are authorised and a product meeting both
+        // conditions carries both claims.
+        //
+        // One consequence for the form. Entering calcium without vitamin D used to yield no
+        // claim at all, because the combined claim below needs both. It now yields this one.
+        private const long CalciumPortionClaimId = 837853;
+        private const decimal CalciumPortionMinMg = 400m;
+
         // Claims shown in the register's own English rather than the machine translation.
         //
         // The free translation endpoint rendered 760473's "blood clotting" as "blodpropp",
@@ -339,6 +399,10 @@ namespace Backend.Services
                 ["Vitamin C"] = "Vitamin C",
                 ["Cocoa flavanols"] = "Kakaoflavanoler",
                 ["Olive oil polyphenols"] = "Polyfenoler i olivenolje",
+                ["Plant sterols"] = "Plantesteroler",
+                ["Plant stanol esters"] = "Plantestanolestere",
+                ["Plant sterols/Plant stanol esters"] = "Plantesteroler og plantestanolestere",
+                ["Plant sterols and plant stanols"] = "Plantesteroler og plantestanoler",
                 ["Choline"] = "Kolin",
                 ["Betaine"] = "Betain",
                 ["Melatonin"] = "Melatonin",
@@ -432,6 +496,12 @@ namespace Backend.Services
             [2638312] = "Les EFSA-uttalelsen om grønn kiwi og tarmfunksjon",
             [766445] = "Les EFSA-uttalelsen om vitamin C og immunforsvaret etter hard trening",
             [835181] = "Les EFSA-uttalelsen om kakaoflavanoler og blodårenes elastisitet",
+            [838613] = "Les EFSA-uttalelsen om kreatin, styrketrening og muskelstyrke",
+            [757605] = "Les EFSA-uttalelsen om plantesteroler og blodkolesterol",
+            [757729] = "Les EFSA-uttalelsen om plantestanolestere og blodkolesterol",
+            [757557] = "Les EFSA-uttalelsen om plantesteroler, plantestanolestere og blodkolesterol",
+            [764289] = "Les EFSA-uttalelsen om plantesteroler, plantestanoler og blodkolesterol",
+            [837853] = "Les EFSA-uttalelsen om kalsium og tap av beinmineral",
             [763885] = "Les EFSA-uttalelsen om polyfenoler i olivenolje og blodfettene",
             [761973] = "Les EFSA-uttalelsen om glukomannan og blodkolesterol",
             [762125] = "Les EFSA-uttalelsen om HPMC og blodkolesterol",
@@ -704,6 +774,23 @@ namespace Backend.Services
                 }
             }
 
+            // Calcium on its own, which needs no second nutrient. Outside the block above
+            // rather than inside it, so a product that declares both still gets this card as
+            // well as the combined one. See CalciumPortionClaimId.
+            if (amounts.TryGetValue(CalciumName, out decimal calciumOnlyMg))
+            {
+                var calciumClaim = await _euHealthClaims.GetByIdAsync(CalciumPortionClaimId);
+                if (calciumClaim != null)
+                    results.Add(BuildEuClaimResult(
+                        CalciumName,
+                        portionSize > 0
+                            ? $"{FormatNo(Math.Round(calciumOnlyMg * portionSize / 100m, 3))} mg per porsjon"
+                            : $"{FormatNo(calciumOnlyMg)} mg {PerHundredLabel(foodType)}",
+                        FormatCalciumPortionResult(calciumOnlyMg, portionSize),
+                        CalciumPortionClaimId,
+                        calciumClaim));
+            }
+
             return results;
         }
 
@@ -756,6 +843,19 @@ namespace Backend.Services
             return missing.Count == 0
                 ? MeetsRequirementText
                 : $"Oppfyller ikke gitt krav ({string.Join("; ", missing)})";
+        }
+
+        // 837853's figure, which is the calcium half of the one above with nothing else
+        // joined to it.
+        private static string FormatCalciumPortionResult(decimal calciumMgPer100, decimal portionSize)
+        {
+            if (portionSize <= 0) return $"{CannotComputePrefix} (porsjonsstørrelse mangler)";
+
+            decimal inPortion = Math.Round(calciumMgPer100 * portionSize / 100m, 3);
+            return inPortion >= CalciumPortionMinMg
+                ? MeetsRequirementText
+                : $"Oppfyller ikke gitt krav (trenger minst {FormatNo(CalciumPortionMinMg)} mg per porsjon, " +
+                  $"porsjonen inneholder {FormatNo(inPortion)} mg)";
         }
 
         // "Food which is high in that fibre" — the specific substance's own amount (not total
