@@ -23,6 +23,20 @@ namespace Backend.Services
             // amount per portion >= a figure the register states per day: "food which
             // provides a daily intake of 3 g of chitosan". See FormatDailyIntakeResult for
             // what is assumed and how the card says so.
+            //
+            // Only for a figure the register makes a condition on the food. Every claim using
+            // this check says so in the same words, and it is worth checking a new one against
+            // them before adding it here: "The claim may be used only for food which provides
+            // a daily intake of X", or for the three that word it differently, "can be used
+            // only for cocoa beverages ... which provide at least a daily intake of 200 mg",
+            // "may be used only for ... kiwifruits ... providing a minimum of 200 g", "can be
+            // used only for food which provides at least a daily intake of 12 g".
+            //
+            // A claim that names a daily figure only inside an "Information to the consumer
+            // that the beneficial effect is obtained with ..." sentence is not this check. That
+            // sentence is a duty about what the label must say, not a limit on what the food
+            // must contain, and reading it as a threshold invents a requirement the register
+            // does not impose. Those are NotComputable; see the note there.
             DailyIntakeThreshold,
             // amount per 100 g >= a fixed minimum, with no portion in it at all.
             PerHundredThreshold,
@@ -46,7 +60,28 @@ namespace Backend.Services
             // is rather than converted to 13,333 so the figure in the code stays the figure
             // in the register.
             CarbsRatioThreshold,
-            // condition can't be derived from any field this calculator collects
+            // No condition on the food to check, so the card reports the claim and its
+            // conditions and reaches no verdict. The verdict line is CannotComputePrefix,
+            // which the frontend and the report already treat as a third state beside met and
+            // not met, and the amount line shows what was declared per 100 g.
+            //
+            // This covers the claims whose only conditions are duties about the label. The
+            // plant sterols and stanols are the clearest case: "Information to the consumer
+            // that the beneficial effect is obtained with a daily intake of 1,5-3 g plant
+            // sterols", and then rules about how the size of the effect may be described.
+            // Nothing in any of it says the food must contain a given amount.
+            //
+            // Five of these were briefly gated at that daily figure, which asserted a
+            // requirement the register does not make. For a picked substance that is not a
+            // silent miss either: the card said "Oppfyller ikke gitt krav (trenger minst 1,5 g
+            // per porsjon)" to a producer who was entitled to the claim.
+            //
+            // The general conditions in Article 5(1)(b) and (d) of Regulation (EC) No
+            // 1924/2006 do require the nutrient to be present in a quantity that produces the
+            // effect, so it is not that any amount will do. But they name no figure, and the
+            // quantity "reasonably expected to be consumed" is not the declared portion. That
+            // is a judgement for whoever prepares the label, with the condition in front of
+            // them, and not one to publish as a verdict.
             NotComputable,
         }
 
@@ -135,20 +170,26 @@ namespace Backend.Services
             // 4 g per day for the cholesterol one.
             ["Chitosan"]           = new(new[] { new OtherClaimRule(760853, OtherClaimCheck.DailyIntakeThreshold, 3m) },
                                          IsFibre: false),
-            // Two claims at the same 3 g a day, so one row carries both. What 838613 adds is
-            // a target population and a training protocol: adults over 55 in regular
-            // resistance training, three times a week at 65-75 % of a one-repetition maximum.
-            // Those are duties for the label, reported through Vilkår for bruk the way
-            // 755661's "only fats and oils" is, and none of them is a figure about the food.
+            // Two claims naming the same 3 g a day, checked differently, and the difference
+            // is the whole point of the note on NotComputable above.
             //
-            // Its condition text in the register is full of typos ("tarteting", "engagted",
-            // "bneficial", "at leat", "maximum loead") and prints verbatim like every other
-            // register sentence. Rewriting it here would mean putting wording on a label that
-            // is not the authorised wording.
+            // 761413 reads "The claim may be used only for food which provides a daily intake
+            // of 3 g of creatine", which is a condition on the food. 838613 names the same
+            // figure only in "the bneficial effect is obtaine with a daily intake of 3 g of
+            // creatine in conjunction with resistance training", a sentence about what the
+            // label must tell the reader. Its only "may be used only for" clause is about who
+            // the food is for: adults over 55 in regular resistance training. So the same
+            // product can be told it meets one and cannot be judged on the other, which reads
+            // oddly until you read the two conditions side by side.
+            //
+            // 838613's register text is full of typos ("tarteting", "engagted", "bneficial",
+            // "at leat", "maximum loead") and prints verbatim like every other register
+            // sentence. Rewriting it here would mean putting wording on a label that is not
+            // the authorised wording.
             ["Creatine"]           = new(new[]
             {
                 new OtherClaimRule(761413, OtherClaimCheck.DailyIntakeThreshold, 3m),
-                new OtherClaimRule(838613, OtherClaimCheck.DailyIntakeThreshold, 3m),
+                new OtherClaimRule(838613, OtherClaimCheck.NotComputable),
             }, IsFibre: false),
             ["Dried plums"]        = new(new[] { new OtherClaimRule(834173, OtherClaimCheck.DailyIntakeThreshold, 100m) },
                                          IsFibre: false),
@@ -164,35 +205,49 @@ namespace Backend.Services
             ["Cocoa flavanols"]    = new(new[] { new OtherClaimRule(835181, OtherClaimCheck.DailyIntakeThreshold, 200m) },
                                          Unit: "mg", IsFibre: false),
 
-            // ── Plant sterols and stanols ────────────────────────────────────
+            // ── Claims conditioned only on what the label says ───────────────
             //
-            // Four authorised claims under four register substance names, kept as four rows
-            // because the names are not interchangeable. 757605 is about sterols, 757729 about
-            // stanol esters, and the other two about either one. A single combined row reading
-            // the sum would grant 757605 to a product holding 1 g of sterols beside 1 g of
-            // stanols, and 1 g of sterols is not the 1,5 g that claim asks for.
+            // None of these has a condition on the food, so none reaches a verdict. The card
+            // carries the claim, the register's conditions and the amount declared, and says
+            // the rest is not something it can decide. See OtherClaimCheck.NotComputable for
+            // why that is the honest answer rather than a gate at the figure they name.
             //
-            // So a sterol product picks Plantesteroler for its own claim and the two
-            // either-or rows for the rest. That is what a barley product already does with
-            // Beta-glucans and Barley beta-glucans, which overlap the same way.
-            //
-            // All four state a daily intake rather than a figure per 100 g, so they read
-            // against the declared portion like the rest of this section. Three of them say
-            // "1,5-3 g" and are read at the floor, as every range here is: a product with 4 g
-            // has not failed to provide 1,5 g. The "7 % to 10 % in 2 to 3 weeks" sentence in
-            // those three governs how the size of the effect may be described on the label,
-            // which is a labelling duty and not a condition on the food.
-            ["Plant sterols"]      = new(new[] { new OtherClaimRule(757605, OtherClaimCheck.DailyIntakeThreshold, 1.5m) },
+            // The plant sterols and stanols are four claims under four register substance
+            // names, kept as four rows because the authorised wording differs with the name:
+            // 757605's sentence is about sterols, 757729's about stanol esters, and 757557 and
+            // 764289 cover either. A sterol product picks Plantesteroler for its own claim and
+            // the two either-or rows for the rest, the way a barley product picks both
+            // Beta-glucans and Barley beta-glucans.
+            ["Plant sterols"]      = new(new[] { new OtherClaimRule(757605, OtherClaimCheck.NotComputable) },
                                          IsFibre: false),
             ["Plant stanol esters"] =
-                                     new(new[] { new OtherClaimRule(757729, OtherClaimCheck.DailyIntakeThreshold, 1.5m) },
+                                     new(new[] { new OtherClaimRule(757729, OtherClaimCheck.NotComputable) },
                                          IsFibre: false),
             ["Plant sterols/Plant stanol esters"] =
-                                     new(new[] { new OtherClaimRule(757557, OtherClaimCheck.DailyIntakeThreshold, 1.5m) },
+                                     new(new[] { new OtherClaimRule(757557, OtherClaimCheck.NotComputable) },
                                          IsFibre: false),
             ["Plant sterols and plant stanols"] =
-                                     new(new[] { new OtherClaimRule(764289, OtherClaimCheck.DailyIntakeThreshold, 0.8m) },
+                                     new(new[] { new OtherClaimRule(764289, OtherClaimCheck.NotComputable) },
                                          IsFibre: false),
+
+            // One claim on two substances at two doses, "3 g WSTC I or 150 mg WSTC II", and
+            // one row rather than two. Two rows were the plan while this looked like a
+            // threshold, because a row carries one unit and those two doses are twenty times
+            // apart; both would then have pointed at the same policy id and a producer who
+            // picked both would have been handed the same card twice. With no verdict to
+            // reach, the unit only labels the figure that was typed, so one row does.
+            //
+            // Milligrams, because WSTC II's 150 mg is the dose that needs the precision and
+            // 3 g states cleanly as 3000 mg, where 150 mg in grams is 0,15.
+            //
+            // Two further parts of the condition would not have been checkable in any case:
+            // the dose has to arrive "in up to 250 ml of either fruit juices, flavoured drinks
+            // or yogurt drinks (unless heavily pasteurised)", which is about the drink the
+            // concentrate is in, and the alternative route is food supplements, which is out
+            // of scope.
+            ["Water-Soluble Tomato Concentrate (WSTC) I and II"] =
+                                     new(new[] { new OtherClaimRule(757477, OtherClaimCheck.NotComputable) },
+                                         Unit: "mg", IsFibre: false),
 
             // ── Claims on a substance the form did not collect before ────────
             //
@@ -403,6 +458,8 @@ namespace Backend.Services
                 ["Plant stanol esters"] = "Plantestanolestere",
                 ["Plant sterols/Plant stanol esters"] = "Plantesteroler og plantestanolestere",
                 ["Plant sterols and plant stanols"] = "Plantesteroler og plantestanoler",
+                ["Water-Soluble Tomato Concentrate (WSTC) I and II"] =
+                    "Vannløselig tomatkonsentrat (WSTC I og II)",
                 ["Choline"] = "Kolin",
                 ["Betaine"] = "Betain",
                 ["Melatonin"] = "Melatonin",
@@ -502,6 +559,7 @@ namespace Backend.Services
             [757557] = "Les EFSA-uttalelsen om plantesteroler, plantestanolestere og blodkolesterol",
             [764289] = "Les EFSA-uttalelsen om plantesteroler, plantestanoler og blodkolesterol",
             [837853] = "Les EFSA-uttalelsen om kalsium og tap av beinmineral",
+            [757477] = "Les EFSA-uttalelsen om vannløselig tomatkonsentrat og blodplater",
             [763885] = "Les EFSA-uttalelsen om polyfenoler i olivenolje og blodfettene",
             [761973] = "Les EFSA-uttalelsen om glukomannan og blodkolesterol",
             [762125] = "Les EFSA-uttalelsen om HPMC og blodkolesterol",
