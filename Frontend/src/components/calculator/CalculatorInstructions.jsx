@@ -1,11 +1,19 @@
 import React from "react";
 import Accordion from "../Accordion";
 
+// In the order the page itself runs, top to bottom, so a step and the thing it names are
+// never on opposite sides of the screen from each other.
 const STEPS = [
   "Velg matvaregruppe, matkategori og eventuelle undermatkategorier.",
-  "Velg mattype (fast eller flytende form).",
-  "Fyll inn næringsinnholdet per 100 g/ml.",
-  "Slå på bryteren «Vil du også beregne helsepåstander?» dersom du også vil sjekke EFSA-påstander, og fyll inn tilleggsfeltene som dukker opp.",
+  "Velg fysisk form (fast eller flytende).",
+  "Åpne «Flere opplysninger» for porsjonsstørrelse og valg for beregningen.",
+  "Fyll inn næringsinnholdet per 100 g for faste næringsmidler, eller per 100 ml for flytende næringsmidler.",
+  // Adding a kilde is no longer the only way to reach a health claim: the ones whose
+  // condition is a cross-reference to a næringspåstand, protein and the fat ones, are
+  // answered by the nutrition table on its own. Saying otherwise would send someone
+  // looking for a picker entry that does not exist for them.
+  "Åpne «Beregn for helsepåstander» og legg til kilder som beta-glukan eller kalsium. " +
+    "Helsepåstander som bare bygger på næringstabellen beregnes uansett.",
   "Trykk «Beregn» for å se resultatet.",
 ];
 

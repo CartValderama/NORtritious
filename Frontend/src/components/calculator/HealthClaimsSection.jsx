@@ -76,7 +76,11 @@ const HealthClaimsSection = ({ result }) => {
                 />
                 {claim.nutrient || "Ukjent"}
 
-                <span className="text-muted small text-lowercase fw-normal ">
+                {/* No text-lowercase. Every amount the backend sends is already in the
+                    case it should be read in, and the class was there to tidy a string
+                    nobody sends; what it actually did was lower-case an acronym, so
+                    "0,4 g EPA og DHA per 100 g" was printed as "epa og dha". */}
+                <span className="text-muted small fw-normal ">
                   {stripPercentageSuffix(claim.amount)}
                 </span>
               </p>

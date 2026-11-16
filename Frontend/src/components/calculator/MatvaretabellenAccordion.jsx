@@ -16,28 +16,41 @@ import {
 import { useCalculatorFormStore } from "../../stores/calculatorFormStore";
 import { useScrollIntoViewOnOpen } from "../../hooks/useScrollIntoViewOnOpen";
 
-// The ingredients the næringsinnhold above is calculated from. Only rendered once there is
-// at least one, and it opens itself when it appears, since the user just asked for it from
-// the settings menu and a collapsed box would look like nothing happened.
+// The ingredients the næringsinnhold above is calculated from.
 //
-// The picker modal lives in NutritionForm rather than here: this component doesn't exist
-// before the first ingredient, so it can't be what opens the picker that adds it.
+// The picker modal lives in NutritionForm rather than here: this panel can be hidden, so it
+// can't be the only way to reach the picker that fills it.
 const MatvaretabellenAccordion = ({ onOpenPicker }) => {
-  const [open, setOpen] = useState(true);
   const {
     importedFoods,
     removeImportedFood,
     setImportedFoodAmount,
     recipePanelOpenRequest,
+    usePortionFromRecipe,
+    setUsePortionFromRecipe,
   } = useCalculatorFormStore((s) => ({
     importedFoods: s.importedFoods,
     removeImportedFood: s.removeImportedFood,
     setImportedFoodAmount: s.setImportedFoodAmount,
     recipePanelOpenRequest: s.recipePanelOpenRequest,
+    usePortionFromRecipe: s.usePortionFromRecipe,
+    setUsePortionFromRecipe: s.setUsePortionFromRecipe,
   }));
 
-  // Brings itself into view when it expands, the same way the helsepåstander panel does.
-  useScrollIntoViewOnOpen("oppskrift-panel", open, { block: "center" });
+  // Collapsed when the switch in Flere opplysninger is what put this on screen: that asked
+  // for the section to be available, not to be opened and read. Open when it arrives with
+  // ingredients already in it, which means the picker filled it from the settings menu and
+  // the list is the thing worth seeing. Read once, at mount, because Bootstrap's JS owns
+  // the collapse from then on.
+  const [open, setOpen] = useState(() => importedFoods.length > 0);
+
+  // Brings itself into view when the user expands it, the same way the helsepåstander panel
+  // does, but not when it merely appears. It mounts already open, and what mounts it is a
+  // switch at the top of the form, so scrolling on mount threw the page down here the moment
+  // that switch was flipped. Gated on the header having been used, which the "oppskrift"
+  // link's own effect below also goes through, since that works by clicking the header.
+  const [headerUsed, setHeaderUsed] = useState(false);
+  useScrollIntoViewOnOpen("oppskrift-panel", headerUsed && open, { block: "center" });
 
   // Somewhere else asked for this panel. Bootstrap's JS owns the collapse, and the only thing
   // it reacts to is a click on the header, so that is what this does rather than setting
@@ -66,7 +79,10 @@ const MatvaretabellenAccordion = ({ onOpenPicker }) => {
         id="matvaretabellenAccordion"
         itemClassName="rounded-2"
         open={open}
-        onToggle={() => setOpen((v) => !v)}
+        onToggle={() => {
+          setHeaderUsed(true);
+          setOpen((v) => !v);
+        }}
       >
         <Accordion.Header
           className="efsa-accordion-toggle d-flex align-items-center gap-2 px-4 py-3"
@@ -114,45 +130,8 @@ const MatvaretabellenAccordion = ({ onOpenPicker }) => {
           {/* gap-4 to match the field rows in the helsepåstander panel above, so the two
               accordions have the same vertical rhythm. */}
           <div className="p-4 d-flex flex-column gap-4">
-            {/* Its own row on the panel's 4-column grid, so the button keeps the width of a
-                single field. Beside the list it would have been one small control alone in a
-                column that only grows emptier, and it took a column's width off the names. */}
-            <div className="d-grid gap-4 new-field-grid">
-              <div style={{ minWidth: 0 }}>
-                <div className="d-flex align-items-center gap-2 mb-2">
-                  <label className="form-label mb-0 new-label-indent">
-                    Matvaretabellen
-                  </label>
-                  <Tooltip
-                    title="Mattilsynets offisielle Matvaretabellen. Verdiene der er oppgitt per 100 g, og fyller ut næringsinnholdet øverst i skjemaet."
-                    placement="right"
-                    arrow
-                  >
-                    <i
-                      className="bi bi-info-circle text-muted"
-                      style={{ cursor: "help", fontSize: "1rem", flexShrink: 0 }}
-                    />
-                  </Tooltip>
-                </div>
-                <Button
-                  variant="outline"
-                  className="justify-content-center w-100"
-                  style={{
-                    whiteSpace: "nowrap",
-                    paddingTop: "var(--calc-field-padding-y)",
-                    paddingBottom: "var(--calc-field-padding-y)",
-                    lineHeight: "var(--calc-field-line-height)",
-                  }}
-                  onClick={onOpenPicker}
-                >
-                  <i className="bi bi-plus-lg" />
-                  Legg til matvare
-                </Button>
-              </div>
-            </div>
-
             <div>
-              <div className="d-flex align-items-center gap-2 mb-2">
+              <div className="d-flex align-items-center gap-2 field-label-row">
                 <label className="form-label mb-0 new-label-indent">
                   Matvarer i produktet
                 </label>
@@ -168,12 +147,23 @@ const MatvaretabellenAccordion = ({ onOpenPicker }) => {
                     style={{ cursor: "help", fontSize: "1rem", flexShrink: 0 }}
                   />
                 </Tooltip>
+                {/* At the right-hand end of the heading of the list it is the total of,
+                    rather than on a line of its own under it. Still only once there is
+                    something to total: the panel stays on screen after the last ingredient
+                    is removed, and a "Totalt: 0 g" would read as something having gone
+                    wrong rather than as a list waiting to be filled.
+                    Without new-label-indent, which the heading beside it carries: that sets
+                    font-weight 500, and this is a figure to glance at, not a second
+                    heading. */}
+                {importedFoods.length > 0 && (
+                  <span
+                    className="text-muted ms-auto flex-shrink-0"
+                    style={{ fontSize: "0.85rem" }}
+                  >
+                    Totalt: {formatNoNumber(roundTo(total))} g
+                  </span>
+                )}
               </div>
-              {importedFoods.length === 0 && (
-                <p className="text-muted mb-0" style={{ fontSize: "0.85rem" }}>
-                  Ingen matvarer lagt til. Næringsinnholdet fylles ut for hånd.
-                </p>
-              )}
               <div className="mvt-recipe-grid">
             {importedFoods.map((food) => (
               <div
@@ -232,22 +222,81 @@ const MatvaretabellenAccordion = ({ onOpenPicker }) => {
                 </div>
               </div>
             ))}
+
+                {/* The next cell in the list rather than a control above it: adding an
+                    ingredient is how the list is continued, so the button sits where the
+                    ingredient it adds will appear. Dashed, and otherwise the same tile as the
+                    rows it follows, so it reads as the empty slot at the end of the list and
+                    not as another ingredient already in it.
+                    No title: the label names the source itself now, so a tooltip repeating it
+                    would say nothing the button does not already. */}
+                <Button
+                  variant="outline"
+                  className="mvt-add-item justify-content-center"
+                  onClick={onOpenPicker}
+                >
+                  <i className="bi bi-plus-lg" />
+                  Hent mat fra Matvaretabellen
+                </Button>
               </div>
             </div>
 
-            {/* The panel stays on screen once a recipe has been used, so it has to read
-                sensibly with nothing in it: an empty grid and a "Totalt: 0 g" would look
-                like something had gone wrong rather than like a list waiting to be filled. */}
+            {/* Under the list it is asked about, and above the total that answers it. The
+                recipe total is a batch, not a serving: it might make one loaf or ten pots,
+                and nothing in the ingredient list says which, so the connection to
+                porsjonsstørrelse is only made when the user answers it here.
+
+                Lives with the recipe rather than beside the field it fills, which is the
+                same arrangement as the nutrition fields: those are written and locked from
+                this panel too, and none of them carries a control of its own. */}
             {importedFoods.length > 0 && (
-              <div className="d-flex justify-content-start">
-                <span
-                  className="text-muted new-label-indent"
-                  style={{ fontSize: "0.85rem" }}
-                >
-                  Totalt: {formatNoNumber(roundTo(total))} g
-                </span>
+              <div>
+                <div style={{ minWidth: 0 }}>
+                  <div className="d-flex align-items-center gap-2 field-label-row">
+                    {/* Names the option rather than the field it fills: a heading reading
+                        only "Porsjonsstørrelse" said what was affected but not that there was
+                        anything to decide. */}
+                    <div className="form-label mb-0 new-label-indent">
+                      Porsjonsstørrelse fra oppskrift
+                    </div>
+                    {/* Short, because the question carries both the condition and the effect.
+                        All that is left is the other branch, which a switch cannot state on
+                        its face the way a Ja/Nei pair could: off is a default, not an
+                        answer. */}
+                    <Tooltip
+                      title="Gir oppskriften flere porsjoner, la den stå av og skriv inn porsjonen selv under «Flere opplysninger»."
+                      placement="right"
+                      arrow
+                    >
+                      <i
+                        className="bi bi-info-circle text-muted"
+                        style={{ cursor: "help", fontSize: "1rem", flexShrink: 0 }}
+                      />
+                    </Tooltip>
+                  </div>
+                  {/* A switch rather than the Ja/Nei pair it was, matching the other two in
+                      the calculator. A real <label htmlFor> now, where the pair had to
+                      borrow a span by id: there is one control to point at. */}
+                  <div className="form-check form-switch form-switch-field mb-0">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id="portionFromRecipe"
+                      checked={usePortionFromRecipe}
+                      onChange={(e) => setUsePortionFromRecipe(e.target.checked)}
+                    />
+                    <label
+                      className="form-check-label"
+                      htmlFor="portionFromRecipe"
+                    >
+                      Er hele oppskriften én porsjon? Totalvekten fylles da inn
+                      som porsjonsstørrelse.
+                    </label>
+                  </div>
+                </div>
               </div>
             )}
+
             </div>
           </div>
         </Accordion.Body>

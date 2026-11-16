@@ -96,6 +96,10 @@ export interface Calculation {
   // them rather than being handed a finished result, which is what stops the document from
   // stating a verdict the calculator wouldn't reach.
   payload: CalculatorRequestPayload;
+  // Whether this verdict rests on the user confirming the korn criterion, which the
+  // calculator has no way to check. Held with the result rather than read off the form
+  // later: it is a premise of this calculation, and the form can move on without it.
+  fullkornConfirmed: boolean;
 }
 
 interface CalculatorFormState {
@@ -148,6 +152,13 @@ interface CalculatorFormState {
     value: EfsaPanelValues[K],
   ) => void;
   resetEfsaValues: () => void;
+  // Everything the kilde picker owns, leaving porsjonsstørrelse where it is. Turning
+  // helsepåstander off used to go through resetEfsaValues, which was right while that field
+  // lived in the helsepåstander panel and wrong now: it sits in the product panel, and the
+  // per-portion energy limits for bordsøtningsmidler read it too. Clearing it from here
+  // threw away a value the user had typed about the product because they switched off an
+  // unrelated calculation.
+  resetEfsaSubstances: () => void;
   // Bumped every time resetEfsaValues runs — EfsaHealthClaimsPanel watches
   // this to clear its own local draft/UI state (newSubstance, hasStarch,
   // etc.), replacing the old key-based force-remount Calculator.jsx used
@@ -166,6 +177,32 @@ interface CalculatorFormState {
   foodType: string;
   setFoodType: (foodType: string) => void;
 
+  // Whether the product is a table-top sweetener (bordsøtningsmiddel). Two of the EFSA
+  // energy claims are written with a separate per-portion limit for these, and nothing in a
+  // nutrition table says which products they are, so the user tells us.
+  //
+  // Beside foodType rather than inside it: a sweetener comes as powder or as drops, so it is
+  // still solid or liquid for every other claim.
+  // Which of the Annex's product-type carve-outs applies, "" for the ordinary case.
+  // One field rather than a flag each, because they are mutually exclusive: nothing is both
+  // a bordsøtningsmiddel and a drikkevann. See CalculatorRequestDTO.ProductType for what
+  // each one changes.
+  productType: string;
+  setProductType: (productType: string) => void;
+
+  // The two claims in the Annex whose condition is about what went into the product rather
+  // than about what came out of it. No nutrition table can answer either, because the
+  // ingredients that give them away look like ordinary sugars and ordinary salt once they
+  // are in the product, so the producer answers and the result records whose answer it was.
+  //
+  // In the store beside productType rather than as local state in the form, for the same
+  // reason: the panel that asks is not the panel that submits, and both describe the
+  // product rather than the calculation. See CalculatorRequestDTO.NoAddedSugarsDeclared.
+  noAddedSugarsDeclared: boolean;
+  setNoAddedSugarsDeclared: (noAddedSugarsDeclared: boolean) => void;
+  noAddedSaltDeclared: boolean;
+  setNoAddedSaltDeclared: (noAddedSaltDeclared: boolean) => void;
+
   foodTypeError: boolean;
   setFoodTypeError: (foodTypeError: boolean) => void;
 
@@ -174,6 +211,16 @@ interface CalculatorFormState {
 
   efsaDisabled: boolean;
   setEfsaDisabled: (efsaDisabled: boolean) => void;
+
+  // Whether the oppskrift accordion is on screen. NutritionForm owns the accordion, but the
+  // switch that shows it is in the product panel, so neither component can own the flag.
+  //
+  // On by default: building the nutrition table from an ingredient list is a normal way to
+  // use the calculator, not a mode to go looking for, and the accordion arrives collapsed
+  // anyway, so showing it costs one header rather than a panel in the way. Switching it off
+  // is for products typed in by hand.
+  showRecipePanel: boolean;
+  setShowRecipePanel: (show: boolean) => void;
 
   // Read by both NutritionForm (owns the Accordion) and EfsaHealthClaimsPanel
   // (its scroll-into-view-on-open effect) — previously threaded down from
@@ -325,10 +372,29 @@ const calculatorFormStoreBase = createStore<CalculatorFormState>((set) => ({
       usePortionFromRecipe: false,
       resetToken: state.resetToken + 1,
     })),
+  // usePortionFromRecipe is left alone with the figure it produced: the portion survives
+  // this reset, so its source is still true.
+  resetEfsaSubstances: () =>
+    set((state) => ({
+      efsaValues: {
+        ...EMPTY_EFSA_VALUES,
+        portionSize: state.efsaValues.portionSize,
+      },
+      resetToken: state.resetToken + 1,
+    })),
   resetToken: 0,
 
   foodType: "",
   setFoodType: (foodType) => set({ foodType }),
+
+  productType: "",
+  setProductType: (productType) => set({ productType }),
+
+  noAddedSugarsDeclared: false,
+  setNoAddedSugarsDeclared: (noAddedSugarsDeclared) =>
+    set({ noAddedSugarsDeclared }),
+  noAddedSaltDeclared: false,
+  setNoAddedSaltDeclared: (noAddedSaltDeclared) => set({ noAddedSaltDeclared }),
 
   foodTypeError: false,
   setFoodTypeError: (foodTypeError) => set({ foodTypeError }),
@@ -338,6 +404,9 @@ const calculatorFormStoreBase = createStore<CalculatorFormState>((set) => ({
 
   efsaDisabled: false,
   setEfsaDisabled: (efsaDisabled) => set({ efsaDisabled }),
+
+  showRecipePanel: true,
+  setShowRecipePanel: (showRecipePanel) => set({ showRecipePanel }),
 
   showHealthClaimsPanel: false,
   setShowHealthClaimsPanel: (showHealthClaimsPanel) =>
@@ -377,8 +446,12 @@ const calculatorFormStoreBase = createStore<CalculatorFormState>((set) => ({
       resetToken: state.resetToken + 1,
       foodType: "",
       foodTypeError: false,
+      productType: "",
+      noAddedSugarsDeclared: false,
+      noAddedSaltDeclared: false,
       calculation: null,
       efsaDisabled: false,
+      showRecipePanel: true,
       showHealthClaimsPanel: false,
       selectsGroup: "",
       selectsProduct: "",
@@ -403,6 +476,10 @@ const calculatorFormStoreBase = createStore<CalculatorFormState>((set) => ({
       foodTypeError: false,
       calculation: null,
       efsaDisabled: false,
+      // A saved product stores its nutrition table, not the foods it was built from, so the
+      // panel opens empty here. Shown all the same, like everywhere else, since the edit may
+      // well be the point at which an ingredient list gets added.
+      showRecipePanel: true,
       // Auto-open when the product actually has restored panel data, so it's
       // visible right away instead of looking dropped behind a collapsed
       // accordion the user has to remember to click open.

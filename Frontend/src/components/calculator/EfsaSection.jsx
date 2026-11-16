@@ -34,7 +34,10 @@ const EfsaSection = ({ result }) => {
               {label}
             </p>
             <p className="mb-0" style={{ color: passed ? "#062814" : "#3b0c0f" }}>
-              {`Produktet inneholder ${formatNoNumber(actualValue)} ${thresholdUnit}. `}
+              {/* No figure means none could be worked out, so the card says nothing about
+                  what the product contains and leaves the explanation to say why. */}
+              {typeof actualValue === "number" &&
+                `Produktet inneholder ${formatNoNumber(actualValue)} ${thresholdUnit}. `}
               {explanation}
             </p>
           </div>

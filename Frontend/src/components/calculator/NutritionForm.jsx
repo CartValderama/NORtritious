@@ -3,7 +3,6 @@ import Tooltip from "@mui/material/Tooltip";
 import efsaLogo from "../../assets/img/efsaLogo.png";
 import NutritionFieldColumn from "./NutritionFieldColumn";
 import MatvaretabellenAccordion from "./MatvaretabellenAccordion";
-import matvaretabellenLogo from "../../assets/img/matvaretabellenLogo.svg";
 import MatvaretabellenModal from "./MatvaretabellenModal";
 import EfsaHealthClaimsPanel from "./EfsaHealthClaimsPanel";
 import PanelBox from "../PanelBox";
@@ -43,7 +42,11 @@ const NutritionForm = () => {
     setCalculation,
     resetEfsaValues,
     efsaDisabled,
-    setEfsaDisabled,
+    productType,
+    noAddedSugarsDeclared,
+    noAddedSaltDeclared,
+    showRecipePanel,
+    setShowRecipePanel,
     showHealthClaimsPanel,
     setShowHealthClaimsPanel,
     toggleHealthClaimsPanel,
@@ -67,7 +70,13 @@ const NutritionForm = () => {
     setCalculation: s.setCalculation,
     resetEfsaValues: s.resetEfsaValues,
     efsaDisabled: s.efsaDisabled,
-    setEfsaDisabled: s.setEfsaDisabled,
+    // Read here only to be sent: the switch and its confirmation both live in the product
+    // panel, and the payload is built here.
+    productType: s.productType,
+    noAddedSugarsDeclared: s.noAddedSugarsDeclared,
+    noAddedSaltDeclared: s.noAddedSaltDeclared,
+    showRecipePanel: s.showRecipePanel,
+    setShowRecipePanel: s.setShowRecipePanel,
     showHealthClaimsPanel: s.showHealthClaimsPanel,
     setShowHealthClaimsPanel: s.setShowHealthClaimsPanel,
     toggleHealthClaimsPanel: s.toggleHealthClaimsPanel,
@@ -101,10 +110,6 @@ const NutritionForm = () => {
   // Lives here rather than in the accordion because the accordion isn't rendered until the
   // first ingredient exists, so it can't be what opens the picker that adds it.
   const [showMatvaretabellen, setShowMatvaretabellen] = useState(false);
-  // Once a recipe has been used in this session the panel stays put, even after the last
-  // ingredient is removed. Letting it vanish there meant getting back to it cost a trip
-  // through the settings menu, for something the user had just been working in.
-  const [recipeUsed, setRecipeUsed] = useState(false);
   // The korn requirement for the chosen category, or null when it has none.
   // Keyed on the level-2 value, the same place the notice comes from, so the
   // two can never disagree about whether a category has a requirement.
@@ -118,17 +123,11 @@ const NutritionForm = () => {
     setFullkornConfirmed(false);
     setFullkornError(false);
   }, [selectsProduct, resetToken]);
+  // The first ingredient brings the panel on screen whatever the switch said: see the
+  // store's own note on showRecipePanel.
   useEffect(() => {
-    if (importedFoods.length > 0) setRecipeUsed(true);
-  }, [importedFoods.length]);
-
-  const handleEfsaDisabledChange = (disabled) => {
-    setEfsaDisabled(disabled);
-    if (disabled) {
-      resetEfsaValues();
-      setShowHealthClaimsPanel(false);
-    }
-  };
+    if (importedFoods.length > 0) setShowRecipePanel(true);
+  }, [importedFoods.length, setShowRecipePanel]);
 
   useEffect(() => {
     const handleScroll = () => setShowScrollTop(window.scrollY > 300);
@@ -162,9 +161,10 @@ const NutritionForm = () => {
     setErrors({});
     setCalculating(false);
     setCalculatedNutrition(null);
-    // Nullstill, disabling helsepåstander and changing category are all "start over", so the
-    // recipe panel goes away with everything else rather than lingering as an empty box.
-    setRecipeUsed(false);
+    // The recipe panel is not put away here any more. resetToken fires on Nullstill, on a
+    // category change and on turning helsepåstander off, and the last two are no reason to
+    // close a panel the user asked for with a switch of its own. Nullstill still clears it,
+    // from resetDraft in the store.
   }, [resetToken]);
 
   const handleReset = () => {
@@ -189,7 +189,7 @@ const NutritionForm = () => {
         <p className="mb-0">
           {!category
             ? "Velg en matkategori for å starte beregningen"
-            : "Velg type matvare for å starte beregningen"}
+            : "Velg fysisk form for å starte beregningen"}
         </p>
       </PanelBox>
     );
@@ -241,15 +241,25 @@ const NutritionForm = () => {
         foodType,
         energyUnit,
         portionSize,
+        productType,
         nutrition,
         totalStarch,
         resistantStarch,
         otherSubstances,
         schema,
+        {
+          noAddedSugars: noAddedSugarsDeclared,
+          noAddedSalt: noAddedSaltDeclared,
+        },
       );
       const data = await calculateNutrition(payload);
 
-      setCalculation({ data, nutrition, payload });
+      setCalculation({
+        data,
+        nutrition,
+        payload,
+        fullkornConfirmed: Boolean(fullkorn),
+      });
       setCalculatedNutrition(nutrition);
       setHasNokkelhullet(data.hasNokkelhullet === true);
       setHasEfsaNutrition(data.efsaNutritionClaims);
@@ -283,7 +293,7 @@ const NutritionForm = () => {
               )
             </h2>
             <Tooltip
-              title={`Fyll inn energi og næringsstoffer per ${foodType === "solid" ? "100 g" : foodType === "liquid" ? "100 ml" : "100 g/ml"}. Åpne "Beregn for helsepåstander" under for helsepåstander.`}
+              title={`Fyll inn energi og næringsstoffer per ${foodType === "solid" ? "100 g" : foodType === "liquid" ? "100 ml" : "100 g/ml"}. Åpne "Beregn for helsepåstander" under for påstander om en bestemt kilde.`}
               placement="right"
               arrow
             >
@@ -321,7 +331,10 @@ const NutritionForm = () => {
                 aria-haspopup="true"
                 aria-expanded={showSettingsMenu}
               >
-                <i className="bi bi-gear-fill" />
+                {/* A kebab, not a cog: the cog now opens «Flere opplysninger», and two
+                    cogs on one screen would be two doors to the same-looking place. Three
+                    dots is the ordinary mark for a menu, and this is a menu. */}
+                <i className="bi bi-three-dots-vertical" />
               </Button>
               {showSettingsMenu && (
                 <div
@@ -336,39 +349,11 @@ const NutritionForm = () => {
                     zIndex: 10,
                   }}
                 >
-                  <Button
-                    variant="menuItem"
-                    className="px-3 py-2"
-                    style={{ textDecoration: "none", whiteSpace: "nowrap" }}
-                    onClick={() => {
-                      handleEfsaDisabledChange(!efsaDisabled);
-                      setShowSettingsMenu(false);
-                    }}
-                  >
-                    {/* The same logos the two accordions carry, so a menu item and the
-                        section it acts on are recognisable as the same thing. Greyscaled by
-                        .menu-item-icon to sit alongside the plain icons in the save menu. */}
-                    <img src={efsaLogo} alt="" className="menu-item-icon" />
-                    {efsaDisabled
-                      ? "Aktiver helsepåstander"
-                      : "Deaktiver helsepåstander"}
-                  </Button>
-                  <Button
-                    variant="menuItem"
-                    className="px-3 py-2"
-                    style={{ textDecoration: "none", whiteSpace: "nowrap" }}
-                    onClick={() => {
-                      setShowMatvaretabellen(true);
-                      setShowSettingsMenu(false);
-                    }}
-                  >
-                    <img
-                      src={matvaretabellenLogo}
-                      alt=""
-                      className="menu-item-icon"
-                    />
-                    Hent matvare fra Matvaretabellen
-                  </Button>
+                  {/* Helsepåstander and the oppskrift used to be two items here. They are
+                      switches under "Flere opplysninger" now, which states what is on rather
+                      than naming the next thing to do to it, and keeps every choice about
+                      the product in the one place. The picker itself is reached from the
+                      oppskrift panel's own tile. */}
                   <Button
                     variant="menuItem"
                     className="px-3 py-2"
@@ -469,7 +454,7 @@ const NutritionForm = () => {
           </div>
         )}
 
-        {(importedFoods.length > 0 || recipeUsed) && (
+        {showRecipePanel && (
           <MatvaretabellenAccordion
             onOpenPicker={() => setShowMatvaretabellen(true)}
           />
@@ -491,7 +476,7 @@ const NutritionForm = () => {
             get. Only rendered for categories that carry a korn requirement. */}
         {fullkorn && (
           <div
-            className={`fullkorn-check${fullkornError ? " fullkorn-check-error" : ""}`}
+            className={`confirm-check${fullkornError ? " confirm-check-error" : ""}`}
           >
             <div className="form-check mb-0">
               <input
@@ -521,16 +506,15 @@ const NutritionForm = () => {
         {Object.keys(errors).length > 0 && (
           <WarningAlert
             messages="Fyll inn alle næringsverdier (0 eller høyere) og velg mattype."
-            className="py-2"
+            className="py-2 mt-3"
           />
         )}
 
-        {/* Owns its own gap from whatever ends up above it, so the spacing holds whether or
-            not the oppskrift accordion is on screen. */}
-        <div
-          className="d-flex flex-wrap gap-2"
-          style={{ marginTop: "2.25rem" }}
-        >
+        {/* The panel's footer: the actions sit in a band of their own at the bottom of the
+            card, under a rule that mirrors the one under the heading. It owns its own gap
+            from whatever ends up above it, so the spacing holds whether or not the oppskrift
+            accordion is on screen. */}
+        <div className="nutrition-footer">
           <Button
             variant="primary"
             size="default"

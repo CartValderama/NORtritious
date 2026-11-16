@@ -17,6 +17,12 @@ export interface MatvaretabellenFoodDetail {
   protein: number;
   salt: number;
   starch: number;
+  // In grams, the same as the form's own fields. See MatvaretabellenDTO.
+  monounsaturatedFat: number;
+  polyunsaturatedFat: number;
+  alphaLinolenicAcid: number;
+  eicosapentaenoicAcid: number;
+  docosahexaenoicAcid: number;
   // For the helsepåstander kilder rather than the nutrition table: mg and µg respectively.
   calcium: number;
   vitaminD: number;

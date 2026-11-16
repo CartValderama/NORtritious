@@ -45,10 +45,10 @@ const AppRoutes: React.FC = () => {
         </Routes>
       </main>
       {/* Mounted once for the whole app so anything can raise a notice without
-          threading show/onClose props down to it. Nothing auto-closes and a
-          click on the body does not dismiss: these carry requirements the user
-          has to act on, so only the close button (or the code that raised it)
-          takes one away. */}
+          threading show/onClose props down to it. Nothing auto-closes by default
+          and a click on the body does not dismiss: these carry requirements the
+          user has to act on, so a notice goes away on its close button, on the
+          code that raised it, or on a timer it asks for itself. */}
       <ToastContainer
         position="bottom-right"
         className={scrollTopVisible ? "toast-above-scroll-top" : undefined}

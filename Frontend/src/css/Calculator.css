@@ -1038,6 +1038,35 @@ li {
 }
 
 
+/* The add button as the last tile in the ingredient grid. Takes .mvt-food-item's
+   geometry so it lines up with the rows above it, and a dashed border so it reads as
+   the empty slot at the end of the list rather than as an ingredient in it. The grid
+   stretches it to the row's height on its own, so nothing here sets one. */
+/* Two classes and !important, neither of them decoration: the dashed edge has two
+   rules to get past. Bootstrap's own `.btn { border: ... solid ... }` loads after this
+   file and beats a single class on source order, and .btn-outline-black above forces
+   its colour with !important. A one-class rule here set neither and the tile came out
+   solid black. */
+.btn.mvt-add-item {
+  border: 1px dashed rgba(0, 0, 0, 0.3) !important;
+  border-radius: 0.5rem;
+  padding: 0.75rem 0.875rem;
+  min-width: 0;
+  white-space: nowrap;
+}
+/* btn-outline-black fills on hover, which on a tile this size is a large black
+   rectangle mid-list. The edge darkens instead, still dashed, and the fill is left to
+   the buttons that are the size of buttons. Matches that rule's own
+   :hover:not(:disabled) and adds a class, so it wins on specificity where !important
+   alone would have tied. */
+.btn.mvt-add-item:hover:not(:disabled),
+.btn.mvt-add-item:focus-visible {
+  background-color: transparent !important;
+  color: #212529 !important;
+  border-color: #212529 !important;
+  border-style: dashed !important;
+}
+
 /* The amount box in an ingredient row. Wide enough for a four-digit batch
    weight at full width, but allowed to shrink instead of squeezing the food
    name out as the row narrows: two columns on a laptop, one on a phone. Below
@@ -1210,9 +1239,6 @@ li {
   background: #fff3cd;
   color: #664d03;
   border: 1px solid #ffe69c;
-  /* The amber edge is what carries at a glance, from the corner of the eye and
-     well before the text is read. */
-  border-left: 4px solid #ffc107;
   border-radius: 0.5rem;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   /* No font-size of its own. The library declares none either, so the notice
@@ -1221,6 +1247,42 @@ li {
   line-height: 1.5;
   padding: 0.85rem 1rem;
 }
+/* The amber edge down the left is the countdown, not decoration: it was a static
+   4px border until the notice started closing itself, and a static bar of the same
+   colour sitting under an animated one would have hidden the animation entirely.
+   The library puts its progress bar along the bottom, so both the track and the bar
+   are turned on their side here. */
+.warning-toast .Toastify__progress-bar--wrp {
+  top: 0;
+  bottom: auto;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  border-radius: 0.5rem 0 0 0.5rem;
+}
+/* Its own keyframes because the library's animate scaleX. The inline duration it
+   sets from autoClose still applies, and so does the play-state it toggles to pause
+   on hover: only the axis changes. */
+@keyframes warning-toast-countdown {
+  0% {
+    transform: scaleY(1);
+  }
+  100% {
+    transform: scaleY(0);
+  }
+}
+.warning-toast .Toastify__progress-bar {
+  /* Anchored at the bottom, so the bar empties downwards: the top edge travels
+     down as the time goes, rather than the bottom edge climbing up. */
+  transform-origin: bottom;
+  animation-name: warning-toast-countdown;
+  background: #ffc107;
+  opacity: 1;
+}
+.warning-toast .Toastify__progress-bar--bg {
+  background: #ffc107;
+}
+
 /* The library's own icon column, hidden in favour of the Bootstrap triangle
    rendered in the content: its typed SVG is a different drawing from the one
    the rest of the page warns with. */
@@ -1247,9 +1309,21 @@ li {
   flex: 1 1 auto;
   min-width: 0;
 }
+/* The requirement is quoted from the regulation, so it arrives as one to three
+   full sentences. A list keeps the branches apart, which matters: the second
+   line is usually the one that lowers the figure for a given product. */
+.warning-toast-list {
+  margin: 0.4rem 0 0;
+  padding-left: 1.1rem;
+}
+.warning-toast-list li + li {
+  margin-top: 0.35rem;
+}
 /* Set back rather than greyed: #6c757d on amber reads as muddy, and the point
    is only that this sentence is the aside, not the requirement. */
 .warning-toast-note {
+  display: block;
+  margin-top: 0.5rem;
   opacity: 0.8;
 }
 .warning-toast .Toastify__close-button {
@@ -1257,39 +1331,341 @@ li {
   opacity: 0.7;
 }
 
+/* A switch sitting in a field cell, under a label of its own, like any other field
+   in the calculator. A flex row because Bootstrap's own arrangement leaves no gap at
+   all between the control and its label, and centred because a switch is a pill
+   taller than the one line of text beside it.
+   Named for the shape rather than for one of the questions wearing it: bordsøtningsmiddel
+   had it first, then the recipe's porsjonsstørrelse switch. */
+.form-check.form-switch.form-switch-field {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding-left: 0;
+}
+/* Three classes, because Bootstrap pulls the control back out of the row with its
+   own `.form-switch .form-check-input` margin-left and would otherwise leave this
+   sitting left of the fields above it. The margin goes to nothing rather than being
+   adjusted: the gap above is what spaces the two now. */
+.form-check.form-switch.form-switch-field .form-check-input {
+  margin: 0;
+  flex-shrink: 0;
+}
+/* Black rather than Bootstrap blue, matching .beregn-btn and the seg-toggle's
+   chosen side. Only the colour is set, so the knob image Bootstrap swaps in on
+   :checked is left alone. */
+.form-check.form-switch.form-switch-field .form-check-input:checked {
+  background-color: #212529;
+  border-color: #212529;
+}
+.form-check.form-switch.form-switch-field .form-check-label {
+  cursor: pointer;
+  line-height: 1.5;
+}
+
+/* The knob, a shade darker than Bootstrap's 0.25 alpha, which nearly vanishes
+   against the pale track. Set through the library's own variable and scoped to
+   :not(:checked), so the white knob it swaps in when the switch is on, and the
+   blue one on focus, are both left alone. */
+.form-check.form-switch.form-switch-field .form-check-input:not(:checked) {
+  --bs-form-switch-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba%280, 0, 0, 0.45%29'/%3e%3c/svg%3e");
+}
+
+/* The nutrition panel's footer: the actions, under a rule running the full width of the
+   card, the mirror of the rule under its heading. Pulled out to the card's edges by the
+   panel's own horizontal padding (PanelBox is px-4) and given it back as padding, and the
+   panel's 2rem bottom padding is cancelled so the band ends flush with the card. */
+.nutrition-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 2.25rem -1.5rem -2rem;
+  padding: 1.5rem;
+  border-top: 1px solid #dee2e6;
+}
+
+/* The card around the fields panel and the band below it. It carries what PanelBox
+   would have carried (the same white, the same 1rem corners, the same shadow) and
+   clips to those corners, so the band can run to the card's own edges and still have
+   its corners cut by them. */
+.product-info-card {
+  background-color: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* The band itself: the fields that are about the product but not about placing it in
+   a category. A rule above it rather than a box around it, so it reads as the bottom
+   of the card rather than a second card inside it. */
+.product-footer {
+  border-top: 1px solid #dee2e6;
+}
+/* A row, not a button that looks like one: no frame of its own and no shift on press,
+   but it does take a background on hover, the same flat grey as the accordion headers
+   further down the page, and holds the darker one while it is open. Full-bleed, which
+   is why the band is a sibling of the fields panel rather than a child: inside that
+   panel's padding the highlight would have stopped short of the card's edges.
+   An even 1.5rem, which is what .accordion-button computes to on the collapses
+   further down the page, so the two sit at the same height. */
+.product-footer-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 1.5rem;
+  border: 0;
+  background-color: #fff;
+  color: #212529;
+  text-align: left;
+  line-height: 1.5;
+  transition: background-color 0.15s ease;
+}
+.product-footer-toggle:hover {
+  background-color: #eee;
+}
+.product-footer-toggle[aria-expanded="true"] {
+  background-color: #e9ecef;
+}
+/* Ahead of the label it belongs to, not at the far end of the row: what it opens is
+   named right beside it, and the summary has the other end to itself.
+   A plus and a cross rather than a chevron, which is Accordion.Header.Indicator's own
+   pair. 1.25rem, the size the instruction accordion gives both its question mark and its
+   chevron, so the two headers carry the same weight of mark. In rem rather than the px
+   it computes to, so it follows the root size the way that accordion's does.
+   A square flex box of exactly 1em with line-height 1, rather than the inline-block it was.
+   A transform needs a block-level box, and it pivots on the centre of that box: left inline,
+   the box was a whole line-height tall, 18 px of glyph in a 27 px box, so the pivot sat
+   several pixels below the glyph's own centre and turning it swung the cog round a small
+   circle. It read as bobbing up and down rather than rotating. Collapsing the box onto the
+   em square puts the pivot back in the middle of the mark. */
+.product-footer-toggle > i {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  line-height: 1;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  color: #6c757d;
+  transition: transform 0.25s ease;
+}
+/* 135 degrees rather than 45: the cog has eight teeth, so both land on the same shape,
+   but three eighths of a turn reads as the cog being turned where an eighth reads as a
+   nudge. It settles where it started, which is the point of a cog rather than an arrow:
+   the open state is said by the label and by the fields appearing, not by the glyph.
+   Unwinds the same way on close. */
+.product-footer-toggle[aria-expanded="true"] > i.bi-gear {
+  transform: rotate(135deg);
+}
+/* Half a turn, unlike the cog: an arrow says which way the row will move, so it has to
+   end up pointing the other way. It inherits size, colour and the transition from the
+   rule above, which both marks in this row share. */
+.product-footer-toggle-chevron {
+  margin-left: auto;
+}
+.product-footer-toggle[aria-expanded="true"] > i.product-footer-toggle-chevron {
+  transform: rotate(180deg);
+}
+.product-footer-toggle-label {
+  font-weight: 500;
+  flex-shrink: 0;
+}
+/* Inset, because the row now runs to the edges of a card that clips its overflow:
+   an outline drawn outside would lose its left and right sides to that clip. */
+.product-footer-toggle:focus-visible {
+  outline: 2px solid #212529;
+  outline-offset: -2px;
+}
+/* grid-template-rows from 0fr to 1fr, which animates to the content's own height
+   with no measuring and no magic number: max-height would need one, and a number
+   large enough to be safe makes the opening look like it stalls at the end.
+   The inner div is what the fr unit sizes, so it has to be the only child, and it
+   is also what clips. */
+.product-footer-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition:
+    grid-template-rows 0.25s ease,
+    visibility 0.25s;
+}
+.product-footer-body > div {
+  overflow: hidden;
+}
+.product-footer-body.is-open {
+  grid-template-rows: 1fr;
+  visibility: visible;
+}
+/* visibility carries the tab order too: a field in a shut band is not reachable
+   by keyboard, which display:none would also give but cannot be transitioned. */
+
+/* One row, on the same four-column grid as the nutrition fields: .new-field-grid
+   carries the tracks and the 4 -> 3 -> 2 -> 1 steps down, so a field added here lands
+   on the same rhythm as the rest of the calculator. Three rather than the four
+   .new-field-grid gives the nutrition rows, and every cell one column wide: a quarter
+   was too narrow for a question, which is what had the switch spanning two of them.
+   Steps down on .new-field-grid's own breakpoints, so the band and the field rows
+   above it reflow together. */
+.product-footer-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+  align-items: start;
+  padding: 1.5rem 1.5rem 0;
+}
+/* The switch group: one heading, then the switches in a wrapping row. Flex rather than
+   the grid the fields above use, because each switch is as wide as its own question and
+   nothing lines up underneath it: in fixed tracks the short ones left a gap before the
+   next column, and the row needs no breakpoints of its own to narrow, it just wraps. */
+/* A label and its control, with room enough that the label reads as a heading over the
+   control rather than as part of it. Bootstrap's mb-2 is 0.5rem and mb-3 is 1rem; this sits
+   between them, which is the distance the switch heading below already uses. Applies to the
+   rows that carry an ⓘ beside the label, which are the ones where the label is a line of
+   its own rather than a word in front of a field. */
+.field-label-row {
+  margin-bottom: 0.75rem;
+}
+
+.product-footer-switches {
+  padding: 1.5rem 1.5rem 1.75rem;
+}
+/* Two labelled groups share the band now, so the second needs the room the band's own
+   padding gives the first. Not a margin on the heading: a heading's margin collapses into
+   whatever sits above it, which is the trap .product-footer-switch-row below documents. */
+.product-footer-group + .product-footer-group {
+  margin-top: 1.75rem;
+}
+/* A checkbox in this band, where everything else is a switch. Two corrections, both of
+   which .confirm-check further down needs for the same reasons.
+
+   First, the layout: Bootstrap's .form-check floats the box and pulls it back out of a
+   padding-left, so the two always sit flush and the box hangs off the label's first line
+   rather than beside it. A flex row with a gap puts real space between them and centres
+   them on each other, which is what these one-line labels want.
+
+   Second, the box itself: the app pads every input 0.6rem 1.2rem, which a text field wants
+   and a checkbox does not. With box-sizing: border-box that padding is a floor under the
+   used width, so an unstyled checkbox comes out a 39 by 20 rounded rectangle with the tick
+   adrift in it, whatever width is set. The switches in this same row do want that padding,
+   since it is what gives them their pill, so this is scoped to the checkboxes.
+
+   The .form-check.<name> pairing is load-bearing, not tidiness: Bootstrap's stylesheet is
+   loaded after this one, so a single-class selector ties .form-check on specificity and
+   loses on source order. Written with one class, every rule here that Bootstrap also sets
+   silently did nothing. */
+.form-check.product-footer-declaration {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding-left: 0;
+}
+.form-check.product-footer-declaration .form-check-input {
+  width: 1.1rem;
+  height: 1.1rem;
+  padding: 0;
+  margin: 0;
+  border-radius: 0.25rem;
+  flex-shrink: 0;
+}
+.form-check.product-footer-declaration .form-check-input:checked {
+  background-color: #212529;
+  border-color: #212529;
+}
+.form-check.product-footer-declaration .form-check-label {
+  cursor: pointer;
+}
+.product-footer-switch-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  /* Wider across than down: wrapped, two switches above each other with the same space
+     as two side by side read as one column rather than as a row that ran out of room. */
+  gap: 0.875rem 2rem;
+  /* Clear of "Valg for beregningen" above. The label's own margin-bottom collapses into
+     this one, so the gap is whichever is larger, not the sum: 0.5rem left the heading
+     sitting on the switches as if it were one of their labels. */
+  margin-top: 0.75rem;
+}
+/* A switch cannot be greyed out and still be read: Bootstrap drops the whole control to
+   0.5 opacity, label included, and this one is disabled exactly when it has something to
+   say. Only the control dims. */
+.product-footer-switch-row .form-check-input:disabled {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.35);
+  border-color: rgba(0, 0, 0, 0.35);
+}
+.product-footer-switch-row .form-check-input:disabled + .form-check-label {
+  opacity: 1;
+  cursor: default;
+}
+@media (max-width: 768px) {
+  .product-footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 550px) {
+  .product-footer-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 /* Fullkorn confirmation, the gate on Beregn. Given its own margin, but no frame
    of its own: the question is a single line, so a box around it would only add
    another edge directly under the accordion above it. */
-.fullkorn-check {
+/* A premise the calculator cannot check, which the user states instead: the fullkorn
+   criterion, and the sweetening power of a bordsøtningsmiddel's portion. One class because
+   they are one kind of thing and stand together above Beregn. Named for the kind rather
+   than for fullkorn, which is only the first of them. */
+.confirm-check {
   margin-top: 2.25rem;
+}
+
+/* The second of two keeps a smaller gap: 2.25rem separates the pair from the panel above,
+   not the declarations from each other. */
+.confirm-check + .confirm-check {
+  margin-top: 1.25rem;
 }
 /* Red only after a press of Beregn, never on first render: an untouched
    checkbox is not yet a mistake. Marks the box itself, there being no border
    left to colour, and the warning below carries the wording. */
-.fullkorn-check-error .form-check-input {
+.confirm-check-error .form-check-input {
   border-color: #dc3545;
 }
-/* Flex rather than Bootstrap's indent-and-pull-back arrangement. There the
-   label flows immediately after the input's margin box, so the two always sit
-   flush and widening the indent just moves the pair sideways. A flex row with
-   a gap puts actual space between them, and keeps the box aligned to the first
-   line of a label that wraps to three. The three-class selector is needed
-   because Bootstrap's own `.form-check .form-check-input` matches two and
-   would otherwise win on source order. */
-.fullkorn-check .form-check {
+/* Flex rather than Bootstrap's indent-and-pull-back arrangement. There the label flows
+   immediately after the input's margin box, so the two always sit flush and widening the
+   indent just moves the pair sideways. A flex row with a gap puts actual space between
+   them. The two-class selector is needed because Bootstrap's own `.form-check` would
+   otherwise win on source order.
+   Not centred, unlike the switches in the product band: both labels run to two lines at
+   most widths, and centring would float the box between them. The top margin lands it on
+   the first line instead. */
+.confirm-check .form-check {
   display: flex;
   gap: 0.65rem;
   padding-left: 0;
 }
-.fullkorn-check .form-check .form-check-input {
-  margin: 0.3rem 0 0 0;
+/* Padding zeroed, and the size stated. The app gives every input 0.6rem 1.2rem of padding,
+   which a text field wants and a checkbox does not: with box-sizing: border-box that padding
+   is a floor under the used width, so the box came out 37px by 19px however small the width
+   was set, a wide rounded rectangle with a tick floating in it. Setting width and height
+   without clearing the padding does nothing at all, which is what makes this one worth a
+   note. Scoped to .confirm-check, so the switches in the product band keep the pill shape
+   that same padding gives them, which is the shape they want. */
+.confirm-check .form-check .form-check-input {
+  width: 1.1rem;
+  height: 1.1rem;
+  padding: 0;
+  border-radius: 0.25rem;
+  margin: 0.2rem 0 0 0;
   flex-shrink: 0;
 }
-.fullkorn-check .form-check-input:checked {
+.confirm-check .form-check-input:checked {
   background-color: #212529;
   border-color: #212529;
 }
-.fullkorn-check .form-check-label {
+.confirm-check .form-check-label {
   cursor: pointer;
   line-height: 1.5;
 }

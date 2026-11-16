@@ -9,6 +9,20 @@ export interface CalculatorRequestPayload {
   foodType: string;
   energyUnit: string;
   portionSize: number;
+  // "", "tableTopSweetener", "drinkingWater" or "semiSkimmedMilk". Picks the Annex
+  // carve-out the product falls under, which rewrites the limits on the two energy claims,
+  // LOW FAT or LOW SODIUM. A "chewingGum" value was added and withheld; see
+  // CalculatorRequestDTO.ProductType.
+  productType: string;
+  // Whether the energy field was filled in, which the number alone cannot say: 0 kcal is a
+  // real measurement. See CalculatorRequestDTO.EnergyEntered.
+  energyEntered: boolean;
+  // What the producer has declared about the recipe. "Uten tilsatt sukker" rests on the
+  // first of these alone; "Uten tilsatt natrium/salt" rests on the second together with the
+  // salt figure below, so a declaration on its own does not carry it. See
+  // CalculatorRequestDTO.NoAddedSugarsDeclared.
+  noAddedSugarsDeclared: boolean;
+  noAddedSaltDeclared: boolean;
   nutrition: {
     energyKcal: number;
     energyKj: number;
@@ -21,6 +35,21 @@ export interface CalculatorRequestPayload {
     fibre: number;
     protein: number;
     salt: number;
+    // Voluntary on a label, so null where the producer has no figure. Unlike the five
+    // below, a null here is read as "no polyols" rather than withholding the claim that
+    // reads it, because it is a deduction from Karbohydrat rather than the subject of a
+    // claim of its own. See CalculatorRequestDTO.Polyols.
+    polyols: number | null;
+    // Voluntary on a label, so null where the producer has no figure. The five claims that
+    // read them are withheld in that case rather than failed. See
+    // CalculatorRequestDTO.MonounsaturatedFat.
+    monounsaturatedFat: number | null;
+    polyunsaturatedFat: number | null;
+    alphaLinolenicAcid: number | null;
+    // Summed by the backend, since the Annex sets its limit on the sum of the two. See
+    // CalculatorService.EpaPlusDha.
+    eicosapentaenoicAcid: number | null;
+    docosahexaenoicAcid: number | null;
     addedSalt: number;
     totalStarch: number;
     resistantStarch: number;
@@ -92,6 +121,9 @@ export interface CalculatorReportPayload extends CalculatorRequestPayload {
   productName: string;
   matvaregruppe: string;
   efsaEnabled: boolean;
+  // True where the Nokkelhullet verdict rests on the user's confirmation of the korn
+  // criterion, so the document can state that premise instead of leaving it out.
+  fullkornConfirmed: boolean;
 }
 
 export const fetchCalculatorReport = async (

@@ -13,12 +13,63 @@ interface NutritionFieldDef {
   unit: string;
   placeholder: string;
   info?: string;
+  // Shown like any other field but not required before Beregn. Only the four fatty-acid
+  // figures are: Regulation (EU) No 1169/2011 makes fett and mettede fettsyrer mandatory on
+  // a label and leaves these voluntary, so most producers simply do not have them. Blank
+  // sends null rather than 0, and the claims that read them are withheld rather than
+  // failed. See CalculatorRequestDTO.MonounsaturatedFat.
+  optional?: boolean;
 }
 
 export const NUTRITION_FIELDS: NutritionFieldDef[] = [
   { key: "fett", label: "Fett", unit: "g", placeholder: "f.eks. 5" },
   { key: "mettede", label: "Mettede fettsyrer", unit: "g", placeholder: "f.eks. 2" },
   { key: "transfett", label: "Transfett", unit: "g", placeholder: "f.eks. 0" },
+  // Spelled out rather than lettered. ALA, EPA and DHA are what a fatty-acid table calls
+  // them, but the person filling this in is reading a label, where the names are written
+  // out, and an acronym they have to decode is a worse label than a long word they can
+  // match by eye.
+  //
+  // None of the five carries an ⓘ. Their names say what they are, and with every field on
+  // the form in grams there is no unit left to explain.
+  {
+    key: "enumettede",
+    label: "Enumettede fettsyrer",
+    unit: "g",
+    placeholder: "f.eks. 12",
+    optional: true,
+  },
+  {
+    key: "flerumettede",
+    label: "Flerumettede fettsyrer",
+    unit: "g",
+    placeholder: "f.eks. 8",
+    optional: true,
+  },
+  {
+    key: "alfalinolensyre",
+    label: "Alfa-linolensyre",
+    unit: "g",
+    placeholder: "f.eks. 1,2",
+    optional: true,
+  },
+  // Asked for one at a time, because that is how a label declares them, and added together
+  // by the calculator: the Annex sets its limit on "the sum of" the two, and making the
+  // producer do that addition is asking them to do arithmetic the tool exists to do.
+  {
+    key: "eikosapentaensyre",
+    label: "Eikosapentaensyre",
+    unit: "g",
+    placeholder: "f.eks. 0,15",
+    optional: true,
+  },
+  {
+    key: "dokosaheksaensyre",
+    label: "Dokosaheksaensyre",
+    unit: "g",
+    placeholder: "f.eks. 0,1",
+    optional: true,
+  },
   { key: "karbohydrat", label: "Karbohydrat", unit: "g", placeholder: "f.eks. 20" },
   {
     key: "sukkerarter",
@@ -28,6 +79,19 @@ export const NUTRITION_FIELDS: NutritionFieldDef[] = [
     // Mattilsynet's wording: the nutrition declaration doesn't separate the two,
     // so the field has to say outright that it covers both.
     info: "Sukkerarter er alle mono- og disakkarider i produktet, unntatt polyoler, slik det oppgis i næringsdeklarasjonen. Tallet omfatter både naturlig forekommende og tilsatte sukkerarter.",
+  },
+  // Voluntary under Article 30(2) of Regulation (EU) No 1169/2011, and sitting under
+  // Sukkerarter the way a nutrition declaration orders it. Read by one claim, 836625, whose
+  // condition is about carbohydrate "excluding polyols" where the Karbohydrat figure above
+  // includes them. Blank is read as none rather than withholding that claim, which is why the
+  // field is shown rather than inferred. See CalculatorRequestDTO.Polyols.
+  {
+    key: "polyoler",
+    label: "Polyoler",
+    unit: "g",
+    placeholder: "f.eks. 0",
+    optional: true,
+    info: "Polyoler er sukkeralkoholer som isomalt, maltitol, sorbitol og xylitol. De regnes med i Karbohydrat i næringsdeklarasjonen, men ikke i Sukkerarter. Feltet er frivillig: står det tomt, regnes produktet som uten polyoler.",
   },
   { key: "kostfiber", label: "Kostfiber", unit: "g", placeholder: "f.eks. 3" },
   { key: "protein", label: "Protein", unit: "g", placeholder: "f.eks. 8" },
@@ -40,8 +104,14 @@ export const EMPTY_NUTRITION: NutritionValues = {
   fett: "",
   mettede: "",
   transfett: "",
+  enumettede: "",
+  flerumettede: "",
+  alfalinolensyre: "",
+  eikosapentaensyre: "",
+  dokosaheksaensyre: "",
   karbohydrat: "",
   sukkerarter: "",
+  polyoler: "",
   kostfiber: "",
   protein: "",
   salt: "",
@@ -224,9 +294,19 @@ export const validateNutritionForm = (
   if (!foodType) errs.foodType = true;
   const energyVal =
     energyUnit === "energikcal" ? nutrition.energikcal : nutrition.energikj;
-  if (energyVal === "" || Number(energyVal) <= 0) errs.energy = true;
+  // Blank or negative, not zero. Energy used to be the one field that refused a typed 0,
+  // which every other nutrient on line below accepts: an energy-free drink, bottled water
+  // and a sweetener in drops all declare 0 kcal, and the form would not submit any of them.
+  // The backend has the matching rule; see CalculatorRequestDTO.EnergyEntered.
+  if (energyVal === "" || Number(energyVal) < 0) errs.energy = true;
   NUTRITION_FIELDS.filter(({ key }) => isFieldRelevant(key, schema)).forEach(
-    ({ key }) => {
+    ({ key, optional }) => {
+      // A blank optional field is a complete answer: the producer does not have the
+      // figure. A negative one is still a mistake, whether the field was required or not.
+      if (optional) {
+        if (nutrition[key] !== "" && Number(nutrition[key]) < 0) errs[key] = true;
+        return;
+      }
       if (nutrition[key] === "" || Number(nutrition[key]) < 0) errs[key] = true;
     },
   );
@@ -250,21 +330,41 @@ const buildVitaminMineralPayload = (
 
 // Maps NutritionForm's local form state (all strings, straight from <input>
 // elements) to the numeric payload shape calculateNutrition sends the backend.
+// Blank stays blank all the way to the backend. The commas are already gone by the time
+// a value is stored, so Number is safe here; see the sanitiser above.
+const optionalNumber = (value: string | undefined): number | null => {
+  const raw = String(value ?? "").trim();
+  if (raw === "") return null;
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
 export const buildCalculationPayload = (
   category: string,
   foodType: string,
   energyUnit: string,
   portionSize: string,
+  productType: string,
   nutrition: NutritionValues,
   totalStarch: string,
   resistantStarch: string,
   otherSubstances: { name: string; amount: string | number }[],
   schema: CalculatorSchema,
+  // One object rather than two more positional booleans at the end of a ten-argument list,
+  // where two adjacent flags of the same type are a transposition waiting to happen.
+  declarations: { noAddedSugars: boolean; noAddedSalt: boolean },
 ): CalculatorRequestPayload => ({
   category,
   foodType,
   energyUnit,
   portionSize: Number(portionSize) || 0,
+  productType,
+  // The raw strings, before Number() turns both "" and "0" into the same thing.
+  energyEntered:
+    String(nutrition.energikcal ?? "").trim() !== "" ||
+    String(nutrition.energikj ?? "").trim() !== "",
+  noAddedSugarsDeclared: declarations.noAddedSugars,
+  noAddedSaltDeclared: declarations.noAddedSalt,
   nutrition: {
     energyKcal: Number(nutrition.energikcal) || 0,
     energyKj: Number(nutrition.energikj) || 0,
@@ -286,11 +386,27 @@ export const buildCalculationPayload = (
     // so always sending 0 has no effect on any active calculation.
     salt: Number(nutrition.salt) || 0,
     addedSalt: 0,
+    // null, not 0. A product with no omega-3 figure on its label is not a product with
+    // none in it, and sending a 0 would have the calculator refuse five claims on a number
+    // nobody entered. See CalculatorRequestDTO.MonounsaturatedFat.
+    polyols: optionalNumber(nutrition.polyoler),
+    monounsaturatedFat: optionalNumber(nutrition.enumettede),
+    polyunsaturatedFat: optionalNumber(nutrition.flerumettede),
+    alphaLinolenicAcid: optionalNumber(nutrition.alfalinolensyre),
+    eicosapentaenoicAcid: optionalNumber(nutrition.eikosapentaensyre),
+    docosahexaenoicAcid: optionalNumber(nutrition.dokosaheksaensyre),
     totalStarch: Number(totalStarch) || 0,
     resistantStarch: Number(resistantStarch) || 0,
   },
   // One picker feeds three request lists: the vitamins and minerals are routed by the
-  // option table, everything left over is an "other" substance and stays in grams.
+  // option table, and everything left over is an "other" substance.
+  //
+  // An "other" carries no unit, unlike the two lists above, and does not need one: the
+  // picker shows the unit the schema gave for that substance, and the backend compares the
+  // number against a threshold written in that same unit. Nothing converts at either end,
+  // so the figure only has to mean the same thing in both places, which it does because
+  // both read it off OtherSubstance.Unit. It used to be true that every "other" was in
+  // grams; Vitamin C and Kakaoflavanoler are in milligrams.
   vitamins: buildVitaminMineralPayload(otherSubstances, "vitamin", schema),
   minerals: buildVitaminMineralPayload(otherSubstances, "mineral", schema),
   others: (otherSubstances || [])

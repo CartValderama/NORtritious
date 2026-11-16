@@ -63,7 +63,8 @@ export interface RuleAssessment {
   key: string;
   label: string;
   passed: boolean;
-  actualValue: number;
+  // Null where there was no figure to report. See RuleAssessmentDTO.ActualValue.
+  actualValue: number | null;
   actualUnit: string;
   comparator: string;
   thresholdValue: number;

@@ -12,6 +12,10 @@ export interface ImportedFood extends MatvaretabellenFoodDetail {
 // EMPTY_NUTRITION is covered, so an import fills the whole table rather than the four values
 // the picker happens to show in its columns. What it can't cover, because Matvaretabellen
 // only holds the totals: tilsatt sukker, tilsatt salt and resistent stivelse.
+//
+// The five fatty-acid fields are covered too, and are the reason the form asks for them in
+// grams: that is the unit the dataset states them in, so an imported figure needs no
+// conversion and a typed one matches what the source would have given.
 const FIELD_SOURCE: Record<string, keyof MatvaretabellenFoodDetail> = {
   energikcal: "energyKcal",
   energikj: "energyKj",
@@ -23,6 +27,22 @@ const FIELD_SOURCE: Record<string, keyof MatvaretabellenFoodDetail> = {
   kostfiber: "fibre",
   protein: "protein",
   salt: "salt",
+  enumettede: "monounsaturatedFat",
+  flerumettede: "polyunsaturatedFat",
+  alfalinolensyre: "alphaLinolenicAcid",
+  eikosapentaensyre: "eicosapentaenoicAcid",
+  dokosaheksaensyre: "docosahexaenoicAcid",
+};
+
+// How many decimals a derived figure keeps, where two is not enough. The three acids are
+// held to thresholds of hundredths of a gram (0,3 g for alfa-linolensyre, 0,04 g for the
+// other two summed), so a two-decimal step is a quarter of the smallest limit and rounding
+// half up could lift an average over a line the real figure sits under. Four decimals puts
+// that error at a twentieth of a milligram.
+const FIELD_DECIMALS: Record<string, number> = {
+  alfalinolensyre: 4,
+  eikosapentaensyre: 4,
+  dokosaheksaensyre: 4,
 };
 
 // The nutrition fields an import owns. Used to lock them while the list drives them, so the
@@ -65,8 +85,8 @@ export const roundTo = (value: number, decimals = DERIVED_DECIMALS): number => {
 
 // Stored with "." as the separator and shown with "," by toDisplayDecimal, the same as a
 // typed value, so every Number(nutrition[key]) downstream keeps working unchanged.
-const toFieldValue = (value: number): string =>
-  Number.isFinite(value) ? String(roundTo(value)) : "";
+const toFieldValue = (value: number, decimals = DERIVED_DECIMALS): string =>
+  Number.isFinite(value) ? String(roundTo(value, decimals)) : "";
 
 // The product's nutrition per 100 g, from the foods that make it up.
 //
@@ -88,7 +108,7 @@ export const nutritionFromImportedFoods = (
       (sum, food) => sum + (Number(food[source]) || 0) * amountOf(food),
       0,
     );
-    nutrition[field] = toFieldValue(weighted / totalGrams);
+    nutrition[field] = toFieldValue(weighted / totalGrams, FIELD_DECIMALS[field]);
   }
   return nutrition;
 };

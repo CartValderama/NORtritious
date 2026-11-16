@@ -129,6 +129,7 @@ const NutritionResult = () => {
         productName: product.name,
         matvaregruppe: selectsGroup,
         efsaEnabled,
+        fullkornConfirmed: calculation.fullkornConfirmed === true,
       });
       // Object URL rather than a data URL: the report is a few hundred kB and a data URL
       // would put the whole thing in the DOM.
