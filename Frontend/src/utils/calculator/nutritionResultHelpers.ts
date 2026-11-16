@@ -442,6 +442,7 @@ export const buildProductSubmitPayload = (
     portionSize: efsaValues.portionSize || "0",
     totalStarch: efsaValues.totalStarch || "0",
     resistantStarch: efsaValues.resistantStarch || "0",
+    slowlyDigestibleStarch: efsaValues.slowlyDigestibleStarch || "0",
     otherSubstancesJson: JSON.stringify(efsaValues.otherSubstances || []),
   };
 };

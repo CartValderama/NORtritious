@@ -294,6 +294,9 @@ namespace Backend.Migrations
                     b.Property<decimal>("SatFat")
                         .HasColumnType("TEXT");
 
+                    b.Property<decimal>("SlowlyDigestibleStarch")
+                        .HasColumnType("TEXT");
+
                     b.Property<decimal>("TotalStarch")
                         .HasColumnType("TEXT");
 

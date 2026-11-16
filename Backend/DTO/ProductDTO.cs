@@ -26,5 +26,6 @@ public class ProductDTO
     public decimal PortionSize { get; set; }
     public decimal TotalStarch { get; set; }
     public decimal ResistantStarch { get; set; }
+    public decimal SlowlyDigestibleStarch { get; set; }
     public string OtherSubstancesJson { get; set; } = "[]";
 }

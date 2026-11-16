@@ -50,6 +50,9 @@ const productToEfsaValues = (product) => {
   return {
     totalStarch: product.totalStarch ? String(product.totalStarch) : "",
     resistantStarch: product.resistantStarch ? String(product.resistantStarch) : "",
+    slowlyDigestibleStarch: product.slowlyDigestibleStarch
+      ? String(product.slowlyDigestibleStarch)
+      : "",
     otherSubstances,
     portionSize: product.portionSize ? String(product.portionSize) : "",
   };

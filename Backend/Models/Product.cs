@@ -38,6 +38,11 @@ public class Product
     public decimal PortionSize { get; set; }
     public decimal TotalStarch { get; set; }
     public decimal ResistantStarch { get; set; }
+    // Stored as a plain decimal rather than nullable, like the two above: a saved product
+    // is a filled-in form, and 0 is what the panel sends for a box left blank. The
+    // calculator request keeps the nullable distinction, because there a blank withholds
+    // the claim and a zero fails it, but nothing can tell those apart once saved.
+    public decimal SlowlyDigestibleStarch { get; set; }
     // JSON-encoded array of {name, amount} — same shape as the frontend's
     // OtherSubstance[] (EfsaPanelValues.otherSubstances in calculatorFormStore.ts).
     public string OtherSubstancesJson { get; set; } = "[]";

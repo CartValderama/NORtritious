@@ -152,6 +152,7 @@ namespace Backend.Controllers
                     PortionSize = productDTO.PortionSize,
                     TotalStarch = productDTO.TotalStarch,
                     ResistantStarch = productDTO.ResistantStarch,
+                    SlowlyDigestibleStarch = productDTO.SlowlyDigestibleStarch,
                     OtherSubstancesJson = productDTO.OtherSubstancesJson,
                     UserId = userId,  // Set the userId for the created product
                     CreatedByUser = user  // Set the User navigation property
@@ -225,6 +226,7 @@ namespace Backend.Controllers
                 existingProduct.PortionSize = productDTO.PortionSize;
                 existingProduct.TotalStarch = productDTO.TotalStarch;
                 existingProduct.ResistantStarch = productDTO.ResistantStarch;
+                existingProduct.SlowlyDigestibleStarch = productDTO.SlowlyDigestibleStarch;
                 existingProduct.OtherSubstancesJson = productDTO.OtherSubstancesJson;
 
                 // You can call the repository to update the product here
