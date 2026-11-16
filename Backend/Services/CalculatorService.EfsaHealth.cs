@@ -282,8 +282,24 @@ namespace Backend.Services
                 new OtherClaimRule(763437, OtherClaimCheck.PortionThreshold, 1m),
             }, Unit: "mg", IsFibre: false),
 
-            ["Linoleic acid"]      = new(new[] { new OtherClaimRule(762689, OtherClaimCheck.PerHundredAndKcalThreshold, 1.5m) },
-                                         IsFibre: false),
+            // Two claims, and the same split as the Creatine row. 762689 conditions the food,
+            // "at least 1,5 g of linoleic acid per 100 g and per 100 kcal", and is checked.
+            //
+            // 757821 is about alfa-linolensyre and linolsyre together, "a daily intake of 2 g
+            // of ALA and a daily intake of 10 g of LA", and every word of that sits inside
+            // "Information to the consumer that the beneficial effect is obtained with". A
+            // labelling duty, so no verdict; see OtherClaimCheck.NotComputable.
+            //
+            // It lives on this row rather than getting one of its own, which costs a product
+            // that declares alfa-linolensyre but no linolsyre the sight of it. That is the
+            // lesser wrong: a row for a claim that reaches no verdict either way would be a
+            // picker entry whose only purpose is to print a sentence, and ALA already has a
+            // field in the nutrition table rather than being a kilde at all.
+            ["Linoleic acid"]      = new(new[]
+            {
+                new OtherClaimRule(762689, OtherClaimCheck.PerHundredAndKcalThreshold, 1.5m),
+                new OtherClaimRule(757821, OtherClaimCheck.NotComputable),
+            }, IsFibre: false),
 
             // "At least 8 g of arabinoxylan (AX)-rich fibre produced from wheat endosperm
             // (at least 60 % AX by weight) per 100 g of available carbohydrates in a
@@ -574,6 +590,7 @@ namespace Backend.Services
             [764289] = "Les EFSA-uttalelsen om plantesteroler, plantestanoler og blodkolesterol",
             [837853] = "Les EFSA-uttalelsen om kalsium og tap av beinmineral",
             [757477] = "Les EFSA-uttalelsen om vannløselig tomatkonsentrat og blodplater",
+            [757821] = "Les EFSA-uttalelsen om essensielle fettsyrer og vekst hos barn",
             [763885] = "Les EFSA-uttalelsen om polyfenoler i olivenolje og blodfettene",
             [761973] = "Les EFSA-uttalelsen om glukomannan og blodkolesterol",
             [762125] = "Les EFSA-uttalelsen om HPMC og blodkolesterol",
