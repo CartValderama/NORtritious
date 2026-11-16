@@ -39,6 +39,19 @@ namespace Backend.Services
         // calls then complete from memory instead of one round trip at a time. Purely an
         // optimisation: an id left out still resolves, it just pays for its own fetch.
         Task PrefetchAsync(IEnumerable<long> policyItemIds, CancellationToken ct = default);
+
+        // Of these ids, the ones whose register entry could not be fetched just now. Read
+        // after PrefetchAsync, which is where the attempt was made.
+        //
+        // A caller needs this because a claim with no entry produces no card, and a card that
+        // is missing for that reason says nothing at all about the product. Without it the
+        // only honest reading of a short list of claims would be "some of these may be
+        // missing", every time, outage or not.
+        //
+        // An id the register answered for and had no row against is not unresolved. That is a
+        // fact about the register, it is cached as one, and it means an id in this project's
+        // own tables is wrong: a different problem, already logged where it is discovered.
+        IReadOnlyList<long> UnresolvedIds(IEnumerable<long> policyItemIds);
     }
 
     // Fetches individual entries from the EU Health Claims register on demand
@@ -55,6 +68,29 @@ namespace Backend.Services
         private readonly ITranslationService _translator;
         private readonly ConcurrentDictionary<long, EuHealthClaimEntry?> _cache = new();
 
+        // When each id's fetch last threw, and how long that is held against it.
+        //
+        // A failure cannot be cached the way an answer is. The register replying "no such row"
+        // is a fact about the register and keeps indefinitely; a request that timed out is a
+        // fact about the network a moment ago, and storing it as a null would blank that claim
+        // for the rest of the process's life on the strength of one bad moment. That is why
+        // the code below used to cache only answers.
+        //
+        // Not remembering the failure at all was the other extreme, and this replaces it.
+        // Every builder asks for its own claim after PrefetchAsync has already tried, so
+        // during an outage one calculation paid the timeout once in parallel and then once
+        // more per claim, in sequence: a plain calculation took 60 seconds and one with
+        // substances picked took 100, against a 20 second timeout. Holding the failure for a
+        // minute collapses that to the single parallel attempt, and still picks the register
+        // up within a minute of it recovering.
+        private static readonly TimeSpan FailureMemory = TimeSpan.FromSeconds(60);
+
+        private readonly ConcurrentDictionary<long, DateTimeOffset> _failedAt = new();
+
+        private bool FailedRecently(long policyItemId) =>
+            _failedAt.TryGetValue(policyItemId, out var at)
+            && DateTimeOffset.UtcNow - at < FailureMemory;
+
         public EuHealthClaimsService(ILogger<EuHealthClaimsService> logger, ITranslationService translator)
         {
             _http = new HttpClient();
@@ -70,16 +106,26 @@ namespace Backend.Services
                 .Where(id => !_cache.ContainsKey(id))
                 .Select(id => GetByIdAsync(id, ct)));
 
+        public IReadOnlyList<long> UnresolvedIds(IEnumerable<long> policyItemIds) =>
+            policyItemIds
+                .Distinct()
+                .Where(id => !_cache.ContainsKey(id) && FailedRecently(id))
+                .ToList();
+
         public async Task<EuHealthClaimEntry?> GetByIdAsync(long policyItemId, CancellationToken ct = default)
         {
             if (_cache.TryGetValue(policyItemId, out var cached))
                 return cached;
 
+            // Not retried while the last failure is still fresh. See FailureMemory.
+            if (FailedRecently(policyItemId))
+                return null;
+
             EuHealthClaimEntry? entry = null;
 
             // A null caches only when the register itself answered and had no such row. A
-            // request that threw is left uncached so the next caller retries: caching it would
-            // let one timeout blank that claim for the rest of the process's life.
+            // request that threw is remembered separately and only for a while, so the next
+            // caller after that retries rather than inheriting one bad moment.
             bool answered = false;
             try
             {
@@ -142,7 +188,16 @@ namespace Backend.Services
                 _logger.LogError(ex, "EuHealthClaims: failed to fetch policy_item_id {Id}", policyItemId);
             }
 
-            if (answered) _cache[policyItemId] = entry;
+            if (answered)
+            {
+                _cache[policyItemId] = entry;
+                _failedAt.TryRemove(policyItemId, out _);
+            }
+            else
+            {
+                _failedAt[policyItemId] = DateTimeOffset.UtcNow;
+            }
+
             return entry;
         }
 

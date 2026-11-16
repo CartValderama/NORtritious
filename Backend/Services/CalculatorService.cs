@@ -64,7 +64,11 @@ namespace Backend.Services
             // builders below still ask for their own claims one at a time, which reads better
             // and keeps each of them responsible for its own scope; after this line those asks
             // are served from memory. On a cold cache the difference was 17 s and about one.
-            await _euHealthClaims.PrefetchAsync(CollectClaimIds(request));
+            //
+            // Materialised rather than streamed, because the same ids are read again below to
+            // find out which of them the register could not answer for.
+            var claimIds = CollectClaimIds(request).ToList();
+            await _euHealthClaims.PrefetchAsync(claimIds);
 
             var autoHealthClaims = new List<HealthClaimResultDTO>();
             var resistantStarchClaim = await CheckResistantStarchHealthClaim(request.Nutrition);
@@ -101,6 +105,16 @@ namespace Backend.Services
                         request.NoAddedSugarsDeclared, request.NoAddedSaltDeclared))
                 : new List<EfsaNutritionClaimDTO>();
 
+            // Read after the prefetch above, which is where every one of these was attempted,
+            // so it does not change while the builders run. It counts the claims that were
+            // owed a card and did not get one because the register could not be reached, which
+            // is the one case where a missing claim says nothing about the product.
+            //
+            // Bounded by what CollectClaimIds yields, which mirrors the builders' traversals
+            // rather than driving them. An id it misses is a claim whose absence goes
+            // unexplained, the same way such an id already misses the prefetch.
+            int unresolvedClaims = _euHealthClaims.UnresolvedIds(claimIds).Count;
+
             return new CalculatorResponseDTO
             {
                 HasNokkelhullet = CheckNokkelhullet(request.Category, request.Nutrition, nokkelhulletRequirements),
@@ -108,7 +122,8 @@ namespace Backend.Services
                 EfsaNutritionClaims = efsaNutritionClaims.Where(c => c.Passed).Select(c => c.Label).ToList(),
                 EfsaNutritionClaimResults = efsaNutritionClaims,
                 EfsaHealthClaims = autoHealthClaims,
-                Warnings = BuildWarnings(request.Nutrition, request.FoodType, request.Others),
+                Warnings = BuildWarnings(
+                    request.Nutrition, request.FoodType, request.Others, unresolvedClaims),
                 IngredientHealthClaims = await CheckHealthClaims(request.Nutrition, request.FoodType, request.EnergyUnit, request.PortionSize, request.Vitamins, request.Minerals, request.Others),
             };
         }
@@ -140,6 +155,13 @@ namespace Backend.Services
                 foreach (var id in SourceOfClaimIds.GetValueOrDefault(input.Name, Array.Empty<long>()))
                     yield return id;
             }
+
+            // Calcium alone carries 837853, so it is wanted whenever calcium is, while the
+            // combined claim needs both nutrients. Missing here meant 837853 skipped the
+            // parallel prefetch and paid for its own round trip, and once the count above
+            // existed it would also have gone missing from the result unexplained.
+            if (hasCalcium)
+                yield return CalciumPortionClaimId;
 
             if (hasCalcium && hasVitaminD)
                 yield return CalciumVitaminDPortionClaimId;
@@ -177,9 +199,26 @@ namespace Backend.Services
             };
 
         private static List<string> BuildWarnings(
-            NutritionInputDTO n, string foodType, List<OtherClaimInputDTO> others)
+            NutritionInputDTO n, string foodType, List<OtherClaimInputDTO> others,
+            int unresolvedClaims)
         {
             var warnings = new List<string>();
+
+            // First, and before any of the early returns below, because it is the only warning
+            // here that is about the answer being incomplete rather than about a figure in it.
+            // Everything the reader is about to see has to be read in its light.
+            //
+            // Worded to rule out the inference the missing cards otherwise invite. A claim that
+            // is absent normally means the product did not qualify, and these are absent for a
+            // reason that has nothing to do with the product.
+            if (unresolvedClaims > 0)
+            {
+                string noun = unresolvedClaims == 1 ? "helsepåstand" : "helsepåstander";
+                warnings.Add(
+                    $"{unresolvedClaims} {noun} kunne ikke hentes fra EUs påstandsregister nå, "
+                    + "og mangler derfor i oversikten nedenfor. Det betyr ikke at produktet ikke "
+                    + "oppfyller dem. Prøv igjen om en liten stund.");
+            }
 
             // Checked before the energy warnings below, which return early in several places.
             foreach (var other in others)
