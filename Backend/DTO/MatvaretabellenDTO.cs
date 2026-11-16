@@ -20,6 +20,14 @@ namespace Backend.DTO
         public double Salt { get; set; }
         public double Starch { get; set; }
 
+        // The five the unsaturated-fat and omega-3 claims read. Matvaretabellen states all
+        // of them in grams, which is the unit the form asks for, so nothing is converted.
+        public double MonounsaturatedFat { get; set; }
+        public double PolyunsaturatedFat { get; set; }
+        public double AlphaLinolenicAcid { get; set; }
+        public double EicosapentaenoicAcid { get; set; }
+        public double DocosahexaenoicAcid { get; set; }
+
         // Feed the helsepåstander panel's kilder rather than the nutrition table: calcium in
         // mg and vitamin D in µg, the units their claim thresholds are written in.
         public double Calcium { get; set; }

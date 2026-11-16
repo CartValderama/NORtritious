@@ -32,6 +32,19 @@ namespace Backend.Services
         private const string NutSalt = "NaCl";
         private const string NutStarch = "Stivel";
 
+        // The fatty-acid breakdown. Every one of the 2121 foods in the dataset states all
+        // five, so an imported figure is always a measured one and a 0 here means the food
+        // genuinely has none rather than that nobody looked: EPA is 0 for 1809 of them,
+        // which is what you would expect of a table where it comes from fish.
+        //
+        // The two sums are named for the group; the three acids are named for the chain,
+        // which is how Matvaretabellen keys them.
+        private const string NutMonounsaturated = "Enumet";
+        private const string NutPolyunsaturated = "Flerum";
+        private const string NutAlphaLinolenic = "C18:3n-3AlfaLinolensyre";
+        private const string NutEicosapentaenoic = "C20:5n-3Eikosapentaensyre";
+        private const string NutDocosahexaenoic = "C22:6n-3Dokosaheksaensyre";
+
         // The only two kilder in the helsepåstander panel that Matvaretabellen carries. Its
         // 57 nutrients have no beta-glucan and no breakdown of fibre by type, so the fibre
         // kilder and resistent stivelse stay hand-entered. Units already match the ones
@@ -133,6 +146,11 @@ namespace Backend.Services
                 Protein = Get(NutProtein),
                 Salt = Get(NutSalt),
                 Starch = Get(NutStarch),
+                MonounsaturatedFat = Get(NutMonounsaturated),
+                PolyunsaturatedFat = Get(NutPolyunsaturated),
+                AlphaLinolenicAcid = Get(NutAlphaLinolenic),
+                EicosapentaenoicAcid = Get(NutEicosapentaenoic),
+                DocosahexaenoicAcid = Get(NutDocosahexaenoic),
                 Calcium = Get(NutCalcium),
                 VitaminD = Get(NutVitaminD),
             };

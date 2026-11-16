@@ -15,5 +15,11 @@ namespace Backend.DTO
         // False when the user turned the EFSA helsepåstander panel off, which omits the
         // health-claim sections rather than printing them empty.
         public bool EfsaEnabled { get; set; } = true;
+
+        // True where the category carries a fullkorn requirement and the user confirmed it
+        // before calculating. The calculator takes nutrition values and has no ingredient
+        // input, so it cannot check fullkorn itself; the document says so rather than
+        // presenting a verdict whose premise is invisible.
+        public bool FullkornConfirmed { get; set; }
     }
 }

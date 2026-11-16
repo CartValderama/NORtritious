@@ -216,7 +216,7 @@ namespace Backend.Services
         // limit is per category and one of them (the dynamic saturated-fat rule) moves with
         // the product's own fat content.
         private static string RequirementExplanation(NokkelhulletRequirementDTO r) =>
-            $"Produktet inneholder {FormatNo(r.ActualValue)} {r.ActualUnit}, "
+            $"Produktet inneholder {FormatNo(r.ActualValue ?? 0m)} {r.ActualUnit}, "
             + (r.Passed ? "som oppfyller kravet om" : "men kravet er")
             + $" {(r.Comparator == "≤" ? "høyst" : "minst")} "
             + $"{FormatNo(r.ThresholdValue)} {r.ThresholdUnit}.";

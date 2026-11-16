@@ -10,8 +10,9 @@ namespace Backend.Services
         // data this calculator collects.
         private enum OtherClaimCheck
         {
-            // amount (g per 100g) >= a fixed minimum, e.g. "at least 1g per quantified portion"
-            GramThreshold,
+            // amount per portion >= a fixed minimum, e.g. "at least 1 g per quantified
+            // portion". In the substance's own unit, which is not always grams.
+            PortionThreshold,
             // the substance's own amount must itself pass the HIGH FIBRE threshold
             // (>=6g/100g or >=3g/100kcal) — condition text: "food which is high in that fibre"
             HighFibreSource,
@@ -19,32 +20,196 @@ namespace Backend.Services
             // (">=4g beta-glucan per 30g available carbohydrates in a quantified portion") —
             // uses the product's own portion size.
             BetaGlucanMealRatio,
+            // amount per portion >= a figure the register states per day: "food which
+            // provides a daily intake of 3 g of chitosan". See FormatDailyIntakeResult for
+            // what is assumed and how the card says so.
+            DailyIntakeThreshold,
+            // amount per 100 g >= a fixed minimum, with no portion in it at all.
+            PerHundredThreshold,
+            // amount per 100 g OR amount per portion >= a fixed minimum, whichever carries
+            // it: "at least 82,5 mg of choline per 100 g or 100 ml or per single portion of
+            // food". Two routes joined by "or", so unlike PortionThreshold a missing portion
+            // size does not withhold the claim, it just leaves the second route unavailable.
+            PerHundredOrPortionThreshold,
+            // amount read on two bases at once, both of which have to clear: "at least 1,5 g
+            // of linoleic acid per 100 g AND per 100 kcal". The same shape as the omega-3
+            // routes in the nutrition partial, which is where Omega3RouteMet answers it for
+            // the fields on the form; this is the version for a picked substance.
+            PerHundredAndKcalThreshold,
+            // amount per portion >= a share of the carbohydrates in that portion: "at least
+            // 8 g of AX-rich fibre per 100 g of available carbohydrates in a quantified
+            // portion". MinAmount is the grams per 100 g of carbohydrates. The portion
+            // cancels out of the ratio itself but is still required, because a quantified
+            // portion is what the condition asks for.
+            //
+            // BetaGlucanMealRatio is the same idea at a hardcoded 4 g per 30 g, kept as it
+            // is rather than converted to 13,333 so the figure in the code stays the figure
+            // in the register.
+            CarbsRatioThreshold,
             // condition can't be derived from any field this calculator collects
             NotComputable,
         }
 
-        private record OtherClaimRule(long PolicyItemId, OtherClaimCheck Check, decimal? MinGrams = null);
+        private record OtherClaimRule(long PolicyItemId, OtherClaimCheck Check, decimal? MinAmount = null);
+
+        // A selectable substance: how it is measured, and every authorised claim on it.
+        //
+        // Unit and IsFibre used to be hardcoded in the picker projection below, as "g" and
+        // true, which held for as long as every substance here was a fibre. Melatonin is
+        // measured in milligrams and activated charcoal is not a fibre, so both are the
+        // substance's own property now. IsFibre is what ties a kilde to the Kostfiber figure
+        // in the nutrition table: a fibre source cannot exceed the total fibre declared, and
+        // charcoal or meat has nothing to do with that total.
+        private record OtherSubstance(OtherClaimRule[] Rules, string Unit = "g", bool IsFibre = true);
 
         // Maps a selectable "Other" substance name to every EU-register claim that applies to it.
         // A substance can have more than one authorised claim (e.g. Beta-glucans has both a
         // cholesterol claim and a separate post-meal-glucose claim) — all are shown.
-        private static readonly Dictionary<string, OtherClaimRule[]> OtherClaimRegistry = new()
+        private static readonly Dictionary<string, OtherSubstance> OtherClaimRegistry = new()
         {
-            ["Beta-glucans"] = new[]
+            ["Beta-glucans"] = new(new[]
             {
-                new OtherClaimRule(760097, OtherClaimCheck.GramThreshold, 1m),
+                new OtherClaimRule(760097, OtherClaimCheck.PortionThreshold, 1m),
                 new OtherClaimRule(760137, OtherClaimCheck.BetaGlucanMealRatio),
-            },
-            ["Barley beta-glucans"] = new[] { new OtherClaimRule(756273, OtherClaimCheck.GramThreshold, 1m) },
-            ["Oat beta-glucan"]     = new[] { new OtherClaimRule(757081, OtherClaimCheck.GramThreshold, 1m) },
-            ["Barley grain fibre"]  = new[] { new OtherClaimRule(760061, OtherClaimCheck.HighFibreSource) },
-            ["Rye fibre"]           = new[] { new OtherClaimRule(764917, OtherClaimCheck.HighFibreSource) },
-            ["Wheat bran fibre"]    = new[]
+            }),
+            // Two authorised claims on one condition. 756273 and 756309 are both
+            // Art.14(1)(a), both "at least 1 g of barley beta-glucan per quantified
+            // portion", and differ only in the sentence the label may carry.
+            ["Barley beta-glucans"] = new(new[]
+            {
+                new OtherClaimRule(756273, OtherClaimCheck.PortionThreshold, 1m),
+                new OtherClaimRule(756309, OtherClaimCheck.PortionThreshold, 1m),
+            }),
+            ["Oat beta-glucan"]    = new(new[] { new OtherClaimRule(757081, OtherClaimCheck.PortionThreshold, 1m) }),
+            ["Barley grain fibre"] = new(new[] { new OtherClaimRule(760061, OtherClaimCheck.HighFibreSource) }),
+            ["Rye fibre"]          = new(new[] { new OtherClaimRule(764917, OtherClaimCheck.HighFibreSource) }),
+            ["Wheat bran fibre"]   = new(new[]
             {
                 new OtherClaimRule(767477, OtherClaimCheck.HighFibreSource),
                 new OtherClaimRule(767513, OtherClaimCheck.HighFibreSource),
-            },
-            ["Oat grain fibre"]     = new[] { new OtherClaimRule(763813, OtherClaimCheck.HighFibreSource) },
+            }),
+            ["Oat grain fibre"]    = new(new[] { new OtherClaimRule(763813, OtherClaimCheck.HighFibreSource) }),
+            ["Sugar beet fibre"]   = new(new[] { new OtherClaimRule(756641, OtherClaimCheck.HighFibreSource) }),
+
+            // Each of these is one sentence in the register: "food which contains X per
+            // quantified portion". Same rule the beta-glucan claims above already use, so
+            // adding one is the line and nothing else.
+            //
+            // The three viscous fibres are subsets of Kostfiber like the beta-glucans.
+            // Activated charcoal, lactulose and meat or fish are not: charcoal is not a
+            // nutrient at all, lactulose is a disaccharide, and meat is a food rather than a
+            // component of one, so none of them are budgeted against the fibre figure.
+            ["Glucomannan"]        = new(new[]
+            {
+                new OtherClaimRule(762017, OtherClaimCheck.PortionThreshold, 1m),
+                new OtherClaimRule(761973, OtherClaimCheck.DailyIntakeThreshold, 4m),
+            }),
+            ["Hydroxypropyl methylcellulose"] = new(new[]
+            {
+                new OtherClaimRule(762089, OtherClaimCheck.PortionThreshold, 4m),
+                new OtherClaimRule(762125, OtherClaimCheck.DailyIntakeThreshold, 5m),
+            }),
+            ["Pectins"]            = new(new[]
+            {
+                new OtherClaimRule(764069, OtherClaimCheck.PortionThreshold, 10m),
+                new OtherClaimRule(764105, OtherClaimCheck.DailyIntakeThreshold, 6m),
+            }),
+            ["Activated charcoal"] = new(new[] { new OtherClaimRule(759949, OtherClaimCheck.PortionThreshold, 1m) },
+                                         IsFibre: false),
+            ["Lactulose"]          = new(new[] { new OtherClaimRule(762653, OtherClaimCheck.PortionThreshold, 10m) },
+                                         IsFibre: false),
+            ["Meat or fish"]       = new(new[] { new OtherClaimRule(763365, OtherClaimCheck.PortionThreshold, 50m) },
+                                         IsFibre: false),
+
+            // ── Claims whose figure the register states per day ──────────────
+            //
+            // "The claim may be used only for food which provides a daily intake of 3 g of
+            // chitosan" is a condition about what the food contains, written in day units.
+            // It is checked against the declared portion, which is the assumption 755405
+            // already rests on, and the card's amount line says so in as many words rather
+            // than leaving the reader to infer it. See FormatDailyIntakeResult.
+            //
+            // Three substances above pick up a second rule here, because the register
+            // authorises both a per-portion claim and a per-day one on the same substance,
+            // at different figures: 1 g of glucomannan per portion for the glucose claim and
+            // 4 g per day for the cholesterol one.
+            ["Chitosan"]           = new(new[] { new OtherClaimRule(760853, OtherClaimCheck.DailyIntakeThreshold, 3m) },
+                                         IsFibre: false),
+            ["Creatine"]           = new(new[] { new OtherClaimRule(761413, OtherClaimCheck.DailyIntakeThreshold, 3m) },
+                                         IsFibre: false),
+            ["Dried plums"]        = new(new[] { new OtherClaimRule(834173, OtherClaimCheck.DailyIntakeThreshold, 100m) },
+                                         IsFibre: false),
+            ["Guar gum"]           = new(new[] { new OtherClaimRule(762053, OtherClaimCheck.DailyIntakeThreshold, 10m) }),
+            ["Native chicory inulin"] =
+                                     new(new[] { new OtherClaimRule(838109, OtherClaimCheck.DailyIntakeThreshold, 12m) }),
+            ["Walnuts"]            = new(new[] { new OtherClaimRule(767369, OtherClaimCheck.DailyIntakeThreshold, 30m) },
+                                         IsFibre: false),
+            ["Green kiwifruit"]    = new(new[] { new OtherClaimRule(2638312, OtherClaimCheck.DailyIntakeThreshold, 200m) },
+                                         IsFibre: false),
+            ["Vitamin C"]          = new(new[] { new OtherClaimRule(766445, OtherClaimCheck.DailyIntakeThreshold, 200m) },
+                                         Unit: "mg", IsFibre: false),
+            ["Cocoa flavanols"]    = new(new[] { new OtherClaimRule(835181, OtherClaimCheck.DailyIntakeThreshold, 200m) },
+                                         Unit: "mg", IsFibre: false),
+
+            // ── Claims on a substance the form did not collect before ────────
+            //
+            // Each is one more row in the picker and nothing else: no new field, no new
+            // input shape. What made them additions rather than one-liners is that none of
+            // their conditions had a check yet.
+            //
+            // None of these six is a fibre, so none is budgeted against Kostfiber. Choline,
+            // betaine and melatonin are measured in milligrams; linoleic acid is a fatty
+            // acid in grams like the rest of the fat breakdown.
+            //
+            // All three choline claims carry the identical condition and differ only in the
+            // effect the label may name, the way the four protein claims do.
+            ["Choline"]            = new(new[]
+            {
+                new OtherClaimRule(760925, OtherClaimCheck.PerHundredOrPortionThreshold, 82.5m),
+                new OtherClaimRule(760961, OtherClaimCheck.PerHundredOrPortionThreshold, 82.5m),
+                new OtherClaimRule(760997, OtherClaimCheck.PerHundredOrPortionThreshold, 82.5m),
+            }, Unit: "mg", IsFibre: false),
+
+            ["Betaine"]            = new(new[] { new OtherClaimRule(760173, OtherClaimCheck.PortionThreshold, 500m) },
+                                         Unit: "mg", IsFibre: false),
+
+            // Two claims at two different figures, so two rules. 763437 is worded "food
+            // which contains 1 mg of melatonin per quantified portion" with no "at least",
+            // and is read as a floor like every other figure here: a gum with 2 mg has not
+            // failed to contain 1 mg. Both also carry a labelling duty about when to take it,
+            // reported through Vilkår for bruk.
+            ["Melatonin"]          = new(new[]
+            {
+                new OtherClaimRule(763401, OtherClaimCheck.PortionThreshold, 0.5m),
+                new OtherClaimRule(763437, OtherClaimCheck.PortionThreshold, 1m),
+            }, Unit: "mg", IsFibre: false),
+
+            ["Linoleic acid"]      = new(new[] { new OtherClaimRule(762689, OtherClaimCheck.PerHundredAndKcalThreshold, 1.5m) },
+                                         IsFibre: false),
+
+            // "At least 8 g of arabinoxylan (AX)-rich fibre produced from wheat endosperm
+            // (at least 60 % AX by weight) per 100 g of available carbohydrates in a
+            // quantified portion."
+            //
+            // The parenthesis is a condition about the ingredient's own composition, not
+            // about the product, so it is reported through Vilkår for bruk rather than
+            // checked: nothing on this form distinguishes an AX-rich fibre from any other.
+            // The ratio is read against Karbohydrater, which the form always collects, and
+            // is the same stand-in for "available carbohydrates" that the beta-glucan
+            // meal-ratio claim already makes.
+            ["Arabinoxylan"]       = new(new[] { new OtherClaimRule(760025, OtherClaimCheck.CarbsRatioThreshold, 8m) }),
+
+            // Not a daily figure at all. 763885 reads "olive oil which contains at least
+            // 5 mg of hydroxytyrosol and its derivatives per 20 g of olive oil", which is a
+            // concentration: 25 mg per 100 g, the same ratio written on the basis this form
+            // collects. The conversion is here rather than at the comparison so the figure
+            // the card quotes is the figure the check used.
+            //
+            // "only for olive oil" is a condition about what the product is, reported
+            // through Vilkår for bruk like 755661's "fats and oils".
+            ["Olive oil polyphenols"] =
+                                     new(new[] { new OtherClaimRule(763885, OtherClaimCheck.PerHundredThreshold, 25m) },
+                                         Unit: "mg", IsFibre: false),
         };
 
         // ── Vitamins and minerals (calcium, vitamin D) ──────────────────────────
@@ -80,13 +245,31 @@ namespace Backend.Services
         // Claims whose whole condition is "food which is at least a source of X". That phrase
         // is a cross-reference, not a number: it points at the SOURCE OF [NAME OF VITAMIN/S]
         // AND/OR [NAME OF MINERAL/S] nutrition claim, which in turn requires a "significant
-        // amount": 15 % of the NRV per 100 g, or 7,5 % per 100 ml for beverages. So all of
-        // these share one gate and differ only in which claim text is shown.
+        // amount": 15 % of the NRV per 100 g, or 7,5 % per 100 ml for beverages. So all nine
+        // shared one gate and differed only in which claim text was shown.
+        //
+        // Withheld by the product owner's decision, and commented out rather than deleted.
+        // Reaching a verdict here means following a condition out of the register into the
+        // Annex to Regulation (EC) No 1924/2006, and from there into the "significant amount"
+        // defined in Annex XIII to Regulation (EU) No 1169/2011. Every other condition this
+        // calculator checks states its own figure; this one is three documents of reading
+        // before a number appears, and a card printing "oppfylt" would be publishing that
+        // reading as a verdict on the label's behalf. The uncertainty is about the chain, not
+        // about the arithmetic.
+        //
+        // Switching them back on is uncommenting the two lines below and the block in
+        // BuildVitaminMineralClaimResults that consumed them. FormatSourceOfResult, which
+        // holds the 15 % / 7,5 % gate and its NRV citation, is left in place for that day.
+        //
+        // The combined "Kalsium og vitamin D" claim is not affected and still runs: see
+        // CalciumVitaminDPortionClaimId, whose condition is a plain 400 mg and 15 µg per
+        // daily portion with no cross-reference in it. Calcium and vitamin D therefore stay
+        // in the kilde picker, and entering only one of them now yields no claim at all.
         private static readonly Dictionary<string, long[]> SourceOfClaimIds =
             new(StringComparer.OrdinalIgnoreCase)
             {
-                [CalciumName] = new[] { 757897L, 760473L, 760509L, 760545L, 760581L, 760617L, 760653L },
-                [VitaminDName] = new[] { 766997L, 767037L },
+                // [CalciumName] = new[] { 757897L, 760473L, 760509L, 760545L, 760581L, 760617L, 760653L },
+                // [VitaminDName] = new[] { 766997L, 767037L },
             };
 
         // The one claim in scope naming both nutrients. It only makes sense once calcium and
@@ -139,10 +322,52 @@ namespace Backend.Services
                 ["Rye fibre"] = "Rugfiber",
                 ["Wheat bran fibre"] = "Hvetekli-fiber",
                 ["Oat grain fibre"] = "Havrefiber",
+                ["Sugar beet fibre"] = "Sukkerbetefiber",
+                ["Glucomannan"] = "Glukomannan",
+                ["Hydroxypropyl methylcellulose"] = "Hydroksypropylmetylcellulose",
+                ["Pectins"] = "Pektin",
+                ["Activated charcoal"] = "Aktivt kull",
+                ["Lactulose"] = "Laktulose",
+                ["Meat or fish"] = "Kjøtt eller fisk",
+                ["Chitosan"] = "Kitosan",
+                ["Creatine"] = "Kreatin",
+                ["Dried plums"] = "Tørkede svisker",
+                ["Guar gum"] = "Guarkjernemel",
+                ["Native chicory inulin"] = "Inulin fra sikori",
+                ["Walnuts"] = "Valnøtter",
+                ["Green kiwifruit"] = "Grønn kiwi",
+                ["Vitamin C"] = "Vitamin C",
+                ["Cocoa flavanols"] = "Kakaoflavanoler",
+                ["Olive oil polyphenols"] = "Polyfenoler i olivenolje",
+                ["Choline"] = "Kolin",
+                ["Betaine"] = "Betain",
+                ["Melatonin"] = "Melatonin",
+                ["Linoleic acid"] = "Linolsyre",
+                ["Arabinoxylan"] = "Arabinoksylan",
             };
 
         private static string NutrientLabel(string name) =>
             NutrientLabels.GetValueOrDefault(name, name);
+
+        // Whether a check cannot reach a verdict at all without the declared portion size, so
+        // the picker can say up front that Porsjonsstørrelse will be needed.
+        //
+        // Read off the check rather than listed at the picker, which is where this lived and
+        // where it had already gone stale: BetaGlucanMealRatio needs a portion and was not in
+        // that list, and got away with it only because its substance carries a per-portion
+        // rule as well. A substance whose only rule is a ratio, like Arabinoxylan, would not
+        // have asked for one.
+        //
+        // PerHundredOrPortionThreshold is deliberately false: its per-100 route needs no
+        // portion, so a product that clears that route should not be told to supply one.
+        private static bool NeedsPortionSize(OtherClaimCheck check) => check switch
+        {
+            OtherClaimCheck.PortionThreshold => true,
+            OtherClaimCheck.DailyIntakeThreshold => true,
+            OtherClaimCheck.BetaGlucanMealRatio => true,
+            OtherClaimCheck.CarbsRatioThreshold => true,
+            _ => false,
+        };
 
         // Short link label for the EFSA scientific opinion behind each policy_item_id above (plus
         // ResistantStarchClaimId) — the EU register API only returns a bare citation like
@@ -172,6 +397,61 @@ namespace Backend.Services
             [755405] = "Les EFSA-uttalelsen om kalsium, vitamin D og tap av beinmineral",
             [766997] = "Les EFSA-uttalelsen om vitamin D og opptak av kalsium og fosfor",
             [767037] = "Les EFSA-uttalelsen om vitamin D og kalsiumnivået i blodet",
+            [756641] = "Les EFSA-uttalelsen om sukkerbetefiber og avføringsvolum",
+            [764437] = "Les EFSA-uttalelsen om protein og vekst i muskelmasse",
+            [764477] = "Les EFSA-uttalelsen om protein og vedlikehold av muskelmasse",
+            [764517] = "Les EFSA-uttalelsen om protein og vedlikehold av normale bein",
+            [758077] = "Les EFSA-uttalelsen om protein og beinvekst hos barn",
+            [755661] = "Les EFSA-uttalelsen om umettet fett, blodkolesterol og hjertesykdom",
+            [763545] = "Les EFSA-uttalelsen om umettet fett og LDL-kolesterol",
+            [763849] = "Les EFSA-uttalelsen om oljesyre og LDL-kolesterol",
+            [759985] = "Les EFSA-uttalelsen om alfa-linolensyre og blodkolesterol",
+            [761529] = "Les EFSA-uttalelsen om EPA, DHA og hjertefunksjon",
+            [756309] = "Les EFSA-uttalelsen om betaglukaner fra bygg og blodkolesterol",
+            [761449] = "Les EFSA-uttalelsen om DHA og hjernefunksjon",
+            [761489] = "Les EFSA-uttalelsen om DHA og synet",
+            [762017] = "Les EFSA-uttalelsen om glukomannan og vekttap",
+            [762089] = "Les EFSA-uttalelsen om HPMC og blodsukker etter måltid",
+            [764069] = "Les EFSA-uttalelsen om pektin og blodsukker etter måltid",
+            [759949] = "Les EFSA-uttalelsen om aktivt kull og tarmgass",
+            [762653] = "Les EFSA-uttalelsen om laktulose og tarmpassasje",
+            [763365] = "Les EFSA-uttalelsen om kjøtt eller fisk og opptak av jern",
+            // Withheld with the chewing gum claims themselves.
+            // [765261] = "Les EFSA-uttalelsen om sukkerfri tyggegummi og tannmineralisering",
+            // [765305] = "Les EFSA-uttalelsen om sukkerfri tyggegummi og plakksyrer",
+            // [765345] = "Les EFSA-uttalelsen om sukkerfri tyggegummi og munntørrhet",
+            // [765381] = "Les EFSA-uttalelsen om tyggegummi med karbamid og plakksyrer",
+            // [756929] = "Les EFSA-uttalelsen om sukkerfri tyggegummi og nøytralisering av plakksyrer",
+            // [756969] = "Les EFSA-uttalelsen om sukkerfri tyggegummi og demineralisering av tenner",
+            [760853] = "Les EFSA-uttalelsen om kitosan og blodkolesterol",
+            [761413] = "Les EFSA-uttalelsen om kreatin og fysisk yteevne",
+            [834173] = "Les EFSA-uttalelsen om svisker og tarmfunksjon",
+            [762053] = "Les EFSA-uttalelsen om guarkjernemel og blodkolesterol",
+            [838109] = "Les EFSA-uttalelsen om inulin fra sikori og tarmfunksjon",
+            [767369] = "Les EFSA-uttalelsen om valnøtter og blodårene",
+            [2638312] = "Les EFSA-uttalelsen om grønn kiwi og tarmfunksjon",
+            [766445] = "Les EFSA-uttalelsen om vitamin C og immunforsvaret etter hard trening",
+            [835181] = "Les EFSA-uttalelsen om kakaoflavanoler og blodårenes elastisitet",
+            [763885] = "Les EFSA-uttalelsen om polyfenoler i olivenolje og blodfettene",
+            [761973] = "Les EFSA-uttalelsen om glukomannan og blodkolesterol",
+            [762125] = "Les EFSA-uttalelsen om HPMC og blodkolesterol",
+            [764105] = "Les EFSA-uttalelsen om pektin og blodkolesterol",
+            [755369] = "Les EFSA-uttalelsen om DHA og hjerneutviklingen hos fosteret",
+            [756569] = "Les EFSA-uttalelsen om DHA og øyeutviklingen hos fosteret",
+            [761901] = "Les EFSA-uttalelsen om mettet fett og blodkolesterol",
+            [761937] = "Les EFSA-uttalelsen om natrium og blodtrykk",
+            [831109] = "Les EFSA-uttalelsen om DHA og triglyserider i blodet",
+            [833485] = "Les EFSA-uttalelsen om EPA, DHA og blodtrykk",
+            [833785] = "Les EFSA-uttalelsen om EPA, DHA og triglyserider i blodet",
+            [760925] = "Les EFSA-uttalelsen om kolin og homocysteinomsetningen",
+            [760961] = "Les EFSA-uttalelsen om kolin og fettomsetningen",
+            [760997] = "Les EFSA-uttalelsen om kolin og leverfunksjonen",
+            [760173] = "Les EFSA-uttalelsen om betain og homocysteinomsetningen",
+            [763401] = "Les EFSA-uttalelsen om melatonin og jetlag",
+            [763437] = "Les EFSA-uttalelsen om melatonin og innsovningstid",
+            [762689] = "Les EFSA-uttalelsen om linolsyre og blodkolesterol",
+            [760025] = "Les EFSA-uttalelsen om arabinoksylan og blodsukker etter måltid",
+            [836625] = "Les EFSA-uttalelsen om karbohydrater og hjernefunksjon",
         };
 
         // Resistant starch (764557) isn't a user-selectable "Other" substance like the ones above —
@@ -179,29 +459,33 @@ namespace Backend.Services
         // checked directly from NutritionInputDTO instead, alongside the Karbohydrater claims.
         private const long ResistantStarchClaimId = 764557;
 
-        // Karbohydrater claims (836625 "brain function", 836661 "muscle recovery") were
-        // checked directly from NutritionInputDTO.Carbs, but both are dropped:
-        // - Brain function (>=20g carbs per quantified portion + low-sugar/no-added-sugar)
-        //   removed at product owner's request.
-        // - Muscle recovery (4g carbs per kg body weight) is permanently unresolvable — the
-        //   calculator has no body-weight input and never will.
+        // The two Karbohydrater claims, and they ended up in opposite places.
+        //
+        // 836625 "brain function" is live again, as NutritionGate.CarbsBrainFunction, which
+        // is also where the history of its removal and the one assumption it still rests on
+        // are written down. It is no longer checked here.
+        //
+        // 836661 "muscle recovery" is permanently unresolvable and stays out. Its condition
+        // is 4 g of carbohydrate per kg of body weight, from all sources, inside a window
+        // after exercise. The calculator has no body-weight input and should not have one:
+        // nothing about a product's composition answers a question about who eats it.
 
         // The kilde picker's options. Neither the category nor the food type changes them, so
         // they're built once at startup rather than per request. Nothing mutates the list or
         // the options in it; they are serialised onto the schema response as they are.
         //
-        // Every fibre source in OtherClaimRegistry is a subset of Kostfiber; a vitamin or
-        // mineral is not. RequiresPortionSize is read off the rules rather than listed by hand,
-        // so a claim that stops being per-portion stops asking for one.
+        // Everything here is read off the substance rather than listed by hand, so a kilde
+        // that stops being a fibre, changes unit, or stops being per-portion says so in one
+        // place and the picker follows.
         private static readonly List<KildeOptionDTO> KildeOptions = OtherClaimRegistry
             .Select(entry => new KildeOptionDTO
             {
                 Value = entry.Key,
                 Label = NutrientLabel(entry.Key),
-                Unit = "g",
+                Unit = entry.Value.Unit,
                 Kind = "other",
-                RequiresKostfiber = true,
-                RequiresPortionSize = entry.Value.Any(r => r.Check == OtherClaimCheck.GramThreshold),
+                RequiresKostfiber = entry.Value.IsFibre,
+                RequiresPortionSize = entry.Value.Rules.Any(r => NeedsPortionSize(r.Check)),
             })
             .Concat(VitaminMineralDefs.Select(entry => new KildeOptionDTO
             {
@@ -241,8 +525,8 @@ namespace Backend.Services
                 // A name with no registered claim is skipped, the same as an unregistered
                 // vitamin or mineral. The picker only offers registry keys, so this can only
                 // be reached by a request that didn't come from the form.
-                if (OtherClaimRegistry.TryGetValue(o.Name, out var rules))
-                    results.AddRange(await BuildEuOtherClaimResults(o.Name, o.Amount, portionSize, n, foodType, energyUnit, rules));
+                if (OtherClaimRegistry.TryGetValue(o.Name, out var substance))
+                    results.AddRange(await BuildEuOtherClaimResults(o.Name, o.Amount, portionSize, n, foodType, energyUnit, substance));
             }
 
             return results;
@@ -252,19 +536,33 @@ namespace Backend.Services
         // rule is checked against the data this calculator actually collects.
         private async Task<List<HealthClaimResultDTO>> BuildEuOtherClaimResults(
             string nutrient, decimal amount, decimal portionSize, NutritionInputDTO n, string foodType,
-            string energyUnit, OtherClaimRule[] rules)
+            string energyUnit, OtherSubstance substance)
         {
             var results = new List<HealthClaimResultDTO>();
+            string unit = substance.Unit;
 
-            foreach (var rule in rules)
+            foreach (var rule in substance.Rules)
             {
                 var euClaim = await _euHealthClaims.GetByIdAsync(rule.PolicyItemId);
                 if (euClaim == null) continue;
 
                 string meetsReq = rule.Check switch
                 {
-                    OtherClaimCheck.GramThreshold =>
-                        FormatPortionThresholdResult(amount, portionSize, rule.MinGrams!.Value, "g"),
+                    OtherClaimCheck.PortionThreshold =>
+                        FormatPortionThresholdResult(amount, portionSize, rule.MinAmount!.Value, unit),
+                    OtherClaimCheck.DailyIntakeThreshold =>
+                        FormatDailyIntakeResult(amount, portionSize, rule.MinAmount!.Value, unit),
+                    OtherClaimCheck.PerHundredThreshold =>
+                        FormatPerHundredThresholdResult(amount, rule.MinAmount!.Value, unit, foodType),
+                    OtherClaimCheck.PerHundredOrPortionThreshold =>
+                        FormatPerHundredOrPortionThresholdResult(
+                            amount, portionSize, rule.MinAmount!.Value, unit, foodType),
+                    OtherClaimCheck.PerHundredAndKcalThreshold =>
+                        FormatPerHundredAndKcalThresholdResult(
+                            amount, rule.MinAmount!.Value, unit, foodType, energyUnit, n),
+                    OtherClaimCheck.CarbsRatioThreshold =>
+                        FormatCarbsRatioThresholdResult(
+                            amount, portionSize, rule.MinAmount!.Value, n.Carbs, unit),
                     OtherClaimCheck.HighFibreSource =>
                         FormatHighFibreSourceResult(amount, energyUnit, n),
                     OtherClaimCheck.BetaGlucanMealRatio =>
@@ -274,9 +572,21 @@ namespace Backend.Services
 
                 // Only the per-portion rule compares against something other than the number
                 // that was typed in, so only it restates the amount on that basis.
-                string amountDisplay = rule.Check == OtherClaimCheck.GramThreshold
-                    ? FormatPortionAmount(amount, portionSize, "g", foodType)
-                    : FormatPerHundredAmount(amount, "g", foodType);
+                string amountDisplay = rule.Check switch
+                {
+                    OtherClaimCheck.PortionThreshold =>
+                        FormatPortionAmount(amount, portionSize, unit, foodType),
+
+                    // The assumption is named here rather than in the verdict, because the
+                    // verdict's met text is matched exactly by the frontend and the report to
+                    // decide a card's colour, and anything appended to it reads as a failure.
+                    // The amount line is where the basis belongs anyway: it is what every
+                    // other claim's amount already restates.
+                    OtherClaimCheck.DailyIntakeThreshold =>
+                        FormatDailyIntakeAmount(amount, portionSize, unit, foodType),
+
+                    _ => FormatPerHundredAmount(amount, unit, foodType),
+                };
 
                 results.Add(BuildEuClaimResult(nutrient, amountDisplay, meetsReq, rule.PolicyItemId, euClaim));
             }
@@ -349,18 +659,26 @@ namespace Backend.Services
                 decimal amount = ConvertAmount(input.Amount, input.Unit, def.Unit);
                 amounts[input.Name] = amount;
 
+                // The amount is still recorded, because the combined claim below reads both
+                // nutrients back from here.
+                //
+                // What follows is commented out with the ids in SourceOfClaimIds, rather than
+                // left to iterate a deliberately empty list: a loop that can never produce a
+                // row reads as a bug to whoever finds it next. The comment on those ids says
+                // why they are withheld.
+                //
                 // The source-of threshold is itself per 100 g / 100 ml, so the typed number is
                 // already the one being compared. Nothing to restate but the basis.
-                string amountDisplay = FormatPerHundredAmount(amount, def.Unit, foodType);
-                string meetsReq = FormatSourceOfResult(amount, def, foodType);
-
-                foreach (var id in SourceOfClaimIds.GetValueOrDefault(input.Name, Array.Empty<long>()))
-                {
-                    var euClaim = await _euHealthClaims.GetByIdAsync(id);
-                    if (euClaim == null) continue;
-                    results.Add(BuildEuClaimResult(input.Name, amountDisplay, meetsReq, id, euClaim));
-                }
-
+                //
+                // string amountDisplay = FormatPerHundredAmount(amount, def.Unit, foodType);
+                // string meetsReq = FormatSourceOfResult(amount, def, foodType);
+                //
+                // foreach (var id in SourceOfClaimIds.GetValueOrDefault(input.Name, Array.Empty<long>()))
+                // {
+                //     var euClaim = await _euHealthClaims.GetByIdAsync(id);
+                //     if (euClaim == null) continue;
+                //     results.Add(BuildEuClaimResult(input.Name, amountDisplay, meetsReq, id, euClaim));
+                // }
             }
 
             if (amounts.TryGetValue("Calcium", out decimal calciumMg) &&
@@ -487,6 +805,127 @@ namespace Backend.Services
                   $"porsjonen inneholder {FormatNo(amountInPortion)} {unit})";
         }
 
+        // "Food which provides a daily intake of X of the substance."
+        //
+        // The figure is about the food, not about a recommendation: a claim may be made only
+        // for a food that delivers that much. What the register does not say is over how much
+        // food, so the declared portion stands in for the day's intake, which is the same
+        // assumption 755405 rests on and was accepted for the same reason: the alternative is
+        // to check nothing at all.
+        //
+        // It is a longer reach than 755405's, whose text at least says "per daily portion"
+        // where these say only "per day", so the amount line on the card states the
+        // substitution outright instead of leaving it to be inferred. See
+        // FormatDailyIntakeAmount, and the condition itself is printed in full under Vilkår
+        // for bruk as always.
+        private static string FormatDailyIntakeResult(
+            decimal amountPer100, decimal portionSize, decimal minPerDay, string unit)
+        {
+            if (portionSize <= 0) return $"{CannotComputePrefix} (porsjonsstørrelse mangler)";
+
+            decimal amountInPortion = Math.Round(amountPer100 * portionSize / 100m, 3);
+            return amountInPortion >= minPerDay
+                ? MeetsRequirementText
+                : $"Oppfyller ikke gitt krav (trenger minst {FormatNo(minPerDay)} {unit} per dag, " +
+                  $"porsjonen inneholder {FormatNo(amountInPortion)} {unit})";
+        }
+
+        // The amount beside a daily-intake verdict, which has to say what was substituted for
+        // what. "3 g per porsjon" alone beside a condition written per day would look like a
+        // figure the register asked for.
+        private static string FormatDailyIntakeAmount(
+            decimal amountPer100, decimal portionSize, string unit, string foodType)
+        {
+            if (amountPer100 <= 0) return "ikke oppgitt";
+            if (portionSize <= 0) return FormatPerHundredAmount(amountPer100, unit, foodType);
+            return $"{FormatNo(Math.Round(amountPer100 * portionSize / 100m, 3))} {unit} " +
+                   "per porsjon, regnet som dagsinntak";
+        }
+
+        // A plain concentration, with no portion and no conversion at the comparison: the
+        // number typed in is already the number being compared.
+        private static string FormatPerHundredThresholdResult(
+            decimal amountPer100, decimal minPer100, string unit, string foodType)
+        {
+            string per = PerHundredLabel(foodType);
+            return amountPer100 >= minPer100
+                ? MeetsRequirementText
+                : $"Oppfyller ikke gitt krav (trenger minst {FormatNo(minPer100)} {unit} {per}, " +
+                  $"produktet inneholder {FormatNo(amountPer100)} {unit})";
+        }
+
+        // "At least X per 100 g or 100 ml or per single portion of food." Two routes joined
+        // by "or", so either one carries the claim and a missing portion size only closes the
+        // second. The per-portion route can only help where the portion is heavier than 100 g,
+        // but it is checked rather than reasoned about, because the condition offers it.
+        private static string FormatPerHundredOrPortionThresholdResult(
+            decimal amountPer100, decimal portionSize, decimal min, string unit, string foodType)
+        {
+            if (amountPer100 >= min) return MeetsRequirementText;
+
+            string per = PerHundredLabel(foodType);
+            if (portionSize <= 0)
+                return $"Oppfyller ikke gitt krav (trenger minst {FormatNo(min)} {unit} {per} " +
+                       $"eller per porsjon, produktet har {FormatNo(amountPer100)} {unit} {per} " +
+                       "og porsjonsstørrelse mangler)";
+
+            decimal amountInPortion = Math.Round(amountPer100 * portionSize / 100m, 3);
+            return amountInPortion >= min
+                ? MeetsRequirementText
+                : $"Oppfyller ikke gitt krav (trenger minst {FormatNo(min)} {unit} {per} eller " +
+                  $"per porsjon, produktet har {FormatNo(amountPer100)} {unit} {per} og " +
+                  $"{FormatNo(amountInPortion)} {unit} per porsjon)";
+        }
+
+        // "At least X per 100 g and per 100 kcal." One figure on two bases, both of which have
+        // to clear, which is the test Omega3RouteMet performs on the form's own fatty-acid
+        // fields. Written separately rather than reusing that helper because this one has to
+        // report which of the two bases fell short, and in the substance's own unit.
+        //
+        // No energy means no second basis, so the claim is withheld rather than decided on the
+        // first alone. An empty form must not produce a verdict, which is the rule
+        // EnergyEntered exists for.
+        private static string FormatPerHundredAndKcalThresholdResult(
+            decimal amountPer100, decimal min, string unit, string foodType,
+            string energyUnit, NutritionInputDTO n)
+        {
+            decimal kcal = EnergyAsKcal(energyUnit, n);
+            if (kcal <= 0) return $"{CannotComputePrefix} (energi mangler)";
+
+            decimal per100Kcal = Math.Round(amountPer100 * 100m / kcal, 3);
+            string per = PerHundredLabel(foodType);
+            return amountPer100 >= min && per100Kcal >= min
+                ? MeetsRequirementText
+                : $"Oppfyller ikke gitt krav (trenger minst {FormatNo(min)} {unit} både {per} og " +
+                  $"per 100 kcal, produktet har {FormatNo(amountPer100)} {unit} {per} og " +
+                  $"{FormatNo(per100Kcal)} {unit} per 100 kcal)";
+        }
+
+        // "At least X of the substance per 100 g of available carbohydrates in a quantified
+        // portion", with minPerHundredCarbs being that X.
+        //
+        // The portion cancels out of a ratio, so this reaches the same verdict for any portion
+        // size. It is still required, for the reason BetaGlucanMealRatio requires it: the
+        // condition asks for a quantified portion, and the figures the card reports are the
+        // ones in that portion.
+        private static string FormatCarbsRatioThresholdResult(
+            decimal amountPer100, decimal portionSize, decimal minPerHundredCarbs,
+            decimal carbsPer100g, string unit)
+        {
+            if (portionSize <= 0) return $"{CannotComputePrefix} (porsjonsstørrelse mangler)";
+
+            decimal carbsPerPortion = carbsPer100g * portionSize / 100m;
+            if (carbsPerPortion <= 0) return $"{CannotComputePrefix} (ingen karbohydrater oppgitt)";
+
+            decimal amountInPortion = Math.Round(amountPer100 * portionSize / 100m, 3);
+            decimal required = Math.Round(carbsPerPortion * minPerHundredCarbs / 100m, 3);
+            return amountInPortion >= required
+                ? MeetsRequirementText
+                : $"Oppfyller ikke gitt krav (trenger minst {FormatNo(required)} {unit} per porsjon " +
+                  $"mot {FormatNo(Math.Round(carbsPerPortion, 3))} g karbohydrater, porsjonen " +
+                  $"inneholder {FormatNo(amountInPortion)} {unit})";
+        }
+
         // "≥4g beta-glucan per 30g available carbohydrates in a quantified portion" — uses this
         // entry's own portion size, not a product-wide serving size.
         private static string FormatBetaGlucanMealRatioResult(decimal betaGlucanPer100g, decimal portionSize, decimal carbsPer100g)
@@ -532,5 +971,568 @@ namespace Backend.Services
                 EfsaQuestionTitle = EfsaOpinionTitles.GetValueOrDefault(ResistantStarchClaimId, claim.EfsaQuestion),
             };
         }
+
+        // ── Health claims gated by a nutrition claim ─────────────────────────
+        //
+        // Nine authorised claims whose entire condition of use is one sentence pointing at a
+        // nutrition claim: "may be used only for food which is at least a source of protein
+        // as referred to in the claim SOURCE OF PROTEIN as listed in the Annex to Regulation
+        // (EC) No 1924/2006", and the same sentence for HIGH UNSATURATED FAT and for SOURCE
+        // OF OMEGA 3 FATTY ACIDS.
+        //
+        // That is the same shape as the calcium and vitamin D claims withheld further up this
+        // file, and these are implemented for the reason those are not. The nutrition claims
+        // these point at are ones the calculator already evaluates, from figures the Annex
+        // itself states, and already shows with those figures in the EFSA nutrition section.
+        // Nothing has to be read into them. The withheld ones point instead at SOURCE OF
+        // [NAME OF VITAMIN/S] AND/OR [NAME OF MINERAL/S], whose figure is not in the Annex
+        // at all but in the "significant amount" of Annex XIII to Regulation (EU) No
+        // 1169/2011.
+        //
+        // Every gate below calls the very predicate the nutrition row was built from, so a
+        // health card here cannot reach a different verdict than the nutrition claim it
+        // depends on.
+        private enum NutritionGate
+        {
+            // SOURCE OF PROTEIN: at least 12 % of the energy from protein.
+            SourceOfProtein,
+            // HIGH UNSATURATED FAT: at least 70 % of the fatty acids from mono- and
+            // polyunsaturated fat, and more than 20 % of the energy from them.
+            HighUnsaturatedFat,
+            // The alfa-linolensyre route of SOURCE OF OMEGA 3 FATTY ACIDS: at least 0,3 g
+            // per 100 g and per 100 kcal. That route specifically and not the claim as a
+            // whole, because the condition reads "at least a source of ALA": a product
+            // carrying the nutrition claim on EPA and DHA alone is not a source of ALA and
+            // must not be given this card.
+            SourceOfAla,
+            // The other route, at least 40 mg of the two summed on the same two bases, and
+            // likewise only that route.
+            SourceOfEpaDha,
+            // Not a route of that claim at all: 761449 and 761489 state their own figure,
+            // "at least 40 mg of DHA per 100 g and per 100 kcal", measured on DHA by itself.
+            // It is the same number as the EPA and DHA route above and is not the same test,
+            // so it gets its own constant rather than borrowing SourceOfOmega3EpaDha.
+            DhaAlone,
+            // Also DHA on its own, and also per portion, but against a figure the register
+            // states per day: "food which provides a daily intake of at least 200 mg DHA".
+            // Separate from DhaAlone because that one is a concentration and this one is a
+            // quantity in a serving, so they can disagree about the same product.
+            DhaDailyIntake,
+            // "Food which is at least low in saturated fatty acids, as referred to in the
+            // claim LOW SATURATED FAT, or reduced in saturated fatty acids as referred to in
+            // the claim REDUCED [NAME OF NUTRIENT]." 761901.
+            //
+            // Two routes joined by "or", and only the first is answerable here: REDUCED is
+            // one of the four Annex claims that needs a reference product's figure, which the
+            // form does not collect. So a product that qualifies only by being reduced gets
+            // no card. That is a miss, never a wrong grant, which is the safe direction and
+            // the same trade accepted on SourceOfAla. Wire it up to the reference-product
+            // input when that exists.
+            LowSaturatedFat,
+            // The same sentence about sodium, pointing at LOW SODIUM/SALT. 761937, with the
+            // same half-answered "or reduced" route.
+            LowSodium,
+            // "Food which provides a daily intake of 2 g of DHA and which contains DHA in
+            // combination with eicosapentaenoic acid (EPA)." 831109.
+            //
+            // Two conditions, not one: the figure is on DHA by itself, and EPA has to be
+            // present at all. That second half is why this is not EpaDhaDailyIntake2g under
+            // another label, even though both come to 2 g: there the 2 g is the sum, here the
+            // sum is irrelevant and only DHA counts toward it.
+            DhaWithEpaDailyIntake,
+            // "Food which provides a daily intake of 2 g of EPA and DHA." 833785, on the sum
+            // the form collects as two fields and EpaPlusDha adds.
+            EpaDhaDailyIntake2g,
+            // The same test at 3 g, for the blood-pressure claim 833485. A separate member
+            // rather than a threshold passed in, because the gate is what the switch below
+            // reads and a gate that means two different numbers is how a card ends up
+            // reporting the wrong one.
+            EpaDhaDailyIntake3g,
+            // 836625: "food which contains at least 20 g carbohydrates which are metabolised
+            // by humans, excluding polyols, per quantified portion and complies with the
+            // nutrition claim LOW SUGARS or WITH NO ADDED SUGARS". Its third sentence, that
+            // the effect needs 130 g of carbohydrate a day from all sources, is a duty for
+            // the label and is reported through Vilkår for bruk.
+            //
+            // This claim was live once and was deleted in 9f00c1e with the note "removed at
+            // product owner's request". Two things about that version are worth knowing
+            // before reading this one as a reversal of their decision:
+            //
+            //  - It was gated on nothing but "n.Carbs <= 0" and then showed its verdict
+            //    whether it passed or failed, so nearly every product opened the health panel
+            //    with a carbohydrate refusal nobody had asked for. That is the complaint the
+            //    met-only rule above exists to answer, and this entry is met-only.
+            //  - Its sugar half read ClaimWithNoAddedSugars(carbs, addedSugars), the
+            //    signature whose own comment now records that it tested whether the product
+            //    contained no sugar at all once the two sugar fields were merged, which is
+            //    Sukkerfri under another name. It now reads the producer's declaration.
+            //
+            // "Excluding polyols" is read off a declared polyol figure rather than assumed
+            // away. It was assumed away for one day: total carbohydrate includes polyols by
+            // the definition in Annex I to Regulation (EU) No 1169/2011, and a polyol-
+            // sweetened product also tends to clear LOW SUGARS, so such a product would have
+            // been granted this card on carbohydrate it does not metabolise. The form asks
+            // for the figure now. See MetabolisableCarbs.
+            CarbsBrainFunction,
+            // Withheld with the six claims that used it. "Chewing gum which complies with
+            // the conditions of use for the nutrition claim SUGARS FREE" is two things the
+            // calculator already knows: what kind of product this is, from Produkttype, and
+            // whether it clears 0,5 g sugars per 100 g, from ClaimSugarsFree.
+            //
+            // Nothing about the check was wrong. What is missing is a way in: Nøkkelhullet
+            // has no category for sweets or chewing gum, categories 1 to 32 cover none of
+            // them, and the form asks for a matkategori before it shows a nutrition table at
+            // all. So the only way to reach these six was to declare the gum as some
+            // unrelated category, which would then be assessed against that category's
+            // Nøkkelhullet limits and its EFSA claims. A right answer nobody can reach
+            // honestly is worse than no answer.
+            //
+            // Switching them back on is uncommenting this, the six entries in
+            // NutritionGatedClaims, the two switch arms that read them, ProductBasis
+            // .IsChewingGum, and the Tyggegummi option in ProductInfoSection.jsx. The real
+            // prerequisite is a way to assess a product that Nøkkelhullet does not cover.
+            // SugarsFreeChewingGum,
+        }
+
+        // 761449 and 761489's own figure. Written in grams because the form asks in grams,
+        // like the two omega-3 limits in the Annex it sits beside.
+        private const decimal DhaAloneMinG = 0.04m;   // 40 mg
+
+        // 755369 and 756569, the two claims about maternal intake, in the same unit.
+        private const decimal DhaDailyIntakeMinG = 0.2m;   // 200 mg per day
+
+        // The three high-dose omega-3 claims, whose figures the register states in grams per
+        // day outright rather than in milligrams. Written as the register writes them.
+        private const decimal DhaWithEpaDailyIntakeMinG = 2m;    // 831109
+        private const decimal EpaDhaDailyIntake2MinG = 2m;       // 833785
+        private const decimal EpaDhaDailyIntake3MinG = 3m;       // 833485
+
+        // 836625, per quantified portion rather than per day: the register states this one
+        // about the food outright.
+        private const decimal CarbsBrainFunctionMinPerPortionG = 20m;
+
+        // Nutrient is the Norwegian heading the card carries. Written in Norwegian here
+        // rather than as the register's English name, because none of these are picker
+        // substances whose name has to match what the request sends back; NutrientLabel
+        // passes through anything it has no translation for.
+        private record NutritionGatedClaim(long PolicyItemId, string Nutrient, NutritionGate Gate);
+
+        private static readonly NutritionGatedClaim[] NutritionGatedClaims =
+        {
+            // All four authorised protein claims carry the identical condition. 758077 is an
+            // Art.14(1)(b) claim about children's development and the other three are
+            // Art.13(1), which changes what the claim may say but not what it requires.
+            new(764437, "Protein", NutritionGate.SourceOfProtein),
+            new(764477, "Protein", NutritionGate.SourceOfProtein),
+            new(764517, "Protein", NutritionGate.SourceOfProtein),
+            new(758077, "Protein", NutritionGate.SourceOfProtein),
+
+            // 755661 carries a second condition the calculator cannot see, "the claim may
+            // only be used on fats and oils". Like every other condition about what kind of
+            // product this is, it is reported through Vilkår for bruk rather than used to
+            // withhold a verdict. See the note on MeetsRequirementText.
+            new(755661, "Umettet fett", NutritionGate.HighUnsaturatedFat),
+            new(763545, "Umettet fett", NutritionGate.HighUnsaturatedFat),
+            // A claim about oleic acid whose condition is nevertheless about unsaturated fat
+            // as a whole, which is why the amount beside it names what was measured.
+            new(763849, "Oljesyre", NutritionGate.HighUnsaturatedFat),
+
+            new(759985, "Alfa-linolensyre", NutritionGate.SourceOfAla),
+            new(761529, "EPA og DHA", NutritionGate.SourceOfEpaDha),
+
+            // Measured on DHA alone, so a product carrying 761529 on a sum made up mostly of
+            // EPA does not carry these.
+            new(761449, "DHA", NutritionGate.DhaAlone),
+            new(761489, "DHA", NutritionGate.DhaAlone),
+
+            // Both carry a duty to tell pregnant and lactating women that the effect needs
+            // 200 mg of DHA on top of the 250 mg of DHA and EPA recommended for adults. That
+            // is a sentence for the label, reported through Vilkår for bruk; the part about
+            // the food is the 200 mg it has to provide.
+            new(755369, "DHA", NutritionGate.DhaDailyIntake),
+            new(756569, "DHA", NutritionGate.DhaDailyIntake),
+
+            // The two claims about eating less of something, which is why the heading names
+            // the nutrient weighed and not a nutrient added. Both carry a route the
+            // calculator cannot follow; see NutritionGate.LowSaturatedFat.
+            new(761901, "Mettet fett", NutritionGate.LowSaturatedFat),
+            new(761937, "Salt", NutritionGate.LowSodium),
+
+            // The three high-dose omega-3 claims. All three also carry a duty to warn against
+            // exceeding 5 g of EPA and DHA a day from supplements, which is a sentence for the
+            // label and is reported through Vilkår for bruk.
+            new(831109, "DHA", NutritionGate.DhaWithEpaDailyIntake),
+            new(833785, "EPA og DHA", NutritionGate.EpaDhaDailyIntake2g),
+            new(833485, "EPA og DHA", NutritionGate.EpaDhaDailyIntake3g),
+
+            // The one claim here with two conditions of different kinds: a quantity in the
+            // portion and a cross-reference to a nutrition claim. See
+            // NutritionGate.CarbsBrainFunction, including what the polyol row would fix.
+            new(836625, "Karbohydrater", NutritionGate.CarbsBrainFunction),
+
+            // Six authorised claims on one condition, withheld because no matkategori
+            // reaches them. See NutritionGate.SugarsFreeChewingGum for why.
+            //
+            // 756929 and 756969 state no composition figure of their own beyond being
+            // sugar-free chewing gum; the other four cross-reference SUGARS FREE in so many
+            // words. 765381 carries one condition more, "each piece of sugar-free chewing gum
+            // should contain at least 20 mg of carbamide", which is a figure per piece about
+            // an additive that no nutrition table holds, so it would have been reported
+            // through Vilkår for bruk rather than checked.
+            //
+            // new(765261, "Sukkerfri tyggegummi", NutritionGate.SugarsFreeChewingGum),
+            // new(765305, "Sukkerfri tyggegummi", NutritionGate.SugarsFreeChewingGum),
+            // new(765345, "Sukkerfri tyggegummi", NutritionGate.SugarsFreeChewingGum),
+            // new(765381, "Sukkerfri tyggegummi", NutritionGate.SugarsFreeChewingGum),
+            // new(756929, "Sukkerfri tyggegummi", NutritionGate.SugarsFreeChewingGum),
+            // new(756969, "Sukkerfri tyggegummi", NutritionGate.SugarsFreeChewingGum),
+        };
+
+        private async Task<List<HealthClaimResultDTO>> CheckNutritionGatedHealthClaims(
+            NutritionInputDTO n, string foodType, string energyUnit, ProductBasis product,
+            ProductDeclarations declarations)
+        {
+            var results = new List<HealthClaimResultDTO>();
+
+            foreach (var gated in NutritionGatedClaims)
+            {
+                // The gate decides whether there is a card at all, so by the time one is
+                // built the verdict is settled and there is only the amount left to say.
+                if (!NutritionGateMet(gated.Gate, foodType, energyUnit, n, product, declarations))
+                    continue;
+
+                var euClaim = await _euHealthClaims.GetByIdAsync(gated.PolicyItemId);
+                if (euClaim == null) continue;
+
+                string amountDisplay = gated.Gate switch
+                {
+                    NutritionGate.SourceOfProtein =>
+                        FormatNamedPerHundredAmount(n.Protein, "protein", foodType),
+
+                    NutritionGate.HighUnsaturatedFat =>
+                        FormatNamedPerHundredAmount(
+                            n.MonounsaturatedFat + n.PolyunsaturatedFat, "umettet fett", foodType),
+
+                    NutritionGate.SourceOfAla =>
+                        FormatNamedPerHundredAmount(n.AlphaLinolenicAcid, "alfa-linolensyre", foodType),
+
+                    NutritionGate.SourceOfEpaDha =>
+                        FormatNamedPerHundredAmount(EpaPlusDha(n), "EPA og DHA", foodType),
+
+                    NutritionGate.DhaAlone =>
+                        FormatNamedPerHundredAmount(n.DocosahexaenoicAcid, "DHA", foodType),
+
+                    NutritionGate.DhaDailyIntake =>
+                        FormatNamedDailyIntakeAmount(
+                            n.DocosahexaenoicAcid, "DHA", product.PortionSize, foodType),
+
+                    // The sum of saturated and trans fat, not saturated fat alone, because
+                    // that sum is what LOW SATURATED FAT sets its limit on and so what the
+                    // gate weighed. The nutrition row beside it reports the same sum.
+                    NutritionGate.LowSaturatedFat =>
+                        FormatNamedPerHundredAmount(
+                            n.SaturatedFat + n.TransFat, "mettet fett og transfett", foodType),
+
+                    // Salt rather than sodium: the form collects salt, LOW SODIUM/SALT is
+                    // stated either way, and SaltPerSodium converts the limit rather than the
+                    // declaration.
+                    NutritionGate.LowSodium =>
+                        FormatNamedPerHundredAmount(n.Salt, "salt", foodType),
+
+                    // DHA alone, since that is the figure its 2 g is measured on. The EPA half
+                    // of its condition is a presence test with no figure to report.
+                    NutritionGate.DhaWithEpaDailyIntake =>
+                        FormatNamedDailyIntakeAmount(
+                            n.DocosahexaenoicAcid, "DHA", product.PortionSize, foodType),
+
+                    NutritionGate.EpaDhaDailyIntake2g or NutritionGate.EpaDhaDailyIntake3g =>
+                        FormatNamedDailyIntakeAmount(
+                            EpaPlusDha(n), "EPA og DHA", product.PortionSize, foodType),
+
+                    // Per portion and not restated as a dagsinntak, because this threshold is
+                    // the register's own per-portion figure rather than a day's figure stood
+                    // in for. The sugar half of the condition carries no quantity to report.
+                    NutritionGate.CarbsBrainFunction =>
+                        FormatCarbsBrainFunctionAmount(n, product.PortionSize, foodType),
+
+                    // The figure that carried it is the sugars figure, so that is what the
+                    // card shows. Naming it matters more here than anywhere else: under the
+                    // heading "Sukkerfri tyggegummi" a bare "0 g per 100 g" would read as
+                    // the weight of the gum.
+                    //
+                    // NutritionGate.SugarsFreeChewingGum =>
+                    //     FormatNamedPerHundredAmount(
+                    //         n.NaturalSugars + n.AddedSugars, "sukkerarter", foodType),
+
+                    _ => "ikke oppgitt",
+                };
+
+                results.Add(BuildEuClaimResult(
+                    gated.Nutrient, amountDisplay, MeetsRequirementText, gated.PolicyItemId, euClaim));
+            }
+
+            return results;
+        }
+
+        // Whether the nutrition claim a card cross-references is met. This is both the
+        // verdict and the test for showing the card at all, by the product owner's decision:
+        // these nine appear only where they are met.
+        //
+        // That hides nothing a reader could have used. The cross-reference is the whole of
+        // each one's condition, so a failed card would have carried no figure the EFSA
+        // næringspåstander section does not already show under the very claim it points at.
+        // "Proteinkilde, 11,9 % mot 12 %" is the entire answer, and repeating it as four
+        // health cards said nothing further. These also have no opt-in the way a kilde does:
+        // every product declares protein, so without this test the panel opened with four
+        // refusals nobody had asked for, on a product whose owner may never have been
+        // interested in a protein claim.
+        //
+        // A blank voluntary field reaches the same answer by a different route and is still
+        // not read as a zero: the predicates below return false on a null rather than on a
+        // measurement. See CalculatorRequestDTO.MonounsaturatedFat.
+        //
+        // To show them with their reasons instead, test what was declared here (protein > 0,
+        // both fatty-acid classes present, the route's figure present) and restore the three
+        // formatters commented out below, which are kept for that.
+        private static bool NutritionGateMet(
+            NutritionGate gate, string foodType, string energyUnit, NutritionInputDTO n,
+            ProductBasis product, ProductDeclarations declarations) => gate switch
+        {
+            NutritionGate.SourceOfProtein => ClaimSourceOfProtein(energyUnit, n),
+            NutritionGate.HighUnsaturatedFat => ClaimHighUnsaturatedFat(energyUnit, n),
+
+            // The LOW route of each, which is the only one of the two the form can answer.
+            // Both call the nutrition partial's own predicate, so neither card can disagree
+            // with the næringspåstand it points at.
+            NutritionGate.LowSaturatedFat => ClaimLowSaturatedFat(foodType, energyUnit, n),
+            NutritionGate.LowSodium => ClaimLowSodium(n.Salt, product),
+
+            // One route each, not ClaimSourceOfOmega3: the conditions read "at least a source
+            // of ALA" and "at least a source of EPA and DHA", so a product carrying the
+            // nutrition claim on the other route is not what either one asks for.
+            NutritionGate.SourceOfAla =>
+                Omega3RouteMet(n.AlphaLinolenicAcid, SourceOfOmega3Ala, EnergyAsKcal(energyUnit, n)),
+            NutritionGate.SourceOfEpaDha =>
+                Omega3RouteMet(EpaPlusDha(n), SourceOfOmega3EpaDha, EnergyAsKcal(energyUnit, n)),
+
+            // Omega3RouteMet is the shape of the test, not a claim: one figure read per 100 g
+            // and per 100 kcal, both of which have to clear. That is word for word what
+            // 761449 and 761489 ask of DHA, so the same helper answers it.
+            NutritionGate.DhaAlone =>
+                Omega3RouteMet(n.DocosahexaenoicAcid, DhaAloneMinG, EnergyAsKcal(energyUnit, n)),
+
+            NutritionGate.DhaDailyIntake =>
+                product.PortionSize > 0
+                && n.DocosahexaenoicAcid is decimal dha
+                && dha * product.PortionSize / 100m >= DhaDailyIntakeMinG,
+
+            // The same per-portion-as-per-day substitution, with EPA's presence as a second
+            // term. EPA has to be declared and above zero, not merely declared: a producer who
+            // fills the field in as 0 has told us there is none, which is the opposite of
+            // "contains DHA in combination with EPA". A blank field is not read as a zero
+            // either, by the usual rule for the voluntary fatty-acid figures.
+            NutritionGate.DhaWithEpaDailyIntake =>
+                product.PortionSize > 0
+                && n.DocosahexaenoicAcid is decimal dhaWithEpa
+                && n.EicosapentaenoicAcid is decimal epa && epa > 0
+                && dhaWithEpa * product.PortionSize / 100m >= DhaWithEpaDailyIntakeMinG,
+
+            NutritionGate.EpaDhaDailyIntake2g =>
+                DailyIntakeGateMet(EpaPlusDha(n), product.PortionSize, EpaDhaDailyIntake2MinG),
+            NutritionGate.EpaDhaDailyIntake3g =>
+                DailyIntakeGateMet(EpaPlusDha(n), product.PortionSize, EpaDhaDailyIntake3MinG),
+
+            // Three terms, and the order matters only for reading: 20 g in the portion, then
+            // either of the two sugar routes. Both routes call the nutrition partial's own
+            // predicate, so this card cannot disagree with the Lavt sukkerinnhold or Uten
+            // tilsatt sukker row beside it, and the declaration one is the producer's answer
+            // rather than a reading of the sugar figure. See NutritionGate.CarbsBrainFunction
+            // for why n.Carbs is a slight overstatement of what the condition measures.
+            NutritionGate.CarbsBrainFunction =>
+                product.PortionSize > 0
+                && MetabolisableCarbs(n) * product.PortionSize / 100m
+                   >= CarbsBrainFunctionMinPerPortionG
+                && (ClaimLowSugars(foodType, n.NaturalSugars, n.AddedSugars)
+                    || ClaimWithNoAddedSugars(declarations)),
+
+            // NutritionGate.SugarsFreeChewingGum =>
+            //     product.IsChewingGum && ClaimSugarsFree(n.NaturalSugars, n.AddedSugars),
+
+            _ => false,
+        };
+
+        // "Carbohydrates which are metabolised by humans, excluding polyols": the declared
+        // Karbohydrat less the declared polyols.
+        //
+        // The subtraction is a definition and not an estimate. Annex I to Regulation (EU) No
+        // 1169/2011 defines carbohydrate as "any carbohydrate which is metabolised by humans,
+        // and includes polyols", so the figure on the label already contains them and 836625
+        // carves them back out in as many words. Sukkerarter is unaffected either way: the
+        // same Annex defines sugars as the mono- and disaccharides "but excludes polyols",
+        // which is what the Sukkerarter field's own help text already tells the user.
+        //
+        // Clamped at zero rather than trusted, since a declared polyol figure above the
+        // declared carbohydrate is a contradiction in the inputs, not a negative quantity of
+        // food.
+        //
+        // Only 836625 reads this. BetaGlucanMealRatio and CarbsRatioThreshold take n.Carbs as
+        // "available carbohydrates", and they are left alone on purpose: their conditions say
+        // nothing about polyols, and what "available" ought to mean is a separate question
+        // from this one.
+        private static decimal MetabolisableCarbs(NutritionInputDTO n) =>
+            Math.Max(0m, n.Carbs - (n.Polyols ?? 0m));
+
+        // "Food which provides a daily intake of X", with the portion standing in for the day.
+        // The same substitution 755405 and the DailyIntakeThreshold kilder rest on, and it is
+        // named as an assumption on the card rather than buried here: see
+        // FormatNamedDailyIntakeAmount.
+        //
+        // A null amount is a figure the producer never declared and is not read as a zero, so
+        // the claim is withheld rather than refused. A missing portion size withholds it too,
+        // since without one there is no day to convert to.
+        private static bool DailyIntakeGateMet(
+            decimal? amountPer100, decimal portionSize, decimal minPerDay) =>
+            portionSize > 0
+            && amountPer100 is decimal a
+            && a * portionSize / 100m >= minPerDay;
+
+        // The amount a gated card shows is the figure its own gate weighed, and it is named,
+        // because the substance a claim is about is not always the one its condition
+        // measures: 763849 is a claim about oleic acid whose condition is about unsaturated
+        // fat as a whole, so a bare "30 g per 100 g" under the heading "Oljesyre" would read
+        // as 30 g of oleic acid. AddOmega3Claim names its route's substance for the same
+        // reason.
+        private static string FormatNamedPerHundredAmount(
+            decimal? amount, string substance, string foodType) =>
+            amount is decimal a
+                ? $"{FormatNo(a)} g {substance} {PerHundredLabel(foodType)}"
+                : "ikke oppgitt";
+
+        // The plain version of the line above, for a gate whose figure the register states
+        // per portion outright with nothing to deduct from it. 836625 was its only caller for
+        // one day and now needs the polyol-aware one, so it has none; commented out rather
+        // than deleted, because the next per-portion gate is the one that wants it and this
+        // also records that a per-portion figure gets no "regnet som dagsinntak" note.
+        //
+        // private static string FormatNamedPortionAmount(
+        //     decimal? amountPer100, string substance, decimal portionSize, string foodType)
+        // {
+        //     if (amountPer100 is not decimal a) return "ikke oppgitt";
+        //     if (portionSize <= 0) return FormatNamedPerHundredAmount(a, substance, foodType);
+        //     return $"{FormatNo(Math.Round(a * portionSize / 100m, 3))} g {substance} per porsjon";
+        // }
+
+        // The carbohydrate figure 836625 weighed, which is not the one in the nutrition table
+        // whenever polyols were declared. The deduction is named in that case, because a reader
+        // checking the card against the table would otherwise find two numbers and no reason
+        // for the difference. Nothing is named when no polyols were declared, since then the
+        // two figures are the same number and saying so would only invite doubt about it.
+        private static string FormatCarbsBrainFunctionAmount(
+            NutritionInputDTO n, decimal portionSize, string foodType)
+        {
+            decimal metabolisable = MetabolisableCarbs(n);
+            if (portionSize <= 0)
+                return FormatNamedPerHundredAmount(metabolisable, "karbohydrater", foodType);
+
+            string line = $"{FormatNo(Math.Round(metabolisable * portionSize / 100m, 3))} g " +
+                          "karbohydrater per porsjon";
+            return n.Polyols is decimal polyols && polyols > 0
+                ? $"{line}, utenom {FormatNo(Math.Round(polyols * portionSize / 100m, 3))} g polyoler"
+                : line;
+        }
+
+        // The same line for a gate whose figure the register states per day, naming the
+        // substitution the way FormatDailyIntakeAmount does for the kilde substances.
+        private static string FormatNamedDailyIntakeAmount(
+            decimal? amountPer100, string substance, decimal portionSize, string foodType)
+        {
+            if (amountPer100 is not decimal a) return "ikke oppgitt";
+            if (portionSize <= 0) return FormatNamedPerHundredAmount(a, substance, foodType);
+            return $"{FormatNo(Math.Round(a * portionSize / 100m, 3))} g {substance} " +
+                   "per porsjon, regnet som dagsinntak";
+        }
+
+        // The three "why it fell short" formatters, commented out with the decision above
+        // rather than deleted, because restoring that decision is restoring these.
+        //
+        // They are left here and not left live-but-unused on purpose: a method that reads as
+        // though some card somewhere prints its wording, when no card can, is the kind of
+        // thing the next reader spends an afternoon on. Each one still states the rule it
+        // was written from, so they are also the record of what these conditions are.
+        //
+        // // "Food which is at least a source of protein". A miss reports the share of the
+        // // energy, not the grams, because the share is what the condition is about: "5 g
+        // // protein" beside "12" would quote a threshold the Annex sets nowhere.
+        // private static string FormatSourceOfProteinGate(string energyUnit, NutritionInputDTO n)
+        // {
+        //     if (ClaimSourceOfProtein(energyUnit, n)) return MeetsRequirementText;
+        //
+        //     bool useKcal = energyUnit == "energikcal";
+        //     decimal energy = useKcal ? n.EnergyKcal : n.EnergyKj;
+        //     if (energy <= 0) return $"{CannotComputePrefix} (energi mangler)";
+        //
+        //     decimal share = RoundAwayFromThreshold(
+        //         n.Protein * (useKcal ? KcalPerGramProtein : KjPerGramProtein) * 100m / energy,
+        //         "≥", 1);
+        //
+        //     return $"Oppfyller ikke gitt krav (trenger minst {FormatNo(SourceOfProteinEnergyShare)} % " +
+        //            $"av energien fra protein, produktet har {FormatNo(share)} %)";
+        // }
+        //
+        // // "Food which is high in unsaturated fatty acids", which is two conditions holding
+        // // at once, so a miss names whichever one refused it. Same choice
+        // // AddUnsaturatedFatClaim makes for the nutrition row, and made the same way round:
+        // // the share of fatty acids is reported unless it cleared, which leaves the energy
+        // // share as what refused it.
+        // private static string FormatHighUnsaturatedFatGate(string energyUnit, NutritionInputDTO n)
+        // {
+        //     if (ClaimHighUnsaturatedFat(energyUnit, n)) return MeetsRequirementText;
+        //
+        //     if (n.MonounsaturatedFat + n.PolyunsaturatedFat is not decimal g
+        //         || DeclaredFattyAcids(n) is not decimal total || total <= 0)
+        //         return $"{CannotComputePrefix} (fettsyrene er ikke oppgitt)";
+        //
+        //     // Both branches compare the unrounded share and print the rounded one, so the
+        //     // figure can never land on the wrong side of the limit it is printed beside.
+        //     if (g * 100m / total < HighUnsaturatedFattyAcidShare)
+        //         return $"Oppfyller ikke gitt krav (trenger minst {FormatNo(HighUnsaturatedFattyAcidShare)} % " +
+        //                $"av fettsyrene fra umettet fett, produktet har " +
+        //                $"{FormatNo(RoundAwayFromThreshold(g * 100m / total, "≥", 1))} %)";
+        //
+        //     bool useKcal = energyUnit == "energikcal";
+        //     decimal energy = useKcal ? n.EnergyKcal : n.EnergyKj;
+        //     if (energy <= 0) return $"{CannotComputePrefix} (energi mangler)";
+        //
+        //     decimal classEnergy = g * (useKcal ? KcalPerGramFat : KjPerGramFat);
+        //     return $"Oppfyller ikke gitt krav (trenger mer enn {FormatNo(HighFatEnergyShare)} % " +
+        //            $"av energien fra umettet fett, produktet har " +
+        //            $"{FormatNo(RoundAwayFromThreshold(classEnergy * 100m / energy, "≥", 2))} %)";
+        // }
+        //
+        // // One route of SOURCE OF OMEGA 3 FATTY ACIDS, whose figure the Annex states once
+        // // and reads twice, per 100 g and per 100 kcal, both of which have to clear. A miss
+        // // names the basis that refused it: the per-100 g one where the grams fell short,
+        // // the energy one where they cleared and the claim still failed.
+        // private static string FormatOmega3RouteGate(
+        //     decimal? amount, decimal limit, string substance,
+        //     string foodType, string energyUnit, NutritionInputDTO n)
+        // {
+        //     decimal kcal = EnergyAsKcal(energyUnit, n);
+        //     if (Omega3RouteMet(amount, limit, kcal)) return MeetsRequirementText;
+        //
+        //     if (amount is not decimal a) return $"{CannotComputePrefix} ({substance} er ikke oppgitt)";
+        //
+        //     if (a < limit)
+        //         return $"Oppfyller ikke gitt krav (trenger minst {FormatNo(limit)} g {substance} " +
+        //                $"{PerHundredLabel(foodType)}, produktet har {FormatNo(a)} g)";
+        //
+        //     if (kcal <= 0) return $"{CannotComputePrefix} (energi mangler)";
+        //
+        //     // Five decimals for the same reason AddOmega3Claim uses them: the smallest
+        //     // limit here is 0,04 g, and two decimals would floor a near miss onto the
+        //     // threshold and print a figure that argues against the verdict beside it.
+        //     return $"Oppfyller ikke gitt krav (trenger minst {FormatNo(limit)} g {substance} per 100 kcal, " +
+        //            $"produktet har {FormatNo(RoundAwayFromThreshold(a * 100m / kcal, "≥", 5))} g)";
+        // }
     }
 }

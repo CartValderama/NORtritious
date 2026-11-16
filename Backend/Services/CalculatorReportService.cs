@@ -36,6 +36,13 @@ namespace Backend.Services
             ("transfett", "Transfett"),
             ("karbohydrat", "Karbohydrat"),
             ("sukkerarter", "Sukkerarter"),
+            // Printed although it is voluntary, unlike the fatty-acid figures which are left
+            // out of this table. The difference is what a blank means: a blank fatty acid is
+            // unknown, so a "0 g" row would be a number nobody supplied, while a blank polyol
+            // row is read as none by the claim that uses it. Printing 0 g states the reading
+            // the verdict was reached on instead of hiding it. See
+            // CalculatorService.MetabolisableCarbs.
+            ("polyoler", "Polyoler"),
             ("kostfiber", "Kostfiber"),
             ("protein", "Protein"),
             ("salt", "Salt"),
@@ -78,8 +85,8 @@ namespace Backend.Services
             DrawSummary(section, request, result);
             DrawUsableClaims(section, request, result);
             DrawNutritionTable(section, request, schema);
-            DrawNokkelhullet(section, result);
-            DrawNutritionClaims(section, result);
+            DrawNokkelhullet(section, request, result);
+            DrawNutritionClaims(section, request, result);
             if (request.EfsaEnabled) DrawHealthClaims(section, result);
 
             var renderer = new PdfDocumentRenderer { Document = doc };
@@ -200,7 +207,7 @@ namespace Backend.Services
             {
                 ("Produkt", string.IsNullOrWhiteSpace(request.ProductName) ? "-" : request.ProductName),
                 ("Matvaregruppe", string.IsNullOrWhiteSpace(request.Matvaregruppe) ? "-" : request.Matvaregruppe),
-                ("Produkttype", request.FoodType == "liquid" ? "flytende form" : "fast form"),
+                ("Fysisk form", request.FoodType == "liquid" ? "flytende form" : "fast form"),
                 ("Dato", DateTime.Now.ToString("d. MMMM yyyy", NorwegianCulture)),
             };
 
@@ -320,6 +327,7 @@ namespace Backend.Services
                 ["transfett"] = n.TransFat,
                 ["karbohydrat"] = n.Carbs,
                 ["sukkerarter"] = n.NaturalSugars + n.AddedSugars,
+                ["polyoler"] = n.Polyols ?? 0m,
                 ["kostfiber"] = n.Fibre,
                 ["protein"] = n.Protein,
                 ["salt"] = n.Salt,
@@ -338,7 +346,7 @@ namespace Backend.Services
             AddTable(section, new[] { "Næringsstoff", "Verdi" }, rows);
         }
 
-        private void DrawNokkelhullet(Section section, CalculatorResponseDTO result)
+        private void DrawNokkelhullet(Section section, CalculatorReportRequestDTO request, CalculatorResponseDTO result)
         {
             DrawSectionHeading(section, "Nøkkelhullet - kravvurdering");
 
@@ -346,6 +354,7 @@ namespace Backend.Services
             if (requirements.Count == 0)
             {
                 section.AddParagraph("Ingen Nøkkelhullet-krav gjelder for denne varekategorien.");
+                DrawFullkornNote(section, request);
                 return;
             }
 
@@ -353,7 +362,7 @@ namespace Backend.Services
                 requirements.Select(r => new[]
                 {
                     r.Label,
-                    $"{FormatNo(r.ActualValue)} {r.ActualUnit}",
+                    r.ActualValue is null ? "-" : $"{FormatNo(r.ActualValue.Value)} {r.ActualUnit}",
                     $"{ComparatorWord(r.Comparator)} {FormatNo(r.ThresholdValue)} {r.ThresholdUnit}",
                     r.Passed ? "Oppfylt" : "Ikke oppfylt",
                 }));
@@ -363,9 +372,21 @@ namespace Backend.Services
             // oppfylt" would otherwise read as a settled verdict.
             foreach (var r in requirements.Where(r => !string.IsNullOrWhiteSpace(r.Note)))
                 section.AddParagraph($"{r.Label}: {r.Note}", "Footnote");
+
+            DrawFullkornNote(section, request);
         }
 
-        private void DrawNutritionClaims(Section section, CalculatorResponseDTO result)
+        // The one Nøkkelhullet criterion the calculator never evaluates. Without this line a
+        // reader would take the verdict above as resting entirely on the figures in the
+        // table, when for these categories it also rests on something the user asserted.
+        private static void DrawFullkornNote(Section section, CalculatorReportRequestDTO request)
+        {
+            if (!request.FullkornConfirmed) return;
+            section.AddParagraph("Fullkornskravet er bekreftet av bruker, ikke beregnet.", "Footnote");
+        }
+
+        private void DrawNutritionClaims(
+            Section section, CalculatorReportRequestDTO request, CalculatorResponseDTO result)
         {
             DrawSectionHeading(section, "EFSA Ernæringspåstander - fullstendig oversikt");
 
@@ -380,10 +401,40 @@ namespace Backend.Services
                 claims.Select(c => new[]
                 {
                     c.Label,
-                    $"{FormatNo(c.ActualValue)} {c.ActualUnit}",
-                    $"{ComparatorWord(c.Comparator)} {FormatNo(c.ThresholdValue)} {c.ThresholdUnit}",
+                    c.ActualValue is null ? "-" : $"{FormatNo(c.ActualValue.Value)} {c.ActualUnit}",
+                    // An empty comparator means the claim has no limit to state, not that the
+                    // limit is zero. "Uten tilsatt sukker" is the case: its condition is about
+                    // the recipe, so the Annex gives no figure and neither does this column.
+                    // Printing the default would have read as "høyst 0", a limit no product
+                    // could meet, beside a verdict of Oppfylt.
+                    string.IsNullOrEmpty(c.Comparator)
+                        ? "-"
+                        : $"{ComparatorWord(c.Comparator)} {FormatNo(c.ThresholdValue)} {c.ThresholdUnit}",
                     c.Passed ? "Oppfylt" : "Ikke oppfylt",
                 }));
+
+            DrawDeclaredClaimsNote(section, request);
+        }
+
+        // The same service the fullkorn note does, for the two claims whose premise the user
+        // supplied. Both are in the table above with a verdict like any other row, and
+        // without this line a reader would take all of them as resting on the figures.
+        //
+        // Named rather than counted, because which claim rests on a declaration is the part
+        // that matters: a reader checking "Uten tilsatt natrium/salt" needs to know the salt
+        // figure was checked and the recipe was not.
+        private static void DrawDeclaredClaimsNote(Section section, CalculatorReportRequestDTO request)
+        {
+            var declared = new List<string>();
+            if (request.NoAddedSugarsDeclared) declared.Add("Uten tilsatt sukker");
+            if (request.NoAddedSaltDeclared) declared.Add("Uten tilsatt natrium/salt");
+            if (declared.Count == 0) return;
+
+            section.AddParagraph(
+                $"{string.Join(" og ", declared)} bygger på bekreftelse fra bruker om hva som er "
+                + "tilsatt produktet. Dette følger av oppskriften og kan ikke leses av "
+                + "næringsinnholdet, og er derfor ikke beregnet av kalkulatoren.",
+                "Footnote");
         }
 
         private void DrawHealthClaims(Section section, CalculatorResponseDTO result)
@@ -421,7 +472,16 @@ namespace Backend.Services
         // The comparator symbols have no glyph in several PDF base fonts and rendered as
         // mojibake in the old report, so they are spelled out. It also reads more naturally
         // in a formal Norwegian document than a bare symbol.
-        private static string ComparatorWord(string comparator) => comparator == "≤" ? "høyst" : "minst";
+        // ">" is its own word, not a synonym for "≥". The three unsaturated-fat claims
+        // state their energy condition as "more than 20 %", and calling that "minst 20 %"
+        // printed a requirement a product sitting at exactly 20,00 % meets, next to the
+        // verdict that correctly refused it.
+        private static string ComparatorWord(string comparator) => comparator switch
+        {
+            "≤" => "høyst",
+            ">" => "mer enn",
+            _ => "minst",
+        };
 
         // The resistant starch claim's amount trails with a "(NN %)" ratio that isn't meant
         // to be shown.

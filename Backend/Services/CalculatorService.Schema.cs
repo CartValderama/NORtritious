@@ -12,8 +12,15 @@ namespace Backend.Services
         // ask for a number nothing will read nor skip one that a rule will.
 
         // Nutrition-table field keys in the order the form renders them.
+        // The four fatty-acid fields sit with the fats they break down rather than at the
+        // end, so the column reads the way a nutrition declaration does: total, then
+        // saturated, then the unsaturated classes under them.
         private static readonly string[] NutritionFieldOrder =
-            { "fett", "mettede", "transfett", "karbohydrat", "sukkerarter", "kostfiber", "protein", "salt" };
+        {
+            "fett", "mettede", "transfett", "enumettede", "flerumettede",
+            "alfalinolensyre", "eikosapentaensyre", "dokosaheksaensyre",
+            "karbohydrat", "sukkerarter", "polyoler", "kostfiber", "protein", "salt",
+        };
 
         // Which nutrition field each EFSA claim reads. Mirrors what the Claim* predicates
         // above actually look at, including the disabled ones, so re-enabling a claim brings
@@ -35,6 +42,19 @@ namespace Backend.Services
             // Trans fat is part of the saturated-fat calculation, so both are needed.
             ["lowSaturatedFat"] = new[] { "mettede", "transfett" },
             ["saturatedFatFree"] = new[] { "mettede", "transfett" },
+            // All three read the share of the declared fatty acids, whose denominator is
+            // the sum of all four classes, so each one needs all four fields and not just
+            // its own. Leaving flerumettede out of the enumettede claim would shrink that
+            // denominator and inflate the share, which grants the claim rather than
+            // refusing it: the one direction a compliance check must not fail in.
+            ["highMonounsaturatedFat"] = new[] { "mettede", "transfett", "enumettede", "flerumettede" },
+            ["highPolyunsaturatedFat"] = new[] { "mettede", "transfett", "enumettede", "flerumettede" },
+            ["highUnsaturatedFat"] = new[] { "mettede", "transfett", "enumettede", "flerumettede" },
+            // Either route alone can carry these, so neither field drags the other in.
+            ["sourceOfOmega3"] =
+                new[] { "alfalinolensyre", "eikosapentaensyre", "dokosaheksaensyre" },
+            ["highOmega3"] =
+                new[] { "alfalinolensyre", "eikosapentaensyre", "dokosaheksaensyre" },
             ["lowSodium"] = new[] { "salt" },
             ["veryLowSodium"] = new[] { "salt" },
             ["sodiumFree"] = new[] { "salt" },
@@ -54,8 +74,11 @@ namespace Backend.Services
             if (t.MaxSalt.HasValue) yield return "salt";
         }
 
-        // Karbohydrat feeds the always-on carbohydrate health claim, so it is always asked for.
-        private static readonly string[] AlwaysRelevantFields = { "karbohydrat" };
+        // Both feed the always-on carbohydrate health claim 836625, so both are always asked
+        // for. Polyoler is voluntary and may be left blank; it has to be *shown* all the same,
+        // because a blank is read as none and that reading is only honest while the producer
+        // had the chance to say otherwise. See CalculatorRequestDTO.Polyols.
+        private static readonly string[] AlwaysRelevantFields = { "karbohydrat", "polyoler" };
 
         // Every field any claim reads, from the whole of EfsaClaimInputFields rather than from
         // the claims one category offers. See the note in BuildSchema for why.

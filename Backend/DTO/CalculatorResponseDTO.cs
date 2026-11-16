@@ -56,7 +56,12 @@
 
         public bool Passed { get; set; }
 
-        public decimal ActualValue { get; set; }
+        // Null where the figure could not be worked out, which is not the same as zero.
+        // A bordsøtningsmiddel with no porsjonsstørrelse is the one case: its limit is per
+        // portion, so without a portion there is no figure to report. Printing 0 there put
+        // "0 kcal ≤ 4 kcal/porsjon" beside a verdict of not met, and the numbers argued
+        // against the verdict they were describing.
+        public decimal? ActualValue { get; set; }
         public string ActualUnit { get; set; } = string.Empty;
 
         // "≤" or "≥"

@@ -100,7 +100,7 @@ namespace Backend.Services
                     string conditionOfUse = StripHtml(raw.ConditionOfUse);
                     string healthRelation = StripHtml(raw.HealthRelation);
                     string restrictionsOfUse = StripHtml(raw.RestrictionsOfUse);
-                    string legislationReference = raw.LegislationReference ?? string.Empty;
+                    string legislationReference = LegislationCitation(raw);
 
                     // Five independent translations of five separate fields. Awaiting them one
                     // after another made a single entry cost five round trips in sequence, and
@@ -146,11 +146,46 @@ namespace Backend.Services
             return entry;
         }
 
+        // Tags first, then entities, and in that order on purpose: a register row that
+        // writes "&lt;p&gt;" means those four characters as text, and decoding before
+        // stripping would turn them into a tag and delete them.
+        //
+        // Entities are not hypothetical here. 756641's claim is stored as "contributes to
+        // an&nbsp;increase in&nbsp;faecal bulk", and 755661's is wrapped in a <p> element.
+        // Without the decode the card printed the ampersand sequence verbatim, since React
+        // escapes what it renders.
+        //
+        // A decoded &nbsp; is U+00A0, which the collapse below would keep as a character of
+        // its own, so it is flattened to an ordinary space before the runs are collapsed.
         private static string StripHtml(string? raw)
         {
             if (string.IsNullOrWhiteSpace(raw)) return string.Empty;
             var plain = Regex.Replace(raw, "<[^>]+>", " ");
+            plain = System.Net.WebUtility.HtmlDecode(plain).Replace('\u00A0', ' ');
             return Regex.Replace(plain, @"\s{2,}", " ").Trim();
+        }
+
+        // Which of the register's two legislation columns to quote.
+        //
+        // legislation_reference normally reads "Commission Regulation (EU) 432/2012 of
+        // 16/05/2012", and the card prints it as the act the claim is authorised by. For 18
+        // of the 269 authorised claims it instead holds a bare internal number: 755405, the
+        // calcium and vitamin D claim already in use here, has "10121", and 756641 has
+        // "11528". Those are not citations of anything a reader can look up, and the card
+        // was printing them as though they were.
+        //
+        // legislation_short carries the real act in those rows ("No 1228/2014",
+        // "No 40/2014"), so it stands in whenever the reference has no letter in it at all.
+        // A letter is the test rather than a pattern, because the citations are not written
+        // to one: "432/2012", "2015/7" and "No 686/2014" all appear in that column. Nothing
+        // is composed around either value; legislation_url still points at the act itself.
+        private static string LegislationCitation(ApiEntry raw)
+        {
+            string reference = (raw.LegislationReference ?? string.Empty).Trim();
+            if (reference.Any(char.IsLetter)) return reference;
+
+            string fallback = (raw.LegislationShort ?? string.Empty).Trim();
+            return fallback.Length > 0 ? fallback : reference;
         }
 
         private class ApiResponse
@@ -172,6 +207,7 @@ namespace Backend.Services
             [JsonPropertyName("legislation_url")] public string? LegislationUrl { get; set; }
             [JsonPropertyName("legislation_type")] public string? LegislationType { get; set; }
             [JsonPropertyName("legislation_reference")] public string? LegislationReference { get; set; }
+            [JsonPropertyName("legislation_short")] public string? LegislationShort { get; set; }
             [JsonPropertyName("efsa_question")] public string? EfsaQuestion { get; set; }
             [JsonPropertyName("efsa_question_url")] public string? EfsaQuestionUrl { get; set; }
         }

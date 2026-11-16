@@ -70,17 +70,35 @@ namespace Backend.Services
             var resistantStarchClaim = await CheckResistantStarchHealthClaim(request.Nutrition);
             if (resistantStarchClaim != null) autoHealthClaims.Add(resistantStarchClaim);
 
+            // Automatic for the same reason resistant starch is: these read the nutrition
+            // table rather than anything picked in "Velg kilde", so there is nothing for the
+            // user to add first. See NutritionGatedClaims.
+            autoHealthClaims.AddRange(await CheckNutritionGatedHealthClaims(
+                request.Nutrition, request.FoodType, request.EnergyUnit,
+                new ProductBasis(request.ProductType, request.PortionSize),
+                new ProductDeclarations(
+                    request.NoAddedSugarsDeclared, request.NoAddedSaltDeclared)));
+
             var nokkelhulletRequirements = BuildNokkelhulletRequirements(request.Category, request.Nutrition);
 
             // No energy entered means nothing was assessed, so the breakdown is withheld too
             // rather than shown against a verdict of null.
-            bool assessed = request.Nutrition.EnergyKcal != 0 || request.Nutrition.EnergyKj != 0;
+            // EnergyEntered is the real answer; the two comparisons behind it are the
+            // fallback for a caller that does not send it, where a non-zero energy still
+            // means the form was filled in. See CalculatorRequestDTO.EnergyEntered.
+            bool assessed = request.EnergyEntered
+                || request.Nutrition.EnergyKcal != 0
+                || request.Nutrition.EnergyKj != 0;
 
             // The names and the breakdown are two views of one evaluation, so it runs once.
             // Building the list twice also meant two places could disagree about which claims
             // were offered.
             var efsaNutritionClaims = assessed
-                ? BuildEfsaNutritionClaimResults(request.Category, request.FoodType, request.EnergyUnit, request.Nutrition)
+                ? BuildEfsaNutritionClaimResults(
+                    request.Category, request.FoodType, request.EnergyUnit, request.Nutrition,
+                    new ProductBasis(request.ProductType, request.PortionSize),
+                    new ProductDeclarations(
+                        request.NoAddedSugarsDeclared, request.NoAddedSaltDeclared))
                 : new List<EfsaNutritionClaimDTO>();
 
             return new CalculatorResponseDTO
@@ -90,7 +108,7 @@ namespace Backend.Services
                 EfsaNutritionClaims = efsaNutritionClaims.Where(c => c.Passed).Select(c => c.Label).ToList(),
                 EfsaNutritionClaimResults = efsaNutritionClaims,
                 EfsaHealthClaims = autoHealthClaims,
-                Warnings = BuildWarnings(request.Nutrition, request.FoodType),
+                Warnings = BuildWarnings(request.Nutrition, request.FoodType, request.Others),
                 IngredientHealthClaims = await CheckHealthClaims(request.Nutrition, request.FoodType, request.EnergyUnit, request.PortionSize, request.Vitamins, request.Minerals, request.Others),
             };
         }
@@ -102,6 +120,14 @@ namespace Backend.Services
         {
             if (request.Nutrition.TotalStarch > 0)
                 yield return ResistantStarchClaimId;
+
+            var basis = new ProductBasis(request.ProductType, request.PortionSize);
+            var declared = new ProductDeclarations(
+                request.NoAddedSugarsDeclared, request.NoAddedSaltDeclared);
+            foreach (var gated in NutritionGatedClaims)
+                if (NutritionGateMet(gated.Gate, request.FoodType, request.EnergyUnit,
+                                     request.Nutrition, basis, declared))
+                    yield return gated.PolicyItemId;
 
             bool hasCalcium = false, hasVitaminD = false;
             foreach (var input in request.Vitamins.Concat(request.Minerals))
@@ -119,8 +145,8 @@ namespace Backend.Services
                 yield return CalciumVitaminDPortionClaimId;
 
             foreach (var other in request.Others)
-                if (OtherClaimRegistry.TryGetValue(other.Name, out var rules))
-                    foreach (var rule in rules)
+                if (OtherClaimRegistry.TryGetValue(other.Name, out var substance))
+                    foreach (var rule in substance.Rules)
                         yield return rule.PolicyItemId;
         }
 
@@ -132,9 +158,45 @@ namespace Backend.Services
         private const decimal KcalPerGramFat = 9m, KcalPerGramCarb = 4m, KcalPerGramProtein = 4m, KcalPerGramFibre = 2m;
         private const decimal KjPerGramFat = 37m, KjPerGramCarb = 17m, KjPerGramProtein = 17m, KjPerGramFibre = 8m;
 
-        private static List<string> BuildWarnings(NutritionInputDTO n, string foodType)
+        // A picked kilde that is part of a figure the nutrition table already declares, so the
+        // two numbers can contradict each other.
+        //
+        // The Kostfiber subsets are not here. Kostfiber is always declared, so the form blocks
+        // a fibre kilde from exceeding it before it can be added, and blocks the sum of them
+        // too. These are the ones whose parent figure is voluntary under Article 30(2) of
+        // Regulation (EU) No 1169/2011 and may simply be blank: there is nothing to block
+        // against, and refusing the claim would mean deciding which of the producer's two
+        // figures to disbelieve. So the calculator says they disagree and leaves the choice
+        // where it belongs.
+        private record SubstanceSubset(string ParentLabel, Func<NutritionInputDTO, decimal?> Parent);
+
+        private static readonly Dictionary<string, SubstanceSubset> SubstanceSubsets =
+            new(StringComparer.OrdinalIgnoreCase)
+            {
+                ["Linoleic acid"] = new("Flerumettede fettsyrer", n => n.PolyunsaturatedFat),
+            };
+
+        private static List<string> BuildWarnings(
+            NutritionInputDTO n, string foodType, List<OtherClaimInputDTO> others)
         {
             var warnings = new List<string>();
+
+            // Checked before the energy warnings below, which return early in several places.
+            foreach (var other in others)
+            {
+                if (!SubstanceSubsets.TryGetValue(other.Name, out var subset)) continue;
+
+                // A blank parent is not a zero, by the rule every voluntary figure follows.
+                // Nothing is declared to contradict, so nothing is said.
+                if (subset.Parent(n) is not decimal parent) continue;
+                if (other.Amount <= parent) continue;
+
+                warnings.Add(
+                    $"Du har oppgitt {FormatNo(other.Amount)} g {NutrientLabel(other.Name).ToLower()} "
+                    + $"per 100 g, mens {subset.ParentLabel} er oppgitt som {FormatNo(parent)} g. "
+                    + $"{NutrientLabel(other.Name)} er en del av {subset.ParentLabel.ToLower()} og kan "
+                    + "ikke overstige den. Kontroller verdiene.");
+            }
             bool liquid = foodType == "liquid";
             bool hasEnergy = n.EnergyKcal > 0 || n.EnergyKj > 0;
             bool allMacrosZero = n.Fat == 0 && n.Carbs == 0 && n.Protein == 0 && n.Fibre == 0;
