@@ -333,6 +333,20 @@ namespace Backend.Services
         private static readonly HashSet<string> MineralNames =
             new(StringComparer.OrdinalIgnoreCase) { CalciumName };
 
+        // Which of the two carry a claim that reads them on their own and states its figure
+        // per portion, so the picker can say up front that Porsjonsstørrelse will be needed.
+        //
+        // Calcium does, through 837853 at 400 mg per quantified portion. Vitamin D does not:
+        // the only claim that reads it is the combined one, which needs calcium as well, so
+        // flagging vitamin D alone would show the hint in cases where it is not needed.
+        //
+        // A set rather than a test written into the picker projection, for the reason
+        // NeedsPortionSize exists: the flag was a hardcoded false there, correct while the
+        // combined claim was the only one in scope, and wrong the moment 837853 was added.
+        // Adding a vitamin or mineral claim means adding its nutrient here.
+        private static readonly HashSet<string> PortionClaimNutrients =
+            new(StringComparer.OrdinalIgnoreCase) { CalciumName };
+
         private static readonly Dictionary<string, VitaminMineralDef> VitaminMineralDefs =
             new(StringComparer.OrdinalIgnoreCase)
             {
@@ -593,10 +607,17 @@ namespace Backend.Services
         // is also where the history of its removal and the one assumption it still rests on
         // are written down. It is no longer checked here.
         //
-        // 836661 "muscle recovery" is permanently unresolvable and stays out. Its condition
-        // is 4 g of carbohydrate per kg of body weight, from all sources, inside a window
-        // after exercise. The calculator has no body-weight input and should not have one:
-        // nothing about a product's composition answers a question about who eats it.
+        // 836661 "muscle recovery" stays out, but not for the reason written here before.
+        // The 4 g per kg of body weight is inside its "Information shall be given to the
+        // consumer" sentence, so it is a duty for the label and not a condition on the food,
+        // the same reading that moved the plant sterols to NotComputable. Its actual condition
+        // is "food which provides carbohydrates which are metabolised by humans (excluding
+        // polyols)", which MetabolisableCarbs already computes.
+        //
+        // So it is checkable, and left out anyway: that condition is met by any product with
+        // carbohydrate in it, so every bread, pasta and piece of fruit would carry a card
+        // about recovery from intensive exercise. That is the complaint that had 836625
+        // removed the first time.
 
         // The kilde picker's options. Neither the category nor the food type changes them, so
         // they're built once at startup rather than per request. Nothing mutates the list or
@@ -622,10 +643,7 @@ namespace Backend.Services
                 Unit = entry.Value.Unit,
                 Kind = MineralNames.Contains(entry.Key) ? "mineral" : "vitamin",
                 RequiresKostfiber = false,
-                // Only the combined calcium and vitamin D claim needs a portion, and it only
-                // appears once both are entered, so flagging either one alone would show the
-                // hint in cases where it isn't needed.
-                RequiresPortionSize = false,
+                RequiresPortionSize = PortionClaimNutrients.Contains(entry.Key),
             }))
             .ToList();
 
@@ -648,33 +666,75 @@ namespace Backend.Services
             results.AddRange(await BuildVitaminMineralClaimResults(
                 vitamins.Concat(minerals).ToList(), foodType, portionSize));
 
+            // Computed once for the whole request rather than per substance, because it is a
+            // question about all of them together.
+            var fibreBudget = FibreBudgetFor(n, others);
+
             foreach (var o in others)
             {
                 // A name with no registered claim is skipped, the same as an unregistered
                 // vitamin or mineral. The picker only offers registry keys, so this can only
                 // be reached by a request that didn't come from the form.
                 if (OtherClaimRegistry.TryGetValue(o.Name, out var substance))
-                    results.AddRange(await BuildEuOtherClaimResults(o.Name, o.Amount, portionSize, n, foodType, energyUnit, substance));
+                    results.AddRange(await BuildEuOtherClaimResults(o.Name, o.Amount, portionSize, n, foodType, energyUnit, substance, fibreBudget));
             }
 
             return results;
         }
 
+        // What the picked fibre kilder come to, against the fibre that was declared.
+        //
+        // Kostfiber is one budget shared by all of them, which is what makes this different
+        // from the SubstanceSubsets in CalculatorService: those each sit under a parent figure
+        // of their own, so each is compared on its own. Two fibre kilder can each be under the
+        // declared total and still be impossible together.
+        //
+        // The other difference is what the parent is. Kostfiber is mandatory in a nutrition
+        // declaration, so it is always there to compare against, and it is load-bearing: HIGH
+        // FIBRE, SOURCE OF FIBRE and the Nøkkelhullet rules all read it. A linoleic acid
+        // figure above the declared polyunsaturated fat gets a warning and keeps its verdict,
+        // because that parent is voluntary and is arguably the likelier of the two to be
+        // wrong. Here the parent is the figure under scrutiny everywhere else, so the kilde is
+        // the likelier error and the claim is withheld.
+        //
+        // Withholding is also the safe direction for a tool whose output goes onto a label: it
+        // can only cost a claim that might have held, never grant one that does not.
+        private readonly record struct FibreBudget(decimal Claimed, decimal Declared)
+        {
+            public bool Exceeded => Claimed > Declared;
+        }
+
+        private static FibreBudget FibreBudgetFor(
+            NutritionInputDTO n, List<OtherClaimInputDTO> others) =>
+            new(others
+                    .Where(o => OtherClaimRegistry.TryGetValue(o.Name, out var s) && s.IsFibre)
+                    .Sum(o => o.Amount),
+                n.Fibre);
+
         // Substances with a known EU Health Claims register entry (OtherClaimRegistry). Each
         // rule is checked against the data this calculator actually collects.
         private async Task<List<HealthClaimResultDTO>> BuildEuOtherClaimResults(
             string nutrient, decimal amount, decimal portionSize, NutritionInputDTO n, string foodType,
-            string energyUnit, OtherSubstance substance)
+            string energyUnit, OtherSubstance substance, FibreBudget fibreBudget)
         {
             var results = new List<HealthClaimResultDTO>();
             string unit = substance.Unit;
+
+            // Replaces the verdict rather than skipping the card. A claim that simply vanished
+            // would read as one the product does not carry, and the point is to say why no
+            // verdict was reached. The card still shows the claim and its conditions.
+            bool overBudget = substance.IsFibre && fibreBudget.Exceeded;
 
             foreach (var rule in substance.Rules)
             {
                 var euClaim = await _euHealthClaims.GetByIdAsync(rule.PolicyItemId);
                 if (euClaim == null) continue;
 
-                string meetsReq = rule.Check switch
+                string meetsReq = overBudget
+                    ? $"Oppfyller ikke gitt krav (valgte fiberkilder utgjør "
+                      + $"{FormatNo(fibreBudget.Claimed)} g {PerHundredLabel(foodType)}, men "
+                      + $"Kostfiber er oppgitt som {FormatNo(fibreBudget.Declared)} g)"
+                    : rule.Check switch
                 {
                     OtherClaimCheck.PortionThreshold =>
                         FormatPortionThresholdResult(amount, portionSize, rule.MinAmount!.Value, unit),

@@ -220,6 +220,17 @@ namespace Backend.Services
                     + "oppfyller dem. Prøv igjen om en liten stund.");
             }
 
+            // The shared budget, before the per-substance ones below. Reads the same
+            // FibreBudgetFor the verdicts read, so the warning and the refusal cannot disagree
+            // about whether the figures add up.
+            var fibre = FibreBudgetFor(n, others);
+            if (fibre.Exceeded)
+                warnings.Add(
+                    $"Du har valgt fiberkilder som til sammen utgjør {FormatNo(fibre.Claimed)} g "
+                    + $"per 100 g, mens Kostfiber er oppgitt som {FormatNo(fibre.Declared)} g. "
+                    + "En fiberkilde er en del av kostfiberet og kan ikke overstige det, så "
+                    + "helsepåstandene på disse kildene er ikke vurdert. Kontroller verdiene.");
+
             // Checked before the energy warnings below, which return early in several places.
             foreach (var other in others)
             {
