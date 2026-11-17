@@ -172,6 +172,31 @@ namespace Backend.Services
             ["Meat or fish"]       = new(new[] { new OtherClaimRule(763365, OtherClaimCheck.PortionThreshold, 50m) },
                                          IsFibre: false),
 
+            // Water, and the first kilde that asks for no figure at all.
+            //
+            // Both claims carry one condition and it is a labelling duty: "information shall
+            // be given to the consumer that in order to obtain the claimed effect, at least
+            // 2,0 L of water, from all sources, should be consumed per day". From all sources,
+            // so not even a property of this product. Nothing about the food is conditioned,
+            // which is why both are NotComputable.
+            //
+            // The register's restriction, "may be used only on water complying with Directives
+            // 2009/54/EC and/or 98/83/EC", is about what the product legally is rather than
+            // what it contains, and is reported through Vilkår for bruk like 755661's "fats
+            // and oils".
+            //
+            // An empty Fields array, which is new: it means this kilde draws no input boxes,
+            // as against a null one, which means it draws the ordinary single "Mengde" box.
+            // There is no amount to ask for. Asking "how much water per 100 g" and then
+            // ignoring the answer would assert a requirement the register does not make,
+            // which is the same mistake that had five claims gated on a labelling duty.
+            // Picking the row is the whole declaration: this product is water.
+            ["Water"]              = new(new[]
+            {
+                new OtherClaimRule(767405, OtherClaimCheck.NotComputable),
+                new OtherClaimRule(767441, OtherClaimCheck.NotComputable),
+            }, IsFibre: false, Fields: Array.Empty<KildeFieldDTO>()),
+
             // ── Claims whose figure the register states per day ──────────────
             //
             // "The claim may be used only for food which provides a daily intake of 3 g of
@@ -550,6 +575,7 @@ namespace Backend.Services
                 ["Betaine"] = "Betain",
                 ["Melatonin"] = "Melatonin",
                 ["Linoleic acid"] = "Linolsyre",
+                ["Water"] = "Vann",
                 ["Arabinoxylan"] = "Arabinoksylan",
             };
 
@@ -623,6 +649,8 @@ namespace Backend.Services
             [764069] = "Les EFSA-uttalelsen om pektin og blodsukker etter måltid",
             [759949] = "Les EFSA-uttalelsen om aktivt kull og tarmgass",
             [762653] = "Les EFSA-uttalelsen om laktulose og tarmpassasje",
+            [767405] = "Les EFSA-uttalelsen om vann og fysisk og kognitiv funksjon",
+            [767441] = "Les EFSA-uttalelsen om vann og kroppstemperatur",
             [763365] = "Les EFSA-uttalelsen om kjøtt eller fisk og opptak av jern",
             // Withheld with the chewing gum claims themselves.
             // [765261] = "Les EFSA-uttalelsen om sukkerfri tyggegummi og tannmineralisering",
@@ -797,6 +825,16 @@ namespace Backend.Services
         //   763277, 763321  meal replacement for weight control. A multi-part specification
         //           per meal, including a table of vitamins and minerals in quantities the
         //           calculator collects as kilder rather than as a declaration.
+        //
+        // One more, left out on scope rather than on mechanics:
+        //   756345  DHA and the normal visual development of infants up to 12 months.
+        //           Art.14(1)(b), the same shape as 757821 which is served: a labelling
+        //           duty, plus a condition that bites only when the claim is used on
+        //           follow-on formula. It could be served with its conditions and no
+        //           verdict. It is not, because infant formula and follow-on formula are
+        //           governed by Regulation (EU) No 609/2013 and Nøkkelhullet does not reach
+        //           them, so a calculator built around the Nøkkelhullet categories has
+        //           nowhere to put such a product in the first place.
         //
         // These are decisions, not findings. Each could be served if the inputs were added,
         // and the reconciliation in the scratchpad reads the ids out of this comment, so a
@@ -1004,6 +1042,12 @@ namespace Backend.Services
                     // "100 mill. CFU/g per 100 g".
                     OtherClaimCheck.PerGramThreshold =>
                         amount > 0 ? $"{FormatNo(amount)} {unit}" : "ikke oppgitt",
+
+                    // A kilde that asks for no figure has none to restate, and the
+                    // per-100 formatter would print "ikke oppgitt" here: it reads as a
+                    // reproach for a number the form never asked for. What the producer
+                    // declared by picking the row is what the product is.
+                    _ when substance.Fields is { Length: 0 } => "gjelder hele produktet",
 
                     _ => FormatPerHundredAmount(amount, unit, foodType),
                 };

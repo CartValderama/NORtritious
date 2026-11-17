@@ -92,9 +92,10 @@ export interface KildeOption {
   // table. It used to be a hardcoded option in the browser for as long as it was the only
   // one of its kind.
   kind: "vitamin" | "mineral" | "other" | "nutrition";
-  // The boxes to render, or absent for the ordinary single "Mengde" one. Which figures a
-  // claim needs is a property of the claim, so it arrives from the backend rather than being
-  // decided here by name.
+  // The boxes to render. Absent or null means the ordinary single "Mengde" one; an empty
+  // array means none at all, which is the water row, whose claims condition nothing about
+  // the food and so have no figure to ask for. Which figures a claim needs is a property of
+  // the claim, so it arrives from the backend rather than being decided here by name.
   fields?: KildeField[] | null;
   requiresKostfiber: boolean;
   requiresPortionSize: boolean;
