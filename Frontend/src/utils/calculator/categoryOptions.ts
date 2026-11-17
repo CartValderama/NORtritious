@@ -155,6 +155,21 @@ export const PRODUCT_TYPE_BY_CATEGORY: Record<string, string> = {
   "bordsøtningsmiddel": "tableTopSweetener",
 };
 
+// The same question asked the other way round. The map above says which carve-out a
+// matkategori implies; this one says which matkategorier a hand-picked carve-out could
+// honestly belong to. A produkttype named here is offered nowhere else, and one left out of
+// here is offered everywhere.
+//
+// Lettmelk is the only carve-out still picked by hand, and 11 a) is the only category a
+// drinking milk can be in: 11 b) is vegetabilsk, and 12 to 15 are either not meant to be
+// drunk or are blends with fløte. Nothing here makes the declaration checkable, because
+// 11 a) holds helmelk, skummet melk and kulturmelk as well. What it removes is every
+// context where the answer would certainly be wrong, which until now was all of them bar
+// one: the option was offered on rugbrød and on oat drinks alike.
+export const PRODUCT_TYPE_ALLOWED_CATEGORIES: Record<string, string[]> = {
+  semiSkimmedMilk: ["melk 11a"],
+};
+
 // ── Group options (level 1) ──────────────────────────────────────────────────
 export const GROUP_OPTIONS: CategoryOption[] = [
   { value: "grønnsaker, frukt, bær og nøtter",                          label: "Grønnsaker, frukt, bær og nøtter" },

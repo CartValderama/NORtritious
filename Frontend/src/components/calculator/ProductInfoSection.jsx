@@ -9,6 +9,7 @@ import API_URL from "../../apiConfig";
 import {
   GROUP_OPTIONS,
   PRODUCT_TYPE_BY_CATEGORY,
+  PRODUCT_TYPE_ALLOWED_CATEGORIES,
   PRODUCT_OPTIONS_BY_GROUP,
   FRAGMENT_OPTIONS,
   RATION_OPTIONS,
@@ -113,6 +114,13 @@ const LIQUID_ONLY_PRODUCTS = {
   drinkingWater: "Drikkevann",
   semiSkimmedMilk: "Lettmelk",
 };
+
+// The produkttyper still offered as a choice, in the order the picker shows them.
+// Bordsøtningsmiddel and Drikkevann left this list when the "annet" varegruppe gave each of
+// them a matkategori to follow from, and Tyggegummi is withheld with its claims. A list
+// rather than one written-out option so that restoring either is a line in this array and a
+// line in PRODUCT_TYPE_ALLOWED_CATEGORIES, with no new condition in the markup.
+const HAND_PICKED_PRODUCT_TYPES = ["semiSkimmedMilk"];
 
 // The mirror of LIQUID_ONLY_PRODUCTS, withheld with the Tyggegummi option it existed for.
 // Restoring it means restoring solidOnlyLabel and fixedFormLabel below, the solid branch of
@@ -266,6 +274,17 @@ const ProductInfoSection = () => {
     drinkingWater: "Drikkevann",
     semiSkimmedMilk: "Lettmelk",
   };
+
+  // The hand-picked carve-outs this matkategori could honestly hold. Lettmelk is the only
+  // one, and 11 a) is the only category it belongs to, so for every other category the
+  // picker has nothing left to ask and is not drawn at all. The category cannot verify the
+  // declaration, since 11 a) is helmelk and skummet melk too, but it can rule the question
+  // out everywhere the answer would certainly be no.
+  const pickableProductTypes = HAND_PICKED_PRODUCT_TYPES.filter((t) =>
+    (PRODUCT_TYPE_ALLOWED_CATEGORIES[t] ?? [selectsProduct]).includes(selectsProduct),
+  );
+  const showProductTypePicker =
+    Boolean(impliedProductType) || pickableProductTypes.length > 0;
   const liquidOnlyLabel = LIQUID_ONLY_PRODUCTS[productType];
   // const solidOnlyLabel = SOLID_ONLY_PRODUCTS[productType];
   // const fixedFormLabel = liquidOnlyLabel ?? solidOnlyLabel;
@@ -292,6 +311,18 @@ const ProductInfoSection = () => {
     if (liquidOnlyLabel && foodType !== "liquid") setFoodType("liquid");
     // if (solidOnlyLabel && foodType !== "solid") setFoodType("solid");
   }, [liquidOnlyLabel, foodType, setFoodType]);
+
+  // A produkttype the current matkategori cannot hold, cleared. Every path that changes a
+  // category already clears it, so this should never fire; it is here because the failure it
+  // prevents is silent. A <select> whose value matches none of its options displays the
+  // first one instead, so a stale Lettmelk would read as "Vanlig næringsmiddel" on screen
+  // while the 1,8 g fettgrense was still being applied behind it, and the band can be shut.
+  // Cheaper to make the state unreachable than to trust three callers to keep clearing it.
+  useEffect(() => {
+    if (!productType || impliedProductType) return;
+    if (!pickableProductTypes.includes(productType)) setProductType("");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [productType, impliedProductType, selectsProduct]);
 
   // 2. Turning the switch on moves the energy limits onto a per-portion basis, so the
   //    cursor goes to the field that basis needs. Only on the switch being turned on, and
@@ -600,6 +631,7 @@ const ProductInfoSection = () => {
                   It sits with Porsjonsstørrelse rather than among the switches below
                   because it answers what the product is, not what the calculation should
                   do. */}
+              {showProductTypePicker && (
               <div style={{ minWidth: 0 }}>
                 <div className="d-flex align-items-center gap-2 field-label-row">
                   <label
@@ -647,16 +679,24 @@ const ProductInfoSection = () => {
 
                       Lettmelk has no such category and keeps its option: the Nøkkelhullet
                       taxonomy does not separate lettmelk from helmelk, which is the reason
-                      this picker exists at all.
+                      this picker exists at all. It is offered in matkategori 11 a) only,
+                      the one category a drinking milk can be in, which is as far as the
+                      taxonomy can narrow a declaration it cannot check. See
+                      PRODUCT_TYPE_ALLOWED_CATEGORIES.
 
                       Restoring either option means deciding which control wins when the
                       two disagree, which is the question their absence answers. */}
                   {/* <option value="tableTopSweetener">Bordsøtningsmiddel</option> */}
                   {/* <option value="drinkingWater">Drikkevann</option> */}
-                  <option value="semiSkimmedMilk">Lettmelk</option>
                   {/* <option value="chewingGum">Tyggegummi</option> */}
+                  {pickableProductTypes.map((t) => (
+                    <option key={t} value={t}>
+                      {PRODUCT_TYPE_LABELS[t]}
+                    </option>
+                  ))}
                 </select>
               </div>
+              )}
 
             </div>
 

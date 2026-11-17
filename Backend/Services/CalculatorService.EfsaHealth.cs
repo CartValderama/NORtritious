@@ -202,16 +202,16 @@ namespace Backend.Services
             // ["Green kiwifruit"]    = new(new[] { new OtherClaimRule(2638312, OtherClaimCheck.DailyIntakeThreshold, 200m) },
             //                              IsFibre: false),
 
-            // Water, 767405 and 767441, withheld for the same reason as the seven chewing
-            // gum claims, and it took being asked to see it.
+            // Water, 767405 and 767441, withheld because this table asks the wrong question
+            // of them, and it took being asked to see it.
             //
             // This table is the kilder: things a product contains. Every other row here is
             // read that way by the register too, "food which contains at least X of Y". The
             // water claims are not. Their restriction reads "the claim may be used only on
             // water complying with Directives 2009/54/EC and/or 98/83/EC", which is about
-            // what the product is, and the subject field is the bare word Water. The gum
-            // claims say "only for chewing gum which complies with SUGARS FREE" and name
-            // Sugar-free chewing gum as their subject, which is the same thing.
+            // what the product is, and the subject field is the bare word Water. The
+            // labelling duty points the same way, "at least 2,0 L of water, from all
+            // sources", so not even the figure it states is about this product's water.
             //
             // So a row here would have asked the wrong question. "Velg kilde" says this is
             // in my product, and a juice that is nine tenths water could have picked it and
@@ -220,6 +220,18 @@ namespace Backend.Services
             //
             // Both conditions are labelling duties, so these were NotComputable with no
             // verdict, which is why the mistake was not a wrong verdict but a wrong audience.
+            //
+            // The seven chewing gum claims name a product in the same way and are equally
+            // not kilder, but they are not the same case beyond that, and an earlier draft
+            // of this note had the two as one. "Only for chewing gum which complies with the
+            // conditions of use for the nutrition claim SUGARS FREE" is an identity plus a
+            // condition the calculator can check, so five of the seven would reach a real
+            // verdict rather than NotComputable. The other two cannot: 765381 adds "each
+            // piece of sugar-free chewing gum should contain at least 20 mg carbamide", a
+            // per-piece figure the form does not collect, and 757785's gum has to be
+            // sweetened with 100 % xylitol, which is a fact about the recipe and not a figure
+            // in the table. Gum is out for want of a way in, never for want of something to
+            // check. See NutritionGate.SugarsFreeChewingGum.
             //
             // The input that would be right already exists and is not this one: produkttype
             // "Drikkevann", which ProductBasis.IsWater already reads for the LOW SODIUM

@@ -28,10 +28,21 @@ namespace Backend.DTO
         //                       SODIUM is withheld: the Annex forbids it outright for waters
         //   "semiSkimmedMilk"   LOW FAT rises to 1,8 g/100 ml
         //
-        // None of these is derivable from what the form already knows. The matkategori list
-        // is the Nøkkelhullet taxonomy, which has no water at all and does not separate
-        // lettmelk from helmelk, and foodType only says fast or flytende, which would sweep
-        // in milk, juice and soup alongside water. So it is asked for.
+        // Each one names what the product IS, not something in it: "for waters", "for
+        // semi-skimmed milk". A soup made with water is not a water and a yoghurt made with
+        // lettmelk is not lettmelk, so none of these is a kilde and none of them is read off
+        // an ingredient. That is also why they sit on the product and not in Velg kilde.
+        //
+        // Two of the three are no longer asked for. The matkategori list was the Nøkkelhullet
+        // taxonomy alone, which has neither a water nor a bordsøtningsmiddel, so all three
+        // had to be declared by hand. The "Annet" varegruppe now carries a category for each
+        // of those two and the produkttype follows from it, which is what
+        // PRODUCT_TYPE_BY_CATEGORY in categoryOptions.ts does.
+        //
+        // Lettmelk has no such category and is still asked for. The taxonomy groups milk by
+        // what it is rather than by fat content, so nothing in it separates lettmelk from
+        // helmelk, and foodType only says fast or flytende, which would sweep in juice and
+        // soup alongside milk.
         //
         // For a bordsøtningsmiddel, PortionSize above is read as the amount with "equivalent
         // sweetening properties to 6 g of sucrose", which is what the form's own label asks
