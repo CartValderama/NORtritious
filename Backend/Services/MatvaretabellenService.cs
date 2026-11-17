@@ -45,12 +45,24 @@ namespace Backend.Services
         private const string NutEicosapentaenoic = "C20:5n-3Eikosapentaensyre";
         private const string NutDocosahexaenoic = "C22:6n-3Dokosaheksaensyre";
 
-        // The only two kilder in the helsepåstander panel that Matvaretabellen carries. Its
-        // 57 nutrients have no beta-glucan and no breakdown of fibre by type, so the fibre
-        // kilder and resistent stivelse stay hand-entered. Units already match the ones
-        // VitaminMineralDefs states the thresholds in, so nothing is converted.
+        // The kilder in the helsepåstander panel that Matvaretabellen carries, which is four
+        // of them. Its 57 nutrients were compared against the picker's whole list: there is
+        // no beta-glucan and no breakdown of fibre by type, so every fibre kilde stays
+        // hand-entered, and none of the isolated substances is in a food composition table
+        // either. Units already match the ones the thresholds are written in, so nothing is
+        // converted anywhere in this path.
+        //
+        // Calcium and vitamin D are the picker's only vitamin and mineral rows, because the
+        // SOURCE OF cross-reference claims are out of scope and those are what the rest
+        // would have been. Vitamin C is a kilde all the same: its claim states its own
+        // figure rather than cross-referencing, so it sits with the substances.
         private const string NutCalcium = "Ca";
         private const string NutVitaminD = "Vit D";
+        private const string NutVitaminC = "Vit C";
+
+        // C18:2n-6, the one fatty acid the picker asks for that the nutrition table does not.
+        // Its four neighbours above feed the table; this one feeds a kilde.
+        private const string NutLinoleicAcid = "C18:2n-6Linolsyre";
 
         private readonly HttpClient _http;
         private readonly ILogger<MatvaretabellenService> _logger;
@@ -153,6 +165,8 @@ namespace Backend.Services
                 DocosahexaenoicAcid = Get(NutDocosahexaenoic),
                 Calcium = Get(NutCalcium),
                 VitaminD = Get(NutVitaminD),
+                VitaminC = Get(NutVitaminC),
+                LinoleicAcid = Get(NutLinoleicAcid),
             };
         }
 

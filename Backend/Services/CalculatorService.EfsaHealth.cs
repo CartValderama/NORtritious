@@ -169,8 +169,38 @@ namespace Backend.Services
                                          IsFibre: false),
             ["Lactulose"]          = new(new[] { new OtherClaimRule(762653, OtherClaimCheck.PortionThreshold, 10m) },
                                          IsFibre: false),
-            ["Meat or fish"]       = new(new[] { new OtherClaimRule(763365, OtherClaimCheck.PortionThreshold, 50m) },
-                                         IsFibre: false),
+            // ── The four kilder that are a whole food rather than something in one ──
+            //
+            // Withheld by the product owner's decision: the Nøkkelhullet category already
+            // says what kind of product this is, so a second row naming the same food is a
+            // second place to say it.
+            //
+            // Recorded here because the register does not agree, and whoever restores these
+            // should know what they are restoring. Each condition reads "food WHICH provides
+            // / contains" a weight of the food, so the claim is written for any product that
+            // holds it, not only for a product that is it: a walnut bread is kategori 5 and
+            // still provides 30 g of walnuts. And a category cannot grant one either, since
+            // kategori 3 is "nøtter og peanøtter som er uforedlet" and that is hazelnuts and
+            // almonds too, which carry no claim.
+            //
+            // These are also the only four claims whose subject is the food itself, because
+            // EFSA never attributed the effect to one compound: "Walnuts contribute to...",
+            // "Meat or fish contributes to...", against "Beta-glucans contribute to..." and
+            // "Cocoa flavanols help maintain...". Where the compound was identified the
+            // kilde is the compound and the food becomes a restriction, which is why olive
+            // oil polyphenols and cocoa flavanols are still here and these are not.
+            //
+            // Restoring any of them is uncommenting its row, its NutrientLabels entry and
+            // its EfsaOpinionTitles entry.
+            //
+            // ["Meat or fish"]       = new(new[] { new OtherClaimRule(763365, OtherClaimCheck.PortionThreshold, 50m) },
+            //                              IsFibre: false),
+            // ["Dried plums"]        = new(new[] { new OtherClaimRule(834173, OtherClaimCheck.DailyIntakeThreshold, 100m) },
+            //                              IsFibre: false),
+            // ["Walnuts"]            = new(new[] { new OtherClaimRule(767369, OtherClaimCheck.DailyIntakeThreshold, 30m) },
+            //                              IsFibre: false),
+            // ["Green kiwifruit"]    = new(new[] { new OtherClaimRule(2638312, OtherClaimCheck.DailyIntakeThreshold, 200m) },
+            //                              IsFibre: false),
 
             // Water, 767405 and 767441, withheld for the same reason as the seven chewing
             // gum claims, and it took being asked to see it.
@@ -239,15 +269,9 @@ namespace Backend.Services
                 new OtherClaimRule(761413, OtherClaimCheck.DailyIntakeThreshold, 3m),
                 new OtherClaimRule(838613, OtherClaimCheck.NotComputable),
             }, IsFibre: false),
-            ["Dried plums"]        = new(new[] { new OtherClaimRule(834173, OtherClaimCheck.DailyIntakeThreshold, 100m) },
-                                         IsFibre: false),
             ["Guar gum"]           = new(new[] { new OtherClaimRule(762053, OtherClaimCheck.DailyIntakeThreshold, 10m) }),
             ["Native chicory inulin"] =
                                      new(new[] { new OtherClaimRule(838109, OtherClaimCheck.DailyIntakeThreshold, 12m) }),
-            ["Walnuts"]            = new(new[] { new OtherClaimRule(767369, OtherClaimCheck.DailyIntakeThreshold, 30m) },
-                                         IsFibre: false),
-            ["Green kiwifruit"]    = new(new[] { new OtherClaimRule(2638312, OtherClaimCheck.DailyIntakeThreshold, 200m) },
-                                         IsFibre: false),
             ["Vitamin C"]          = new(new[] { new OtherClaimRule(766445, OtherClaimCheck.DailyIntakeThreshold, 200m) },
                                          Unit: "mg", IsFibre: false),
             ["Cocoa flavanols"]    = new(new[] { new OtherClaimRule(835181, OtherClaimCheck.DailyIntakeThreshold, 200m) },
@@ -559,14 +583,15 @@ namespace Backend.Services
                 ["Pectins"] = "Pektin",
                 ["Activated charcoal"] = "Aktivt kull",
                 ["Lactulose"] = "Laktulose",
-                ["Meat or fish"] = "Kjøtt eller fisk",
+                // Withheld with the four whole-food kilder.
+                // ["Meat or fish"] = "Kjøtt eller fisk",
                 ["Chitosan"] = "Kitosan",
                 ["Creatine"] = "Kreatin",
-                ["Dried plums"] = "Tørkede svisker",
+                // ["Dried plums"] = "Tørkede svisker",
                 ["Guar gum"] = "Guarkjernemel",
                 ["Native chicory inulin"] = "Inulin fra sikori",
-                ["Walnuts"] = "Valnøtter",
-                ["Green kiwifruit"] = "Grønn kiwi",
+                // ["Walnuts"] = "Valnøtter",
+                // ["Green kiwifruit"] = "Grønn kiwi",
                 ["Vitamin C"] = "Vitamin C",
                 ["Cocoa flavanols"] = "Kakaoflavanoler",
                 ["Olive oil polyphenols"] = "Polyfenoler i olivenolje",
@@ -661,7 +686,8 @@ namespace Backend.Services
             // titles above are.
             // [767405] = "Les EFSA-uttalelsen om vann og fysisk og kognitiv funksjon",
             // [767441] = "Les EFSA-uttalelsen om vann og kroppstemperatur",
-            [763365] = "Les EFSA-uttalelsen om kjøtt eller fisk og opptak av jern",
+            // Withheld with the four whole-food kilder.
+            // [763365] = "Les EFSA-uttalelsen om kjøtt eller fisk og opptak av jern",
             // Withheld with the chewing gum claims themselves.
             // [765261] = "Les EFSA-uttalelsen om sukkerfri tyggegummi og tannmineralisering",
             // [765305] = "Les EFSA-uttalelsen om sukkerfri tyggegummi og plakksyrer",
@@ -671,11 +697,11 @@ namespace Backend.Services
             // [756969] = "Les EFSA-uttalelsen om sukkerfri tyggegummi og demineralisering av tenner",
             [760853] = "Les EFSA-uttalelsen om kitosan og blodkolesterol",
             [761413] = "Les EFSA-uttalelsen om kreatin og fysisk yteevne",
-            [834173] = "Les EFSA-uttalelsen om svisker og tarmfunksjon",
+            // [834173] = "Les EFSA-uttalelsen om svisker og tarmfunksjon",
             [762053] = "Les EFSA-uttalelsen om guarkjernemel og blodkolesterol",
             [838109] = "Les EFSA-uttalelsen om inulin fra sikori og tarmfunksjon",
-            [767369] = "Les EFSA-uttalelsen om valnøtter og blodårene",
-            [2638312] = "Les EFSA-uttalelsen om grønn kiwi og tarmfunksjon",
+            // [767369] = "Les EFSA-uttalelsen om valnøtter og blodårene",
+            // [2638312] = "Les EFSA-uttalelsen om grønn kiwi og tarmfunksjon",
             [766445] = "Les EFSA-uttalelsen om vitamin C og immunforsvaret etter hard trening",
             [835181] = "Les EFSA-uttalelsen om kakaoflavanoler og blodårenes elastisitet",
             [838613] = "Les EFSA-uttalelsen om kreatin, styrketrening og muskelstyrke",
@@ -800,9 +826,11 @@ namespace Backend.Services
         // Every claim the register authorises falls into one of six groups: served here,
         // carrying the SOURCE OF cross-reference the client's scope excludes, food
         // supplements only, chewing gum only, needing a reference product to compare
-        // against, or in scope and not served. That last group is fourteen: the ten below,
-        // 836661 above, 756345 after them, and the two water claims, whose reason is on the
-        // withheld Water entry in OtherClaimRegistry because that is where the row would be.
+        // against, or in scope and not served. That last group is eighteen: the ten below,
+        // 836661 above, 756345 after them, and six whose reason sits on the withheld entry
+        // in OtherClaimRegistry where each row would have been, because that is where
+        // someone restoring one would look. Those six are the two water claims and the four
+        // whole-food kilder, 763365, 767369, 834173 and 2638312.
         //
         // The ten had no reason recorded anywhere, which is the only reason this note
         // exists: a scope with ten silent omissions in it cannot be defended, and an

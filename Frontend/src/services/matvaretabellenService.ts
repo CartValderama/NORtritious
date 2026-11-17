@@ -23,9 +23,12 @@ export interface MatvaretabellenFoodDetail {
   alphaLinolenicAcid: number;
   eicosapentaenoicAcid: number;
   docosahexaenoicAcid: number;
-  // For the helsepåstander kilder rather than the nutrition table: mg and µg respectively.
+  // For the helsepåstander kilder rather than the nutrition table, each in the unit its
+  // own claim threshold is written in: mg, µg, mg and g.
   calcium: number;
   vitaminD: number;
+  vitaminC: number;
+  linoleicAcid: number;
 }
 
 export interface MatvaretabellenSearchResult {

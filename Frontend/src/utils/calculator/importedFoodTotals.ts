@@ -114,12 +114,24 @@ export const nutritionFromImportedFoods = (
 };
 
 // The kilder in the helsepåstander panel that Matvaretabellen can supply, and the field each
-// reads. Names match the schema's kilde values, which is what routes them into the request's
-// vitamins and minerals lists. The seven fibre kilder aren't here because the dataset has no
-// beta-glucan and no fibre breakdown, and resistent stivelse isn't there either.
+// reads. Names match the schema's kilde values, which is what routes each one into the right
+// request list: calcium and vitamin D are the picker's only mineral and vitamin rows, and the
+// other two are "other" substances and travel in that list instead.
+//
+// Four of the picker's rows, out of all of them, and the dataset is the reason rather than
+// the mapping. Its 57 nutrients have no beta-glucan and no breakdown of fibre by type, so
+// every fibre kilde stays hand-entered, and no food composition table holds plant sterols,
+// melatonin, creatine or the rest of the isolated substances.
+//
+// Stivelse is the near miss: the dataset does carry it, and it is deliberately not here. A
+// recipe can fill a product's total starch but never its resistant or slowly digestible
+// part, and a total with a zero beside it is what 764557 reads as 0 % against a 14 %
+// threshold. Filling it would tell a producer they failed a claim they never made.
 const KILDE_SOURCE: Record<string, keyof MatvaretabellenFoodDetail> = {
   Calcium: "calcium",
   "Vitamin D": "vitaminD",
+  "Vitamin C": "vitaminC",
+  "Linoleic acid": "linoleicAcid",
 };
 
 export const RECIPE_KILDE_NAMES = Object.keys(KILDE_SOURCE);

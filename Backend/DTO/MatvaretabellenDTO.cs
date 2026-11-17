@@ -28,9 +28,12 @@ namespace Backend.DTO
         public double EicosapentaenoicAcid { get; set; }
         public double DocosahexaenoicAcid { get; set; }
 
-        // Feed the helsepåstander panel's kilder rather than the nutrition table: calcium in
-        // mg and vitamin D in µg, the units their claim thresholds are written in.
+        // Feed the helsepåstander panel's kilder rather than the nutrition table, each in
+        // the unit its own claim threshold is written in: calcium mg, vitamin D µg,
+        // vitamin C mg, linoleic acid g. Nothing is converted at either end.
         public double Calcium { get; set; }
         public double VitaminD { get; set; }
+        public double VitaminC { get; set; }
+        public double LinoleicAcid { get; set; }
     }
 }
