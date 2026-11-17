@@ -122,6 +122,7 @@ namespace Backend.Services
             return new CalculatorResponseDTO
             {
                 HasNokkelhullet = CheckNokkelhullet(request.Category, request.Nutrition, nokkelhulletRequirements),
+                NokkelhulletApplies = NokkelhulletApplies(request.Category),
                 NokkelhulletRequirements = assessed ? nokkelhulletRequirements : new(),
                 EfsaNutritionClaims = efsaNutritionClaims.Where(c => c.Passed).Select(c => c.Label).ToList(),
                 EfsaNutritionClaimResults = efsaNutritionClaims,

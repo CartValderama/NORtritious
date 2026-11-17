@@ -330,6 +330,7 @@ const NutritionResult = () => {
           >
             <NokkelhulletSection
               requirements={result.nokkelhulletRequirements}
+              applies={stats.nokkelhulletApplies}
             />
           </ResultAccordionSection>
 

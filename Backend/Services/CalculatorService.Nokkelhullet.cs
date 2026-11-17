@@ -26,6 +26,30 @@ namespace Backend.Services
         // Categories with no numeric thresholds — always pass if inputs are provided
         private static readonly HashSet<string> AlwaysPassCategories = new() { "Kategori0", "Kategori2", "Kategori21" };
 
+        // Products the Nøkkelhullet regulation does not cover at all, which is a different
+        // thing from a category whose thresholds nobody has entered yet, and a very different
+        // thing from AlwaysPassCategories above: those pass, these are not judged.
+        //
+        // The matkategori list is otherwise the Nøkkelhullet taxonomy one for one, and that
+        // taxonomy has no drinking water in it and no bordsøtningsmiddel. Both are real
+        // products with real EFSA claims: a water carries the LOW SODIUM særregel of 2 mg
+        // natrium per 100 ml, and a sweetener has LOW ENERGY and ENERGY-FREE read per
+        // portion. Before this group existed a producer of either had to name some other
+        // category to use the calculator at all, which put a Nøkkelhullet verdict on a
+        // product that cannot carry the mark.
+        //
+        // Both still reach CheckNokkelhullet and still come back null, the same answer an
+        // unrecognised category gets. They are named here so that the answer is a decision
+        // rather than an accident, and so that adding thresholds to either one is a thing
+        // somebody has to do on purpose.
+        private static readonly HashSet<string> OutsideNokkelhullet =
+            new() { "AnnetDrikkevann", "AnnetBordsotningsmiddel" };
+
+        // Whether the regulation has anything to say about this kind of product. Read by the
+        // schema so the form can say so before a figure is entered.
+        public static bool NokkelhulletApplies(string category) =>
+            !OutsideNokkelhullet.Contains(category);
+
         private static readonly Dictionary<string, CategoryThreshold> NokkelhulletThresholds = new()
         {
             // Cat 1–10
@@ -230,8 +254,14 @@ namespace Backend.Services
             if (AlwaysPassCategories.Contains(category))
                 return true;
 
-            // An unknown category has no rules to judge against, which is not the same as
-            // having no unmet rules, so it stays null rather than falling through to All().
+            // Neither an unknown category nor one the regulation does not cover has rules to
+            // judge against, which is not the same as having no unmet rules, so both stay
+            // null rather than falling through to All(). They are separate tests because
+            // they are separate facts: one is a gap in this table, the other is a gap in the
+            // regulation, and only the second is permanent.
+            if (OutsideNokkelhullet.Contains(category))
+                return null;
+
             if (!NokkelhulletThresholds.ContainsKey(category))
                 return null;
 

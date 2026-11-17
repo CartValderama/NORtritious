@@ -114,6 +114,7 @@ namespace Backend.Services
 
             return new CalculatorSchemaDTO
             {
+                NokkelhulletApplies = NokkelhulletApplies(category),
                 Kilder = KildeOptions,
                 Fields = NutritionFieldOrder.Where(needed.Contains).ToList(),
                 NokkelhulletFields = NutritionFieldOrder.Where(nokkelhulletFields.Contains).ToList(),

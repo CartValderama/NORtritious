@@ -8,6 +8,7 @@ import API_URL from "../../apiConfig";
 // and the section it governs are recognisable as the same thing.
 import {
   GROUP_OPTIONS,
+  PRODUCT_TYPE_BY_CATEGORY,
   PRODUCT_OPTIONS_BY_GROUP,
   FRAGMENT_OPTIONS,
   RATION_OPTIONS,
@@ -255,6 +256,16 @@ const ProductInfoSection = () => {
   const [footerOpen, setFooterOpen] = useState(false);
   const portionInputRef = useRef(null);
   const isSweetener = productType === "tableTopSweetener";
+
+  // The carve-out this matkategori implies, if it implies one. Where it does, the
+  // produkttype control states it rather than offering a list: the category has already
+  // answered, and a second control for the same fact could be set against the first.
+  const impliedProductType = PRODUCT_TYPE_BY_CATEGORY[selectsProduct];
+  const PRODUCT_TYPE_LABELS = {
+    tableTopSweetener: "Bordsøtningsmiddel",
+    drinkingWater: "Drikkevann",
+    semiSkimmedMilk: "Lettmelk",
+  };
   const liquidOnlyLabel = LIQUID_ONLY_PRODUCTS[productType];
   // const solidOnlyLabel = SOLID_ONLY_PRODUCTS[productType];
   // const fixedFormLabel = liquidOnlyLabel ?? solidOnlyLabel;
@@ -399,6 +410,9 @@ const ProductInfoSection = () => {
                 type: `<strong>Matkategori:</strong> ${e.label}`,
               }));
               if (wasPreviouslySelected) resetCalculationState();
+              // After the reset, which clears produkttype: a category that implies one has
+              // to put it back, and a category that implies none leaves it cleared.
+              setProductType(PRODUCT_TYPE_BY_CATEGORY[e.value] ?? "");
             }}
             options={productOptions}
           />
@@ -609,14 +623,36 @@ const ProductInfoSection = () => {
                   id="productType"
                   className="form-select"
                   value={productType}
+                  // Disabled rather than hidden where the category implies the value: the
+                  // producer still needs to see which særregel is being applied to them,
+                  // and the matkategori above is where to change it.
+                  disabled={Boolean(impliedProductType)}
                   onChange={(e) => {
                     setProductType(e.target.value);
                     setCalculation(null);
                   }}
                 >
+                  {impliedProductType && (
+                    <option value={impliedProductType}>
+                      {PRODUCT_TYPE_LABELS[impliedProductType]} (følger av
+                      matkategorien)
+                    </option>
+                  )}
                   <option value="">Vanlig næringsmiddel</option>
-                  <option value="tableTopSweetener">Bordsøtningsmiddel</option>
-                  <option value="drinkingWater">Drikkevann</option>
+                  {/* Bordsøtningsmiddel and Drikkevann are set from the matkategori now,
+                      by PRODUCT_TYPE_BY_CATEGORY above, because the "annet" varegruppe has
+                      a category for each. The value still arrives and the særregel still
+                      bites; what is gone is the second control for the same fact, which
+                      could be set against the first.
+
+                      Lettmelk has no such category and keeps its option: the Nøkkelhullet
+                      taxonomy does not separate lettmelk from helmelk, which is the reason
+                      this picker exists at all.
+
+                      Restoring either option means deciding which control wins when the
+                      two disagree, which is the question their absence answers. */}
+                  {/* <option value="tableTopSweetener">Bordsøtningsmiddel</option> */}
+                  {/* <option value="drinkingWater">Drikkevann</option> */}
                   <option value="semiSkimmedMilk">Lettmelk</option>
                   {/* <option value="chewingGum">Tyggegummi</option> */}
                 </select>

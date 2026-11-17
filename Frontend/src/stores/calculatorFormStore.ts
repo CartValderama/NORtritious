@@ -16,6 +16,7 @@ import {
   type ImportedFood,
 } from "../utils/calculator/importedFoodTotals";
 import type { MatvaretabellenFoodDetail } from "../services/matvaretabellenService";
+import { PRODUCT_TYPE_BY_CATEGORY } from "../utils/calculator/categoryOptions";
 
 export interface OtherSubstance {
   name: string;
@@ -478,6 +479,12 @@ const calculatorFormStoreBase = createStore<CalculatorFormState>((set) => ({
       resetToken: state.resetToken + 1,
       foodType,
       foodTypeError: false,
+      // Derived rather than stored. A product keeps its category and not its produkttype,
+      // and the two categories in the "annet" varegruppe each imply one. Without this a
+      // saved drikkevann came back as an ordinary næringsmiddel, and since the produkttype
+      // picker no longer offers that option there would have been no way to say otherwise.
+      // Every other category implies nothing and clears it, which is what resetDraft does.
+      productType: PRODUCT_TYPE_BY_CATEGORY[categoryPath?.product ?? ""] ?? "",
       calculation: null,
       efsaDisabled: false,
       // A saved product stores its nutrition table, not the foods it was built from, so the

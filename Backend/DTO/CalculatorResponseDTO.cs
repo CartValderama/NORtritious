@@ -5,6 +5,14 @@
         // null means the category has no Nøkkelhullet requirements defined
         public bool? HasNokkelhullet { get; set; }
 
+        // Whether the regulation covers this kind of product at all, which HasNokkelhullet
+        // cannot say on its own: its null covers three different facts, and only one of them
+        // is permanent. No energy entered yet is null, an unrecognised category is null, and
+        // a category the regulation does not reach is null. Reading that null as "does not
+        // apply" would tell an ordinary producer the mark was not for them because they had
+        // not filled in the energy field.
+        public bool NokkelhulletApplies { get; set; } = true;
+
         // The per-requirement breakdown behind HasNokkelhullet: which nutrient, what was
         // entered, what the limit is, and whether it cleared. HasNokkelhullet is the AND of
         // Passed across this list, so the two can't disagree.

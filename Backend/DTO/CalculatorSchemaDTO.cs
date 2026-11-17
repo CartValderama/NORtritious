@@ -10,6 +10,13 @@ namespace Backend.DTO
     // sugar field be sent as a measured 0 and grant "Sukkerfri" to milk.
     public class CalculatorSchemaDTO
     {
+        // Whether the Nøkkelhullet regulation covers this kind of product at all. False for
+        // the "annet" varegruppe, whose two categories sit outside the taxonomy. The form
+        // reads it to say so before a figure is entered, rather than leaving a producer to
+        // infer it from an empty requirement list that elsewhere means the opposite: an
+        // always-pass category has no requirements either, and it qualifies.
+        public bool NokkelhulletApplies { get; set; } = true;
+
         // Nutrition-table field keys to render, in the form's own order. A field is included
         // when a Nøkkelhullet rule or an offered EFSA claim actually reads it, so nothing is
         // asked for that no rule will look at, and nothing a rule reads goes unasked.

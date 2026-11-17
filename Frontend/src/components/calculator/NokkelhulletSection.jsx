@@ -6,16 +6,25 @@ import ClaimGrid from "./ClaimGrid";
 // derives HasNokkelhullet from the same list, so what's shown and what was decided can't
 // disagree. buildRequirementTitle/Detail stay: they turn a requirement into Norwegian prose,
 // which is presentation, not assessment.
-const NokkelhulletSection = ({ requirements = [] }) => {
+const NokkelhulletSection = ({ requirements = [], applies = true }) => {
 
   return (
     <ClaimGrid
       isEmpty={requirements.length === 0}
       emptyMessage={
-        <>
-          <strong>Nøkkelhullet ukjent.</strong> Det finnes ingen spesifikke krav
-          til næringsinnhold for denne kategorien.
-        </>
+        applies ? (
+          <>
+            <strong>Nøkkelhullet ukjent.</strong> Det finnes ingen spesifikke
+            krav til næringsinnhold for denne kategorien.
+          </>
+        ) : (
+          <>
+            <strong>Nøkkelhullet gjelder ikke.</strong> Produkter i denne
+            varegruppen omfattes ikke av Nøkkelhullforskriften, og kan ikke
+            merkes med Nøkkelhullet uansett næringsinnhold. Resten av
+            beregningen gjelder som vanlig.
+          </>
+        )
       }
     >
       {requirements.map((req, i) => {

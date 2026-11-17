@@ -104,6 +104,10 @@ export interface KildeOption {
 }
 
 export interface CalculatorSchema {
+  // Whether the Nøkkelhullet regulation covers this kind of product at all. False only for
+  // the two categories in the "annet" varegruppe. Optional so a response from an older
+  // backend reads as the ordinary case rather than as "does not apply".
+  nokkelhulletApplies?: boolean;
   kilder: KildeOption[];
   fields: string[];
   nokkelhulletFields: string[];

@@ -161,7 +161,11 @@ export const buildClaimStatistic = (
 
 
 interface ResultSummaryInput {
-  hasNokkelhullet?: boolean;
+  // null covers three facts and cannot be read as any one of them: no energy entered, an
+  // unrecognised category, or a product the regulation does not reach. Only the last is
+  // permanent, and it arrives as its own field.
+  hasNokkelhullet?: boolean | null;
+  nokkelhulletApplies?: boolean;
   nokkelhulletRequirements?: NokkelhulletRequirement[];
   efsaNutritionClaims?: string[];
   efsaNutritionClaimResults?: EfsaNutritionClaimResult[];
@@ -170,6 +174,10 @@ interface ResultSummaryInput {
 }
 
 export interface ResultStats {
+  // Whether Nøkkelhullet judged this product at all. An empty requirement list means two
+  // opposite things without it: an always-pass category qualifies, and a product outside
+  // the regulation cannot.
+  nokkelhulletApplies: boolean;
   nokkelhulletPassed: boolean;
   nokkelhulletPassedCount: number;
   nokkelhulletTotalCount: number;
@@ -195,6 +203,9 @@ export const buildResultStats = (result: ResultSummaryInput): ResultStats => {
   ];
 
   return {
+    // Explicitly false, not merely absent: a response from an older backend has no such
+    // field and must read as the ordinary case.
+    nokkelhulletApplies: result.nokkelhulletApplies !== false,
     nokkelhulletPassed: result.hasNokkelhullet === true,
     nokkelhulletPassedCount: requirements.filter((r) => r.passed).length,
     nokkelhulletTotalCount: requirements.length,
@@ -211,6 +222,10 @@ export const buildResultStats = (result: ResultSummaryInput): ResultStats => {
 // already carry the raw numbers, so these say what that number actually means
 // in practice instead of just repeating it.
 export const buildNokkelhulletVerdict = (stats: ResultStats): string => {
+  // Before the count, because a product the regulation does not cover also has no
+  // requirements, and "ingen krav" would read as though it had cleared them all.
+  if (!stats.nokkelhulletApplies)
+    return "Nøkkelhullet gjelder ikke for denne varegruppen";
   if (stats.nokkelhulletTotalCount === 0)
     return "Ingen krav for denne kategorien";
   return stats.nokkelhulletPassedCount === stats.nokkelhulletTotalCount

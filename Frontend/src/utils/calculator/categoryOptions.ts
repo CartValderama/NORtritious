@@ -5,6 +5,11 @@ export interface CategoryOption {
 
 // Maps the dropdown selection values to the backend category keys (e.g. "Kategori1", "Melk11a")
 const CATEGORY_KEY_MAP: Record<string, string> = {
+  // The two that are not Nøkkelhullet categories. Prefixed so the key says which list it
+  // belongs to, and so neither can collide with a numbered category later.
+  drikkevann: "AnnetDrikkevann",
+  "bordsøtningsmiddel": "AnnetBordsotningsmiddel",
+
   "kategori 1": "Kategori1",
   "kategori 2": "Kategori2",
   "kategori 3": "Kategori3",
@@ -136,6 +141,20 @@ export function getAllCategoryLabels(): Record<string, string> {
   return labelsByKey;
 }
 
+// The two categories in the "annet" varegruppe say what the product is, and produkttype
+// asks the same question for the Annex's carve-outs. Picking the category answers it, so
+// the answer is filled in rather than asked for twice, and neither option is offered in the
+// produkttype picker any more.
+//
+// Here rather than in the form, because the store needs it too: a saved product keeps its
+// category and not its produkttype, so loading one for editing has to derive the second
+// from the first. Nothing else in the form implies a produkttype, so this map stays these
+// two; lettmelk has no category and is still picked by hand.
+export const PRODUCT_TYPE_BY_CATEGORY: Record<string, string> = {
+  drikkevann: "drinkingWater",
+  "bordsøtningsmiddel": "tableTopSweetener",
+};
+
 // ── Group options (level 1) ──────────────────────────────────────────────────
 export const GROUP_OPTIONS: CategoryOption[] = [
   { value: "grønnsaker, frukt, bær og nøtter",                          label: "Grønnsaker, frukt, bær og nøtter" },
@@ -149,6 +168,10 @@ export const GROUP_OPTIONS: CategoryOption[] = [
   { value: "helt eller delvis vegetabilske produkter",                   label: "Helt eller delvis vegetabilske produkter" },
   { value: "ferdigretter",                                               label: "Ferdigretter" },
   { value: "dressinger og sauser",                                       label: "Dressinger og sauser" },
+  // Last, and deliberately not a Nøkkelhullet varegruppe: these are products the
+  // regulation does not cover. Listed here as well as in PRODUCT_OPTIONS_BY_GROUP below,
+  // because this array is what fills the first dropdown and the map only fills the second.
+  { value: "annet (ikke omfattet av nøkkelhullet)",                      label: "Annet (testing/midlertidig)" },
 ];
 
 // ── Product options per group (level 2) ─────────────────────────────────────
@@ -210,6 +233,15 @@ export const PRODUCT_OPTIONS_BY_GROUP: Record<string, CategoryOption[]> = {
     { value: "kategori 28", label: "28. Piroger, pizzaer, vårruller, andre paier enn dessertpaier og lignende produkter. Produktet skal inneholde minst 28 g grønnsaker (unntatt poteter), belgvekster (unntatt peanøtter), rotfrukter, eller frukt og bær per 100 g produkt. Inneholder produktet en korndel, skal denne inneholde minst 30 % fullkorn beregnet ut fra korndelens tørrstoffinnhold. Inneholder produktet minst 50 % grønnsaker (unntatt poteter), belgvekster (unntatt peanøtter), rotfrukter, eller frukt og bær per 100 g produkt, skal produktets eventuelle korndel inneholde minst 15 % fullkorn beregnet ut fra korndelens tørrstoffinnhold. Er korndelen glutenfri, skal den inneholde minst 10 % fullkorn, beregnet ut fra korndelens tørrstoffinnhold." },
     { value: "kategori 29", label: "29. Smørbrød, bagetter, wraps og lignende produkter. Produktet skal inneholde minst 25 g grønnsaker (unntatt poteter), belgvekster (unntatt peanøtter), rotfrukter eller frukt og bær per 100 g produkt. Inneholder produktet en korndel, skal denne inneholde minst 30 % fullkorn, beregnet ut fra korndelens tørrstoffinnhold. Inneholder produktet minst 50 % grønnsaker (unntatt poteter), belgvekster (unntatt peanøtter), rotfrukter eller frukt og bær per 100 g produkt, skal produktets eventuelle korndel inneholde minst 15 % fullkorn beregnet ut fra korndelens tørrstoffinnhold. Er korndelen glutenfri, skal den inneholde minst 10 % fullkorn, beregnet ut fra korndelens tørrstoffinnhold." },
     { value: "kategori 30", label: "30. Supper. Produktet skal inneholde minst 35 g grønnsaker (unntatt poteter), belgvekster (unntatt peanøtter), rotfrukter eller frukt og bær per 100 g suppe. Inneholder produktet en korndel, skal denne oppfylle kravet til fullkorn som er gitt i den relevante næringsmiddelgruppen. Hvis glutenfri pasta inngår, gjelder kravet til kostfiber i gruppe 10." },
+  ],
+  // Not a Nøkkelhullet varegruppe. Every group above is the regulation's own taxonomy,
+  // one for one; these two are products it does not cover, and they are here so that a
+  // producer of either can use the calculator without naming a category that is not theirs.
+  // The calculation returns no Nøkkelhullet verdict for them and the EFSA halves run as
+  // normal, which is the whole point: both have claims of their own.
+  "annet (ikke omfattet av nøkkelhullet)": [
+    { value: "drikkevann", label: "Drikkevann. Vann som omfattes av drikkevannsforskriften eller forskriften om naturlig mineralvann og kildevann." },
+    { value: "bordsøtningsmiddel", label: "Bordsøtningsmiddel. Produkter som brukes til å søte mat og drikke, i tabletter, pulver eller dråper." },
   ],
   "dressinger og sauser": [
     { value: "kategori 31", label: "31. Dressinger av olje og eddik. Produktene kan være tilsatt smak." },
