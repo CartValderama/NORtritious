@@ -102,40 +102,42 @@ export function useKildePicker(schema: CalculatorSchema) {
   const isNutritionKilde = newSubstance?.kind === "nutrition";
 
   // The boxes to draw for the current pick: whatever the backend described, or the ordinary
-  // single "Mengde" one for the kilde that described none, which is most of them.
+  // single "Mengde" one for the kilde that described none, which is all but three of them.
   //
-  // An empty array is not the same as none described, and the difference is the water row:
-  // it describes zero boxes on purpose, because its claims condition nothing about the food
-  // and there is no figure to ask for. Testing for length here would have given it a Mengde
-  // box whose answer nothing reads.
-  const kildeFields: KildeField[] = Array.isArray(newSubstance?.fields)
-    ? newSubstance.fields
-    : [
-        {
-          target: "amount",
-          label: "Mengde",
-          unit: kildeUnit(newSubstance),
-          placeholder: kildePlaceholder(newSubstance),
-        },
-      ];
+  // Withheld with the water claims, which were the only kilde to describe zero boxes: the
+  // test was Array.isArray rather than length, so that an empty array meant none at all
+  // instead of falling through to a "Mengde" box whose answer nothing reads. Restoring it
+  // means restoring declaresNoAmount below, its branch in canAddSubstance and in
+  // handleAddSubstance, and the pill in EfsaHealthClaimsPanel.jsx.
+  const kildeFields: KildeField[] =
+    newSubstance?.fields && newSubstance.fields.length > 0
+      ? newSubstance.fields
+      : [
+          {
+            target: "amount",
+            label: "Mengde",
+            unit: kildeUnit(newSubstance),
+            placeholder: kildePlaceholder(newSubstance),
+          },
+        ];
 
   // A kilde whose declaration is the picking of it, with nothing to fill in.
-  const declaresNoAmount = kildeFields.length === 0;
+  // const declaresNoAmount = kildeFields.length === 0;
 
   // Single source of truth for "is there enough filled in to add this kilde
   // right now" — used for both the Legg til button's disabled state and as
   // handleAddSubstance's own guard, so the two can't drift apart.
+  //
+  // The withheld zero-box branch went in front of these two: `declaresNoAmount ? true`,
+  // because there is nothing to fill in and picking the row is already the declaration.
   const canAddSubstance =
     !!newSubstance &&
-    (declaresNoAmount
-      ? // nothing to fill in, so picking it is already enough
-        true
-      : isNutritionKilde
-        ? // the first box is the figure the others are fractions of, and none of them means
-          // anything without it
-          !!efsaValues[kildeFields[0].target as keyof typeof efsaValues]
-        : !!newSubstanceAmount &&
-          !(newSubstance.requiresKostfiber && fiberFullyUsed));
+    (isNutritionKilde
+      ? // the first box is the figure the others are fractions of, and none of them means
+        // anything without it
+        !!efsaValues[kildeFields[0].target as keyof typeof efsaValues]
+      : !!newSubstanceAmount &&
+        !(newSubstance.requiresKostfiber && fiberFullyUsed));
 
   const handleAddSubstance = () => {
     if (!canAddSubstance || !newSubstance) return;
@@ -165,9 +167,11 @@ export function useKildePicker(schema: CalculatorSchema) {
     setSubstanceError("");
     setEfsaField("otherSubstances", [
       ...otherSubstances.filter((s) => s.name !== newSubstance.value),
-      // "0" rather than the empty draft string for a kilde with no box: the request's amount
-      // is a number, and the backend does not read this one at all.
-      { name: newSubstance.value, amount: declaresNoAmount ? "0" : newSubstanceAmount },
+      // Withheld with the water claims: a kilde with no box stored "0" here rather than
+      // the empty draft string, because the request's amount is a number and the backend
+      // did not read that one at all.
+      // { name: newSubstance.value, amount: declaresNoAmount ? "0" : newSubstanceAmount },
+      { name: newSubstance.value, amount: newSubstanceAmount },
     ]);
     setNewSubstance(null);
     setNewSubstanceAmount("");

@@ -215,16 +215,16 @@ const EfsaHealthClaimsPanel = ({ schema }) => {
             {otherSubstances.map((s) => {
               const opt = byValue.get(s.name);
               const label = opt?.label ?? s.name;
-              // A kilde that asked for no figure has none to show. Printing "Vann: 0 g"
-              // would put a quantity on the pill that nobody typed and nothing reads.
-              const pill =
-                opt?.fields?.length === 0
-                  ? label
-                  : `${label}: ${s.amount} ${kildeUnit(opt)}`;
+              // Withheld with the water claims. A kilde that asked for no figure has none
+              // to show, and printing "Vann: 0 g" would put a quantity on the pill that
+              // nobody typed and nothing reads:
+              //   const pill = opt?.fields?.length === 0
+              //     ? label
+              //     : `${label}: ${s.amount} ${kildeUnit(opt)}`;
               return (
                 <RemovablePill
                   key={s.name}
-                  label={pill}
+                  label={`${label}: ${s.amount} ${kildeUnit(opt)}`}
                   onRemove={() => handleRemoveSubstance(s.name)}
                   ariaLabel={`Fjern ${label}`}
                 />

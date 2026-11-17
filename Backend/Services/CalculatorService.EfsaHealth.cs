@@ -172,30 +172,37 @@ namespace Backend.Services
             ["Meat or fish"]       = new(new[] { new OtherClaimRule(763365, OtherClaimCheck.PortionThreshold, 50m) },
                                          IsFibre: false),
 
-            // Water, and the first kilde that asks for no figure at all.
+            // Water, 767405 and 767441, withheld for the same reason as the seven chewing
+            // gum claims, and it took being asked to see it.
             //
-            // Both claims carry one condition and it is a labelling duty: "information shall
-            // be given to the consumer that in order to obtain the claimed effect, at least
-            // 2,0 L of water, from all sources, should be consumed per day". From all sources,
-            // so not even a property of this product. Nothing about the food is conditioned,
-            // which is why both are NotComputable.
+            // This table is the kilder: things a product contains. Every other row here is
+            // read that way by the register too, "food which contains at least X of Y". The
+            // water claims are not. Their restriction reads "the claim may be used only on
+            // water complying with Directives 2009/54/EC and/or 98/83/EC", which is about
+            // what the product is, and the subject field is the bare word Water. The gum
+            // claims say "only for chewing gum which complies with SUGARS FREE" and name
+            // Sugar-free chewing gum as their subject, which is the same thing.
             //
-            // The register's restriction, "may be used only on water complying with Directives
-            // 2009/54/EC and/or 98/83/EC", is about what the product legally is rather than
-            // what it contains, and is reported through Vilkår for bruk like 755661's "fats
-            // and oils".
+            // So a row here would have asked the wrong question. "Velg kilde" says this is
+            // in my product, and a juice that is nine tenths water could have picked it and
+            // been handed both claims. The register's restriction would have been on the
+            // card for a careful reader, and the tool would still have offered the claim.
             //
-            // An empty Fields array, which is new: it means this kilde draws no input boxes,
-            // as against a null one, which means it draws the ordinary single "Mengde" box.
-            // There is no amount to ask for. Asking "how much water per 100 g" and then
-            // ignoring the answer would assert a requirement the register does not make,
-            // which is the same mistake that had five claims gated on a labelling duty.
-            // Picking the row is the whole declaration: this product is water.
-            ["Water"]              = new(new[]
-            {
-                new OtherClaimRule(767405, OtherClaimCheck.NotComputable),
-                new OtherClaimRule(767441, OtherClaimCheck.NotComputable),
-            }, IsFibre: false, Fields: Array.Empty<KildeFieldDTO>()),
+            // Both conditions are labelling duties, so these were NotComputable with no
+            // verdict, which is why the mistake was not a wrong verdict but a wrong audience.
+            //
+            // The input that would be right already exists and is not this one: produkttype
+            // "Drikkevann", which ProductBasis.IsWater already reads for the LOW SODIUM
+            // særregel of 2 mg natrium per 100 ml. Restoring these two means gating them on
+            // that rather than on a kilde, and restoring the two opinion titles, the Vann
+            // label, the zero-box amount line, and the zero-field branch in useKildePicker.ts
+            // that the frontend has also given back.
+            //
+            // ["Water"]              = new(new[]
+            // {
+            //     new OtherClaimRule(767405, OtherClaimCheck.NotComputable),
+            //     new OtherClaimRule(767441, OtherClaimCheck.NotComputable),
+            // }, IsFibre: false, Fields: Array.Empty<KildeFieldDTO>()),
 
             // ── Claims whose figure the register states per day ──────────────
             //
@@ -575,7 +582,8 @@ namespace Backend.Services
                 ["Betaine"] = "Betain",
                 ["Melatonin"] = "Melatonin",
                 ["Linoleic acid"] = "Linolsyre",
-                ["Water"] = "Vann",
+                // Withheld with the water claims.
+                // ["Water"] = "Vann",
                 ["Arabinoxylan"] = "Arabinoksylan",
             };
 
@@ -649,8 +657,10 @@ namespace Backend.Services
             [764069] = "Les EFSA-uttalelsen om pektin og blodsukker etter måltid",
             [759949] = "Les EFSA-uttalelsen om aktivt kull og tarmgass",
             [762653] = "Les EFSA-uttalelsen om laktulose og tarmpassasje",
-            [767405] = "Les EFSA-uttalelsen om vann og fysisk og kognitiv funksjon",
-            [767441] = "Les EFSA-uttalelsen om vann og kroppstemperatur",
+            // Withheld with the water claims themselves, the way the six chewing gum
+            // titles above are.
+            // [767405] = "Les EFSA-uttalelsen om vann og fysisk og kognitiv funksjon",
+            // [767441] = "Les EFSA-uttalelsen om vann og kroppstemperatur",
             [763365] = "Les EFSA-uttalelsen om kjøtt eller fisk og opptak av jern",
             // Withheld with the chewing gum claims themselves.
             // [765261] = "Les EFSA-uttalelsen om sukkerfri tyggegummi og tannmineralisering",
@@ -790,10 +800,13 @@ namespace Backend.Services
         // Every claim the register authorises falls into one of six groups: served here,
         // carrying the SOURCE OF cross-reference the client's scope excludes, food
         // supplements only, chewing gum only, needing a reference product to compare
-        // against, or one of the ten below. The ten had no reason recorded anywhere, which
-        // is the only reason this note exists: a scope with ten silent omissions in it
-        // cannot be defended, and an omission nobody wrote down is indistinguishable from
-        // one nobody noticed.
+        // against, or in scope and not served. That last group is fourteen: the ten below,
+        // 836661 above, 756345 after them, and the two water claims, whose reason is on the
+        // withheld Water entry in OtherClaimRegistry because that is where the row would be.
+        //
+        // The ten had no reason recorded anywhere, which is the only reason this note
+        // exists: a scope with ten silent omissions in it cannot be defended, and an
+        // omission nobody wrote down is indistinguishable from one nobody noticed.
         //
         // Reformulation claims. Each one asks what the product used to contain, or what it
         // contains instead of something else, which is a second product's figures:
@@ -1043,11 +1056,11 @@ namespace Backend.Services
                     OtherClaimCheck.PerGramThreshold =>
                         amount > 0 ? $"{FormatNo(amount)} {unit}" : "ikke oppgitt",
 
-                    // A kilde that asks for no figure has none to restate, and the
-                    // per-100 formatter would print "ikke oppgitt" here: it reads as a
-                    // reproach for a number the form never asked for. What the producer
-                    // declared by picking the row is what the product is.
-                    _ when substance.Fields is { Length: 0 } => "gjelder hele produktet",
+                    // Withheld with the water claims. A kilde that asks for no figure has
+                    // none to restate, and the per-100 formatter below prints "ikke oppgitt"
+                    // for it, which reads as a reproach for a number the form never asked
+                    // for. No kilde describes zero boxes any more, so nothing reaches this.
+                    // _ when substance.Fields is { Length: 0 } => "gjelder hele produktet",
 
                     _ => FormatPerHundredAmount(amount, unit, foodType),
                 };
