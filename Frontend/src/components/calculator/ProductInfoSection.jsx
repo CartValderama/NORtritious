@@ -112,7 +112,13 @@ const DECLARATION_HELP =
 
 const LIQUID_ONLY_PRODUCTS = {
   drinkingWater: "Drikkevann",
-  semiSkimmedMilk: "Lettmelk",
+  // Lettmelk withheld for now. It forced Fysisk form to flytende the moment the produkttype
+  // was picked, and disabled the control, which takes the answer away instead of asking for
+  // it. Drikkevann keeps the lock because it follows from the matkategori rather than from a
+  // declaration, so there is nothing for the user to have meant by it. Restoring Lettmelk is
+  // this one line: the disabled state, the hint and the food-type effect all read off this
+  // map and need no other change.
+  // semiSkimmedMilk: "Lettmelk",
 };
 
 // The produkttyper still offered as a choice, in the order the picker shows them.
