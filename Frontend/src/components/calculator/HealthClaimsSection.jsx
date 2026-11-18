@@ -18,8 +18,14 @@ const CLAIM_STYLES = {
 
 // Plain click-to-toggle, no accordion styling/border — just hides the
 // condition text behind a click instead of always showing it.
-const VilkaarForBruk = ({ text }) => {
-  const [open, setOpen] = useState(false);
+//
+// Used for both blocks of text the register keeps per claim, which is why the label is a
+// prop and the component is no longer named after one of them. The second block,
+// restrictions_of_use, is not a list of things to satisfy: it holds prohibitions and
+// warnings, so calling it "Vilkår for bruk" would have told the reader the wrong thing
+// about what to do with it.
+const ClaimTextToggle = ({ text, label, defaultOpen = false }) => {
+  const [open, setOpen] = useState(defaultOpen);
 
   return (
     <div>
@@ -29,7 +35,7 @@ const VilkaarForBruk = ({ text }) => {
         style={{ fontSize: "0.8rem" }}
         onClick={() => setOpen((o) => !o)}
       >
-        Vilkår for bruk
+        {label}
         <i className={`bi bi-caret-${open ? "up" : "down"}-fill`} />
       </button>
       {open && (
@@ -93,7 +99,31 @@ const HealthClaimsSection = ({ result }) => {
                 {claim.pastand}
               </p>
 
-              {claim.vilkaarForBruk && <VilkaarForBruk text={claim.vilkaarForBruk} />}
+              {claim.vilkaarForBruk && (
+                <ClaimTextToggle
+                  text={claim.vilkaarForBruk}
+                  label="Vilkår for bruk"
+                />
+              )}
+
+              {/* The register's second block, restrictions_of_use. The backend has always
+                  fetched, translated and sent it, and nothing drew it, so 13 of the 66
+                  served claims were losing text: seven a mandatory choking warning for
+                  people with swallowing difficulties, three a prohibition on foods aimed at
+                  children, one a prohibition on products that are wholly sugars, plus
+                  betaine's warning about intakes above 4 g.
+
+                  Open by default, where the conditions above stay collapsed. The conditions
+                  are reference text a label-maker goes looking for; these are warnings and
+                  prohibitions, and one a reader has to discover behind a click is one they
+                  can miss while preparing a label. */}
+              {claim.vilkaarOgBegrensninger && (
+                <ClaimTextToggle
+                  text={claim.vilkaarOgBegrensninger}
+                  label="Begrensninger for bruk"
+                  defaultOpen
+                />
+              )}
             </div>
 
             {(claim.sourceUrl || claim.efsaQuestionUrl) && (

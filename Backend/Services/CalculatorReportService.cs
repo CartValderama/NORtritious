@@ -287,6 +287,15 @@ namespace Backend.Services
                     var footnote = new List<string>();
                     if (!string.IsNullOrWhiteSpace(claim.VilkaarForBruk))
                         footnote.Add($"Vilkår for bruk: {claim.VilkaarForBruk}");
+                    // The register keeps two blocks per claim and this report printed one.
+                    // restrictions_of_use is where the prohibitions and warnings live, so
+                    // the text being dropped was the part a label must carry rather than
+                    // the part it must satisfy: the choking warning on the viscous fibre
+                    // claims, "shall not be used for foods targeting children" on the three
+                    // high-dose omega-3 ones, and the ban on using 836625 where the product
+                    // is wholly sugars.
+                    if (!string.IsNullOrWhiteSpace(claim.VilkaarOgBegrensninger))
+                        footnote.Add($"Begrensninger for bruk: {claim.VilkaarOgBegrensninger}");
                     if (!string.IsNullOrWhiteSpace(claim.LegislationReference))
                         footnote.Add($"Kilde: {claim.LegislationReference}");
 
