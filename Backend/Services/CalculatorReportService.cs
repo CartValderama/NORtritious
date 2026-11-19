@@ -55,6 +55,27 @@ namespace Backend.Services
             ["undetermined"] = "Ikke vurdert",
         };
 
+        // Where the two rulesets this report judges against are written down, cited once per
+        // section rather than once per row. Every limit in a section is read from the same
+        // vedlegg, and addressing a single krav would need Lovdata's query API, which is open
+        // only to a paid account.
+        //
+        // The address is printed as text and not only linked. A report like this one is filed
+        // and read on paper, where a link whose target is invisible cites nothing. The
+        // helsepåstand entries in section 2 already carry their own Kilde line, naming the
+        // forordning that authorises each individual claim, which is why no third citation is
+        // added here.
+        private const string NokkelhulletSource =
+            "Kilde: Forskrift om frivillig merking av næringsmidler med Nøkkelhullet "
+            + "(FOR-2015-02-18-139), vedlegg 2. ";
+        private const string NokkelhulletSourceUrl =
+            "https://lovdata.no/dokument/SF/forskrift/2015-02-18-139/KAPITTEL_2";
+        private const string NutritionClaimsSource =
+            "Kilde: Forskrift om ernærings- og helsepåstander om næringsmidler "
+            + "(FOR-2010-02-17-187), vedlegget til forordning (EF) nr. 1924/2006. ";
+        private const string NutritionClaimsSourceUrl =
+            "https://lovdata.no/dokument/SF/forskrift/2010-02-17-187/KAPITTEL_1-1-1-6";
+
         private readonly CalculatorService _calculator;
         private int _sectionNumber;
 
@@ -147,6 +168,18 @@ namespace Backend.Services
         {
             _sectionNumber += 1;
             section.AddParagraph($"{_sectionNumber}. {title}", "SectionHeading");
+        }
+
+        // Sits directly under a section heading, so the reader is told what the figures below
+        // rest on before reading them rather than after.
+        private static void DrawRegulationSource(Section section, string text, string url)
+        {
+            var paragraph = section.AddParagraph();
+            paragraph.Style = "Footnote";
+            paragraph.AddText(text);
+            var link = paragraph.AddHyperlink(url, HyperlinkType.Web);
+            link.Font.Underline = Underline.Single;
+            link.AddText(url);
         }
 
         private static Table AddTable(Section section, string[] headers, IEnumerable<string[]> rows)
@@ -358,6 +391,7 @@ namespace Backend.Services
         private void DrawNokkelhullet(Section section, CalculatorReportRequestDTO request, CalculatorResponseDTO result)
         {
             DrawSectionHeading(section, "Nøkkelhullet - kravvurdering");
+            DrawRegulationSource(section, NokkelhulletSource, NokkelhulletSourceUrl);
 
             var requirements = result.NokkelhulletRequirements;
             if (requirements.Count == 0)
@@ -398,6 +432,7 @@ namespace Backend.Services
             Section section, CalculatorReportRequestDTO request, CalculatorResponseDTO result)
         {
             DrawSectionHeading(section, "EFSA Ernæringspåstander - fullstendig oversikt");
+            DrawRegulationSource(section, NutritionClaimsSource, NutritionClaimsSourceUrl);
 
             var claims = result.EfsaNutritionClaimResults;
             if (claims.Count == 0)

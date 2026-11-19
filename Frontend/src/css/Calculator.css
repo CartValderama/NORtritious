@@ -154,6 +154,86 @@ html.calculator-responsive-text {
   color: #495057 !important;
 }
 
+/* An alternative look for the kilde-link under a result section's cards, in
+   RegulationSourceLink.jsx. Blue text on nothing at rest with the tint only under the
+   cursor, so the row reads as a reference rather than as a third verdict button. The
+   link wears the same chip as the helsepaastand cards' links instead, so this sits
+   unused, kept here in case the plain link is wanted after all.
+
+.regulation-source-link {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  color: #0d6efd !important;
+  text-decoration: none !important;
+}
+.regulation-source-link:hover,
+.regulation-source-link:focus {
+  background-color: #cfe2ff !important;
+  border-color: #cfe2ff !important;
+  color: #084298 !important;
+}
+*/
+
+/* The pager under a result section's cards, from Pagination.jsx. Bootstrap's own
+   .pagination is link-blue with a blue current page, which would be the loudest thing in a
+   section whose cards are already carrying green and red verdicts. It wears the same grey
+   chip as the links instead, and the current page takes the navy the calculator uses for
+   its own buttons. */
+.result-pagination {
+  gap: 0.25rem;
+}
+/* Square, and the same square whatever digit is in it. Bootstrap sizes a page button by
+   its padding, so a 1 is narrower than a 10 and the row of them reads as uneven. A fixed
+   box centres the number instead, and the pager keeps its shape as a section grows past
+   nine pages. */
+.result-pagination .page-link {
+  /* !important because Bootstrap rounds only the outer corners of the first and last
+     button, through .pagination .page-item:first-child .page-link, which outweighs this
+     selector and loads after this file. Without it the row reads as one joined strip with
+     two rounded ends rather than as separate buttons. */
+  border-radius: 0.25rem !important;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #495057;
+  background-color: #e9ecef;
+  border-color: #e9ecef;
+}
+.result-pagination .page-link:hover {
+  color: #495057;
+  background-color: #dee2e6;
+  border-color: #dee2e6;
+}
+/* Bootstrap's focus ring is its own blue, which would be the one bit of the control that
+   never matches the rest of it. */
+.result-pagination .page-link:focus {
+  box-shadow: 0 0 0 0.2rem rgba(0, 32, 91, 0.25);
+}
+/* The open page takes the tone of the section it sits in, which ResultAccordionSection
+   publishes as custom properties on the accordion item. Nøkkelhullet and ernæringspåstander
+   turn green when everything passed and red when something did not, helsepåstander is blue,
+   so the pager says the same thing as the count badge up in the heading.
+   The border is what carries the contrast. Both the tone and the resting grey are pale, and
+   the fill alone was a weak way to say which page you are on. The navy fallback is for a
+   pager used outside a result section, where there is no tone to take. */
+.result-pagination .page-item.active .page-link {
+  color: var(--result-tone-color, #fff);
+  background-color: var(--result-tone-bg, #00205b);
+  border-color: var(--result-tone-border, #00205b);
+}
+/* Nothing in the pager is disabled now that the chevrons are gone, since a page button is
+   never the page you are on without being the active one. Kept for the chevrons, which are
+   commented out rather than dropped in Pagination.jsx.
+.result-pagination .page-item.disabled .page-link {
+  color: #adb5bd;
+  background-color: #f8f9fa;
+  border-color: #f8f9fa;
+}
+*/
+
 /* "Legg til" (Kilde til Annet) — Bootstrap's default disabled opacity (0.65) still
    reads as a fairly solid blue; fade it further so a disabled state is unmistakable.
    Bootstrap also sets pointer-events: none on :disabled, which silently suppresses any

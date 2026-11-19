@@ -1,6 +1,8 @@
 import React from "react";
 import { buildRequirementTitle } from "../../utils/calculator/nokkelhulletDisplay";
+import { NOKKELHULLET_SOURCE } from "../../utils/calculator/lovdataLinks";
 import ClaimGrid from "./ClaimGrid";
+import ResultSectionFooter from "./ResultSectionFooter";
 
 // The breakdown comes from the response rather than being recomputed here. The backend
 // derives HasNokkelhullet from the same list, so what's shown and what was decided can't
@@ -9,57 +11,65 @@ import ClaimGrid from "./ClaimGrid";
 const NokkelhulletSection = ({ requirements = [], applies = true }) => {
 
   return (
-    <ClaimGrid
-      isEmpty={requirements.length === 0}
-      emptyMessage={
-        applies ? (
-          <>
-            <strong>Nøkkelhullet ukjent.</strong> Det finnes ingen spesifikke
-            krav til næringsinnhold for denne kategorien.
-          </>
-        ) : (
-          <>
-            <strong>Nøkkelhullet gjelder ikke.</strong> Produkter i denne
-            varegruppen omfattes ikke av Nøkkelhullforskriften, og kan ikke
-            merkes med Nøkkelhullet uansett næringsinnhold. Resten av
-            beregningen gjelder som vanlig.
-          </>
-        )
-      }
-    >
-      {requirements.map((req, i) => {
-        const isLastInRow = i % 2 === 1 || i === requirements.length - 1;
-        const rows = Math.ceil(requirements.length / 2);
-        const isLastRow = i >= (rows - 1) * 2;
+    <>
+      <ClaimGrid
+        isEmpty={requirements.length === 0}
+        emptyMessage={
+          applies ? (
+            <>
+              <strong>Nøkkelhullet ukjent.</strong> Det finnes ingen spesifikke
+              krav til næringsinnhold for denne kategorien.
+            </>
+          ) : (
+            <>
+              <strong>Nøkkelhullet gjelder ikke.</strong> Produkter i denne
+              varegruppen omfattes ikke av Nøkkelhullforskriften, og kan ikke
+              merkes med Nøkkelhullet uansett næringsinnhold. Resten av
+              beregningen gjelder som vanlig.
+            </>
+          )
+        }
+      >
+        {requirements.map((req, i) => {
+          const isLastInRow = i % 2 === 1 || i === requirements.length - 1;
+          const rows = Math.ceil(requirements.length / 2);
+          const isLastRow = i >= (rows - 1) * 2;
 
-        return (
-          <div
-            key={req.key}
-            className={`claim-grid-item p-4 ${!isLastInRow ? "border-end" : ""} ${!isLastRow ? "border-bottom" : ""}`}
-            style={{ paddingRight: !isLastInRow ? "1rem" : 0 }}
-          >
-            <p
-              className={`mb-2 fw-bold d-flex align-items-center gap-2 ${req.passed ? "text-success-emphasis" : "text-danger-emphasis"}`}
+          return (
+            <div
+              key={req.key}
+              className={`claim-grid-item p-4 ${!isLastInRow ? "border-end" : ""} ${!isLastRow ? "border-bottom" : ""}`}
+              style={{ paddingRight: !isLastInRow ? "1rem" : 0 }}
             >
-              <i
-                className={`bi ${req.passed ? "bi-check-circle-fill" : "bi-x-circle-fill"}`}
-                style={{
-                  color: req.passed ? "#198754" : "#dc3545",
-                  fontSize: "1rem",
-                }}
-              />
-              {buildRequirementTitle(req)}
-            </p>
-            <p
-              className="mb-0"
-              style={{ color: req.passed ? "#062814" : "#3b0c0f" }}
-            >
-              {req.note ? `${req.explanation} ${req.note}` : req.explanation}
-            </p>
-          </div>
-        );
-      })}
-    </ClaimGrid>
+              <p
+                className={`mb-2 fw-bold d-flex align-items-center gap-2 ${req.passed ? "text-success-emphasis" : "text-danger-emphasis"}`}
+              >
+                <i
+                  className={`bi ${req.passed ? "bi-check-circle-fill" : "bi-x-circle-fill"}`}
+                  style={{
+                    color: req.passed ? "#198754" : "#dc3545",
+                    fontSize: "1rem",
+                  }}
+                />
+                {buildRequirementTitle(req)}
+              </p>
+              <p
+                className="mb-0"
+                style={{ color: req.passed ? "#062814" : "#3b0c0f" }}
+              >
+                {req.note ? `${req.explanation} ${req.note}` : req.explanation}
+              </p>
+            </div>
+          );
+        })}
+      </ClaimGrid>
+
+      {/* Shown whether or not any krav applied, and whether or not the product met them. The
+          link is about the forskrift rather than about this product, so it is still the right
+          reference for a varegruppe the forskrift leaves out, which is the case where a reader
+          is most likely to want to check the text for themselves. */}
+      <ResultSectionFooter source={NOKKELHULLET_SOURCE} />
+    </>
   );
 };
 

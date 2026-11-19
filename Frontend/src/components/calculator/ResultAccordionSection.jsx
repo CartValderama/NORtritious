@@ -21,6 +21,14 @@ const ResultAccordionSection = ({
       itemStyle={{
         backgroundColor: "#fff",
         border: `1px solid ${open ? colors.border : "#dee2e6"}`,
+        // The section's tone, published once here for anything inside the body that has to
+        // match it. The pager's current page reads these, which saves threading the colours
+        // through every section component to reach a control three levels down. They are
+        // the same pair the count badge in this header wears, so the open page and the
+        // badge above it say the same thing in the same colour.
+        "--result-tone-bg": colors.badgeBg,
+        "--result-tone-color": colors.badgeColor,
+        "--result-tone-border": colors.border,
       }}
       open={open}
       onToggle={onToggle}
