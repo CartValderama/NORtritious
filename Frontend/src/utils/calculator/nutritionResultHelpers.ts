@@ -233,6 +233,9 @@ export const buildNokkelhulletVerdict = (stats: ResultStats): string => {
     : "Kan ikke merkes med Nøkkelhullet";
 };
 
+// Only the first branch is reached now. The overview card draws its two counts as a chart
+// and prints no verdict line under it, except where there is no påstand to chart. The rest
+// is kept for a caller that wants the sentence rather than the columns.
 export const buildEfsaVerdict = (stats: ResultStats): string => {
   if (stats.efsaTotalCount === 0)
     return "Ingen påstander mulig for denne kategorien";
@@ -281,22 +284,32 @@ export interface ClaimToneColors {
   headerBg: string;
   badgeBg: string;
   badgeColor: string;
+  // The one place a tone is stated at full strength rather than as a tint: the open page
+  // of a section's pager, which has to stand out from the grey chips the other pages wear.
+  // The tints cannot do it. A pale green or blue page button is still legible as the
+  // current one, but the neutral tint and the resting chip are a shade apart and the
+  // control stopped saying which page you were on at all. All four clear 4.5:1 against
+  // white, which the page number is set in.
+  strongBg: string;
 }
 
 const CLAIM_TONE_COLORS: Record<"pass" | "fail" | "none", ClaimToneColors> = {
   pass: {
+    strongBg: "#146c43",
     border: "#a3cfbb",
     headerBg: "#eaf6ee",
     badgeBg: "#d1e7dd",
     badgeColor: "#0a3622",
   },
   fail: {
+    strongBg: "#b02a37",
     border: "#f1aeb5",
     headerBg: "#fdeef0",
     badgeBg: "#f8d7da",
     badgeColor: "#58151c",
   },
   none: {
+    strongBg: "#6c757d",
     border: "#dee2e6",
     headerBg: "#f8f9fa",
     badgeBg: "#e2e3e5",
@@ -341,11 +354,46 @@ export const claimBadges = (passedCount: number, totalCount: number): ClaimBadge
   ];
 };
 
+// Ernæringspåstander is the one section that does not go red when it comes up short. A
+// påstand the product cannot carry is not a requirement it failed, it is a påstand about a
+// nutrient this food does not have much of, and the regulation asks nothing of a product
+// that stays quiet about it. So anything short of every påstand takes the neutral tone and
+// only a clean sweep is green. The cards inside keep their green and red, where the two
+// colours say something narrower: whether that one påstand cleared its own threshold.
+export const nutritionClaimColors = (metCount: number, totalCount: number): ClaimToneColors =>
+  totalCount > 0 && metCount === totalCount
+    ? CLAIM_TONE_COLORS.pass
+    : CLAIM_TONE_COLORS.none;
+
+// The same split claimBadges makes, with the unmet count in grey rather than red, which is
+// the colour its column wears on the overview card above.
+export const nutritionClaimBadges = (metCount: number, totalCount: number): ClaimBadge[] => {
+  if (totalCount === 0) return [];
+  const pass = CLAIM_TONE_COLORS.pass;
+  const neutral = CLAIM_TONE_COLORS.none;
+
+  if (metCount === totalCount)
+    return [{ text: `${totalCount}`, backgroundColor: pass.badgeBg, color: pass.badgeColor }];
+  if (metCount === 0)
+    return [
+      { text: `${totalCount}`, backgroundColor: neutral.badgeBg, color: neutral.badgeColor },
+    ];
+  return [
+    { text: `${metCount}`, backgroundColor: pass.badgeBg, color: pass.badgeColor },
+    {
+      text: `${totalCount - metCount}`,
+      backgroundColor: neutral.badgeBg,
+      color: neutral.badgeColor,
+    },
+  ];
+};
+
 // Helsepåstander only ever lists claims that qualify (no "failed" list to
 // compare against), so it gets a two-state grey/blue treatment instead — blue
 // matches EFSA's own accent color used elsewhere on the result page.
 const HEALTH_CLAIMS_TONE_COLORS: Record<"met" | "none", ClaimToneColors> = {
   met: {
+    strongBg: "#0a58ca",
     border: "#9ec5fe",
     headerBg: "#eff6ff",
     badgeBg: "#cfe2ff",
@@ -391,6 +439,15 @@ export const getNokkelhulletPercentage = (stats: ResultStats): number =>
 
 export const getEfsaPercentage = (stats: ResultStats): number =>
   stats.efsaTotalCount > 0 ? (stats.efsaMetCount / stats.efsaTotalCount) * 100 : 0;
+
+// The share of the possible påstander the product cannot carry, for the second column on
+// the overview card. Not 100 minus the met share, because a kategori with no påstander at
+// all has a met share of 0, and the subtraction would draw a full column for påstander
+// that do not exist.
+export const getEfsaUnmetPercentage = (stats: ResultStats): number =>
+  stats.efsaTotalCount > 0
+    ? ((stats.efsaTotalCount - stats.efsaMetCount) / stats.efsaTotalCount) * 100
+    : 0;
 
 // The product payload for "Lagre produkt" on the calculator.
 export const buildProductSubmitPayload = (

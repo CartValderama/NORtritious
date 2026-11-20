@@ -4,6 +4,7 @@ import PanelBox from "../PanelBox";
 import Button from "../Button";
 import WarningAlert from "../WarningAlert";
 import CircularProgress from "../CircularProgress";
+import MetricBar from "../MetricBar";
 import OverviewCard from "../OverviewCard";
 import ResultAccordionSection from "./ResultAccordionSection";
 import NokkelhulletSection from "./NokkelhulletSection";
@@ -19,15 +20,29 @@ import {
   buildHealthClaimsVerdict,
   claimColors,
   claimBadges,
+  nutritionClaimColors,
+  nutritionClaimBadges,
   healthClaimsColors,
   healthClaimsBadges,
   getNokkelhulletPercentage,
   getEfsaPercentage,
+  getEfsaUnmetPercentage,
   buildProductSubmitPayload,
 } from "../../utils/calculator/nutritionResultHelpers";
 import { getCategoryKey } from "../../utils/calculator/categoryOptions";
 import { fetchCalculatorReport } from "../../services/calculatorService";
 import { useCalculatorFormStore } from "../../stores/calculatorFormStore";
+
+// The two bars on the ernæringspåstander card. Green for what the product can print,
+// since that is the same thing a green check means on the cards below. Grey rather than red
+// for the rest: these are the claims it is simply not making, and the red would have said
+// it had failed them.
+const EFSA_MET_COLOR = "#198754";
+// The bar pale and the figure on it darker, so the grey stays legible without the bar
+// itself carrying weight. It is usually the longer of the two, and at full strength grey it
+// drew the eye away from the count the reader is actually here for.
+const EFSA_UNMET_COLOR = "#adb5bd";
+const EFSA_UNMET_TEXT_COLOR = "#6c757d";
 
 const NutritionResult = () => {
   const {
@@ -114,11 +129,24 @@ const NutritionResult = () => {
 
   const nokkelhulletPercentage = getNokkelhulletPercentage(stats);
 
+  // The two columns on the ernæringspåstander card are drawn against the taller of the
+  // two rather than against the whole pool. Against the pool, a six-of-seventeen split left
+  // most of the box empty above both columns, and the chart is there to be compared with
+  // itself: which of the two counts is the larger, and by how much. How many påstander the
+  // kategori offers in all is in the footer line and in the badge on the section below.
+  const efsaMetShare = getEfsaPercentage(stats);
+  const efsaUnmetShare = getEfsaUnmetPercentage(stats);
+  // Never zero, so a kategori with no påstander at all divides cleanly and draws nothing.
+  const efsaBarScale = Math.max(efsaMetShare, efsaUnmetShare, 1);
+
   const nokkelhulletColors = claimColors(
     stats.nokkelhulletPassedCount,
     stats.nokkelhulletTotalCount,
   );
-  const efsaColors = claimColors(stats.efsaMetCount, stats.efsaTotalCount);
+  const efsaColors = nutritionClaimColors(
+    stats.efsaMetCount,
+    stats.efsaTotalCount,
+  );
   const healthClaimsColorSet = healthClaimsColors(stats.healthClaimsMetCount);
 
   const handleSavePdf = async () => {
@@ -285,13 +313,37 @@ const NutritionResult = () => {
               logoSrc={efsaLogoGreen}
               title="Ernæringspåstander"
             />
-            <OverviewCard.Metric>
-              <CircularProgress
-                percentage={getEfsaPercentage(stats)}
-                strokeWidth={16}
+            {/* Two bars rather than one ring. The ring had to make the met share the
+                filled part and leave the rest as an empty track, which reads as a product
+                that fell short of something, and the gradient said it outright: orange at
+                41 %, red at 0 %. A påstand a product cannot carry is not a failed test
+                though, it is a påstand about a nutrient this food does not have much of,
+                so the second count gets a bar of its own and a neutral grey. */}
+            <OverviewCard.BarMetric>
+              <MetricBar
+                caption="Kan brukes"
+                value={stats.efsaMetCount}
+                percentage={(efsaMetShare / efsaBarScale) * 100}
+                color={EFSA_MET_COLOR}
               />
-            </OverviewCard.Metric>
-            <OverviewCard.Footer>{buildEfsaVerdict(stats)}</OverviewCard.Footer>
+              <MetricBar
+                caption="Kan ikke brukes"
+                value={stats.efsaTotalCount - stats.efsaMetCount}
+                percentage={(efsaUnmetShare / efsaBarScale) * 100}
+                color={EFSA_UNMET_COLOR}
+                valueColor={EFSA_UNMET_TEXT_COLOR}
+              />
+            </OverviewCard.BarMetric>
+            {/* No verdict line under the chart. It used to read "9 påstander kan brukes
+                på pakningen", which is the green column, its caption and the badge on the
+                section below all saying the same thing a fourth time. The one case the
+                line still earns its place is a kategori that offers no påstander at all,
+                where the chart is two stubs at zero and nothing on the card would say why. */}
+            {stats.efsaTotalCount === 0 && (
+              <OverviewCard.Footer>
+                {buildEfsaVerdict(stats)}
+              </OverviewCard.Footer>
+            )}
           </OverviewCard>
 
           <OverviewCard>
@@ -341,7 +393,10 @@ const NutritionResult = () => {
             open={efsaOpen}
             onToggle={() => setEfsaOpen((o) => !o)}
             colors={efsaColors}
-            badges={claimBadges(stats.efsaMetCount, stats.efsaTotalCount)}
+            badges={nutritionClaimBadges(
+              stats.efsaMetCount,
+              stats.efsaTotalCount,
+            )}
           >
             <EfsaSection result={result} />
           </ResultAccordionSection>

@@ -17,7 +17,9 @@ const OverviewCard = ({ children }) => (
       minWidth: "200px",
     }}
   >
-    <div className="p-4">{children}</div>
+    {/* A flex column, so a metric that can use more room than it asks for is able to take
+        it. The header and the footer size to their content either way. */}
+    <div className="p-4 d-flex flex-column flex-grow-1">{children}</div>
   </div>
 );
 
@@ -42,12 +44,31 @@ const Metric = ({ children }) => (
   </div>
 );
 
+// The metric slot for a card that shows a bar chart instead of a ring or a single figure.
+// Holds at least the vertical room Metric's square takes, so the three cards in a row line
+// up, and then takes whatever else the card has going spare. On a card with no footer line
+// that is the footer's room as well, which the columns grow into rather than leaving a gap
+// under the chart.
+//
+// The columns stretch to the full height of the row, which is what lets each one find the
+// same baseline. A caption long enough to wrap would push its own column's baseline up; at
+// two or three words, as the pair of them are, none does.
+const BarMetric = ({ children }) => (
+  <div
+    className="d-flex justify-content-center gap-3 flex-grow-1"
+    style={{ minHeight: "7rem" }}
+  >
+    {children}
+  </div>
+);
+
 const Footer = ({ children }) => (
   <span className="small mt-3 d-block">{children}</span>
 );
 
 OverviewCard.Header = Header;
 OverviewCard.Metric = Metric;
+OverviewCard.BarMetric = BarMetric;
 OverviewCard.Footer = Footer;
 
 export default OverviewCard;

@@ -23,12 +23,13 @@ const ResultAccordionSection = ({
         border: `1px solid ${open ? colors.border : "#dee2e6"}`,
         // The section's tone, published once here for anything inside the body that has to
         // match it. The pager's current page reads these, which saves threading the colours
-        // through every section component to reach a control three levels down. They are
-        // the same pair the count badge in this header wears, so the open page and the
-        // badge above it say the same thing in the same colour.
-        "--result-tone-bg": colors.badgeBg,
-        "--result-tone-color": colors.badgeColor,
-        "--result-tone-border": colors.border,
+        // through every section component to reach a control three levels down. The tone at
+        // full strength rather than the tint the count badge in this header wears, because
+        // the page the reader is on has to be told apart from the grey chips beside it, and
+        // a tint of the neutral tone is the same shade as those chips.
+        "--result-tone-bg": colors.strongBg,
+        "--result-tone-color": "#fff",
+        "--result-tone-border": colors.strongBg,
       }}
       open={open}
       onToggle={onToggle}

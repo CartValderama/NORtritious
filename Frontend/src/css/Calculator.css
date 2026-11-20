@@ -213,26 +213,26 @@ html.calculator-responsive-text {
   box-shadow: 0 0 0 0.2rem rgba(0, 32, 91, 0.25);
 }
 /* The open page takes the tone of the section it sits in, which ResultAccordionSection
-   publishes as custom properties on the accordion item. Nøkkelhullet and ernæringspåstander
-   turn green when everything passed and red when something did not, helsepåstander is blue,
-   so the pager says the same thing as the count badge up in the heading.
-   The border is what carries the contrast. Both the tone and the resting grey are pale, and
-   the fill alone was a weak way to say which page you are on. The navy fallback is for a
-   pager used outside a result section, where there is no tone to take. */
+   publishes as custom properties on the accordion item. Ernæringspåstander turns green when
+   every påstand is met and goes neutral otherwise, helsepåstander is blue, so the pager
+   says the same thing as the count badge up in the heading.
+   At full strength, not as the tint the badge wears. The tints and the resting grey chip
+   are a shade apart, which left the neutral section with no visible current page at all.
+   The navy fallback is for a pager used outside a result section, where there is no tone
+   to take. */
 .result-pagination .page-item.active .page-link {
   color: var(--result-tone-color, #fff);
   background-color: var(--result-tone-bg, #00205b);
   border-color: var(--result-tone-border, #00205b);
 }
-/* Nothing in the pager is disabled now that the chevrons are gone, since a page button is
-   never the page you are on without being the active one. Kept for the chevrons, which are
-   commented out rather than dropped in Pagination.jsx.
+/* Only the chevrons ever reach this, at the two ends of the range. A page button is never
+   the page you are on without being the active one. Paler than the resting chip and without
+   its border, so a dead end reads as a gap in the row rather than as another button. */
 .result-pagination .page-item.disabled .page-link {
   color: #adb5bd;
   background-color: #f8f9fa;
   border-color: #f8f9fa;
 }
-*/
 
 /* "Legg til" (Kilde til Annet) — Bootstrap's default disabled opacity (0.65) still
    reads as a fairly solid blue; fade it further so a disabled state is unmistakable.
